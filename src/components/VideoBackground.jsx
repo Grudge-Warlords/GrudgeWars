@@ -60,7 +60,7 @@ export default function VideoBackground({ blurred = false, visible = true }) {
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-      zIndex: 0, overflow: 'hidden', background: '#050a15',
+      zIndex: 0, overflow: 'hidden', background: '#020a18',
       visibility: visible ? 'visible' : 'hidden'
     }}>
       <div ref={clearHolderRef} style={{
@@ -77,7 +77,7 @@ export default function VideoBackground({ blurred = false, visible = true }) {
       }} />
       <div style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-        background: 'rgba(5,10,21,0.55)',
+        background: 'linear-gradient(180deg, rgba(4,18,37,0.4) 0%, rgba(2,10,24,0.6) 100%)',
         pointerEvents: 'none'
       }} />
     </div>

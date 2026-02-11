@@ -1,11 +1,11 @@
 export const cities = [
   {
     id: 'greenhollow',
-    name: 'Camp',
-    description: 'Your basecamp at the edge of the Verdant Plains. A merchant offers supplies and buys your spoils of war.',
+    name: 'Reef Camp',
+    description: 'Your basecamp at the edge of the Coral Shallows. A merchant offers supplies and buys your ocean treasures.',
     icon: 'camp',
-    color: '#4ade80',
-    glow: 'rgba(74,222,128,0.4)',
+    color: '#22d3ee',
+    glow: 'rgba(34,211,238,0.4)',
     unlocked: true,
     unlockLevel: 0,
     unlockBoss: null,
@@ -15,8 +15,8 @@ export const cities = [
   },
   {
     id: 'ironkeep',
-    name: 'Ironkeep',
-    description: 'A fortified stronghold built into the mountainside. The finest blacksmiths work their forges here. Unlocked by defeating the Grand Shaman.',
+    name: 'Shell Fortress',
+    description: 'A fortified stronghold built into a giant conch shell. The finest pearl smiths work their craft here. Unlocked by defeating the Reef Shaman.',
     icon: 'shield',
     color: '#fbbf24',
     glow: 'rgba(251,191,36,0.4)',
@@ -29,8 +29,8 @@ export const cities = [
   },
   {
     id: 'shadowhaven',
-    name: 'Shadowhaven',
-    description: 'A lawless port city where smugglers and mercenaries trade in secrets and steel. Unlocked by defeating the Shadow Beast.',
+    name: 'Ink Haven',
+    description: 'A lawless deep-sea port where smuggler fish and mercenary eels trade in secrets and shells. Unlocked by defeating the Shadow Shark.',
     icon: 'skull',
     color: '#a78bfa',
     glow: 'rgba(167,139,250,0.4)',
@@ -43,8 +43,8 @@ export const cities = [
   },
   {
     id: 'emberpeak',
-    name: 'Emberpeak',
-    description: 'A dwarven city carved from volcanic rock. The heat of the forges never dies. Unlocked by defeating the Canyon Warlord.',
+    name: 'Vent City',
+    description: 'A deep-sea city built around volcanic vents. The heat of the thermal forges never dies. Unlocked by defeating the Trench Warlord.',
     icon: 'hammer',
     color: '#f97316',
     glow: 'rgba(249,115,22,0.4)',
@@ -58,7 +58,7 @@ export const cities = [
   {
     id: 'crystalspire',
     name: 'Crystal Spire',
-    description: 'An ancient elven citadel suspended by arcane magic. The most powerful mages convene here. Unlocked by defeating the Lich.',
+    description: 'An ancient underwater citadel suspended by arcane currents. The most powerful ocean mages convene here. Unlocked by defeating the Kraken Lich.',
     icon: 'chaos',
     color: '#a78bfa',
     glow: 'rgba(167,139,250,0.4)',

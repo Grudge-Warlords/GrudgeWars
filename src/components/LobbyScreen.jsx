@@ -72,7 +72,7 @@ export default function LobbyScreen() {
     }}>
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: 'url(/backgrounds/tavern_bg.png)',
+        backgroundImage: 'url(/backgrounds/coral_reef_city.png)',
         backgroundSize: 'cover', backgroundPosition: 'center',
         zIndex: 0,
       }} />

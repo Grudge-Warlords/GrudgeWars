@@ -31,7 +31,14 @@ export default function TitleScreen() {
         padding: '6% 3% 27% 3%',
         opacity: fadeClass ? 1 : 0,
         transition: 'opacity 1.5s ease',
+        backgroundImage: 'url(/backgrounds/ocean_title_bg.png)',
+        backgroundSize: 'cover', backgroundPosition: 'center',
       }}>
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'rgba(4,18,37,0.6)',
+          pointerEvents: 'none',
+        }} />
         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: 600, padding: '0 20px' }}>
           <div style={{
             fontSize: '0.7rem', color: 'var(--muted)', letterSpacing: 8,
@@ -42,23 +49,23 @@ export default function TitleScreen() {
 
           <h1 className="font-cinzel" style={{
             fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-            background: 'linear-gradient(135deg, #6ee7b7, #ffd700, #ef4444)',
+            background: 'linear-gradient(135deg, #22d3ee, #06b6d4, #a855f7)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             textShadow: 'none', marginBottom: 8, lineHeight: 1.1,
           }}>
-            GRUDGE<br/>WARLORDS
+            BETTA<br/>WARLORDS
           </h1>
 
           <div style={{
             fontSize: '0.85rem', color: 'var(--accent)', letterSpacing: 3,
             textTransform: 'uppercase', marginBottom: 50, opacity: 0.8,
           }}>
-            The Void King Awaits
+            The Abyss King Awaits
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
             <MenuButton
-              label="PLAY AS GUEST"
+              label="DIVE IN"
               onClick={() => handleLogin('guest')}
               primary
               icon={<EssentialIcon name="Gamepad" size={20} style={{ marginRight: 8 }} />}
@@ -86,7 +93,7 @@ export default function TitleScreen() {
             color: 'var(--muted)', fontSize: '0.7rem', marginTop: 40, opacity: 0.4,
             letterSpacing: 1,
           }}>
-            Turn-Based RPG &bull; 6 Races &bull; 4 Classes &bull; 24 Warlords
+            Ocean RPG &bull; 6 Species &bull; 4 Classes &bull; Deep Sea Adventure
           </div>
         </div>
 
@@ -94,7 +101,7 @@ export default function TitleScreen() {
           position: 'absolute', bottom: '28%', left: 0, right: 0, textAlign: 'center',
           color: 'var(--muted)', fontSize: '0.65rem', opacity: 0.3,
         }}>
-          &copy; 2026 Grudge Studio &bull; Inspired by Final Fantasy VII
+          &copy; 2026 Grudge Studio &bull; Betta Warlords
         </div>
       </div>
     );
@@ -106,8 +113,8 @@ function MenuButton({ label, onClick, primary, subtle, icon }) {
   const baseStyle = {
     background: primary
       ? hovered
-        ? 'rgba(110,231,183,0.25)'
-        : 'linear-gradient(135deg, rgba(110,231,183,0.15), rgba(110,231,183,0.05))'
+        ? 'rgba(34,211,238,0.25)'
+        : 'linear-gradient(135deg, rgba(34,211,238,0.15), rgba(34,211,238,0.05))'
       : subtle
         ? 'transparent'
         : hovered
@@ -131,7 +138,7 @@ function MenuButton({ label, onClick, primary, subtle, icon }) {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: hovered && primary ? '0 0 30px rgba(110,231,183,0.3)' : 'none',
+    boxShadow: hovered && primary ? '0 0 30px rgba(34,211,238,0.3)' : 'none',
   };
 
   return (

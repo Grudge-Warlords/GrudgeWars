@@ -80,7 +80,7 @@ function GameApp() {
       <LoadingScreen
         progress={progress.loaded}
         total={progress.total}
-        message="Entering the Realm..."
+        message="Diving into the Deep..."
       />
     );
   }

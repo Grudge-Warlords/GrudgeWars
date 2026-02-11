@@ -55,11 +55,11 @@ export default function LoadingScreen({ progress = 0, total = 1, message = 'Load
       }}>
         <h2 className="font-cinzel" style={{
           fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
-          background: 'linear-gradient(135deg, #6ee7b7, #ffd700, #ef4444)',
+          background: 'linear-gradient(135deg, #22d3ee, #06b6d4, #a855f7)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           marginBottom: 24
         }}>
-          GRUDGE WARLORDS
+          BETTA WARLORDS
         </h2>
 
         <div style={{
@@ -68,7 +68,7 @@ export default function LoadingScreen({ progress = 0, total = 1, message = 'Load
         }}>
           <div style={{
             width: `${pct}%`, height: '100%',
-            background: 'linear-gradient(90deg, #6ee7b7, #ffd700)',
+            background: 'linear-gradient(90deg, #22d3ee, #06b6d4)',
             borderRadius: 3, transition: 'width 0.3s ease'
           }} />
         </div>
