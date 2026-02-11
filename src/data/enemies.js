@@ -4,7 +4,7 @@ import { raceDefinitions } from './races.js';
 
 export const enemyTemplates = {
   goblin: {
-    name: 'Puffer Scout', icon: 'sword', color: '#0ea5e9',
+    name: 'Puffer Scout', icon: 'sword', color: '#0ea5e9', portrait: '/images/enemies/puffer_scout.png',
     baseHealth: 80, baseDamage: 12, baseDefense: 5, baseMana: 20,
     xpReward: 15, goldReward: 8, speed: 14,
     abilities: [
@@ -13,7 +13,7 @@ export const enemyTemplates = {
     ]
   },
   skeleton: {
-    name: 'Barnacle Warrior', icon: 'skull', color: '#94a3b8',
+    name: 'Barnacle Warrior', icon: 'skull', color: '#94a3b8', portrait: '/images/enemies/barnacle_warrior.png',
     baseHealth: 120, baseDamage: 18, baseDefense: 15, baseMana: 0,
     xpReward: 22, goldReward: 12, speed: 10,
     abilities: [
@@ -22,7 +22,7 @@ export const enemyTemplates = {
     ]
   },
   wolf: {
-    name: 'Barracuda', icon: 'wolf', color: '#64748b',
+    name: 'Barracuda', icon: 'wolf', color: '#64748b', portrait: '/images/enemies/barracuda.png',
     baseHealth: 100, baseDamage: 22, baseDefense: 8, baseMana: 0,
     xpReward: 18, goldReward: 6, speed: 18,
     abilities: [
@@ -31,7 +31,7 @@ export const enemyTemplates = {
     ]
   },
   dark_mage: {
-    name: 'Ink Sorcerer', icon: 'crystal', color: '#4c1d95',
+    name: 'Ink Sorcerer', icon: 'crystal', color: '#4c1d95', portrait: '/images/enemies/ink_sorcerer.png',
     baseHealth: 90, baseDamage: 25, baseDefense: 6, baseMana: 100,
     xpReward: 30, goldReward: 20, speed: 12,
     abilities: [
@@ -41,7 +41,7 @@ export const enemyTemplates = {
     ]
   },
   dark_knight: {
-    name: 'Armored Crab', icon: 'skull', color: '#1e3a5f',
+    name: 'Armored Crab', icon: 'skull', color: '#1e3a5f', portrait: '/images/enemies/armored_crab.png',
     baseHealth: 160, baseDamage: 26, baseDefense: 22, baseMana: 30,
     xpReward: 32, goldReward: 18, speed: 10,
     abilities: [
@@ -51,7 +51,7 @@ export const enemyTemplates = {
     ]
   },
   shadow_warrior: {
-    name: 'Shadow Eel', icon: 'skull', color: '#0f172a',
+    name: 'Shadow Eel', icon: 'skull', color: '#0f172a', portrait: '/images/enemies/shadow_eel.png',
     baseHealth: 140, baseDamage: 30, baseDefense: 16, baseMana: 40,
     xpReward: 35, goldReward: 20, speed: 14,
     abilities: [
@@ -61,7 +61,7 @@ export const enemyTemplates = {
     ]
   },
   water_priestess_mage: {
-    name: 'Water Priestess', icon: 'ice', color: '#0891b2',
+    name: 'Water Priestess', icon: 'ice', color: '#0891b2', portrait: '/images/enemies/water_priestess.png',
     baseHealth: 110, baseDamage: 20, baseMagicDamage: 32, baseDefense: 12, baseMana: 150,
     xpReward: 38, goldReward: 24, speed: 12,
     abilities: [
@@ -71,7 +71,7 @@ export const enemyTemplates = {
     ]
   },
   orc: {
-    name: 'Giant Mantis Shrimp', icon: 'sword', color: '#dc2626',
+    name: 'Giant Mantis Shrimp', icon: 'sword', color: '#dc2626', portrait: '/images/enemies/mantis_shrimp.png',
     baseHealth: 180, baseDamage: 28, baseDefense: 20, baseMana: 0,
     xpReward: 35, goldReward: 18, speed: 8,
     abilities: [
@@ -81,7 +81,7 @@ export const enemyTemplates = {
     ]
   },
   dragon_whelp: {
-    name: 'Sea Serpent Hatchling', icon: 'fire', color: '#0d9488',
+    name: 'Sea Serpent Hatchling', icon: 'fire', color: '#0d9488', portrait: '/images/enemies/sea_serpent.png',
     baseHealth: 150, baseDamage: 30, baseDefense: 18, baseMana: 80,
     xpReward: 45, goldReward: 30, speed: 15,
     abilities: [
@@ -91,7 +91,7 @@ export const enemyTemplates = {
     ]
   },
   lich: {
-    name: 'Kraken Lich', icon: 'skull', color: '#312e81',
+    name: 'Kraken Lich', icon: 'skull', color: '#312e81', portrait: '/images/enemies/kraken_lich.png',
     baseHealth: 700, baseDamage: 40, baseDefense: 22, baseMana: 350,
     xpReward: 120, goldReward: 90, speed: 11,
     isBoss: true,
@@ -106,7 +106,7 @@ export const enemyTemplates = {
     ]
   },
   demon_lord: {
-    name: 'Volcanic Leviathan', icon: 'fire', color: '#ea580c',
+    name: 'Volcanic Leviathan', icon: 'fire', color: '#ea580c', portrait: '/images/enemies/demon_lord.png',
     baseHealth: 900, baseDamage: 52, baseDefense: 35, baseMana: 250,
     xpReward: 160, goldReward: 120, speed: 13,
     isBoss: true,
@@ -119,7 +119,7 @@ export const enemyTemplates = {
     ]
   },
   evil_wizard: {
-    name: 'Abyssal Sorcerer', icon: 'crystal', color: '#7e22ce',
+    name: 'Abyssal Sorcerer', icon: 'crystal', color: '#7e22ce', portrait: '/images/enemies/abyss_king.png',
     baseHealth: 1400, baseDamage: 65, baseDefense: 35, baseMana: 600,
     xpReward: 350, goldReward: 250, speed: 14,
     isBoss: true,
@@ -136,7 +136,7 @@ export const enemyTemplates = {
     ]
   },
   void_king: {
-    name: 'The Abyss King', icon: 'crown', color: '#0c4a6e',
+    name: 'The Abyss King', icon: 'crown', color: '#0c4a6e', portrait: '/images/enemies/abyss_king.png',
     baseHealth: 1200, baseDamage: 60, baseDefense: 48, baseMana: 500,
     xpReward: 300, goldReward: 200, speed: 16,
     isBoss: true,
@@ -152,7 +152,7 @@ export const enemyTemplates = {
     ]
   },
   god_odin: {
-    name: 'Poseidon, Lord of Tides', icon: 'lightning', color: '#0284c7',
+    name: 'Poseidon, Lord of Tides', icon: 'lightning', color: '#0284c7', portrait: '/images/enemies/poseidon.png',
     baseHealth: 1800, baseDamage: 75, baseDefense: 55, baseMana: 600,
     xpReward: 500, goldReward: 400, speed: 18,
     isBoss: true,
@@ -170,7 +170,7 @@ export const enemyTemplates = {
     ]
   },
   god_madra: {
-    name: 'Charybdis, The Devourer', icon: 'target', color: '#be123c',
+    name: 'Charybdis, The Devourer', icon: 'target', color: '#be123c', portrait: '/images/enemies/charybdis.png',
     baseHealth: 2000, baseDamage: 82, baseDefense: 45, baseMana: 500,
     xpReward: 500, goldReward: 400, speed: 17,
     isBoss: true,
@@ -188,7 +188,7 @@ export const enemyTemplates = {
     ]
   },
   god_omni: {
-    name: 'The Leviathan, Weaver of Currents', icon: 'sparkle', color: '#7c3aed',
+    name: 'The Leviathan, Weaver of Currents', icon: 'sparkle', color: '#7c3aed', portrait: '/images/enemies/leviathan.png',
     baseHealth: 1600, baseDamage: 70, baseDefense: 60, baseMana: 800,
     xpReward: 500, goldReward: 400, speed: 20,
     isBoss: true,
@@ -206,7 +206,7 @@ export const enemyTemplates = {
     ]
   },
   water_elemental: {
-    name: 'Grand Water Elemental', icon: 'ice', color: '#06b6d4',
+    name: 'Grand Water Elemental', icon: 'ice', color: '#06b6d4', portrait: '/images/enemies/water_elemental.png',
     baseHealth: 550, baseDamage: 50, baseDefense: 38, baseMana: 300,
     xpReward: 175, goldReward: 120, speed: 14,
     isBoss: true,
@@ -220,7 +220,7 @@ export const enemyTemplates = {
     ]
   },
   nature_elemental: {
-    name: 'Coral Elemental', icon: 'nature', color: '#f472b6',
+    name: 'Coral Elemental', icon: 'nature', color: '#f472b6', portrait: '/images/enemies/nature_elemental.png',
     baseHealth: 600, baseDamage: 44, baseDefense: 42, baseMana: 250,
     xpReward: 175, goldReward: 120, speed: 12,
     isBoss: true,
@@ -234,7 +234,7 @@ export const enemyTemplates = {
     ]
   },
   grand_shaman: {
-    name: 'Reef Shaman', icon: 'nature', color: '#059669',
+    name: 'Reef Shaman', icon: 'nature', color: '#059669', portrait: '/images/enemies/grand_shaman.png',
     baseHealth: 500, baseDamage: 32, baseDefense: 18, baseMana: 200,
     xpReward: 80, goldReward: 55, speed: 11,
     isBoss: true,
@@ -247,7 +247,7 @@ export const enemyTemplates = {
     ]
   },
   canyon_warlord: {
-    name: 'Trench Warlord', icon: 'crossed_swords', color: '#991b1b',
+    name: 'Trench Warlord', icon: 'crossed_swords', color: '#991b1b', portrait: '/images/enemies/lobster_warlord.png',
     baseHealth: 650, baseDamage: 38, baseDefense: 28, baseMana: 50,
     xpReward: 95, goldReward: 65, speed: 10,
     isBoss: true,
@@ -260,7 +260,7 @@ export const enemyTemplates = {
     ]
   },
   frost_wyrm: {
-    name: 'Frost Serpent', icon: 'ice', color: '#22d3ee',
+    name: 'Frost Serpent', icon: 'ice', color: '#22d3ee', portrait: '/images/enemies/frost_wyrm.png',
     baseHealth: 750, baseDamage: 42, baseDefense: 30, baseMana: 200,
     xpReward: 110, goldReward: 80, speed: 14,
     isBoss: true,
@@ -274,7 +274,7 @@ export const enemyTemplates = {
     ]
   },
   shadow_beast: {
-    name: 'Shadow Shark', icon: 'skull', color: '#581c87',
+    name: 'Shadow Shark', icon: 'skull', color: '#581c87', portrait: '/images/enemies/shadow_manta.png',
     baseHealth: 800, baseDamage: 45, baseDefense: 25, baseMana: 250,
     xpReward: 130, goldReward: 90, speed: 15,
     isBoss: true,
@@ -288,7 +288,7 @@ export const enemyTemplates = {
     ]
   },
   forest_guardian: {
-    name: 'Guardian of the Reef', icon: 'nature', color: '#2dd4bf',
+    name: 'Guardian of the Reef', icon: 'nature', color: '#2dd4bf', portrait: '/images/enemies/kelp_giant.png',
     baseHealth: 280, baseDamage: 28, baseDefense: 18, baseMana: 120,
     xpReward: 50, goldReward: 35, speed: 11,
     abilities: [
@@ -298,7 +298,7 @@ export const enemyTemplates = {
     ]
   },
   corrupted_grove_keeper: {
-    name: 'Corrupted Reef Keeper', icon: 'crystal', color: '#0d9488',
+    name: 'Corrupted Reef Keeper', icon: 'crystal', color: '#0d9488', portrait: '/images/enemies/kelp_giant.png',
     baseHealth: 600, baseDamage: 35, baseDefense: 20, baseMana: 300,
     xpReward: 100, goldReward: 70, speed: 12,
     isBoss: true,
@@ -312,7 +312,7 @@ export const enemyTemplates = {
     ]
   },
   void_sentinel: {
-    name: 'Void Angler', icon: 'crystal', color: '#7c3aed',
+    name: 'Void Angler', icon: 'crystal', color: '#7c3aed', portrait: '/images/enemies/void_sentinel.png',
     baseHealth: 1000, baseDamage: 55, baseDefense: 42, baseMana: 400,
     xpReward: 200, goldReward: 150, speed: 13,
     isBoss: true,
@@ -327,7 +327,7 @@ export const enemyTemplates = {
     ]
   },
   abyssal_demon: {
-    name: 'Abyssal Leviathan', icon: 'fire', color: '#b91c1c',
+    name: 'Abyssal Leviathan', icon: 'fire', color: '#b91c1c', portrait: '/images/enemies/demon_lord.png',
     baseHealth: 1600, baseDamage: 72, baseDefense: 40, baseMana: 400,
     xpReward: 400, goldReward: 300, speed: 15,
     isBoss: true,
@@ -343,7 +343,7 @@ export const enemyTemplates = {
     ]
   },
   eldritch_horror: {
-    name: 'The Deep Horror', icon: 'chaos', color: '#065f46',
+    name: 'The Deep Horror', icon: 'chaos', color: '#065f46', portrait: '/images/enemies/void_sentinel.png',
     baseHealth: 1800, baseDamage: 68, baseDefense: 35, baseMana: 500,
     xpReward: 450, goldReward: 350, speed: 12,
     isBoss: true,
@@ -360,7 +360,7 @@ export const enemyTemplates = {
     ]
   },
   frost_titan: {
-    name: 'Frost Leviathan', icon: 'ice', color: '#67e8f9',
+    name: 'Frost Leviathan', icon: 'ice', color: '#67e8f9', portrait: '/images/enemies/frost_titan.png',
     baseHealth: 1500, baseDamage: 65, baseDefense: 50, baseMana: 350,
     xpReward: 380, goldReward: 280, speed: 10,
     isBoss: true,
@@ -376,7 +376,7 @@ export const enemyTemplates = {
     ]
   },
   flying_eye: {
-    name: 'Jellyfish Scout', icon: 'crystal', color: '#c084fc',
+    name: 'Jellyfish Scout', icon: 'crystal', color: '#c084fc', portrait: '/images/enemies/jellyfish_eye.png',
     baseHealth: 70, baseDamage: 16, baseDefense: 4, baseMana: 40,
     xpReward: 14, goldReward: 7, speed: 19,
     abilities: [
@@ -385,7 +385,7 @@ export const enemyTemplates = {
     ]
   },
   mushroom: {
-    name: 'Sea Urchin', icon: 'nature', color: '#a855f7',
+    name: 'Sea Urchin', icon: 'nature', color: '#a855f7', portrait: '/images/enemies/sea_mushroom.png',
     baseHealth: 90, baseDamage: 10, baseDefense: 8, baseMana: 60,
     xpReward: 13, goldReward: 6, speed: 8,
     abilities: [
@@ -394,7 +394,7 @@ export const enemyTemplates = {
     ]
   },
   skeleton_knight: {
-    name: 'Shell Knight', icon: 'skull', color: '#64748b',
+    name: 'Shell Knight', icon: 'skull', color: '#64748b', portrait: '/images/enemies/barnacle_warrior.png',
     baseHealth: 160, baseDamage: 22, baseDefense: 20, baseMana: 0,
     xpReward: 28, goldReward: 15, speed: 9,
     abilities: [
@@ -404,7 +404,7 @@ export const enemyTemplates = {
     ]
   },
   shadow_bat: {
-    name: 'Moray Eel', icon: 'energy', color: '#4c1d95',
+    name: 'Moray Eel', icon: 'energy', color: '#4c1d95', portrait: '/images/enemies/shadow_manta.png',
     baseHealth: 55, baseDamage: 14, baseDefense: 3, baseMana: 30,
     xpReward: 12, goldReward: 5, speed: 22,
     abilities: [
@@ -414,7 +414,7 @@ export const enemyTemplates = {
     ]
   },
   imp: {
-    name: 'Pufferfish Imp', icon: 'fire', color: '#0891b2',
+    name: 'Pufferfish Imp', icon: 'fire', color: '#0891b2', portrait: '/images/enemies/sea_devil.png',
     baseHealth: 65, baseDamage: 11, baseDefense: 4, baseMana: 50,
     xpReward: 13, goldReward: 7, speed: 17,
     abilities: [
@@ -424,7 +424,7 @@ export const enemyTemplates = {
     ]
   },
   mimic: {
-    name: 'Mimic Clam', icon: 'shield', color: '#0e7490',
+    name: 'Mimic Clam', icon: 'shield', color: '#0e7490', portrait: '/images/enemies/ocean_mimic.png',
     baseHealth: 200, baseDamage: 26, baseDefense: 22, baseMana: 80,
     xpReward: 40, goldReward: 35, speed: 7,
     abilities: [
@@ -435,7 +435,7 @@ export const enemyTemplates = {
     ]
   },
   crow_knight: {
-    name: 'Swordfish Knight', icon: 'sword', color: '#1e3a5f',
+    name: 'Swordfish Knight', icon: 'sword', color: '#1e3a5f', portrait: '/images/enemies/swordfish_knight.png',
     baseHealth: 170, baseDamage: 24, baseDefense: 16, baseMana: 40,
     xpReward: 32, goldReward: 18, speed: 16,
     abilities: [
@@ -446,7 +446,7 @@ export const enemyTemplates = {
     ]
   },
   stone_guardian: {
-    name: 'Coral Guardian', icon: 'shield', color: '#f472b6',
+    name: 'Coral Guardian', icon: 'shield', color: '#f472b6', portrait: '/images/enemies/stone_guardian.png',
     baseHealth: 250, baseDamage: 20, baseDefense: 30, baseMana: 60,
     xpReward: 38, goldReward: 22, speed: 6,
     abilities: [

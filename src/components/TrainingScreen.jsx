@@ -60,7 +60,7 @@ export default function TrainingScreen() {
 
   const bgStyle = {
     width: '100%', height: '100%',
-    backgroundImage: 'url(/backgrounds/shadow_citadel.png)',
+    backgroundImage: 'url(/backgrounds/training_ocean.png)',
     backgroundSize: 'cover', backgroundPosition: 'center',
   };
 

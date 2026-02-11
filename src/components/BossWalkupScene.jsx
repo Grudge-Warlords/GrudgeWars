@@ -43,7 +43,7 @@ export default function BossWalkupScene() {
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: 'url(/backgrounds/lava_boss_walkup.png)',
+        backgroundImage: 'url(/backgrounds/boss_walkup_ocean.png)',
         backgroundSize: 'cover', backgroundPosition: 'center',
       }} />
 

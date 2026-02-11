@@ -7,11 +7,11 @@ import { setBgm } from '../utils/audioManager';
 import NpcSprite from './NpcSprite';
 
 const RESOURCE_NODES = [
-  { id: 'gold_mine', name: 'Gold Mine', icon: 'pickaxe', resource: 'gold', x: 18, y: 30, color: '#fbbf24', img: '/images/buildings/gold_mine.png' },
-  { id: 'herb_garden', name: 'Herb Garden', icon: 'nature', resource: 'herbs', x: 72, y: 28, color: '#4ade80', img: '/images/buildings/herb_garden.png' },
-  { id: 'lumber_yard', name: 'Lumber Yard', icon: 'wood', resource: 'wood', x: 12, y: 58, color: '#a3764a', img: '/images/buildings/lumber_yard.png' },
-  { id: 'ore_vein', name: 'Ore Vein', icon: 'ore', resource: 'ore', x: 80, y: 55, color: '#94a3b8', img: '/images/buildings/ore_vein.png' },
-  { id: 'crystal_cave', name: 'Crystal Cave', icon: 'diamond', resource: 'crystals', x: 50, y: 22, color: '#a78bfa', img: '/images/buildings/crystal_cave.png' },
+  { id: 'gold_mine', name: 'Pearl Beds', icon: 'pickaxe', resource: 'gold', x: 18, y: 30, color: '#fbbf24', img: '/images/buildings/pearl_beds.png' },
+  { id: 'herb_garden', name: 'Algae Garden', icon: 'nature', resource: 'herbs', x: 72, y: 28, color: '#4ade80', img: '/images/buildings/algae_garden.png' },
+  { id: 'lumber_yard', name: 'Coral Grove', icon: 'wood', resource: 'wood', x: 12, y: 58, color: '#22d3ee', img: '/images/buildings/coral_grove.png' },
+  { id: 'ore_vein', name: 'Shell Deposit', icon: 'ore', resource: 'ore', x: 80, y: 55, color: '#94a3b8', img: '/images/buildings/shell_deposit.png' },
+  { id: 'crystal_cave', name: 'Crystal Grotto', icon: 'diamond', resource: 'crystals', x: 50, y: 22, color: '#a78bfa', img: '/images/buildings/crystal_grotto.png' },
 ];
 
 const SELL_PRICES = { gold: 1, herbs: 2, wood: 2, ore: 4, crystals: 8 };
@@ -83,7 +83,7 @@ export default function CampScene() {
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: 'url(/backgrounds/scene_camp.png)',
+        backgroundImage: 'url(/backgrounds/scene_camp_ocean.png)',
         backgroundSize: 'cover', backgroundPosition: 'center',
       }} />
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)', pointerEvents: 'none' }} />

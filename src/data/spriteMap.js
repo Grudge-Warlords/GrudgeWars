@@ -1,6 +1,7 @@
 export const classSpriteMap = {
   warrior: {
     folder: 'knight',
+    filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/knight/idle.png', frames: 6 },
     attack1: { src: '/sprites/knight/attack1.png', frames: 7 },
     attack2: { src: '/sprites/knight/attack2.png', frames: 10 },
@@ -14,6 +15,7 @@ export const classSpriteMap = {
   },
   mage: {
     folder: 'priest',
+    filter: 'hue-rotate(200deg) saturate(1.4) brightness(1.1)',
     idle: { src: '/sprites/priest/idle.png', frames: 6 },
     attack1: { src: '/sprites/priest/attack1.png', frames: 9 },
     attack2: { src: '/sprites/priest/attack.png', frames: 6 },
@@ -24,6 +26,7 @@ export const classSpriteMap = {
   },
   worge: {
     folder: 'priest',
+    filter: 'hue-rotate(45deg) saturate(1.5) brightness(1.15)',
     idle: { src: '/sprites/priest/idle.png', frames: 6 },
     attack1: { src: '/sprites/priest/attack1.png', frames: 9 },
     attack2: { src: '/sprites/priest/attack.png', frames: 6 },
@@ -34,6 +37,7 @@ export const classSpriteMap = {
   },
   ranger: {
     folder: 'archer',
+    filter: 'hue-rotate(120deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/archer/idle.png', frames: 6 },
     attack1: { src: '/sprites/archer/attack1.png', frames: 9 },
     attack2: { src: '/sprites/archer/attack2.png', frames: 12 },
@@ -48,6 +52,7 @@ const spriteSheets = {
   priest: classSpriteMap.mage,
   'orc-rider': {
     folder: 'orc-rider',
+    filter: 'hue-rotate(180deg) saturate(1.3) brightness(1.05)',
     idle: { src: '/sprites/orc-rider/idle.png', frames: 6 },
     attack1: { src: '/sprites/orc-rider/attack1.png', frames: 8 },
     attack2: { src: '/sprites/orc-rider/attack2.png', frames: 9 },
@@ -59,6 +64,7 @@ const spriteSheets = {
   },
   'barbarian-mage': {
     folder: 'barbarian-mage/Wizard Pack',
+    filter: 'hue-rotate(190deg) saturate(1.4) brightness(1.1)',
     idle: { src: '/sprites/barbarian-mage/Wizard Pack/Idle.png', frames: 6 },
     attack1: { src: '/sprites/barbarian-mage/Wizard Pack/Attack1.png', frames: 8 },
     attack2: { src: '/sprites/barbarian-mage/Wizard Pack/Attack2.png', frames: 8 },
@@ -70,6 +76,7 @@ const spriteSheets = {
   },
   'hero-knight': {
     folder: 'heroes/elf_warrior',
+    filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/heroes/elf_warrior/Idle.png', frames: 11 },
     attack1: { src: '/sprites/heroes/elf_warrior/Attack1.png', frames: 7 },
     attack2: { src: '/sprites/heroes/elf_warrior/Attack2.png', frames: 7 },
@@ -82,6 +89,7 @@ const spriteSheets = {
   archer: classSpriteMap.ranger,
   'human-ranger': {
     folder: 'human-ranger',
+    filter: 'hue-rotate(140deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/human-ranger/idle.png', frames: 8 },
     attack1: { src: '/sprites/human-ranger/attack1.png', frames: 20 },
     attack2: { src: '/sprites/human-ranger/attack2.png', frames: 28 },
@@ -91,6 +99,7 @@ const spriteSheets = {
   },
   'barbarian-warrior': {
     folder: 'heroes/barbarian_warrior',
+    filter: 'hue-rotate(170deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/heroes/barbarian_warrior/Idle.png', frames: 11 },
     attack1: { src: '/sprites/heroes/barbarian_warrior/Attack1.png', frames: 7 },
     attack2: { src: '/sprites/heroes/barbarian_warrior/Attack2.png', frames: 7 },
@@ -102,6 +111,7 @@ const spriteSheets = {
   },
   orc: {
     folder: 'orc',
+    filter: 'hue-rotate(180deg) saturate(1.2) brightness(1.05)',
     idle: { src: '/sprites/orc/idle.png', frames: 6 },
     attack1: { src: '/sprites/orc/attack1.png', frames: 6 },
     attack2: { src: '/sprites/orc/attack2.png', frames: 6 },
@@ -111,6 +121,7 @@ const spriteSheets = {
   },
   'elite-orc': {
     folder: 'elite-orc',
+    filter: 'hue-rotate(170deg) saturate(1.3) brightness(1.05)',
     idle: { src: '/sprites/elite-orc/idle.png', frames: 6 },
     attack1: { src: '/sprites/elite-orc/attack1.png', frames: 7 },
     attack2: { src: '/sprites/elite-orc/attack2.png', frames: 11 },
@@ -121,6 +132,7 @@ const spriteSheets = {
   },
   'medieval-warrior-3': {
     folder: 'medieval-warrior-3',
+    filter: 'hue-rotate(180deg) saturate(1.2) brightness(1.1)',
     frameWidth: 135,
     frameHeight: 135,
     idle: { src: '/sprites/medieval-warrior-3/Idle.png', frames: 10 },
@@ -133,6 +145,7 @@ const spriteSheets = {
   },
   'fantasy-warrior': {
     folder: 'fantasy-warrior',
+    filter: 'hue-rotate(190deg) saturate(1.3) brightness(1.1)',
     frameWidth: 162,
     frameHeight: 162,
     idle: { src: '/sprites/fantasy-warrior/Idle.png', frames: 10 },
@@ -145,6 +158,7 @@ const spriteSheets = {
   },
   skeleton: {
     folder: 'skeleton',
+    filter: 'hue-rotate(180deg) saturate(1.1) brightness(1.15)',
     idle: { src: '/sprites/skeleton/idle.png', frames: 6 },
     attack1: { src: '/sprites/skeleton/attack1.png', frames: 6 },
     attack2: { src: '/sprites/skeleton/attack2.png', frames: 7 },
@@ -155,6 +169,7 @@ const spriteSheets = {
   },
   'armored-skeleton': {
     folder: 'armored-skeleton',
+    filter: 'hue-rotate(190deg) saturate(1.2) brightness(1.1)',
     idle: { src: '/sprites/armored-skeleton/idle.png', frames: 6 },
     attack1: { src: '/sprites/armored-skeleton/attack1.png', frames: 8 },
     attack2: { src: '/sprites/armored-skeleton/attack2.png', frames: 9 },
@@ -164,6 +179,7 @@ const spriteSheets = {
   },
   wizard: {
     folder: 'wizard',
+    filter: 'hue-rotate(200deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/wizard/idle.png', frames: 6 },
     attack1: { src: '/sprites/wizard/attack1.png', frames: 6 },
     attack2: { src: '/sprites/wizard/attack2.png', frames: 6 },
@@ -173,6 +189,7 @@ const spriteSheets = {
   },
   'evil-wizard': {
     folder: 'evil-wizard',
+    filter: 'hue-rotate(210deg) saturate(1.4) brightness(1.05)',
     idle: { src: '/sprites/evil-wizard/idle.png', frames: 8 },
     attack1: { src: '/sprites/evil-wizard/attack1.png', frames: 8 },
     attack2: { src: '/sprites/evil-wizard/attack2.png', frames: 8 },
@@ -182,6 +199,7 @@ const spriteSheets = {
   },
   'evil-wizard-2': {
     folder: 'evil-wizard-2',
+    filter: 'hue-rotate(200deg) saturate(1.3) brightness(1.1)',
     frameWidth: 250,
     frameHeight: 250,
     idle: { src: '/sprites/evil-wizard-2/idle.png', frames: 8 },
@@ -193,6 +211,7 @@ const spriteSheets = {
   },
   necromancer: {
     folder: 'necromancer',
+    filter: 'hue-rotate(180deg) saturate(1.2) brightness(1.1)',
     frameWidth: 160,
     frameHeight: 128,
     idle: { src: '/sprites/necromancer/idle.png', frames: 8 },
@@ -205,6 +224,7 @@ const spriteSheets = {
   },
   swordsman: {
     folder: 'swordsman',
+    filter: 'hue-rotate(170deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/swordsman/idle.png', frames: 6 },
     attack1: { src: '/sprites/swordsman/attack1.png', frames: 7 },
     attack2: { src: '/sprites/swordsman/attack2.png', frames: 15 },
@@ -215,6 +235,7 @@ const spriteSheets = {
   },
   werewolf: {
     folder: 'werewolf',
+    filter: 'hue-rotate(160deg) saturate(1.2) brightness(1.1)',
     idle: { src: '/sprites/werewolf/idle.png', frames: 6 },
     attack1: { src: '/sprites/werewolf/attack1.png', frames: 9 },
     attack2: { src: '/sprites/werewolf/attack2.png', frames: 13 },
@@ -224,6 +245,7 @@ const spriteSheets = {
   },
   werebear: {
     folder: 'werebear',
+    filter: 'hue-rotate(170deg) saturate(1.2) brightness(1.1)',
     idle: { src: '/sprites/werebear/idle.png', frames: 6 },
     attack1: { src: '/sprites/werebear/attack1.png', frames: 9 },
     attack2: { src: '/sprites/werebear/attack2.png', frames: 13 },
@@ -234,6 +256,7 @@ const spriteSheets = {
   },
   'greatsword-skeleton': {
     folder: 'greatsword-skeleton',
+    filter: 'hue-rotate(180deg) saturate(1.2) brightness(1.1)',
     idle: { src: '/sprites/greatsword-skeleton/idle.png', frames: 6 },
     attack1: { src: '/sprites/greatsword-skeleton/attack1.png', frames: 9 },
     attack2: { src: '/sprites/greatsword-skeleton/attack2.png', frames: 12 },
@@ -244,6 +267,7 @@ const spriteSheets = {
   },
   'skeleton-archer': {
     folder: 'skeleton-archer',
+    filter: 'hue-rotate(180deg) saturate(1.2) brightness(1.1)',
     idle: { src: '/sprites/skeleton-archer/idle.png', frames: 6 },
     attack1: { src: '/sprites/skeleton-archer/attack1.png', frames: 9 },
     attack2: { src: '/sprites/skeleton-archer/attack.png', frames: 6 },
@@ -253,6 +277,7 @@ const spriteSheets = {
   },
   'dark-knight': {
     folder: 'dark-knight',
+    filter: 'hue-rotate(190deg) saturate(1.3) brightness(1.05)',
     frameWidth: 128,
     frameHeight: 96,
     idle: { src: '/sprites/dark-knight/idle.png', frames: 4 },
@@ -265,6 +290,7 @@ const spriteSheets = {
   },
   'shadow-warrior': {
     folder: 'shadow-warrior',
+    filter: 'hue-rotate(200deg) saturate(1.3) brightness(1.05)',
     frameWidth: 128,
     frameHeight: 96,
     idle: { src: '/sprites/shadow-warrior/idle.png', frames: 4 },
@@ -277,6 +303,7 @@ const spriteSheets = {
   },
   'skeleton-enemy': {
     folder: 'skeleton-enemy',
+    filter: 'hue-rotate(180deg) saturate(1.1) brightness(1.15)',
     frameWidth: 64,
     frameHeight: 64,
     idle: { src: '/sprites/skeleton-enemy/idle.png', frames: 13 },
@@ -287,6 +314,7 @@ const spriteSheets = {
   },
   'water-priestess': {
     folder: 'water-priestess',
+    filter: 'hue-rotate(10deg) saturate(1.4) brightness(1.1)',
     frameWidth: 288,
     frameHeight: 128,
     idle: { src: '/sprites/water-priestess/idle.png', frames: 8 },
@@ -301,6 +329,7 @@ const spriteSheets = {
   },
   'armored-orc': {
     folder: 'armored-orc',
+    filter: 'hue-rotate(170deg) saturate(1.2) brightness(1.1)',
     idle: { src: '/sprites/armored-orc/idle.png', frames: 6 },
     attack1: { src: '/sprites/armored-orc/attack1.png', frames: 7 },
     attack2: { src: '/sprites/armored-orc/attack2.png', frames: 8 },
@@ -312,6 +341,7 @@ const spriteSheets = {
   },
   'knight-templar': {
     folder: 'knight-templar',
+    filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/knight-templar/idle.png', frames: 6 },
     attack1: { src: '/sprites/knight-templar/attack1.png', frames: 7 },
     attack2: { src: '/sprites/knight-templar/attack2.png', frames: 8 },
@@ -325,6 +355,7 @@ const spriteSheets = {
   },
   'armored-axeman': {
     folder: 'armored-axeman',
+    filter: 'hue-rotate(170deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/armored-axeman/idle.png', frames: 6 },
     attack1: { src: '/sprites/armored-axeman/attack1.png', frames: 9 },
     attack2: { src: '/sprites/armored-axeman/attack2.png', frames: 9 },
@@ -335,6 +366,7 @@ const spriteSheets = {
   },
   lancer: {
     folder: 'lancer',
+    filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/lancer/idle.png', frames: 6 },
     attack1: { src: '/sprites/lancer/attack1.png', frames: 6 },
     attack2: { src: '/sprites/lancer/attack2.png', frames: 9 },
@@ -345,6 +377,7 @@ const spriteSheets = {
   },
   soldier: {
     folder: 'soldier',
+    filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/soldier/idle.png', frames: 6 },
     attack1: { src: '/sprites/soldier/attack1.png', frames: 6 },
     attack2: { src: '/sprites/soldier/attack2.png', frames: 6 },
@@ -355,6 +388,7 @@ const spriteSheets = {
   },
   slime: {
     folder: 'slime',
+    filter: 'hue-rotate(140deg) saturate(1.4) brightness(1.1)',
     idle: { src: '/sprites/slime/idle.png', frames: 6 },
     attack1: { src: '/sprites/slime/attack1.png', frames: 6 },
     attack2: { src: '/sprites/slime/attack2.png', frames: 12 },
@@ -364,6 +398,7 @@ const spriteSheets = {
   },
   'demon-sword': {
     folder: 'demon-sword',
+    filter: 'hue-rotate(200deg) saturate(1.3) brightness(1.05)',
     frameWidth: 128,
     frameHeight: 64,
     idle: { src: '/sprites/demon-sword/idle.png', frames: 7 },
@@ -377,6 +412,7 @@ const spriteSheets = {
   },
   'water-elemental': {
     folder: 'water-elemental',
+    filter: 'saturate(1.3) brightness(1.1)',
     frameWidth: 256,
     frameHeight: 128,
     idle: { src: '/sprites/water-elemental/idle.png', frames: 2 },
@@ -387,6 +423,7 @@ const spriteSheets = {
   },
   'nature-elemental': {
     folder: 'nature-elemental',
+    filter: 'hue-rotate(120deg) saturate(1.3) brightness(1.1)',
     frameWidth: 256,
     frameHeight: 128,
     idle: { src: '/sprites/nature-elemental/idle.png', frames: 2 },
@@ -397,6 +434,7 @@ const spriteSheets = {
   },
   'forest-guardian': {
     folder: 'forest-guardian',
+    filter: 'hue-rotate(140deg) saturate(1.3) brightness(1.1)',
     frameWidth: 256,
     frameHeight: 128,
     facesLeft: true,
@@ -408,6 +446,7 @@ const spriteSheets = {
   },
   'barbarian-ranger': {
     folder: 'barbarian-ranger',
+    filter: 'hue-rotate(150deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/barbarian-ranger/idle.png', frames: 6 },
     attack1: { src: '/sprites/barbarian-ranger/attack1.png', frames: 6 },
     attack2: { src: '/sprites/barbarian-ranger/attack2.png', frames: 9 },
@@ -417,6 +456,7 @@ const spriteSheets = {
   },
   'dwarf-ranger': {
     folder: 'dwarf-ranger',
+    filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/dwarf-ranger/idle.png', frames: 6 },
     attack1: { src: '/sprites/dwarf-ranger/attack1.png', frames: 6 },
     attack2: { src: '/sprites/dwarf-ranger/attack2.png', frames: 6 },
@@ -426,6 +466,7 @@ const spriteSheets = {
   },
   'elf-ranger': {
     folder: 'elf-ranger',
+    filter: 'hue-rotate(140deg) saturate(1.3) brightness(1.1)',
     idle: { src: '/sprites/elf-ranger/idle.png', frames: 6 },
     attack1: { src: '/sprites/elf-ranger/attack1.png', frames: 6 },
     attack2: { src: '/sprites/elf-ranger/attack2.png', frames: 6 },
@@ -435,6 +476,7 @@ const spriteSheets = {
   },
   'boss-demon': {
     folder: 'boss-demon',
+    filter: 'hue-rotate(200deg) saturate(1.4) brightness(1.05)',
     frameWidth: 288,
     frameHeight: 160,
     idle: { src: '/sprites/boss-demon/idle.png', frames: 6 },
@@ -445,6 +487,7 @@ const spriteSheets = {
   },
   'cthulu-boss': {
     folder: 'cthulu-boss',
+    filter: 'hue-rotate(20deg) saturate(1.3) brightness(1.1)',
     frameWidth: 192,
     frameHeight: 112,
     idle: { src: '/sprites/cthulu-boss/idle.png', frames: 15 },
@@ -456,6 +499,7 @@ const spriteSheets = {
   },
   'frost-guardian': {
     folder: 'frost-guardian',
+    filter: 'hue-rotate(10deg) saturate(1.3) brightness(1.1)',
     frameWidth: 192,
     frameHeight: 128,
     idle: { src: '/sprites/frost-guardian/idle.png', frames: 6 },
@@ -466,6 +510,7 @@ const spriteSheets = {
   },
   'arcane-archer': {
     folder: 'arcane-archer',
+    filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.1)',
     frameWidth: 64,
     frameHeight: 64,
     idle: { src: '/sprites/arcane-archer/idle.png', frames: 8 },
@@ -479,6 +524,7 @@ const spriteSheets = {
   },
   'wind-hashashin': {
     folder: 'wind-hashashin',
+    filter: 'hue-rotate(150deg) saturate(1.3) brightness(1.1)',
     frameWidth: 288,
     frameHeight: 128,
     idle: { src: '/sprites/wind-hashashin/idle.png', frames: 8 },
@@ -493,6 +539,7 @@ const spriteSheets = {
   },
   'crystal-mauler': {
     folder: 'crystal-mauler',
+    filter: 'hue-rotate(180deg) saturate(1.3) brightness(1.1)',
     frameWidth: 288,
     frameHeight: 128,
     idle: { src: '/sprites/crystal-mauler/idle.png', frames: 8 },
@@ -507,6 +554,7 @@ const spriteSheets = {
   },
   'leaf-ranger': {
     folder: 'leaf-ranger',
+    filter: 'hue-rotate(130deg) saturate(1.3) brightness(1.1)',
     frameWidth: 288,
     frameHeight: 128,
     idle: { src: '/sprites/leaf-ranger/idle.png', frames: 12 },
@@ -521,6 +569,7 @@ const spriteSheets = {
   },
   'fire-knight': {
     folder: 'fire-knight',
+    filter: 'hue-rotate(200deg) saturate(1.3) brightness(1.1)',
     frameWidth: 288,
     frameHeight: 128,
     idle: { src: '/sprites/fire-knight/idle.png', frames: 8 },
@@ -535,6 +584,7 @@ const spriteSheets = {
   },
   'martial-hero': {
     folder: 'martial-hero',
+    filter: 'hue-rotate(170deg) saturate(1.3) brightness(1.1)',
     frameWidth: 200,
     frameHeight: 200,
     idle: { src: '/sprites/martial-hero/idle.png', frames: 8 },
@@ -546,6 +596,7 @@ const spriteSheets = {
   },
   'loreon-knight': {
     folder: 'loreon-knight',
+    filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.1)',
     frameWidth: 100,
     frameHeight: 65,
     idle: { src: '/sprites/loreon-knight/idle.png', frames: 3 },
@@ -584,7 +635,7 @@ export const raceClassSpriteMap = {
     ranger: spriteSheets['skeleton-archer'],
   },
   barbarian: {
-    warrior: { ...spriteSheets['barbarian-warrior'], filter: 'sepia(0.5) saturate(1.5) brightness(0.9)', scale: 1.35 },
+    warrior: { ...spriteSheets['barbarian-warrior'], filter: 'hue-rotate(170deg) saturate(1.4) brightness(1.05)', scale: 1.35 },
     mage: { ...spriteSheets['barbarian-mage'], scale: 1.35 },
     worge: { ...spriteSheets.soldier, scale: 1.35 },
     ranger: { ...spriteSheets['barbarian-ranger'], scale: 1.35 },
@@ -601,6 +652,7 @@ export const warriorTransformSprite = spriteSheets['demon-sword'];
 
 export const nightborneSprite = {
   folder: 'nightborne',
+  filter: 'hue-rotate(180deg) saturate(1.3) brightness(1.1)',
   frameWidth: 80,
   frameHeight: 80,
   facesLeft: true,
@@ -675,6 +727,7 @@ export const eliteTransformSprites = {
 const monsterSprites = {
   'monster-goblin': {
     folder: 'monsters/goblin',
+    filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.1)',
     frameWidth: 150,
     frameHeight: 150,
     idle: { src: '/sprites/monsters/goblin/idle.png', frames: 4 },
@@ -687,6 +740,7 @@ const monsterSprites = {
   },
   'monster-skeleton': {
     folder: 'monsters/skeleton',
+    filter: 'hue-rotate(180deg) saturate(1.2) brightness(1.1)',
     frameWidth: 150,
     frameHeight: 150,
     idle: { src: '/sprites/monsters/skeleton/idle.png', frames: 4 },
@@ -700,6 +754,7 @@ const monsterSprites = {
   },
   'flying-eye': {
     folder: 'monsters/flying_eye',
+    filter: 'hue-rotate(150deg) saturate(1.3) brightness(1.1)',
     frameWidth: 150,
     frameHeight: 150,
     idle: { src: '/sprites/monsters/flying_eye/idle.png', frames: 8 },
@@ -711,6 +766,7 @@ const monsterSprites = {
   },
   'monster-mushroom': {
     folder: 'monsters/mushroom',
+    filter: 'hue-rotate(140deg) saturate(1.4) brightness(1.1)',
     frameWidth: 150,
     frameHeight: 150,
     idle: { src: '/sprites/monsters/mushroom/idle.png', frames: 4 },
@@ -723,6 +779,7 @@ const monsterSprites = {
   },
   'shadow-bat': {
     folder: 'monsters/shadow_bat',
+    filter: 'hue-rotate(190deg) saturate(1.3) brightness(1.1)',
     frameWidth: 32,
     frameHeight: 32,
     idle: { src: '/sprites/monsters/shadow_bat/idle.png', frames: 7 },
@@ -731,6 +788,7 @@ const monsterSprites = {
   },
   'imp': {
     folder: 'monsters/imp',
+    filter: 'hue-rotate(170deg) saturate(1.3) brightness(1.1)',
     frameWidth: 32,
     frameHeight: 32,
     idle: { src: '/sprites/monsters/imp/idle.png', frames: 11 },
@@ -740,6 +798,7 @@ const monsterSprites = {
   },
   'mimic': {
     folder: 'monsters/mimic',
+    filter: 'hue-rotate(180deg) saturate(1.3) brightness(1.1)',
     frameWidth: 64,
     frameHeight: 64,
     idle: { src: '/sprites/monsters/mimic/idle.png', frames: 8 },
@@ -749,6 +808,7 @@ const monsterSprites = {
   },
   'crow-knight': {
     folder: 'monsters/crow_knight',
+    filter: 'hue-rotate(190deg) saturate(1.2) brightness(1.1)',
     frameWidth: 64,
     frameHeight: 64,
     idle: { src: '/sprites/monsters/crow_knight/idle.png', frames: 7 },
@@ -758,6 +818,7 @@ const monsterSprites = {
   },
   'stone-guardian': {
     folder: 'monsters/stone_guardian',
+    filter: 'hue-rotate(170deg) saturate(1.2) brightness(1.1)',
     frameWidth: 64,
     frameHeight: 64,
     idle: { src: '/sprites/monsters/stone_guardian/idle.png', frames: 9 },
@@ -767,6 +828,7 @@ const monsterSprites = {
   },
   'fire-worm': {
     folder: 'monsters/fire_worm/Fire Worm/Sprites/Worm',
+    filter: 'hue-rotate(200deg) saturate(1.3) brightness(1.05)',
     frameWidth: 90,
     frameHeight: 90,
     idle: { src: '/sprites/monsters/fire_worm/Fire Worm/Sprites/Worm/Idle.png', frames: 9 },

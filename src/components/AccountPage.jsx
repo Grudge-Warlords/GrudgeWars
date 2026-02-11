@@ -17,27 +17,27 @@ import { useTooltip, showTooltip, hideTooltip, updateTooltipPosition } from './G
 const ATTRIBUTES = Object.keys(attributeDefinitions);
 
 const TAB_BG = {
-  stats: '/backgrounds/tab_stats.png',
-  equipment: '/backgrounds/tab_gear.png',
-  abilities: '/backgrounds/tab_abilities.png',
-  skills: '/backgrounds/tab_skills.png',
-  attributes: '/backgrounds/tab_attributes.png',
+  stats: '/backgrounds/tab_stats_ocean.png',
+  equipment: '/backgrounds/tab_gear_ocean.png',
+  abilities: '/backgrounds/tab_abilities_ocean.png',
+  skills: '/backgrounds/tab_skills_ocean.png',
+  attributes: '/backgrounds/tab_attributes_ocean.png',
 };
 
 const CLASS_BG = {
-  warrior: '/backgrounds/wc_red.png',
-  mage: '/backgrounds/wc_purple.png',
-  ranger: '/backgrounds/wc_green.png',
-  worge: '/backgrounds/wc_gold.png',
+  warrior: '/backgrounds/wc_red_ocean.png',
+  mage: '/backgrounds/wc_purple_ocean.png',
+  ranger: '/backgrounds/wc_green_ocean.png',
+  worge: '/backgrounds/wc_gold_ocean.png',
 };
 
 const RACE_BG = {
-  human: '/backgrounds/card_divine.png',
-  elf: '/backgrounds/card_beach.png',
-  dwarf: '/backgrounds/card_green_hills.png',
-  undead: '/backgrounds/card_dark.png',
-  orc: '/backgrounds/blood_canyon.png',
-  barbarian: '/backgrounds/volcanic_field.png',
+  human: '/backgrounds/card_blue_betta.png',
+  elf: '/backgrounds/card_purple_betta.png',
+  dwarf: '/backgrounds/card_green_betta.png',
+  undead: '/backgrounds/card_white_betta.png',
+  orc: '/backgrounds/card_red_betta.png',
+  barbarian: '/backgrounds/card_gold_betta.png',
 };
 
 function MiniBar({ current, max, color, height = 6, label }) {

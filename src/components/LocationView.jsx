@@ -27,12 +27,12 @@ const CLASS_BG = {
 };
 
 const RACE_BG = {
-  human: '/backgrounds/card_divine.png',
-  elf: '/backgrounds/card_beach.png',
-  dwarf: '/backgrounds/card_green_hills.png',
-  undead: '/backgrounds/card_dark.png',
-  orc: '/backgrounds/blood_canyon.png',
-  barbarian: '/backgrounds/volcanic_field.png',
+  human: '/backgrounds/card_blue_betta.png',
+  elf: '/backgrounds/card_purple_betta.png',
+  dwarf: '/backgrounds/card_green_betta.png',
+  undead: '/backgrounds/card_white_betta.png',
+  orc: '/backgrounds/card_red_betta.png',
+  barbarian: '/backgrounds/card_gold_betta.png',
 };
 
 const CLASS_BORDER = {
