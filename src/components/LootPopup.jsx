@@ -26,7 +26,7 @@ export default function LootPopup() {
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 9998, animation: 'fadeIn 0.3s ease',
+      zIndex: 10700, animation: 'fadeIn 0.3s ease',
     }}>
       <div style={{
         background: 'linear-gradient(135deg, #141a2b, #1e293b)',

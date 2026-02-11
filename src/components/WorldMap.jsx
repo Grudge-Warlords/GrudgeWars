@@ -3258,9 +3258,9 @@ export default function WorldMap() {
             }
             return 'idle';
           };
-          return (
+          const panelContent = (
           <div style={{
-            position: 'absolute', top: 70, right: 12, zIndex: MAP_LAYERS.HUD_SIDE,
+            position: 'absolute', top: 70, right: 12, zIndex: 10600, pointerEvents: 'auto',
             background: 'rgba(14,22,48,0.95)', border: '1px solid rgba(110,231,183,0.2)',
             borderRadius: 12, padding: 14, maxWidth: 380, width: 370,
             boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
@@ -3455,11 +3455,14 @@ export default function WorldMap() {
             )}
           </div>
           );
+          const hudOverlay = document.getElementById('hud-overlay');
+          return hudOverlay ? createPortal(panelContent, hudOverlay) : panelContent;
         })()}
 
-        {showGruda && (
+        {showGruda && (() => {
+          const grudaContent = (
           <div style={{
-            position: 'absolute', top: 70, right: 12, zIndex: MAP_LAYERS.HUD_SIDE,
+            position: 'absolute', top: 70, right: 12, zIndex: 10600, pointerEvents: 'auto',
             background: 'rgba(14,22,48,0.95)', border: '1px solid rgba(239,68,68,0.25)',
             borderRadius: 12, padding: 14, maxWidth: 380, width: 360,
             boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
@@ -3565,7 +3568,10 @@ export default function WorldMap() {
               Share the link or code with anyone. Full hero builds including equipment, skills, and loadouts are encoded. They can paste it into the Gruda Arena page to fight with your heroes against AI enemies.
             </div>
           </div>
-        )}
+          );
+          const hudOverlay = document.getElementById('hud-overlay');
+          return hudOverlay ? createPortal(grudaContent, hudOverlay) : grudaContent;
+        })()}
 
         <MapBottomBar
           chatLog={chatLog}

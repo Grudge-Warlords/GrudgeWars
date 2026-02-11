@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import useGameStore, { getHeroStatsWithBonuses } from '../stores/gameStore';
 import { classDefinitions } from '../data/classes';
 import { raceDefinitions } from '../data/races';
@@ -26,7 +27,7 @@ function HarvestingPopup({ onClose }) {
 
   return (
     <div style={{
-      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10100,
+      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
       background: 'rgba(14,22,48,0.97)', border: '1px solid rgba(251,191,36,0.3)',
       borderRadius: 12, padding: 16, width: 360, maxHeight: 400, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
@@ -119,7 +120,7 @@ function GearPopup({ onClose }) {
 
   return (
     <div style={{
-      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10100,
+      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
       background: 'rgba(14,22,48,0.97)', border: '1px solid rgba(110,231,183,0.3)',
       borderRadius: 12, padding: 16, width: 380, maxHeight: 450, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
@@ -204,7 +205,7 @@ function CharacterPopup({ onClose }) {
 
   return (
     <div style={{
-      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10100,
+      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
       background: 'rgba(14,22,48,0.97)', border: '1px solid rgba(168,85,247,0.3)',
       borderRadius: 12, padding: 16, width: 400, maxHeight: 500, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
@@ -349,10 +350,12 @@ export default function MapBottomBar({
     setChatInput('');
   };
 
-  return (
+  const hudOverlay = document.getElementById('hud-overlay');
+
+  const bottomBarContent = (
     <div style={{
       position: 'absolute', bottom: 0, left: 0, right: 0, height: BAR_HEIGHT,
-      zIndex: 10000,
+      zIndex: 10600,
       pointerEvents: 'none',
     }}>
       {showHarvesting && <div style={{ pointerEvents: 'auto' }}><HarvestingPopup onClose={() => setShowHarvesting(false)} /></div>}
@@ -525,4 +528,6 @@ export default function MapBottomBar({
       </div>
     </div>
   );
+
+  return hudOverlay ? createPortal(bottomBarContent, hudOverlay) : bottomBarContent;
 }

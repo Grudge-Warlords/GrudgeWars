@@ -121,6 +121,8 @@ function GameApp() {
           {renderScreen()}
         </div>
         <FrameMaskLayer />
+      </div>
+      <div id="hud-overlay" style={{ position: 'absolute', inset: 0, zIndex: 10600, pointerEvents: 'none' }}>
         <GameTooltipRenderer />
         <SettingsMenu />
         <AdminGizmo />
@@ -129,7 +131,7 @@ function GameApp() {
           <div style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
             background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 9999, animation: 'fadeIn 0.3s ease'
+            zIndex: 10700, pointerEvents: 'auto', animation: 'fadeIn 0.3s ease'
           }} onClick={clearMessage}>
             <div style={{
               background: 'linear-gradient(135deg, #141a2b, #1e293b)',
