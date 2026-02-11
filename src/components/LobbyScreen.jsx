@@ -87,10 +87,10 @@ export default function LobbyScreen() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span className="font-cinzel" style={{
             fontSize: '1.2rem',
-            background: 'linear-gradient(135deg, #6ee7b7, #ffd700)',
+            background: 'linear-gradient(135deg, #22d3ee, #06b6d4)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           }}>
-            GRUDGE WARLORDS
+            BETTA WARLORDS
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -345,7 +345,7 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
             Upgrade to Discord Login
           </div>
           <div style={{ color: 'var(--muted)', fontSize: '0.8rem', lineHeight: 1.5 }}>
-            Connect your Discord account to save progress across devices and join the Grudge Warlords community.
+            Connect your Discord account to save progress across devices and join the Betta Warlords community.
           </div>
         </div>
       )}
@@ -441,7 +441,7 @@ function DiscordTab({ panelStyle }) {
           </svg>
           <div>
             <div className="font-cinzel" style={{ color: '#5865F2', fontSize: '1rem' }}>
-              Grudge Warlords Discord
+              Betta Warlords Discord
             </div>
             <div style={{ color: 'var(--muted)', fontSize: '0.75rem' }}>
               Join the community
@@ -613,14 +613,14 @@ function CreditsTab({ panelStyle }) {
           <CreditEntry title="Grudge Studio" role="Development & Design" />
           <CreditEntry title="Sprite Artists" role="Character & Monster Sprites" />
           <CreditEntry title="Sound Design" role="Web Audio Synthesized SFX" />
-          <CreditEntry title="Special Thanks" role="The Grudge Warlords Community" />
+          <CreditEntry title="Special Thanks" role="The Betta Warlords Community" />
         </div>
       </div>
       <div style={{
         ...panelStyle, marginTop: 16, textAlign: 'center',
       }}>
         <div style={{ color: 'var(--muted)', fontSize: '0.75rem', lineHeight: 1.6 }}>
-          Grudge Warlords v1.0<br/>
+          Betta Warlords v1.0<br/>
           &copy; 2026 Grudge Studio. All rights reserved.<br/>
           Inspired by Final Fantasy VII
         </div>

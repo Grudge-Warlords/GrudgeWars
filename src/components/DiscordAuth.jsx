@@ -87,7 +87,7 @@ export default function DiscordAuth() {
           color: '#d4a96a', marginBottom: 8, fontWeight: 700,
           textShadow: '0 2px 8px rgba(212,169,106,0.3)',
         }}>
-          Grudge Warlords
+          Betta Warlords
         </div>
         <div style={{
           fontSize: '0.85rem', color: '#7289da', marginBottom: 24,
@@ -103,7 +103,7 @@ export default function DiscordAuth() {
         {status === 'ready' && (
           <div>
             <p style={{ color: '#b0a080', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
-              Connect your Discord account to join the Grudge Warlords Beta and gain
+              Connect your Discord account to join the Betta Warlords Beta and gain
               exclusive access to our testing channel.
             </p>
             <button onClick={handleLogin} style={{

@@ -44,7 +44,7 @@ export default function TitleScreen() {
             fontSize: '0.7rem', color: 'var(--muted)', letterSpacing: 8,
             textTransform: 'uppercase', marginBottom: 24, opacity: 0.5,
           }}>
-            Grudge Studio Presents
+            Deep Sea Adventures
           </div>
 
           <h1 className="font-cinzel" style={{

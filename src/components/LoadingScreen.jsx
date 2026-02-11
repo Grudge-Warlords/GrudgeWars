@@ -38,7 +38,7 @@ export default function LoadingScreen({ progress = 0, total = 1, message = 'Load
       position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
       zIndex: 9998, display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      background: '#050a15', overflow: 'hidden'
+      background: '#020a18', overflow: 'hidden'
     }}>
       <div ref={holderRef} style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',

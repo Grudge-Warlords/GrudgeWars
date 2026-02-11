@@ -3175,7 +3175,7 @@ export default function WorldMap() {
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--gold)'; e.currentTarget.style.boxShadow = '0 0 18px rgba(255,215,0,0.3)'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,215,0,0.4)'; e.currentTarget.style.boxShadow = '0 0 12px rgba(255,215,0,0.1)'; }}
             >
-              <img src="/images/logo.png" alt="Grudge Warlords" style={{
+              <img src="/images/logo.png" alt="Betta Warlords" style={{
                 width: 36, height: 36, objectFit: 'contain',
                 imageRendering: 'pixelated',
                 filter: 'drop-shadow(0 0 4px rgba(255,215,0,0.3))',

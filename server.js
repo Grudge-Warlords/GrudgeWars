@@ -175,7 +175,7 @@ async function sendWebhookMessage({ content, embeds, username, avatar_url }) {
   const payload = {};
   if (content) payload.content = content;
   if (embeds) payload.embeds = embeds;
-  payload.username = username || 'Grudge Warlords';
+  payload.username = username || 'Betta Warlords';
   payload.avatar_url = avatar_url || 'https://grudgewarlords.com/icons/logo.png';
   const res = await fetch(DISCORD_WEBHOOK_URL, {
     method: 'POST',
@@ -202,7 +202,7 @@ app.post('/api/discord/webhook/update', requireAdmin, async (req, res) => {
         description,
         color: EMBED_COLORS.update,
         fields,
-        footer: { text: 'Grudge Warlords | grudgewarlords.com' },
+        footer: { text: 'Betta Warlords | grudgewarlords.com' },
         timestamp: new Date().toISOString(),
       }],
     });
@@ -228,7 +228,7 @@ app.post('/api/discord/webhook/patch', requireAdmin, async (req, res) => {
         description: 'A new patch has been deployed! Here\'s what changed:',
         color: EMBED_COLORS.patch,
         fields,
-        footer: { text: 'Grudge Warlords | Patch Notes' },
+        footer: { text: 'Betta Warlords | Patch Notes' },
         timestamp: new Date().toISOString(),
       }],
     });
@@ -253,7 +253,7 @@ app.post('/api/discord/webhook/challenge', requireAdmin, async (req, res) => {
         description,
         color: EMBED_COLORS.challenge,
         fields,
-        footer: { text: 'Grudge Warlords | Community Challenge' },
+        footer: { text: 'Betta Warlords | Community Challenge' },
         timestamp: new Date().toISOString(),
       }],
     });
@@ -278,7 +278,7 @@ app.post('/api/discord/webhook/event', requireAdmin, async (req, res) => {
         description,
         color: EMBED_COLORS.event,
         fields,
-        footer: { text: 'Grudge Warlords | Events' },
+        footer: { text: 'Betta Warlords | Events' },
         timestamp: new Date().toISOString(),
       }],
     });
@@ -302,7 +302,7 @@ app.post('/api/discord/webhook/lore', requireAdmin, async (req, res) => {
         description: `*${story}*`,
         color: EMBED_COLORS.lore,
         fields,
-        footer: { text: 'Grudge Warlords | World Lore' },
+        footer: { text: 'Betta Warlords | World Lore' },
         timestamp: new Date().toISOString(),
       }],
     });
@@ -326,7 +326,7 @@ app.post('/api/discord/webhook/tip', requireAdmin, async (req, res) => {
         description: tip,
         color: EMBED_COLORS.tip,
         fields,
-        footer: { text: 'Grudge Warlords | Tips & Tricks' },
+        footer: { text: 'Betta Warlords | Tips & Tricks' },
         timestamp: new Date().toISOString(),
       }],
     });
@@ -349,7 +349,7 @@ app.post('/api/discord/webhook/custom', requireAdmin, async (req, res) => {
         description: description || '',
         color: color || EMBED_COLORS.update,
         fields: fields || [],
-        footer: { text: 'Grudge Warlords' },
+        footer: { text: 'Betta Warlords' },
         timestamp: new Date().toISOString(),
       }];
     }
