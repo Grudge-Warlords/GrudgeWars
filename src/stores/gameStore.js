@@ -1148,10 +1148,10 @@ const useGameStore = create(persist((set, get) => ({
       updated.buffs = prevBuffs
         .map(b => ({ ...b, duration: b.duration - 1 }))
         .filter(b => b.duration > 0);
-      if (updated.bearForm && prevBuffs.some(b => b.source === 'Bear Form') && !updated.buffs.some(b => b.source === 'Bear Form')) {
+      if (updated.bearForm && prevBuffs.some(b => b.source === 'Shark Form') && !updated.buffs.some(b => b.source === 'Shark Form')) {
         updated.bearForm = false;
       }
-      if (updated.demonBlade && prevBuffs.some(b => b.source === 'Demon Blade') && !updated.buffs.some(b => b.source === 'Demon Blade')) {
+      if (updated.demonBlade && prevBuffs.some(b => b.source === 'Leviathan Form') && !updated.buffs.some(b => b.source === 'Leviathan Form')) {
         updated.demonBlade = false;
       }
 
@@ -1461,7 +1461,7 @@ const useGameStore = create(persist((set, get) => ({
 
     } else if (ability.type === 'revert_form') {
       attacker.bearForm = false;
-      attacker.buffs = attacker.buffs.filter(b => b.source !== 'Bear Form');
+      attacker.buffs = attacker.buffs.filter(b => b.source !== 'Shark Form');
       actionResult.targetId = currentUnitId;
       log.push(`${attacker.name} reverts to normal form!`);
 
@@ -1483,7 +1483,7 @@ const useGameStore = create(persist((set, get) => ({
           attacker.buffs.push({ ...ability.defenseBoost, source: ability.name });
         }
         actionResult.targetId = currentUnitId;
-        log.push(`${attacker.name} transforms into beast form!`);
+        log.push(`${attacker.name} transforms into Shark Form!`);
       } else if (ability.isDemonBlade) {
         attacker.demonBlade = true;
         attacker.buffs.push({ ...ability.effect, source: ability.name });

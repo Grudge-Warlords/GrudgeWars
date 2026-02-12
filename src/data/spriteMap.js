@@ -1485,7 +1485,7 @@ export const abilityEffectMap = {
     'Lightning Lash': { effect: 'arcanelighting', beam: 'orange', anim: 'attack2', followUp: [{ effect: 'arcanebolt', delay: 250, filter: 'hue-rotate(40deg) saturate(1.5)' }] },
     "Nature's Grasp": { effect: 'healingwave', beam: 'green', anim: 'heal', postHealEffect: 'healingregen', followUp: [{ effect: 'holylight', delay: 350, filter: 'hue-rotate(90deg) saturate(1.3)' }] },
     'Dagger Toss': { effect: 'windProjectile', beam: 'green', anim: 'attack2', followUp: [{ effect: 'hitBurst', delay: 250, filter: 'hue-rotate(90deg)' }] },
-    'Bear Form': { effect: 'arcanemist', beam: null, anim: 'cast', followUp: [{ effect: 'beamHoly', delay: 200 }, { effect: 'arcanebolt', delay: 500 }] },
+    'Shark Form': { effect: 'arcanemist', beam: null, anim: 'cast', followUp: [{ effect: 'beamHoly', delay: 200 }, { effect: 'arcanebolt', delay: 500 }] },
     'Maul': { effect: 'arcaneslash', beam: null, anim: 'attack1', comboAnims: ['attack1', 'attack2', 'attack1'], followUp: [{ effect: 'hitBurst', delay: 150 }, { effect: 'critSlash', delay: 400 }] },
     "Nature's Taunt": { effect: 'arcanemist', beam: null, anim: 'cast', followUp: [{ effect: 'holylight', delay: 300, filter: 'hue-rotate(90deg)' }] },
     'Worge Charge': { effect: 'critSlash', beam: null, anim: 'attack3', comboAnims: ['attack1', 'attack3', 'attack1'], followUp: [{ effect: 'hitBurst', delay: 200 }, { effect: 'arcaneslash', delay: 450 }] },
