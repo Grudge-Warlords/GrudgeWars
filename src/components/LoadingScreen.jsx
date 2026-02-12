@@ -1,36 +1,6 @@
-import React, { useRef, useEffect } from 'react';
-import { createVideoElement } from '../utils/assetManager';
+import React from 'react';
 
 export default function LoadingScreen({ progress = 0, total = 1, message = 'Loading...' }) {
-  const holderRef = useRef(null);
-
-  useEffect(() => {
-    const holder = holderRef.current;
-    const video = createVideoElement('/videos/loading.mp4');
-
-    if (video && holder) {
-      video.style.position = 'absolute';
-      video.style.top = '50%';
-      video.style.left = '50%';
-      video.style.transform = 'translate(-50%, -50%)';
-      video.style.minWidth = '100%';
-      video.style.minHeight = '100%';
-      video.style.width = 'auto';
-      video.style.height = 'auto';
-      video.style.objectFit = 'cover';
-      video.style.opacity = '0.7';
-      holder.appendChild(video);
-      video.play().catch(() => {});
-
-      return () => {
-        if (holder.contains(video)) {
-          video.pause();
-          holder.removeChild(video);
-        }
-      };
-    }
-  }, []);
-
   const pct = total > 0 ? Math.round((progress / total) * 100) : 0;
 
   return (
@@ -40,9 +10,11 @@ export default function LoadingScreen({ progress = 0, total = 1, message = 'Load
       alignItems: 'center', justifyContent: 'center',
       background: '#020a18', overflow: 'hidden'
     }}>
-      <div ref={holderRef} style={{
+      <div style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-        overflow: 'hidden'
+        backgroundImage: 'url(/images/loading-1.gif)',
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        opacity: 0.7,
       }} />
       <div style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',

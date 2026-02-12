@@ -31,7 +31,7 @@ export default function TitleScreen() {
         padding: '6% 3% 27% 3%',
         opacity: fadeClass ? 1 : 0,
         transition: 'opacity 1.5s ease',
-        backgroundImage: 'url(/backgrounds/ocean_title_bg.png)',
+        backgroundImage: 'url(/images/loading-1.gif)',
         backgroundSize: 'cover', backgroundPosition: 'center',
       }}>
         <div style={{

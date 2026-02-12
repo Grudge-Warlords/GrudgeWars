@@ -36,6 +36,7 @@ function GameApp() {
   const [progress, setProgress] = useState({ loaded: 0, total: 1 });
   const prevScreenRef = useRef(screen);
   const [transitioning, setTransitioning] = useState(false);
+  const [transitionPhase, setTransitionPhase] = useState('none');
 
   useEffect(() => {
     if (isReady()) {
@@ -66,9 +67,15 @@ function GameApp() {
       );
       if (needsTransition) {
         setTransitioning(true);
-        const timer = setTimeout(() => setTransitioning(false), 300);
+        setTransitionPhase('in');
+        const t1 = setTimeout(() => setTransitionPhase('hold'), 400);
+        const t2 = setTimeout(() => setTransitionPhase('out'), 800);
+        const t3 = setTimeout(() => {
+          setTransitioning(false);
+          setTransitionPhase('none');
+        }, 1200);
         prevScreenRef.current = screen;
-        return () => clearTimeout(timer);
+        return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
       }
       prevScreenRef.current = screen;
     }
@@ -113,12 +120,25 @@ function GameApp() {
         <VideoBackground blurred={bgBlurred} visible={bgVisible} />
         <div style={{
           position: 'relative', zIndex: 1, width: '100%', height: '100%',
-          opacity: transitioning ? 0 : 1,
-          transition: 'opacity 0.3s ease',
           animation: 'fadeIn 0.5s ease'
         }}>
           {renderScreen()}
         </div>
+        {transitionPhase !== 'none' && (
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 10500,
+            backgroundImage: 'url(/images/loading-2.gif)',
+            backgroundSize: 'cover', backgroundPosition: 'center',
+            opacity: transitionPhase === 'in' ? 1 : transitionPhase === 'hold' ? 1 : 0,
+            transition: transitionPhase === 'in' ? 'opacity 0.4s ease-in' : 'opacity 0.4s ease-out',
+            pointerEvents: 'none',
+          }}>
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'rgba(2,10,24,0.3)',
+            }} />
+          </div>
+        )}
       </div>
       <div id="hud-overlay" style={{ position: 'absolute', inset: 0, zIndex: 10600, pointerEvents: 'none' }}>
         <GameTooltipRenderer />
