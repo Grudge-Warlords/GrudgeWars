@@ -56,6 +56,6 @@ externalPort = 80
 expertMode = true
 
 [deployment]
-deploymentTarget = "autoscale"
+deploymentTarget = "vm"
 build = ["npm", "run", "build"]
 run = ["node", "server.prod.js"]
