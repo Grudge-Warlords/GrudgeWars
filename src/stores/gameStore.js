@@ -2236,6 +2236,22 @@ const useGameStore = create(persist((set, get) => ({
     set({ heroRoster: updatedRoster, inventory: [...state.inventory, item] });
   },
 
+  restAtCamp: () => {
+    const state = get();
+    const stats = state.getStats();
+    const fullHp = Math.floor(stats.health);
+    const updatedRoster = state.heroRoster.map(h => {
+      const hStats = getHeroStatsWithBonuses(h);
+      const maxHp = Math.floor(hStats.health);
+      return { ...h, currentHealth: maxHp, maxHealth: maxHp };
+    });
+    set({
+      playerHealth: fullHp,
+      playerMaxHealth: fullHp,
+      heroRoster: updatedRoster,
+    });
+  },
+
   addToInventory: (items) => {
     const state = get();
     set({ inventory: [...state.inventory, ...items] });

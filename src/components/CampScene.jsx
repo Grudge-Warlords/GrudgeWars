@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useGameStore from '../stores/gameStore';
 import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite, SCENE_NPCS } from '../data/spriteMap';
+import { TIERS, EQUIPMENT_SLOTS, getSellPrice } from '../data/equipment';
 import { InlineIcon } from '../data/uiSprites';
 import { setBgm } from '../utils/audioManager';
 import NpcSprite from './NpcSprite';
@@ -15,6 +16,9 @@ const RESOURCE_NODES = [
   { id: 'crystal_cave', name: 'Crystal Grotto', icon: 'diamond', resource: 'crystals', x: 50, y: 22, color: '#a78bfa', img: '/images/buildings/crystal_grotto.png' },
 ];
 
+const REST_NODE = { id: 'rest_spot', name: 'Rest', x: 35, y: 55, color: '#818cf8', img: '/images/buildings/sleeping_bag.png' };
+const CHEST_NODE = { id: 'inventory_chest', name: 'Inventory', x: 90, y: 48, color: '#f59e0b', img: '/images/buildings/treasure_chest.png' };
+
 const SELL_PRICES = { gold: 1, herbs: 2, wood: 2, ore: 4, crystals: 8 };
 
 const SPAWN_POS = { x: 50, y: -8 };
@@ -25,6 +29,11 @@ const NPC_EDGES = [
   { from: 'right', x: 110, y: null },
   { from: 'top', x: null, y: -10 },
 ];
+
+const SLOT_LABELS = {
+  weapon: 'Weapon', offhand: 'Off-Hand', helmet: 'Helmet',
+  armor: 'Armor', feet: 'Feet', ring: 'Ring', relic: 'Relic',
+};
 
 export default function CampScene() {
   useEffect(() => { setBgm('scene'); }, []);
@@ -42,9 +51,24 @@ export default function CampScene() {
   const playerRace = useGameStore(s => s.playerRace);
   const playerClass = useGameStore(s => s.playerClass);
   const tickHarvests = useGameStore(s => s.tickHarvests);
+  const playerHealth = useGameStore(s => s.playerHealth);
+  const playerMaxHealth = useGameStore(s => s.playerMaxHealth);
+  const restAtCamp = useGameStore(s => s.restAtCamp);
+  const inventory = useGameStore(s => s.inventory);
+  const equipItem = useGameStore(s => s.equipItem);
+  const unequipItem = useGameStore(s => s.unequipItem);
+  const removeFromInventory = useGameStore(s => s.removeFromInventory);
+  const sellItem = useGameStore(s => s.sellItem);
 
   const [selectedNode, setSelectedNode] = useState(null);
   const [showSellPanel, setShowSellPanel] = useState(false);
+  const [showRestPanel, setShowRestPanel] = useState(false);
+  const [showInventory, setShowInventory] = useState(false);
+  const [resting, setResting] = useState(false);
+  const [restDone, setRestDone] = useState(false);
+  const [invTab, setInvTab] = useState('items');
+  const [selectedInvItem, setSelectedInvItem] = useState(null);
+  const [selectedEquipHero, setSelectedEquipHero] = useState(null);
   const [heroX, setHeroX] = useState(SPAWN_POS.x);
   const [heroY, setHeroY] = useState(SPAWN_POS.y);
   const [heroScale, setHeroScale] = useState(0.3);
@@ -169,6 +193,8 @@ export default function CampScene() {
     setExiting(true);
     setSelectedNode(null);
     setShowSellPanel(false);
+    setShowRestPanel(false);
+    setShowInventory(false);
     setFacingLeft(heroX > 50);
     setWalking(true);
     setHeroX(50);
@@ -215,6 +241,86 @@ export default function CampScene() {
     walkToNode(node);
   };
 
+  const handleRestClick = () => {
+    if (exiting || entering) return;
+    if (walkTimeout.current) clearTimeout(walkTimeout.current);
+    setFacingLeft(REST_NODE.x < heroX);
+    setWalking(true);
+    setHeroX(REST_NODE.x - 6);
+    setHeroY(REST_NODE.y + 8);
+    setSelectedNode(null);
+    setShowInventory(false);
+    walkTimeout.current = setTimeout(() => {
+      setWalking(false);
+      setShowRestPanel(true);
+    }, 600);
+  };
+
+  const handleChestClick = () => {
+    if (exiting || entering) return;
+    if (walkTimeout.current) clearTimeout(walkTimeout.current);
+    setFacingLeft(CHEST_NODE.x < heroX);
+    setWalking(true);
+    setHeroX(CHEST_NODE.x - 6);
+    setHeroY(CHEST_NODE.y + 8);
+    setSelectedNode(null);
+    setShowRestPanel(false);
+    walkTimeout.current = setTimeout(() => {
+      setWalking(false);
+      setShowInventory(true);
+      setSelectedInvItem(null);
+      setSelectedEquipHero(null);
+    }, 600);
+  };
+
+  const doRest = () => {
+    setResting(true);
+    setRestDone(false);
+    setTimeout(() => {
+      if (!mountedRef.current) return;
+      restAtCamp();
+      setResting(false);
+      setRestDone(true);
+      setTimeout(() => {
+        if (!mountedRef.current) return;
+        setRestDone(false);
+      }, 2000);
+    }, 1500);
+  };
+
+  const hpPct = playerMaxHealth > 0 ? Math.round((playerHealth / playerMaxHealth) * 100) : 100;
+  const allFullHp = heroRoster.every(h => h.currentHealth >= (h.maxHealth || h.currentHealth));
+  const partyFullHp = allFullHp && playerHealth >= playerMaxHealth;
+
+  const equipItems = inventory.filter(i => i.slot && !i.consumable);
+  const consumableItems = inventory.filter(i => i.consumable);
+
+  const renderInteractiveNode = (node, onClick) => (
+    <div key={node.id} onClick={onClick} style={{
+      position: 'absolute', left: `${node.x}%`, top: `${node.y}%`,
+      transform: 'translate(-50%, -50%)', cursor: 'pointer', zIndex: 15,
+      textAlign: 'center',
+    }}>
+      <div style={{
+        width: 72, height: 72, borderRadius: 10,
+        background: `radial-gradient(circle, ${node.color}25, rgba(0,0,0,0.3))`,
+        border: `2px solid ${node.color}80`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: `0 0 16px ${node.color}40, inset 0 0 20px rgba(0,0,0,0.3)`,
+        overflow: 'hidden',
+      }}>
+        <img src={node.img} alt={node.name} style={{ width: 60, height: 60, objectFit: 'contain', imageRendering: 'auto' }} />
+      </div>
+      <div className="font-cinzel" style={{
+        color: node.color, fontSize: '0.85rem', fontWeight: 700, marginTop: 4,
+        textShadow: `0 2px 6px rgba(0,0,0,0.95), 0 0 10px ${node.color}40`,
+        whiteSpace: 'nowrap',
+      }}>
+        {node.name}
+      </div>
+    </div>
+  );
+
   return (
     <div
       ref={sceneRef}
@@ -254,7 +360,7 @@ export default function CampScene() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ color: '#fbbf24', fontSize: '0.75rem', fontWeight: 700, textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
-            {gold} Gold
+            {gold} Pearls
           </span>
           <button onClick={() => setShowSellPanel(!showSellPanel)} style={{
             background: 'rgba(0,0,0,0.6)', border: '1px solid #fbbf24', borderRadius: 8,
@@ -376,6 +482,313 @@ export default function CampScene() {
         );
       })}
 
+      {renderInteractiveNode(REST_NODE, handleRestClick)}
+      {renderInteractiveNode(CHEST_NODE, handleChestClick)}
+
+      {showRestPanel && (
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          background: 'rgba(10,15,30,0.95)', border: '2px solid #818cf8',
+          borderRadius: 12, padding: 16, minWidth: 240, zIndex: 50,
+          backdropFilter: 'blur(8px)',
+        }} onClick={e => e.stopPropagation()}>
+          <div className="font-cinzel" style={{ color: '#818cf8', fontSize: '0.85rem', marginBottom: 10, textAlign: 'center' }}>
+            Rest
+          </div>
+
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ color: '#e2e8f0', fontSize: '0.6rem' }}>Your Health</span>
+              <span style={{ color: hpPct >= 100 ? '#4ade80' : '#fbbf24', fontSize: '0.6rem', fontWeight: 700 }}>
+                {playerHealth}/{playerMaxHealth}
+              </span>
+            </div>
+            <div style={{
+              width: '100%', height: 8, borderRadius: 4,
+              background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)',
+              overflow: 'hidden',
+            }}>
+              <div style={{
+                width: `${hpPct}%`, height: '100%', borderRadius: 4,
+                background: hpPct > 60 ? '#22c55e' : hpPct > 30 ? '#f59e0b' : '#ef4444',
+                transition: 'width 0.3s ease',
+              }} />
+            </div>
+          </div>
+
+          {heroRoster.length > 0 && (
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ color: '#94a3b8', fontSize: '0.55rem', marginBottom: 4 }}>Party Health:</div>
+              {heroRoster.map(h => {
+                const hp = h.currentHealth || 0;
+                const maxHp = h.maxHealth || hp || 1;
+                const pct = Math.round((hp / maxHp) * 100);
+                return (
+                  <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                    <span style={{ color: '#e2e8f0', fontSize: '0.5rem', width: 60, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {h.name}
+                    </span>
+                    <div style={{
+                      flex: 1, height: 6, borderRadius: 3,
+                      background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)',
+                      overflow: 'hidden',
+                    }}>
+                      <div style={{
+                        width: `${pct}%`, height: '100%', borderRadius: 3,
+                        background: pct > 60 ? '#22c55e' : pct > 30 ? '#f59e0b' : '#ef4444',
+                      }} />
+                    </div>
+                    <span style={{ color: '#94a3b8', fontSize: '0.45rem', minWidth: 40, textAlign: 'right' }}>
+                      {hp}/{maxHp}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {resting ? (
+            <div style={{ textAlign: 'center', padding: '8px 0' }}>
+              <div style={{ color: '#818cf8', fontSize: '0.7rem', animation: 'pulse 1s infinite' }}>
+                Resting...
+              </div>
+              <div style={{ color: '#94a3b8', fontSize: '0.5rem', marginTop: 4 }}>
+                💤 Recovering health...
+              </div>
+            </div>
+          ) : restDone ? (
+            <div style={{ textAlign: 'center', padding: '8px 0' }}>
+              <div style={{ color: '#4ade80', fontSize: '0.7rem', fontWeight: 700 }}>
+                Fully Rested!
+              </div>
+              <div style={{ color: '#94a3b8', fontSize: '0.5rem', marginTop: 4 }}>
+                All heroes restored to full health
+              </div>
+            </div>
+          ) : (
+            <button onClick={doRest} disabled={partyFullHp} style={{
+              width: '100%',
+              background: partyFullHp ? 'rgba(50,50,50,0.3)' : 'rgba(129,140,248,0.2)',
+              border: `1px solid ${partyFullHp ? '#555' : '#818cf8'}`,
+              borderRadius: 8, padding: '6px 0',
+              color: partyFullHp ? '#666' : '#818cf8',
+              cursor: partyFullHp ? 'default' : 'pointer',
+              fontSize: '0.65rem', fontWeight: 700,
+            }}>
+              {partyFullHp ? 'Already at Full Health' : 'Rest & Heal All'}
+            </button>
+          )}
+
+          <button onClick={() => setShowRestPanel(false)} style={{
+            width: '100%', background: 'rgba(100,100,100,0.2)', border: '1px solid #555',
+            borderRadius: 6, padding: '4px 0', color: '#aaa', cursor: 'pointer',
+            fontSize: '0.55rem', marginTop: 8,
+          }}>Close</button>
+        </div>
+      )}
+
+      {showInventory && (
+        <div style={{
+          position: 'absolute', top: '5%', right: '3%', bottom: '12%',
+          width: '52%', maxWidth: 340,
+          background: 'rgba(10,15,30,0.96)', border: '2px solid #f59e0b',
+          borderRadius: 12, zIndex: 50,
+          backdropFilter: 'blur(8px)',
+          display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
+        }} onClick={e => e.stopPropagation()}>
+          <div style={{
+            padding: '8px 12px', borderBottom: '1px solid rgba(245,158,11,0.3)',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <div className="font-cinzel" style={{ color: '#f59e0b', fontSize: '0.85rem' }}>
+              Inventory
+            </div>
+            <button onClick={() => setShowInventory(false)} style={{
+              background: 'none', border: 'none', color: '#aaa', cursor: 'pointer',
+              fontSize: '0.9rem', lineHeight: 1,
+            }}>✕</button>
+          </div>
+
+          <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            {[{ key: 'items', label: `Equipment (${equipItems.length})` }, { key: 'consumables', label: `Consumables (${consumableItems.length})` }].map(tab => (
+              <button key={tab.key} onClick={() => { setInvTab(tab.key); setSelectedInvItem(null); }} style={{
+                flex: 1, padding: '6px 0',
+                background: invTab === tab.key ? 'rgba(245,158,11,0.15)' : 'transparent',
+                border: 'none', borderBottom: invTab === tab.key ? '2px solid #f59e0b' : '2px solid transparent',
+                color: invTab === tab.key ? '#f59e0b' : '#94a3b8',
+                cursor: 'pointer', fontSize: '0.55rem', fontWeight: 600,
+              }}>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ flex: 1, overflow: 'auto', padding: 8 }}>
+            {invTab === 'items' ? (
+              equipItems.length === 0 ? (
+                <div style={{ color: '#555', fontSize: '0.55rem', textAlign: 'center', padding: 16 }}>
+                  No equipment in inventory
+                </div>
+              ) : (
+                equipItems.map(item => {
+                  const tierDef = TIERS[item.tier] || TIERS[1];
+                  const isSelected = selectedInvItem?.id === item.id;
+                  return (
+                    <div key={item.id} onClick={() => { setSelectedInvItem(isSelected ? null : item); setSelectedEquipHero(null); }} style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '5px 6px', marginBottom: 3, borderRadius: 6, cursor: 'pointer',
+                      background: isSelected ? `${tierDef.color}15` : 'rgba(0,0,0,0.2)',
+                      border: `1px solid ${isSelected ? tierDef.color + '50' : 'rgba(255,255,255,0.03)'}`,
+                    }}>
+                      <div style={{
+                        width: 28, height: 28, borderRadius: 4,
+                        background: `${tierDef.color}15`, border: `1px solid ${tierDef.color}30`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '0.75rem',
+                      }}>
+                        <InlineIcon name={item.slot || 'sword'} />
+                      </div>
+                      <div style={{ flex: 1, overflow: 'hidden' }}>
+                        <div style={{
+                          color: tierDef.color, fontSize: '0.58rem', fontWeight: 700,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>
+                          {item.name}
+                        </div>
+                        <div style={{ color: '#94a3b8', fontSize: '0.45rem' }}>
+                          {SLOT_LABELS[item.slot] || item.slot} · T{item.tier}
+                        </div>
+                      </div>
+                      <div style={{ color: '#fbbf24', fontSize: '0.45rem', fontWeight: 600 }}>
+                        {getSellPrice(item)}p
+                      </div>
+                    </div>
+                  );
+                })
+              )
+            ) : (
+              consumableItems.length === 0 ? (
+                <div style={{ color: '#555', fontSize: '0.55rem', textAlign: 'center', padding: 16 }}>
+                  No consumables in inventory
+                </div>
+              ) : (
+                consumableItems.map(item => {
+                  const isSelected = selectedInvItem?.id === item.id;
+                  return (
+                    <div key={item.id} onClick={() => setSelectedInvItem(isSelected ? null : item)} style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '5px 6px', marginBottom: 3, borderRadius: 6, cursor: 'pointer',
+                      background: isSelected ? 'rgba(74,222,128,0.1)' : 'rgba(0,0,0,0.2)',
+                      border: `1px solid ${isSelected ? 'rgba(74,222,128,0.3)' : 'rgba(255,255,255,0.03)'}`,
+                    }}>
+                      <div style={{
+                        width: 28, height: 28, borderRadius: 4,
+                        background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.2)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '0.75rem',
+                      }}>
+                        <InlineIcon name="heart" />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ color: '#4ade80', fontSize: '0.58rem', fontWeight: 700 }}>
+                          {item.name}
+                        </div>
+                        <div style={{ color: '#94a3b8', fontSize: '0.45rem' }}>
+                          {item.description || 'Consumable'}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )
+            )}
+          </div>
+
+          {selectedInvItem && !selectedInvItem.consumable && (
+            <div style={{
+              borderTop: '1px solid rgba(255,255,255,0.05)', padding: 8,
+              background: 'rgba(0,0,0,0.3)',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ color: (TIERS[selectedInvItem.tier] || TIERS[1]).color, fontSize: '0.6rem', fontWeight: 700 }}>
+                  {selectedInvItem.name}
+                </span>
+                <span style={{ color: '#94a3b8', fontSize: '0.45rem' }}>
+                  {SLOT_LABELS[selectedInvItem.slot]}
+                </span>
+              </div>
+
+              {selectedInvItem.stats && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 6 }}>
+                  {Object.entries(selectedInvItem.stats).filter(([, v]) => v !== 0).map(([stat, val]) => (
+                    <span key={stat} style={{
+                      color: val > 0 ? '#4ade80' : '#ef4444', fontSize: '0.45rem',
+                      background: 'rgba(0,0,0,0.3)', borderRadius: 3, padding: '1px 4px',
+                    }}>
+                      {val > 0 ? '+' : ''}{typeof val === 'number' && val < 1 && val > -1 ? (val * 100).toFixed(0) + '%' : val} {stat}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {!selectedEquipHero ? (
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <button onClick={() => setSelectedEquipHero('pick')} style={{
+                    flex: 1, background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.4)',
+                    borderRadius: 6, padding: '4px 0', color: '#4ade80', cursor: 'pointer',
+                    fontSize: '0.5rem', fontWeight: 700,
+                  }}>Equip</button>
+                  <button onClick={() => {
+                    if (sellItem) sellItem(selectedInvItem.id);
+                    else removeFromInventory(selectedInvItem.id);
+                    setSelectedInvItem(null);
+                  }} style={{
+                    flex: 1, background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(251,191,36,0.4)',
+                    borderRadius: 6, padding: '4px 0', color: '#fbbf24', cursor: 'pointer',
+                    fontSize: '0.5rem', fontWeight: 700,
+                  }}>Sell ({getSellPrice(selectedInvItem)}p)</button>
+                  <button onClick={() => {
+                    removeFromInventory(selectedInvItem.id);
+                    setSelectedInvItem(null);
+                  }} style={{
+                    background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)',
+                    borderRadius: 6, padding: '4px 6px', color: '#ef4444', cursor: 'pointer',
+                    fontSize: '0.5rem', fontWeight: 700,
+                  }}>Drop</button>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ color: '#94a3b8', fontSize: '0.5rem', marginBottom: 4 }}>Equip on:</div>
+                  {heroRoster.map(hero => (
+                    <button key={hero.id} onClick={() => {
+                      equipItem(hero.id, selectedInvItem);
+                      setSelectedInvItem(null);
+                      setSelectedEquipHero(null);
+                    }} style={{
+                      width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)',
+                      borderRadius: 4, padding: '3px 6px', color: '#6ee7b3', cursor: 'pointer',
+                      fontSize: '0.5rem', fontWeight: 600, marginBottom: 2,
+                    }}>
+                      <span>{hero.name} (Lv{hero.level})</span>
+                      <span style={{ color: '#94a3b8', fontSize: '0.4rem' }}>
+                        {hero.equipment?.[selectedInvItem.slot] ? `Replace: ${hero.equipment[selectedInvItem.slot].name}` : 'Empty slot'}
+                      </span>
+                    </button>
+                  ))}
+                  <button onClick={() => setSelectedEquipHero(null)} style={{
+                    width: '100%', background: 'rgba(100,100,100,0.15)', border: '1px solid #555',
+                    borderRadius: 4, padding: '3px 0', color: '#888', cursor: 'pointer',
+                    fontSize: '0.45rem', marginTop: 2,
+                  }}>Cancel</button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {showSellPanel && (
         <div style={{
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
@@ -396,7 +809,7 @@ export default function CampScene() {
                 <div>
                   <span style={{ color: '#e2e8f0', fontSize: '0.6rem', textTransform: 'capitalize' }}>{res}</span>
                   <span style={{ color: '#94a3b8', fontSize: '0.5rem', marginLeft: 6 }}>x{amount}</span>
-                  <span style={{ color: '#fbbf24', fontSize: '0.45rem', marginLeft: 4 }}>({price}g ea)</span>
+                  <span style={{ color: '#fbbf24', fontSize: '0.45rem', marginLeft: 4 }}>({price}p ea)</span>
                 </div>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <button disabled={amount < 10} onClick={() => sellResource(res, 10)} style={{
