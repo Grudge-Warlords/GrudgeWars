@@ -547,8 +547,8 @@ export default function WorldMap() {
 
   const [heroWalking, setHeroWalking] = useState({});
   const [hoveredNode, setHoveredNode] = useState(null);
-  const [currentDialogue, setCurrentDialogue] = useState(null);
-  const [dialoguePhase, setDialoguePhase] = useState(0);
+  const [bubbleQueue, setBubbleQueue] = useState([]);
+  const lastDialogueTime = useRef(0);
   const [chatLog, setChatLog] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const chatLogRef = useRef(null);
@@ -1047,32 +1047,58 @@ export default function WorldMap() {
     return () => clearInterval(interval);
   }, [tickHarvests]);
 
+  const dismissBubble = useCallback((bubbleId) => {
+    setBubbleQueue(prev => prev.filter(b => b.id !== bubbleId));
+  }, []);
+
   useEffect(() => {
     const activeHeroes = heroRoster.filter(h => activeHeroIds.includes(h.id));
     if (activeHeroes.length < 2) return;
-    const delay = 5000 + Math.random() * 3000;
-    const timeout = setTimeout(() => {
+    const spawnDialogue = () => {
       const gameState = { gold, level, currentZone, zoneConquer, bossesDefeated, locationsCleared, victories, locations };
       const dialogue = generateDialogue(activeHeroes, gameState);
       if (dialogue) {
-        setCurrentDialogue(dialogue);
-        setDialoguePhase(1);
+        lastDialogueTime.current = Date.now();
+
+        const sprite1 = getPlayerSprite(dialogue.speaker1.classId, dialogue.speaker1.raceId);
+        const bubble1 = {
+          id: `b_${Date.now()}_1`,
+          speaker: dialogue.speaker1,
+          text: dialogue.line1,
+          colorHex: '#6ee7b7',
+          spriteData: sprite1,
+          autoExpire: 8000,
+        };
+        setBubbleQueue(prev => [...prev.slice(-4), bubble1]);
+
         setChatLog(prev => {
           const entry = { id: Date.now(), speaker: dialogue.speaker1.name, line: dialogue.line1, color: 'var(--accent)' };
           return [...prev.slice(-49), entry];
         });
+
         setTimeout(() => {
-          setDialoguePhase(2);
+          const sprite2 = getPlayerSprite(dialogue.speaker2.classId, dialogue.speaker2.raceId);
+          const bubble2 = {
+            id: `b_${Date.now()}_2`,
+            speaker: dialogue.speaker2,
+            text: dialogue.line2,
+            colorHex: '#fbbf24',
+            spriteData: sprite2,
+            autoExpire: 8000,
+          };
+          setBubbleQueue(prev => [...prev.slice(-4), bubble2]);
+
           setChatLog(prev => {
             const entry = { id: Date.now() + 1, speaker: dialogue.speaker2.name, line: dialogue.line2, color: 'var(--gold)' };
             return [...prev.slice(-49), entry];
           });
         }, 2500);
-        
       }
-    }, delay);
-    return () => clearTimeout(timeout);
-  }, [currentDialogue, heroRoster, activeHeroIds, gold, level, currentZone, zoneConquer, bossesDefeated, locationsCleared, victories]);
+    };
+    const initialDelay = setTimeout(spawnDialogue, 5000 + Math.random() * 3000);
+    const interval = setInterval(spawnDialogue, 12000 + Math.random() * 6000);
+    return () => { clearTimeout(initialDelay); clearInterval(interval); };
+  }, [heroRoster, activeHeroIds, gold, level, currentZone, zoneConquer, bossesDefeated, locationsCleared, victories]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -2105,55 +2131,25 @@ export default function WorldMap() {
           );
         })()}
 
-        {currentDialogue && dialoguePhase > 0 && (() => {
+        {bubbleQueue.length > 0 && (() => {
           const baseZonePos2 = getNodePos(currentZone) || locationPositions.verdant_plains;
           const zonePos2 = isPathing ? heroPos : baseZonePos2;
-          const activeHeroes2 = heroRoster.filter(h => activeHeroIds.includes(h.id));
-          const heroSpriteMap = {};
-          const speakerPositions = {};
-          const mapSpriteScale2 = 1.2;
           const heroScale2 = calcNodeScale(camZoom, 0.35);
-          const baseFrame2 = 100;
-          const spriteW2 = baseFrame2 * mapSpriteScale2;
-          const spriteH2 = baseFrame2 * mapSpriteScale2;
-          const footCrop2 = 1.0;
-          const visibleH2 = Math.round(spriteH2 * footCrop2);
-          const heroCount2 = activeHeroes2.length;
-          const containerW2 = heroCount2 * (spriteW2 * 0.4) + spriteW2 * 0.6;
-          const hitOffsetX2 = 0;
-          const hitOffsetY2 = -10 * mapSpriteScale2;
-          const hitAnchorX2 = containerW2 / 2 + hitOffsetX2;
-          const hitAnchorY2 = visibleH2 / 2 + hitOffsetY2;
-
-          activeHeroes2.forEach((h, idx) => {
-            heroSpriteMap[h.id] = getPlayerSprite(h.classId, h.raceId);
-            const offset = wanderOffsets[h.id] || { x: 0, y: 0 };
-            const heroSpriteData = getPlayerSprite(h.classId, h.raceId);
-            const heroFrameW = (heroSpriteData?.frameWidth || 100) * mapSpriteScale2;
-            const heroFrameH = (heroSpriteData?.frameHeight || 100) * mapSpriteScale2;
-            speakerPositions[h.id] = {
-              x: idx * (spriteW2 * 0.4) + offset.x * 3 + heroFrameW / 2,
-              y: heroFrameH * footCrop2,
-            };
-          });
 
           return (
             <div style={{
               position: 'absolute',
               left: `${zonePos2.x}%`,
               top: `${zonePos2.y}%`,
-              width: containerW2,
-              height: 0,
-              transform: `translate(-${hitAnchorX2}px, -${hitAnchorY2}px) scale(${heroScale2})`,
+              transform: `translate(-50%, 0) scale(${heroScale2})`,
               zIndex: 9999,
               pointerEvents: 'none',
+              width: 0,
+              height: 0,
             }}>
               <ChatBubbleSystem
-                dialogue={currentDialogue}
-                phase={dialoguePhase}
-                heroSprites={heroSpriteMap}
-                speakerPositions={speakerPositions}
-                onDismiss={() => { setDialoguePhase(0); setTimeout(() => setCurrentDialogue(null), 300); }}
+                bubbleQueue={bubbleQueue}
+                onDismiss={dismissBubble}
                 camZoom={camZoom}
               />
             </div>

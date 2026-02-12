@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-function SpriteFace({ spriteData, size = 32 }) {
+function SpriteFace({ spriteData, size = 28 }) {
   const [frame, setFrame] = useState(0);
   const intervalRef = useRef(null);
   const idleAnim = spriteData?.idle;
@@ -40,165 +40,152 @@ function SpriteFace({ spriteData, size = 32 }) {
   );
 }
 
-function ComicBubble({ bubble, speakerPos, onDismiss, camZoom, index, isLeft }) {
+function StackedBubble({ bubble, index, totalVisible, onDismiss }) {
   const [visible, setVisible] = useState(false);
+  const [exiting, setExiting] = useState(false);
+  const bubbleRef = useRef(null);
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), index * 250 + 80);
+    const t = setTimeout(() => setVisible(true), 60);
     return () => clearTimeout(t);
-  }, [index]);
+  }, []);
 
-  const bubbleScale = Math.max(0.44, 1.1 / camZoom);
-  const tailH = 36;
-  const bubbleW = 400;
+  const handleDismiss = useCallback(() => {
+    setExiting(true);
+    setTimeout(() => { if (onDismiss) onDismiss(bubble.id); }, 300);
+  }, [bubble.id, onDismiss]);
 
-  const anchorX = speakerPos ? speakerPos.x : (isLeft ? 20 : 100);
-  const anchorY = speakerPos?.y ?? 0;
+  useEffect(() => {
+    if (bubble.autoExpire) {
+      const t = setTimeout(handleDismiss, bubble.autoExpire);
+      return () => clearTimeout(t);
+    }
+  }, [bubble.autoExpire, handleDismiss]);
+
+  const opacity = exiting ? 0 : (visible ? 1 : 0);
+  const yShift = exiting ? -20 : (visible ? 0 : 15);
 
   return (
-    <div style={{
-      position: 'absolute',
-      left: anchorX,
-      bottom: -anchorY,
-      transform: `translateX(-50%)`,
-      zIndex: 9500 + index,
-      pointerEvents: 'none',
-    }}>
-      <div style={{
-        position: 'relative',
-        transformOrigin: 'bottom center',
-        transform: visible ? `scale(${bubbleScale})` : `scale(${bubbleScale * 0.2})`,
-        opacity: visible ? 1 : 0,
-        transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease',
+    <div
+      ref={bubbleRef}
+      style={{
+        transition: 'transform 0.35s ease, opacity 0.3s ease',
+        opacity,
+        transform: `translateY(${yShift}px)`,
         pointerEvents: 'auto',
         cursor: 'pointer',
-        marginBottom: tailH * bubbleScale + 4,
+        marginBottom: 6,
+        maxWidth: 320,
+        minWidth: 180,
+        width: 'auto',
       }}
-        onClick={(e) => { e.stopPropagation(); if (onDismiss) onDismiss(); }}
-      >
+      onClick={(e) => { e.stopPropagation(); handleDismiss(); }}
+    >
+      <div style={{
+        position: 'relative',
+        filter: 'drop-shadow(2px 3px 0px rgba(0,0,0,0.5))',
+      }}>
         <div style={{
+          background: '#fffef5',
+          border: '3px solid #111',
+          borderRadius: 18,
+          padding: '8px 12px 8px 10px',
           position: 'relative',
-          width: bubbleW,
-          filter: `drop-shadow(3px 4px 0px rgba(0,0,0,0.55))`,
         }}>
           <div style={{
-            background: '#fffef5',
-            border: '4px solid #111',
-            borderRadius: 26,
-            padding: '14px 18px 14px 16px',
-            position: 'relative',
+            display: 'flex', alignItems: 'flex-start', gap: 8,
           }}>
             <div style={{
-              position: 'absolute', top: 4, right: 10,
-              fontSize: '1rem', color: '#999', lineHeight: 1,
-              fontWeight: 700, fontFamily: 'sans-serif',
-              pointerEvents: 'auto',
+              width: 36, height: 36, borderRadius: '50%',
+              border: `2px solid ${bubble.colorHex}`,
+              overflow: 'hidden', flexShrink: 0,
+              background: '#2a2a4a',
+              boxShadow: `inset 0 0 4px rgba(0,0,0,0.6), 0 0 6px ${bubble.colorHex}44`,
+              marginTop: 2,
             }}>
-              x
+              {bubble.spriteData && <SpriteFace spriteData={bubble.spriteData} size={36} />}
             </div>
-
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              marginBottom: 6,
-            }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
-                width: 56, height: 56, borderRadius: '50%',
-                border: `3px solid ${bubble.colorHex}`,
-                overflow: 'hidden', flexShrink: 0,
-                background: '#2a2a4a',
-                boxShadow: `inset 0 0 6px rgba(0,0,0,0.6), 0 0 8px ${bubble.colorHex}44`,
-              }}>
-                {bubble.spriteData && <SpriteFace spriteData={bubble.spriteData} size={56} />}
-              </div>
-              <div style={{
-                fontFamily: "'Cinzel', serif", fontWeight: 800,
-                fontSize: '1.1rem', color: '#1a1a2e',
+                fontFamily: "'Cinzel', serif", fontWeight: 700,
+                fontSize: '0.7rem', color: bubble.colorHex || '#1a1a2e',
                 letterSpacing: '0.02em',
                 textTransform: 'uppercase',
+                marginBottom: 2,
+                lineHeight: 1.2,
               }}>
                 {bubble.speaker?.name}
               </div>
-            </div>
-
-            <div style={{
-              fontSize: '1.1rem',
-              color: '#222',
-              lineHeight: 1.5,
-              fontWeight: 500,
-              fontFamily: "'Jost', sans-serif",
-              wordBreak: 'break-word',
-            }}>
-              {bubble.text?.replace(`${bubble.speaker?.name}: `, '')}
+              <div style={{
+                fontSize: '0.82rem',
+                color: '#222',
+                lineHeight: 1.4,
+                fontWeight: 500,
+                fontFamily: "'Jost', sans-serif",
+                wordBreak: 'break-word',
+              }}>
+                {bubble.text?.replace(`${bubble.speaker?.name}: `, '')}
+              </div>
             </div>
           </div>
-
-          <svg
-            width="56"
-            height={tailH}
-            viewBox={`0 0 56 ${tailH}`}
-            style={{
-              position: 'absolute',
-              top: '100%',
-              marginTop: -4,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              display: 'block',
-              overflow: 'visible',
-            }}
-          >
-            <path
-              d={`M 12 0 C 17 ${tailH * 0.5}, 22 ${tailH * 0.85}, 28 ${tailH} C 34 ${tailH * 0.85}, 39 ${tailH * 0.5}, 44 0`}
-              fill="#fffef5"
-              stroke="#111"
-              strokeWidth="4"
-              strokeLinejoin="round"
-            />
-            <line x1="14" y1="0" x2="42" y2="0" stroke="#fffef5" strokeWidth="6" />
-          </svg>
         </div>
+
+        <svg
+          width="24"
+          height="14"
+          viewBox="0 0 24 14"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            marginTop: -3,
+            left: 24,
+            display: 'block',
+            overflow: 'visible',
+          }}
+        >
+          <path
+            d="M 4 0 C 6 6, 9 11, 12 14 C 15 11, 18 6, 20 0"
+            fill="#fffef5"
+            stroke="#111"
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <line x1="5" y1="0" x2="19" y2="0" stroke="#fffef5" strokeWidth="4" />
+        </svg>
       </div>
     </div>
   );
 }
 
-export default function ChatBubbleSystem({ dialogue, phase, heroSprites, speakerPositions, onDismiss, camZoom = 3 }) {
-  if (!dialogue || phase === 0) return null;
+export default function ChatBubbleSystem({ bubbleQueue, onDismiss, camZoom = 3 }) {
+  if (!bubbleQueue || bubbleQueue.length === 0) return null;
 
-  const bubbleData = [];
-  if (phase >= 1) {
-    bubbleData.push({
-      id: 'speaker1',
-      speakerId: dialogue.speaker1?.id,
-      speaker: dialogue.speaker1,
-      text: dialogue.line1,
-      colorHex: '#6ee7b7',
-      spriteData: heroSprites?.[dialogue.speaker1?.id],
-    });
-  }
-  if (phase >= 2) {
-    bubbleData.push({
-      id: 'speaker2',
-      speakerId: dialogue.speaker2?.id,
-      speaker: dialogue.speaker2,
-      text: dialogue.line2,
-      colorHex: '#fbbf24',
-      spriteData: heroSprites?.[dialogue.speaker2?.id],
-    });
-  }
+  const bubbleScale = Math.max(0.5, 1.0 / camZoom);
 
   return (
-    <>
-      {bubbleData.map((bubble, i) => (
-        <ComicBubble
+    <div style={{
+      position: 'absolute',
+      left: '50%',
+      bottom: '100%',
+      transform: `translateX(-50%) scale(${bubbleScale})`,
+      transformOrigin: 'bottom center',
+      display: 'flex',
+      flexDirection: 'column-reverse',
+      alignItems: 'center',
+      pointerEvents: 'none',
+      zIndex: 9500,
+      paddingBottom: 12,
+      minWidth: 180,
+    }}>
+      {bubbleQueue.map((bubble, i) => (
+        <StackedBubble
           key={bubble.id}
           bubble={bubble}
-          speakerPos={speakerPositions?.[bubble.speakerId]}
-          isLeft={i === 0}
-          onDismiss={onDismiss}
-          camZoom={camZoom}
           index={i}
+          totalVisible={bubbleQueue.length}
+          onDismiss={onDismiss}
         />
       ))}
-    </>
+    </div>
   );
 }
