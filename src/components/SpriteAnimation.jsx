@@ -173,7 +173,7 @@ export default function SpriteAnimation({
   }, [equipmentOverlays, displayWidth, displayHeight]);
 
   const isSwimming = spriteData?.swimming;
-  const swimPadding = isSwimming ? Math.round(frameHeight * scale * 0.3) : 0;
+  const swimPadding = isSwimming ? Math.round(frameHeight * scale * 0.4) : 0;
   const containerHeight = displayHeight + swimPadding;
 
   return (

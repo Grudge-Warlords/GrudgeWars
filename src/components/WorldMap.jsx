@@ -2034,7 +2034,7 @@ export default function WorldMap() {
           const baseFrame = 100;
           const spriteW = baseFrame * mapSpriteScale;
           const spriteH = baseFrame * mapSpriteScale;
-          const footCrop = 0.82;
+          const footCrop = 1.0;
           const visibleH = Math.round(spriteH * footCrop);
           const heroCount = activeHeroes.length;
           const containerW = heroCount * (spriteW * 0.4) + spriteW * 0.6;
@@ -2086,7 +2086,7 @@ export default function WorldMap() {
                         background: 'radial-gradient(ellipse, rgba(0,0,0,0.55), transparent)',
                         zIndex: 1,
                       }} />
-                      <div style={{ position: 'relative', zIndex: 2, width: heroFrameW, height: heroVisH, overflow: 'hidden' }}>
+                      <div style={{ position: 'relative', zIndex: 2, width: heroFrameW, height: heroVisH, overflow: 'visible' }}>
                         <SpriteAnimation
                           spriteData={heroSpriteData}
                           animation={isWalking ? 'walk' : 'idle'}
@@ -2121,7 +2121,7 @@ export default function WorldMap() {
           const baseFrame2 = 100;
           const spriteW2 = baseFrame2 * mapSpriteScale2;
           const spriteH2 = baseFrame2 * mapSpriteScale2;
-          const footCrop2 = 0.82;
+          const footCrop2 = 1.0;
           const visibleH2 = Math.round(spriteH2 * footCrop2);
           const heroCount2 = activeHeroes2.length;
           const containerW2 = heroCount2 * (spriteW2 * 0.4) + spriteW2 * 0.6;
@@ -2276,7 +2276,7 @@ export default function WorldMap() {
                     left: '50%', bottom: 0,
                     transform: `translateX(calc(-50% + ${off.x}px)) translateY(${off.y}px)`,
                     width: evFrameW, height: spriteVisH,
-                    overflow: 'hidden',
+                    overflow: 'visible',
                     imageRendering: 'pixelated',
                     filter: `drop-shadow(0 2px 4px rgba(0,0,0,0.8)) hue-rotate(340deg) saturate(2) brightness(0.7)`,
                     zIndex: i,
@@ -3181,7 +3181,7 @@ export default function WorldMap() {
                 filter: 'drop-shadow(0 0 4px rgba(255,215,0,0.3))',
               }} />
             </div>
-            <div style={{ width: 48, height: 48, overflow: 'hidden', flexShrink: 0 }}>
+            <div style={{ width: 52, height: 56, overflow: 'visible', flexShrink: 0 }}>
               <SpriteAnimation spriteData={getPlayerSprite(playerClass, playerRace)} animation="idle" scale={1.5} speed={150} />
             </div>
             <div>
@@ -3332,7 +3332,7 @@ export default function WorldMap() {
                       }
                     }}
                   >
-                    <div style={{ width: 60, height: 60, margin: '0 auto', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 60, height: 60, margin: '0 auto', overflow: 'visible', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={0.7} speed={150} />
                     </div>
                     <div style={{ fontSize: '0.6rem', fontWeight: 700, color: isActive ? 'var(--accent)' : isHarvesting ? 'var(--gold)' : 'var(--muted)', marginTop: 2 }}>
