@@ -6,6 +6,7 @@ import { getItemPrice, getSellPrice, generateShopInventory } from '../data/equip
 import { InlineIcon } from '../data/uiSprites';
 import { setBgm } from '../utils/audioManager';
 import NpcSprite from './NpcSprite';
+import BubbleEmitter from './BubbleEmitter';
 
 const PORTAL_NODES = [
   { id: 'forge', name: 'Void Forge', icon: 'hammer', x: 25, y: 30, color: '#f97316', description: 'Upgrade equipment using resources' },
@@ -330,6 +331,21 @@ export default function PortalScene() {
         backgroundSize: 'cover', backgroundPosition: 'center',
       }} />
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)', pointerEvents: 'none' }} />
+
+      <BubbleEmitter
+        ambient={2}
+        density={0.3}
+        sources={[
+          ...(SCENE_NPCS.portal || []).map(npc => ({
+            id: `npc_${npc.id}`, x: npc.x, y: npc.y, rate: 0.3,
+            minSize: 2, maxSize: 5,
+          })),
+          ...PORTAL_NODES.map(n => ({
+            id: `node_${n.id}`, x: n.x, y: n.y, rate: 0.5,
+            minSize: 2, maxSize: 7, color: n.color + '50',
+          })),
+        ]}
+      />
 
       <div style={{
         position: 'absolute', top: 6, left: 12, right: 12,

@@ -5,6 +5,7 @@ import { getPlayerSprite, SCENE_NPCS } from '../data/spriteMap';
 import { InlineIcon } from '../data/uiSprites';
 import { setBgm } from '../utils/audioManager';
 import NpcSprite from './NpcSprite';
+import BubbleEmitter from './BubbleEmitter';
 
 const FIELD_EVENTS = [
   { id: 'patrol', name: 'Wandering Foe', icon: 'battle', x: 65, y: 40, type: 'battle', color: '#ef4444', img: '/images/buildings/enemy_patrol.png' },
@@ -91,6 +92,24 @@ export default function OpenFieldScene() {
         backgroundSize: 'cover', backgroundPosition: 'center',
       }} />
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.1)', pointerEvents: 'none' }} />
+
+      <BubbleEmitter
+        ambient={4}
+        density={0.4}
+        sources={[
+          ...(SCENE_NPCS.field || []).map(npc => ({
+            id: `npc_${npc.id}`, x: npc.x, y: npc.y, rate: 0.3,
+            minSize: 2, maxSize: 5,
+          })),
+          ...FIELD_EVENTS.map(e => ({
+            id: `event_${e.id}`, x: e.x, y: e.y,
+            rate: e.type === 'rest' ? 1.2 : 0.4,
+            minSize: e.type === 'rest' ? 3 : 2,
+            maxSize: e.type === 'rest' ? 9 : 6,
+            color: e.color + '50',
+          })),
+        ]}
+      />
 
       <div style={{
         position: 'absolute', top: 8, left: 16, right: 16,

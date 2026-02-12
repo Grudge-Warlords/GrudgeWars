@@ -6,6 +6,7 @@ import { getItemPrice, getSellPrice } from '../data/equipment';
 import { InlineIcon } from '../data/uiSprites';
 import { setBgm } from '../utils/audioManager';
 import NpcSprite from './NpcSprite';
+import BubbleEmitter from './BubbleEmitter';
 
 const TRADER_NODES = [
   { id: 'weapons', name: 'Weapons', icon: 'crossed_swords', x: 18, y: 42, color: '#ef4444', filter: 'weapon', img: '/images/buildings/weapons_shop.png' },
@@ -93,6 +94,21 @@ export default function TradingPostScene() {
         backgroundSize: 'cover', backgroundPosition: 'center',
       }} />
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.1)', pointerEvents: 'none' }} />
+
+      <BubbleEmitter
+        ambient={3}
+        density={0.4}
+        sources={[
+          ...(SCENE_NPCS.trading || []).map(npc => ({
+            id: `npc_${npc.id}`, x: npc.x, y: npc.y, rate: 0.3,
+            minSize: 2, maxSize: 5,
+          })),
+          ...TRADER_NODES.map(n => ({
+            id: `shop_${n.id}`, x: n.x, y: n.y, rate: 0.5,
+            minSize: 3, maxSize: 7, color: n.color + '50',
+          })),
+        ]}
+      />
 
       <div style={{
         position: 'absolute', top: 8, left: 16, right: 16,

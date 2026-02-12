@@ -5,6 +5,7 @@ import { getPlayerSprite, SCENE_NPCS } from '../data/spriteMap';
 import { InlineIcon } from '../data/uiSprites';
 import { setBgm } from '../utils/audioManager';
 import NpcSprite from './NpcSprite';
+import BubbleEmitter from './BubbleEmitter';
 
 const RESOURCE_NODES = [
   { id: 'gold_mine', name: 'Pearl Beds', icon: 'pickaxe', resource: 'gold', x: 18, y: 30, color: '#fbbf24', img: '/images/buildings/pearl_beds.png' },
@@ -114,6 +115,22 @@ export default function CampScene() {
         backgroundSize: 'cover', backgroundPosition: 'center',
       }} />
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)', pointerEvents: 'none' }} />
+
+      <BubbleEmitter
+        ambient={3}
+        density={0.5}
+        sources={[
+          ...(SCENE_NPCS.camp || []).map(npc => ({
+            id: `npc_${npc.id}`, x: npc.x, y: npc.y, rate: 0.3,
+            minSize: 2, maxSize: 5,
+          })),
+          ...RESOURCE_NODES.map(n => ({
+            id: `res_${n.id}`, x: n.x, y: n.y, rate: 0.6,
+            minSize: 3, maxSize: 8, color: n.color + '60',
+          })),
+          { id: 'exit_portal', x: 50, y: 90, rate: 0.8, minSize: 2, maxSize: 6, color: 'rgba(110,231,183,0.4)' },
+        ]}
+      />
 
       <div style={{
         position: 'absolute', top: 8, left: 16, right: 16,

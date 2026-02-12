@@ -4,6 +4,7 @@ import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite } from '../data/spriteMap';
 import { InlineIcon } from '../data/uiSprites';
 import { setBgm } from '../utils/audioManager';
+import BubbleEmitter from './BubbleEmitter';
 
 const DUNGEON_CONFIGS = {
   default: {
@@ -118,6 +119,15 @@ export default function DungeonScene() {
         backgroundSize: 'cover', backgroundPosition: 'center',
       }} />
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.2)', pointerEvents: 'none' }} />
+
+      <BubbleEmitter
+        ambient={2}
+        density={0.2}
+        sources={config.nodes.map((n, i) => ({
+          id: `dnode_${i}`, x: 50, y: n.y, rate: 0.3,
+          minSize: 2, maxSize: 6, color: config.color + '40',
+        }))}
+      />
 
       <div style={{
         position: 'absolute', top: 8, left: 16, right: 16,
