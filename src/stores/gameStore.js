@@ -8,6 +8,7 @@ import { skillTrees } from '../data/skillTrees';
 import { generateLoot, getEquipmentStatBonuses, getStartingEquipment, EQUIPMENT_SLOTS, canClassEquip, upgradeItem, UPGRADE_COSTS, getItemPrice, getSellPrice, generateShopInventory, WEAPON_TYPES } from '../data/equipment';
 import { getDefaultLoadout, resolveLoadout, getAllAbilityMap } from '../utils/abilityLoadout';
 import { missionTemplates, arenaTemplates } from '../data/missions';
+import { puterKV, isPuterAvailable } from '../utils/puterService';
 import { cities } from '../data/cities';
 import { getDefaultRow, getRowPositions, applyRowCombatModifiers, getAdjacentRows, getRowName, getAIRowPreference, isUnitRanged, PLAYER_ROWS, ENEMY_ROWS } from '../data/battleRows';
 
@@ -2756,8 +2757,40 @@ const useGameStore = create(persist((set, get) => ({
     });
   },
 
+  cloudSaveGame: async () => {
+    if (!isPuterAvailable()) return false;
+    try {
+      const state = get();
+      const partialize = useGameStore.persist?.getOptions?.()?.partialize;
+      const saveData = partialize ? partialize(state) : state;
+      await puterKV.save('betta-warlords-save', saveData);
+      console.log('[Puter] Cloud save successful');
+      return true;
+    } catch (err) {
+      console.error('[Puter] Cloud save failed:', err);
+      return false;
+    }
+  },
+
+  cloudLoadGame: async () => {
+    if (!isPuterAvailable()) return false;
+    try {
+      const data = await puterKV.load('betta-warlords-save');
+      if (data && typeof data === 'object' && data.playerName) {
+        set(data);
+        console.log('[Puter] Cloud load successful');
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('[Puter] Cloud load failed:', err);
+      return false;
+    }
+  },
+
   resetGame: () => {
     localStorage.removeItem('grudge-warlords-save');
+    if (isPuterAvailable()) { puterKV.remove('betta-warlords-save').catch(() => {}); }
     const zero = { Strength: 0, Vitality: 0, Endurance: 0, Dexterity: 0, Agility: 0, Intellect: 0, Wisdom: 0, Tactics: 0 };
     set({
       screen: 'title',
@@ -2931,6 +2964,24 @@ const useGameStore = create(persist((set, get) => ({
     dungeonProgress: state.dungeonProgress,
   }),
 }));
+
+let _cloudSaveTimer = null;
+useGameStore.subscribe((state, prevState) => {
+  if (!isPuterAvailable()) return;
+  if (state.screen === 'title' || state.screen === 'battle') return;
+  if (state.playerName === prevState.playerName &&
+      state.gold === prevState.gold &&
+      state.level === prevState.level &&
+      state.xp === prevState.xp &&
+      state.heroRoster === prevState.heroRoster &&
+      state.inventory === prevState.inventory &&
+      state.locationsCleared === prevState.locationsCleared &&
+      state.victories === prevState.victories) return;
+  if (_cloudSaveTimer) clearTimeout(_cloudSaveTimer);
+  _cloudSaveTimer = setTimeout(() => {
+    useGameStore.getState().cloudSaveGame();
+  }, 5000);
+});
 
 export default useGameStore;
 export { getHeroSkillBonuses, getHeroStatsWithBonuses };

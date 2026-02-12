@@ -13,6 +13,7 @@ import { setBgm } from '../utils/audioManager';
 import { TIERS, UPGRADE_COSTS, EQUIPMENT_SLOTS, WEAPON_TYPES, ARMOR_TYPES, getItemPrice, getSellPrice } from '../data/equipment';
 import { generateDialogue } from '../data/dialogue';
 import ChatBubbleSystem from './ChatBubble';
+import { puterAI, isPuterAvailable } from '../utils/puterService';
 import { generateRandomEvent, getRewardDescription } from '../data/randomEvents';
 import { encodeGrudaShare, generateShareUrl, generateShareCode } from '../utils/grudaShare';
 import { MAP_LAYERS, svgOverlayProps, mapNodeStyle, mapCenterStyle, fullCoverStyle, nodeScale as calcNodeScale } from './mapConstants';
@@ -1226,23 +1227,47 @@ export default function WorldMap() {
           return [...prev.slice(-49), entry];
         });
 
-        setTimeout(() => {
-          const sprite2 = getPlayerSprite(dialogue.speaker2.classId, dialogue.speaker2.raceId);
-          const bubble2 = {
-            id: `b_${Date.now()}_2`,
-            speaker: dialogue.speaker2,
-            text: dialogue.line2,
-            colorHex: '#fbbf24',
-            spriteData: sprite2,
-            autoExpire: 8000,
-          };
-          setBubbleQueue(prev => [...prev.slice(-4), bubble2]);
+        const useAI = isPuterAvailable() && Math.random() < 0.25;
+        if (useAI) {
+          const hero2 = dialogue.speaker2;
+          const zoneName = locations.find(l => l.id === currentZone)?.name || 'the depths';
+          puterAI.npcDialogue(hero2.name, `You are a ${raceDefinitions[hero2.raceId]?.name || ''} ${classDefinitions[hero2.classId]?.name || ''} in ${zoneName}. Your ally ${dialogue.speaker1.name} just said: "${dialogue.line1}". Reply in character.`).then(aiText => {
+            if (aiText) {
+              const sprite2 = getPlayerSprite(hero2.classId, hero2.raceId);
+              const bubble2 = {
+                id: `b_${Date.now()}_ai`,
+                speaker: hero2,
+                text: aiText,
+                colorHex: '#c084fc',
+                spriteData: sprite2,
+                autoExpire: 10000,
+              };
+              setBubbleQueue(prev => [...prev.slice(-4), bubble2]);
+              setChatLog(prev => {
+                const entry = { id: Date.now() + 1, speaker: hero2.name, line: aiText, color: '#c084fc' };
+                return [...prev.slice(-49), entry];
+              });
+            }
+          }).catch(() => {});
+        } else {
+          setTimeout(() => {
+            const sprite2 = getPlayerSprite(dialogue.speaker2.classId, dialogue.speaker2.raceId);
+            const bubble2 = {
+              id: `b_${Date.now()}_2`,
+              speaker: dialogue.speaker2,
+              text: dialogue.line2,
+              colorHex: '#fbbf24',
+              spriteData: sprite2,
+              autoExpire: 8000,
+            };
+            setBubbleQueue(prev => [...prev.slice(-4), bubble2]);
 
-          setChatLog(prev => {
-            const entry = { id: Date.now() + 1, speaker: dialogue.speaker2.name, line: dialogue.line2, color: 'var(--gold)' };
-            return [...prev.slice(-49), entry];
-          });
-        }, 2500);
+            setChatLog(prev => {
+              const entry = { id: Date.now() + 1, speaker: dialogue.speaker2.name, line: dialogue.line2, color: 'var(--gold)' };
+              return [...prev.slice(-49), entry];
+            });
+          }, 2500);
+        }
       }
     };
     const initialDelay = setTimeout(spawnDialogue, 5000 + Math.random() * 3000);

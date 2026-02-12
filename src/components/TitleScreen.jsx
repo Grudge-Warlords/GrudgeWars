@@ -40,6 +40,13 @@ export default function TitleScreen() {
         loginTime: Date.now(),
       };
       localStorage.setItem('grudge-session', JSON.stringify(session));
+      const cloudLoadGame = useGameStore.getState().cloudLoadGame;
+      if (cloudLoadGame) {
+        const loaded = await cloudLoadGame();
+        if (loaded) {
+          console.log('[Puter] Restored cloud save');
+        }
+      }
       setScreen('intro');
     } catch (err) {
       console.error('Puter sign-in failed:', err);

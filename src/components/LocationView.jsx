@@ -10,6 +10,8 @@ import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite } from '../data/spriteMap';
 import { InlineIcon, EssentialIcon } from '../data/uiSprites';
 import useIsMobile from '../hooks/useIsMobile';
+import { useLocationLore } from '../hooks/usePuterAI';
+import { isPuterAvailable } from '../utils/puterService';
 
 const SLOT_ICONS = {
   weapon: 'crossed_swords', offhand: 'shield', helmet: 'helm', armor: 'shield',
@@ -248,6 +250,7 @@ function QuestItem({ quest, zoneId, zoneStats, gameState, completed, onComplete 
 
 export default function LocationView() {
   const isMobile = useIsMobile();
+  const { lore, loading: loreLoading, generateZoneLore } = useLocationLore();
   const {
     currentLocation, startBattle, startBossBattle, returnToWorld,
     bossesDefeated, level, heroRoster, activeHeroIds, zoneConquer,
@@ -369,6 +372,38 @@ export default function LocationView() {
                   transition: 'width 0.3s',
                 }} />
               </div>
+            </div>
+          )}
+
+          {isPuterAvailable() && (
+            <div style={{
+              background: 'rgba(34,211,238,0.04)',
+              border: '1px solid rgba(34,211,238,0.15)',
+              borderRadius: 10, padding: '8px 12px', marginBottom: 8,
+            }}>
+              {lore ? (
+                <div style={{
+                  fontSize: '0.65rem', color: '#94a3b8', fontStyle: 'italic',
+                  lineHeight: 1.5,
+                }}>
+                  <span style={{ color: '#22d3ee', fontWeight: 600, fontStyle: 'normal', marginRight: 4 }}>AI Lore:</span>
+                  {lore}
+                </div>
+              ) : (
+                <button
+                  onClick={() => generateZoneLore(loc.name, `Level ${loc.levelRange[0]}-${loc.levelRange[1]} underwater zone`)}
+                  disabled={loreLoading}
+                  style={{
+                    background: 'rgba(34,211,238,0.1)', border: '1px solid rgba(34,211,238,0.25)',
+                    borderRadius: 6, padding: '6px 14px', color: '#22d3ee',
+                    fontSize: '0.65rem', cursor: loreLoading ? 'wait' : 'pointer',
+                    fontFamily: "'Cinzel', serif", fontWeight: 600, width: '100%',
+                    minHeight: 32,
+                  }}
+                >
+                  {loreLoading ? 'Channeling the tides...' : 'Generate AI Lore'}
+                </button>
+              )}
             </div>
           )}
 

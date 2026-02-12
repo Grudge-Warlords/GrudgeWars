@@ -22,6 +22,8 @@ import AdminSprite from './components/AdminSprite';
 import SceneView from './components/SceneView';
 import IntroCinematic from './components/IntroCinematic';
 import DiscordAuth from './components/DiscordAuth';
+import ArenaPage from './components/ArenaPage';
+import CraftingPage from './components/CraftingPage';
 import { InlineIcon } from './data/uiSprites';
 import GameTooltipRenderer from './components/GameTooltip';
 
@@ -206,6 +208,8 @@ export default function App() {
   if (path === '/adminbattle') return <AdminBattle />;
   if (path === '/adminsprite') return <AdminSprite />;
   if (path === '/discordauth') return <DiscordAuth />;
+  if (path === '/arena') return <ArenaPage />;
+  if (path === '/crafting') return <CraftingPage />;
 
   return <GameApp />;
 }

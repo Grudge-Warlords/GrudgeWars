@@ -12,6 +12,7 @@ import { playSwordHit, playMagicCast, playHeal, playBuff, playHurt, playCrit, pl
 import AbilityIcon from './AbilityIcon';
 import { showTooltip, hideTooltip, updateTooltipPosition } from './GameTooltip';
 import useIsMobile from '../hooks/useIsMobile';
+import { useBattleNarration } from '../hooks/usePuterAI';
 
 const locationBackgrounds = {
   coral_shallows: '/backgrounds/ocean_battle_new.png',
@@ -1149,6 +1150,7 @@ export default function BattleScreen() {
   } = useGameStore();
 
   const isMobile = useIsMobile();
+  const { narration, narrateAction } = useBattleNarration();
 
   const [unitAnims, setUnitAnims] = useState({});
   const [dashPositions, setDashPositions] = useState({});
@@ -1420,6 +1422,10 @@ export default function BattleScreen() {
     const attacker = battleUnits.find(u => u.id === attackerId);
     const target = battleUnits.find(u => u.id === targetId);
     if (!attacker) { setTimeout(() => advanceTurn(), 200); return; }
+
+    if (target && totalDmg > 0 && abilityName && Math.random() < 0.3) {
+      narrateAction(attacker.name, target.name, abilityName, totalDmg);
+    }
 
     const spriteData = getUnitSprite(attacker);
     const getAttackAnim = () => {
@@ -2206,6 +2212,13 @@ export default function BattleScreen() {
           padding: '0 16px 4px', maxHeight: 36, overflow: 'hidden',
           borderTop: '1px solid rgba(255,255,255,0.04)',
         }}>
+          {narration && (
+            <div style={{
+              color: '#22d3ee', fontSize: '0.55rem', fontStyle: 'italic',
+              padding: '1px 0', opacity: 0.85,
+              borderBottom: '1px solid rgba(34,211,238,0.15)', marginBottom: 1,
+            }}>{narration}</div>
+          )}
           {battleLog.slice(-3).map((msg, i, arr) => (
             <div key={i} style={{
               color: i === arr.length - 1 ? 'var(--text)' : 'var(--muted)',
