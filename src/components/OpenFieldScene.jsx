@@ -120,7 +120,7 @@ export default function OpenFieldScene() {
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <div style={{ color: '#fbbf24', fontSize: '0.55rem' }}>
-            {gold} Gold
+            {gold} Pearls
           </div>
           <div style={{
             width: 60, height: 6, background: 'rgba(0,0,0,0.5)', borderRadius: 3, overflow: 'hidden',

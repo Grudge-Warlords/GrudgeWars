@@ -397,11 +397,11 @@ const useGameStore = create(persist((set, get) => ({
   shopLastRefresh: 0,
   pendingLoot: [],
   harvestNodes: [
-    { id: 'gold_mine', name: 'Gold Mine', icon: 'pickaxe', resource: 'gold', baseRate: 3, unlockLevel: 1 },
-    { id: 'herb_garden', name: 'Herb Garden', icon: 'nature', resource: 'herbs', baseRate: 2, unlockLevel: 2 },
-    { id: 'lumber_yard', name: 'Lumber Yard', icon: 'wood', resource: 'wood', baseRate: 2, unlockLevel: 3 },
-    { id: 'ore_vein', name: 'Ore Vein', icon: 'ore', resource: 'ore', baseRate: 1, unlockLevel: 5 },
-    { id: 'crystal_cave', name: 'Crystal Cave', icon: 'diamond', resource: 'crystals', baseRate: 1, unlockLevel: 8 },
+    { id: 'gold_mine', name: 'Pearl Beds', icon: 'pickaxe', resource: 'gold', baseRate: 3, unlockLevel: 1 },
+    { id: 'herb_garden', name: 'Algae Garden', icon: 'nature', resource: 'herbs', baseRate: 2, unlockLevel: 2 },
+    { id: 'lumber_yard', name: 'Coral Grove', icon: 'wood', resource: 'wood', baseRate: 2, unlockLevel: 3 },
+    { id: 'ore_vein', name: 'Shell Deposit', icon: 'ore', resource: 'ore', baseRate: 1, unlockLevel: 5 },
+    { id: 'crystal_cave', name: 'Crystal Grotto', icon: 'diamond', resource: 'crystals', baseRate: 1, unlockLevel: 8 },
   ],
   activeHarvests: {},
   harvestResources: { gold: 0, herbs: 0, wood: 0, ore: 0, crystals: 0 },
@@ -1756,7 +1756,7 @@ const useGameStore = create(persist((set, get) => ({
       }
 
       log.push(`MISSION COMPLETE: ${mission.title}!`);
-      log.push(`Earned ${totalXp} XP and ${totalGold} Gold.`);
+      log.push(`Earned ${totalXp} XP and ${totalGold} Pearls.`);
 
       const levelsGained = newLevel - state.level;
       const playerUnit = state.battleUnits.find(u => u.id === 'player');
@@ -1830,7 +1830,7 @@ const useGameStore = create(persist((set, get) => ({
       }
 
       log.push(`ARENA VICTORY: ${arena?.title}!`);
-      log.push(`Earned ${totalXp} XP and ${totalGold} Gold.`);
+      log.push(`Earned ${totalXp} XP and ${totalGold} Pearls.`);
 
       const levelsGained = newLevel - state.level;
       const playerUnit = state.battleUnits.find(u => u.id === 'player');
@@ -1937,7 +1937,7 @@ const useGameStore = create(persist((set, get) => ({
     }
 
     const newConquer = zoneConquer[locId] || 0;
-    log.push(`Victory! Gained ${adjustedTotalXp} XP and ${totalGold} Gold.${eventBonus ? ' (Event Bonus!)' : ''}`);
+    log.push(`Victory! Gained ${adjustedTotalXp} XP and ${totalGold} Pearls.${eventBonus ? ' (Event Bonus!)' : ''}`);
     if (locId) log.push(`Zone conquered: ${Math.floor(newConquer)}%${xpReduction > 0 ? ` (XP -${Math.floor(xpReduction * 100)}%)` : ''}`);
 
     const lootDrops = [];
@@ -2622,7 +2622,7 @@ const useGameStore = create(persist((set, get) => ({
       newSkillPoints += 1;
     }
 
-    log.push(`Training complete! Gained ${totalXp} XP and ${totalGold} Gold.`);
+    log.push(`Training complete! Gained ${totalXp} XP and ${totalGold} Pearls.`);
 
     const updatedRoster = state.heroRoster.map(hero => {
       const battleUnit = state.battleUnits.find(u => u.id === hero.id);

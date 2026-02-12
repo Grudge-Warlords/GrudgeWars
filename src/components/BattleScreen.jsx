@@ -2681,12 +2681,12 @@ export default function BattleScreen() {
             {isVictory && (
               <div style={{ color: 'var(--accent)', marginTop: 8, fontSize: '0.8rem' }}>
                 +{battleUnits.filter(u => u.team === 'enemy').reduce((s, e) => s + (e.xpReward || 0), 0)} XP |
-                +{Math.floor(battleUnits.filter(u => u.team === 'enemy').reduce((s, e) => s + (e.goldReward || 0), 0) * 0.1)} Gold
+                +{Math.floor(battleUnits.filter(u => u.team === 'enemy').reduce((s, e) => s + (e.goldReward || 0), 0) * 0.1)} Pearls
               </div>
             )}
             {isDefeat && (
               <div style={{ color: 'var(--muted)', marginTop: 8, fontSize: '0.75rem' }}>
-                Recover at 50% HP, lose 10% gold.
+                Recover at 50% HP, lose 10% pearls.
               </div>
             )}
             <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'center' }}>

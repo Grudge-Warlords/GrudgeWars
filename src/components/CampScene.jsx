@@ -22,6 +22,7 @@ const CHEST_NODE = { id: 'inventory_chest', name: 'Inventory', x: 90, y: 48, col
 const REEF_HUNT_NODE = { id: 'reef_hunt', name: 'Reef Hunt', x: 55, y: 35, color: '#22d3ee', img: '/images/buildings/crystal_grotto.png' };
 
 const SELL_PRICES = { gold: 1, herbs: 2, wood: 2, ore: 4, crystals: 8 };
+const RESOURCE_LABELS = { gold: 'Pearls', herbs: 'Algae', wood: 'Coral', ore: 'Shells', crystals: 'Crystals' };
 
 const SPAWN_POS = { x: 50, y: -8 };
 const LAND_POS = { x: 45, y: 75 };
@@ -834,7 +835,7 @@ export default function CampScene() {
                 padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.05)',
               }}>
                 <div>
-                  <span style={{ color: '#e2e8f0', fontSize: '0.6rem', textTransform: 'capitalize' }}>{res}</span>
+                  <span style={{ color: '#e2e8f0', fontSize: '0.6rem' }}>{RESOURCE_LABELS[res] || res}</span>
                   <span style={{ color: '#94a3b8', fontSize: '0.5rem', marginLeft: 6 }}>x{amount}</span>
                   <span style={{ color: '#fbbf24', fontSize: '0.45rem', marginLeft: 4 }}>({price}p ea)</span>
                 </div>

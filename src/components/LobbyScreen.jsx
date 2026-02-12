@@ -250,7 +250,7 @@ function MainTab({ hasExistingSave, onContinue, onNewGame, playerName, playerLev
               </div>
               <div style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: 4 }}>
                 Level {playerLevel} {playerRace} {playerClass} &bull;{' '}
-                <InlineIcon name="gold" size={12} /> {gold} Gold &bull;{' '}
+                <InlineIcon name="gold" size={12} /> {gold} Pearls &bull;{' '}
                 <EssentialIcon name="Team" size={12} /> {heroRoster?.length || 0} Heroes
               </div>
             </div>

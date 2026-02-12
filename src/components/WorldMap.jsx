@@ -2866,7 +2866,7 @@ export default function WorldMap() {
                       </div>
                       <div style={{ color: 'var(--muted)', fontSize: '0.65rem', marginBottom: 6 }}>{arena.description}</div>
                       <div style={{ display: 'flex', gap: 8, fontSize: '0.55rem' }}>
-                        <span style={{ color: 'var(--gold)' }}><InlineIcon name="gold" size={12} /> {arena.rewards.gold}g</span>
+                        <span style={{ color: 'var(--gold)' }}><InlineIcon name="gold" size={12} /> {arena.rewards.gold}</span>
                         <span style={{ color: 'var(--accent)' }}><InlineIcon name="sparkle" size={12} /> {arena.rewards.xp} XP</span>
                         <span style={{ color: 'var(--muted)' }}>👹 {arena.enemies.length} enemies</span>
                       </div>
@@ -2912,7 +2912,7 @@ export default function WorldMap() {
                         </div>
                         <div style={{ color: 'var(--muted)', fontSize: '0.65rem', marginBottom: 6, lineHeight: 1.3 }}>{mission.description}</div>
                         <div style={{ display: 'flex', gap: 8, fontSize: '0.55rem', flexWrap: 'wrap' }}>
-                          <span style={{ color: 'var(--gold)' }}><InlineIcon name="gold" size={12} /> {mission.rewards.gold}g</span>
+                          <span style={{ color: 'var(--gold)' }}><InlineIcon name="gold" size={12} /> {mission.rewards.gold}</span>
                           <span style={{ color: 'var(--accent)' }}><InlineIcon name="sparkle" size={12} /> {mission.rewards.xp} XP</span>
                           <span style={{ color: 'var(--muted)' }}><InlineIcon name="battle" size={12} /> {mission.rounds.length} round{mission.rounds.length > 1 ? 's' : ''}</span>
                           <span style={{ color: 'var(--muted)' }}>Lv.{mission.levelRange[0]}-{mission.levelRange[1]}</span>
@@ -2978,7 +2978,7 @@ export default function WorldMap() {
                         </div>
                       )}
                       <div style={{ color: 'var(--gold)', fontSize: '0.65rem', padding: '0 4px 6px' }}>
-                        Gold: {gold}g
+                        Pearls: {gold}
                       </div>
                       {(() => {
                         const upgradeHero = heroRoster.find(h => h.id === upgradeHeroId);
@@ -3078,7 +3078,7 @@ export default function WorldMap() {
                     Merchant
                   </div>
                   <div style={{ color: 'var(--gold)', fontSize: '0.65rem', padding: '0 8px 6px' }}>
-                    Gold: {gold}g
+                    Pearls: {gold}
                   </div>
 
                   <div style={{ display: 'flex', gap: 4, padding: '0 8px 8px' }}>

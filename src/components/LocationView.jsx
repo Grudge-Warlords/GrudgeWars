@@ -233,7 +233,7 @@ function QuestItem({ quest, zoneId, zoneStats, gameState, completed, onComplete 
       }}>
         <div style={{ display: 'flex', gap: 8 }}>
           {quest.rewards.gold > 0 && (
-            <span style={{ fontSize: '0.48rem', color: 'var(--gold)' }}>+{quest.rewards.gold}g</span>
+            <span style={{ fontSize: '0.48rem', color: 'var(--gold)' }}>+{quest.rewards.gold} <InlineIcon name="gold" size={10} /></span>
           )}
           {quest.rewards.xp > 0 && (
             <span style={{ fontSize: '0.48rem', color: '#60a5fa' }}>+{quest.rewards.xp} XP</span>

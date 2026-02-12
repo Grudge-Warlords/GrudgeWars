@@ -227,7 +227,7 @@ export default function PortalScene() {
           <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
             {Object.entries(harvestResources).filter(([k]) => k !== 'gold').map(([res, amt]) => (
               <span key={res} style={{ color: '#94a3b8', fontSize: '0.45rem', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: 4 }}>
-                {res}: {Math.floor(amt)}
+                {{ herbs: 'Algae', wood: 'Coral', ore: 'Shells', crystals: 'Crystals' }[res] || res}: {Math.floor(amt)}
               </span>
             ))}
           </div>
@@ -254,7 +254,7 @@ export default function PortalScene() {
                   <span style={{ color: '#6ee7b3', fontSize: '0.45rem', marginLeft: 6 }}>+{recipe.bonus} {recipe.stat}</span>
                 </div>
                 <div style={{ color: '#94a3b8', fontSize: '0.4rem' }}>
-                  {Object.entries(recipe.cost).map(([r, a]) => `${a} ${r}`).join(', ')}
+                  {Object.entries(recipe.cost).map(([r, a]) => `${a} ${{ herbs: 'Algae', wood: 'Coral', ore: 'Shells', crystals: 'Crystals', gold: 'Pearls' }[r] || r}`).join(', ')}
                 </div>
               </div>
             ))}
@@ -355,9 +355,9 @@ export default function PortalScene() {
           Void Nexus
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ color: '#fbbf24', fontSize: '0.5rem' }}>{gold} gold</span>
+          <span style={{ color: '#fbbf24', fontSize: '0.5rem' }}>{gold} Pearls</span>
           {Object.entries(harvestResources).filter(([k]) => k !== 'gold').map(([r, a]) => (
-            <span key={r} style={{ color: '#94a3b8', fontSize: '0.4rem' }}>{r}: {Math.floor(a)}</span>
+            <span key={r} style={{ color: '#94a3b8', fontSize: '0.4rem' }}>{{ herbs: 'Algae', wood: 'Coral', ore: 'Shells', crystals: 'Crystals' }[r] || r}: {Math.floor(a)}</span>
           ))}
         </div>
       </div>

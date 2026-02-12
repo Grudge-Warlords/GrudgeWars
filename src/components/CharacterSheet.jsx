@@ -71,7 +71,7 @@ export default function CharacterSheet() {
             <h2 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '1.3rem' }}>{playerName}</h2>
             <div style={{ color: cls?.color, fontSize: '0.9rem' }}>Level {level} {raceDef ? raceDef.name + ' ' : ''}{cls?.name}</div>
             <div style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: 4 }}>
-              XP: {xp}/{xpToNext} | Gold: {gold}
+              XP: {xp}/{xpToNext} | Pearls: {gold}
             </div>
             <div style={{
               marginTop: 10, background: 'rgba(255,215,0,0.1)', border: '1px solid var(--gold)',

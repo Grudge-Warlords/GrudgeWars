@@ -116,11 +116,11 @@ export function generateRandomEvent(playerLevel, unlockedLocationIds, existingEv
 
 export function getRewardDescription(event) {
   const parts = [];
-  if (event.rewards.gold) parts.push(`${event.rewards.gold}g`);
+  if (event.rewards.gold) parts.push(`${event.rewards.gold} Pearls`);
   if (event.rewards.xp) parts.push(`${event.rewards.xp} XP`);
   if (event.rewards.bonusLootTier) parts.push('Bonus Loot');
-  if (event.rewards.materials) parts.push(`${event.rewards.materials} Materials`);
-  if (event.rewards.potions) parts.push(`${event.rewards.potions} Potions`);
+  if (event.rewards.materials) parts.push(`${event.rewards.materials} Reef Materials`);
+  if (event.rewards.potions) parts.push(`${event.rewards.potions} Elixirs`);
   return parts.join('  ');
 }
 
