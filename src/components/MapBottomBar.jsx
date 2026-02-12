@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import useGameStore, { getHeroStatsWithBonuses } from '../stores/gameStore';
 import { classDefinitions } from '../data/classes';
 import { raceDefinitions } from '../data/races';
+import { attributeDefinitions, calculateCombatPower } from '../data/attributes';
 import { InlineIcon } from '../data/uiSprites.jsx';
 import { showTooltip, hideTooltip, updateTooltipPosition } from './GameTooltip';
 import SpriteAnimation from './SpriteAnimation';
@@ -197,20 +198,35 @@ function CharacterPopup({ onClose }) {
   const cls = hero ? classDefinitions[hero.classId] : null;
   const race = hero ? raceDefinitions[hero.raceId] : null;
 
-  const statLabels = ['STR', 'AGI', 'INT', 'VIT', 'LCK', 'DEF', 'SPD', 'CHA'];
-  const statKeys = ['strength', 'agility', 'intellect', 'vitality', 'luck', 'defense', 'speed', 'charisma'];
-  const maxStat = 100;
+  const attrKeys = Object.keys(attributeDefinitions);
+  const attrLabels = attrKeys.map(k => k.slice(0, 3).toUpperCase());
+  const attrPoints = hero?.attributePoints || {};
+  const maxAttrPts = Math.max(1, ...attrKeys.map(k => attrPoints[k] || 0));
+  const radarValues = attrKeys.map(k => Math.min(100, ((attrPoints[k] || 0) / Math.max(maxAttrPts, 20)) * 100));
 
-  const radarValues = stats ? statKeys.map(k => Math.min(100, ((stats[k] || 0) / maxStat) * 100)) : [];
+  const combatPower = stats ? calculateCombatPower(stats) : 0;
 
-  const totalPower = stats ? statKeys.reduce((sum, k) => sum + (stats[k] || 0), 0) + (hero.level || 1) * 10 : 0;
+  const combatStats = stats ? [
+    { label: 'Health', value: Math.floor(stats.health), color: '#22c55e' },
+    { label: 'Mana', value: Math.floor(stats.mana), color: '#3b82f6' },
+    { label: 'Phys Dmg', value: Math.floor(stats.physicalDamage), color: '#ef4444' },
+    { label: 'Magic Dmg', value: Math.floor(stats.magicDamage), color: '#a855f7' },
+    { label: 'Defense', value: Math.floor(stats.defense), color: '#f59e0b' },
+    { label: 'Crit %', value: stats.criticalChance?.toFixed(1), color: '#f97316' },
+    { label: 'Crit Dmg', value: Math.floor(stats.criticalDamage) + '%', color: '#fb923c' },
+    { label: 'Accuracy', value: stats.accuracy?.toFixed(1), color: '#06b6d4' },
+    { label: 'Evasion', value: stats.evasion?.toFixed(1), color: '#14b8a6' },
+    { label: 'Block %', value: stats.block?.toFixed(1), color: '#64748b' },
+    { label: 'Atk Spd', value: stats.attackSpeed?.toFixed(1), color: '#22d3ee' },
+    { label: 'Resistance', value: stats.resistance?.toFixed(1), color: '#8b5cf6' },
+  ] : [];
 
   return (
     <div style={{
       position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
       backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
       border: '1px solid rgba(168,85,247,0.3)',
-      borderRadius: 12, padding: 16, width: 400, maxHeight: 500, overflowY: 'auto',
+      borderRadius: 12, padding: 16, width: 420, maxHeight: 500, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
       animation: 'fadeIn 0.15s ease-out',
     }}>
@@ -249,31 +265,51 @@ function CharacterPopup({ onClose }) {
                 border: '1px solid rgba(168,85,247,0.3)', borderRadius: 6, padding: '3px 8px',
                 display: 'inline-block',
               }}>
-                <span style={{ color: '#c084fc', fontSize: '0.7rem', fontWeight: 700 }}>Power: {totalPower}</span>
+                <span style={{ color: '#c084fc', fontSize: '0.7rem', fontWeight: 700 }}>Power: {combatPower.toLocaleString()}</span>
               </div>
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
             <div style={{ flex: '0 0 auto' }}>
-              <RadarChart labels={statLabels} values={radarValues} size={160} color="#a855f7" />
+              <RadarChart labels={attrLabels} values={radarValues} size={160} color="#a855f7" />
             </div>
-            <div style={{ flex: 1, display: 'grid', gap: 4 }}>
-              {statKeys.map((k, i) => (
-                <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 28, fontSize: '0.55rem', color: '#c084fc', fontWeight: 700, textAlign: 'right' }}>{statLabels[i]}</span>
-                  <div style={{ flex: 1, height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
-                    <div style={{
-                      height: '100%', width: `${Math.min(100, (stats[k] / maxStat) * 100)}%`,
-                      background: 'linear-gradient(90deg, #7c3aed, #c084fc)',
-                      borderRadius: 3, transition: 'width 0.3s',
-                    }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '0.5rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Attributes</div>
+              <div style={{ display: 'grid', gap: 3, marginBottom: 8 }}>
+                {attrKeys.map(k => {
+                  const pts = attrPoints[k] || 0;
+                  const def = attributeDefinitions[k];
+                  return (
+                    <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ width: 32, fontSize: '0.5rem', color: def.color, fontWeight: 700, textAlign: 'right' }}>{k.slice(0, 3).toUpperCase()}</span>
+                      <div style={{ flex: 1, height: 5, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{
+                          height: '100%', width: `${Math.min(100, (pts / Math.max(maxAttrPts, 20)) * 100)}%`,
+                          background: `linear-gradient(90deg, ${def.color}88, ${def.color})`,
+                          borderRadius: 3, transition: 'width 0.3s',
+                        }} />
+                      </div>
+                      <span style={{ width: 20, fontSize: '0.5rem', color: 'var(--text)', fontWeight: 600, textAlign: 'right' }}>{pts}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ fontSize: '0.5rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Combat Stats</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 8px' }}>
+                {combatStats.map(s => (
+                  <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1px 0' }}>
+                    <span style={{ fontSize: '0.45rem', color: '#999' }}>{s.label}</span>
+                    <span style={{ fontSize: '0.5rem', color: s.color, fontWeight: 600 }}>{s.value}</span>
                   </div>
-                  <span style={{ width: 24, fontSize: '0.55rem', color: 'var(--text)', fontWeight: 600, textAlign: 'right' }}>{stats[k]}</span>
-                </div>
-              ))}
+                ))}
+              </div>
+
               <div style={{ marginTop: 6, padding: '4px 6px', background: 'rgba(0,0,0,0.2)', borderRadius: 4 }}>
-                <div style={{ fontSize: '0.5rem', color: 'var(--muted)' }}>HP: {hero.currentHealth}/{stats.health} | MP: {hero.currentMana}/{stats.mana}</div>
+                <div style={{ fontSize: '0.5rem', color: 'var(--muted)' }}>
+                  HP: {hero.currentHealth || 0}/{Math.floor(stats.health)} | MP: {hero.currentMana || 0}/{Math.floor(stats.mana)}
+                </div>
               </div>
             </div>
           </div>
