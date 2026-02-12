@@ -362,15 +362,15 @@ export default function MapBottomBar({
     { id: 'points', label: 'Points', img: '/images/icons/btn-points.png', color: hasUnspent ? '#ef4444' : '#94a3b8', action: () => setScreen('account'), pulse: hasUnspent },
     { id: 'council', label: 'Council', img: '/images/icons/btn-council.png', color: 'var(--gold)', action: () => setScreen('account') },
     { id: 'party', label: 'Party', img: '/images/icons/btn-party.png', color: 'var(--accent)', action: () => onToggleWarParty(), badge: Object.keys(activeHarvests).length > 0 ? Object.keys(activeHarvests).length : null },
-    { id: 'gruda', label: 'Gruda', iconSrc: '/sprites/ui/icons/icon_skull.png', color: '#f87171', action: () => onToggleGruda() },
+    { id: 'gruda', label: 'Gruda', img: '/images/icons/btn-gruda.png', color: '#f87171', action: () => onToggleGruda() },
     { id: 'settings', label: 'Settings', img: '/images/icons/btn-settings.png', color: '#94a3b8', action: () => window.dispatchEvent(new Event('toggle-settings')) },
-    { id: 'music', label: musicMuted ? 'Unmute' : 'Mute', iconSrc: '/sprites/ui/icons/icon_energy.png', color: musicMuted ? '#ef4444' : '#6ee7b7', action: () => {
+    { id: 'music', label: musicMuted ? 'Unmute' : 'Mute', img: '/images/icons/btn-music.png', color: musicMuted ? '#ef4444' : '#6ee7b7', action: () => {
       const newVal = !musicMuted;
       setMusicMutedState(newVal);
       setMusicMuted(newVal);
       setSfxMuted(newVal);
     }},
-    { id: 'quests', label: 'Quests', iconSrc: '/sprites/ui/icons/icon_sea_scroll.png', color: '#fbbf24', action: () => setScreen('account') },
+    { id: 'quests', label: 'Quests', img: '/images/icons/btn-quests.png', color: '#fbbf24', action: () => setScreen('account') },
   ];
 
   const popupButtons = [
