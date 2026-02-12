@@ -954,47 +954,94 @@ const squidSprite = {
   death: { src: '/sprites/enemies/squid/death.png', frames: 2 },
 };
 
+function underwaterBossSprite(name, hasAttack2 = false, walkFrames = 6) {
+  const base = {
+    folder: `enemies/${name}`,
+    frameWidth: 48,
+    frameHeight: 48,
+    swimming: true,
+    idle: { src: `/sprites/enemies/${name}/idle.png`, frames: 4 },
+    attack1: { src: `/sprites/enemies/${name}/attack.png`, frames: 6 },
+    hurt: { src: `/sprites/enemies/${name}/hurt.png`, frames: 2 },
+    walk: { src: `/sprites/enemies/${name}/walk.png`, frames: walkFrames },
+    death: { src: `/sprites/enemies/${name}/death.png`, frames: 6 },
+  };
+  if (hasAttack2) {
+    base.attack2 = { src: `/sprites/enemies/${name}/attack2.png`, frames: 6 };
+  }
+  return base;
+}
+
+const anglerSprite = underwaterBossSprite('angler');
+const seahorseSprite = underwaterBossSprite('seahorse');
+const pufferbossSprite = underwaterBossSprite('pufferfish_boss', true);
+const jellybossSprite = underwaterBossSprite('jellyfish_boss');
+const crabbossSprite = underwaterBossSprite('crab_boss');
+const turtlebossSprite = underwaterBossSprite('turtle_boss', false, 4);
+
+function gifCharSprite(name, idleFrames, hurtFrames = 2) {
+  return {
+    folder: `enemies/${name}`,
+    frameWidth: 128,
+    frameHeight: 128,
+    swimming: true,
+    idle: { src: `/sprites/enemies/${name}/idle.png`, frames: idleFrames },
+    walk: { src: `/sprites/enemies/${name}/walk.png`, frames: idleFrames },
+    attack1: { src: `/sprites/enemies/${name}/attack1.png`, frames: idleFrames },
+    hurt: { src: `/sprites/enemies/${name}/hurt.png`, frames: hurtFrames },
+    death: { src: `/sprites/enemies/${name}/death.png`, frames: hurtFrames },
+  };
+}
+
+const greenFishCharSprite = gifCharSprite('green_fish_char', 4);
+const pinkFishCharSprite = gifCharSprite('pink_fish_char', 3);
+const jellyfishCharSprite = gifCharSprite('jellyfish_char', 3);
+const starfishCharSprite = gifCharSprite('starfish_char', 4);
+const tadpoleCharSprite = gifCharSprite('tadpole_char', 3);
+const wormCharSprite = gifCharSprite('worm_char', 3);
+const eggCharSprite = gifCharSprite('egg_char', 5);
+
 export const enemySpriteMap = {
   goblin: fishEnemySprite('fish_tan'),
   skeleton: fishEnemySprite('fish_dark'),
   wolf: fishEnemySprite('fish_red'),
-  dark_mage: squidSprite,
-  dark_knight: salmonSprite,
+  dark_mage: jellyfishCharSprite,
+  dark_knight: anglerSprite,
   shadow_warrior: fishEnemySprite('fish_crimson'),
-  water_priestess_mage: clownfishSprite,
-  orc: mudfishSprite,
-  dragon_whelp: solarfishSprite,
-  flying_eye: fishEnemySprite('fish_sky'),
-  mushroom: fishEnemySprite('fish_coral'),
-  skeleton_knight: fishEnemySprite('fish_dark'),
+  water_priestess_mage: pinkFishCharSprite,
+  orc: crabbossSprite,
+  dragon_whelp: seahorseSprite,
+  flying_eye: starfishCharSprite,
+  mushroom: eggCharSprite,
+  skeleton_knight: turtlebossSprite,
   shadow_bat: fishEnemySprite('fish_purple'),
-  imp: fishEnemySprite('fish_teal'),
-  mimic: { ...clownfishSprite, filter: 'hue-rotate(180deg) saturate(1.2)' },
+  imp: tadpoleCharSprite,
+  mimic: { ...greenFishCharSprite, filter: 'hue-rotate(30deg) saturate(1.2)' },
   crow_knight: fishEnemySprite('fish_blue'),
-  stone_guardian: { ...mudfishSprite, filter: 'hue-rotate(30deg) saturate(0.8) brightness(0.9)' },
-  forest_guardian: { ...solarfishSprite, filter: 'hue-rotate(90deg) saturate(1.3)' },
-  elite_orc: { ...salmonSprite, filter: 'hue-rotate(350deg) saturate(1.4)' },
-  lich: killerFishSprite,
-  demon_lord: { ...killerFishSprite, filter: 'hue-rotate(30deg) saturate(1.4) brightness(1.1)' },
-  evil_wizard: { ...squidSprite, filter: 'hue-rotate(270deg) saturate(1.3) brightness(1.1)' },
-  void_king: { ...killerFishSprite, filter: 'hue-rotate(180deg) saturate(1.5) brightness(1.2)' },
-  water_elemental: { ...clownfishSprite, filter: 'hue-rotate(160deg) saturate(1.4) brightness(1.1)' },
-  nature_elemental: { ...solarfishSprite, filter: 'hue-rotate(60deg) saturate(1.3) brightness(1.1)' },
-  grand_shaman: { ...mudfishSprite, filter: 'hue-rotate(120deg) saturate(1.2)' },
-  canyon_warlord: { ...salmonSprite, filter: 'hue-rotate(20deg) saturate(1.5)' },
-  frost_wyrm: { ...killerFishSprite, filter: 'hue-rotate(160deg) saturate(1.2) brightness(1.3)' },
-  shadow_beast: { ...killerFishSprite, filter: 'hue-rotate(240deg) saturate(1.5) brightness(0.9)' },
-  corrupted_grove_keeper: { ...killerFishSprite, filter: 'hue-rotate(100deg) saturate(1.4) brightness(1.1)' },
-  void_sentinel: { ...squidSprite, filter: 'hue-rotate(200deg) saturate(1.5) brightness(1.1)' },
-  abyssal_demon: { ...killerFishSprite, filter: 'hue-rotate(350deg) saturate(1.6) brightness(1.0)' },
-  eldritch_horror: { ...squidSprite, filter: 'hue-rotate(120deg) saturate(1.3) brightness(0.8)' },
-  frost_titan: { ...killerFishSprite, filter: 'hue-rotate(170deg) saturate(1.2) brightness(1.4)' },
-  god_odin: { ...killerFishSprite, filter: 'hue-rotate(190deg) saturate(1.6) brightness(1.3)' },
-  god_madra: { ...killerFishSprite, filter: 'hue-rotate(330deg) saturate(1.8) brightness(1.1)' },
-  god_omni: { ...killerFishSprite, filter: 'hue-rotate(260deg) saturate(1.5) brightness(1.2)' },
+  stone_guardian: { ...crabbossSprite, filter: 'hue-rotate(30deg) saturate(0.8) brightness(0.9)' },
+  forest_guardian: { ...seahorseSprite, filter: 'hue-rotate(90deg) saturate(1.3)' },
+  elite_orc: { ...anglerSprite, filter: 'hue-rotate(350deg) saturate(1.4)' },
+  lich: pufferbossSprite,
+  demon_lord: { ...jellybossSprite, filter: 'hue-rotate(30deg) saturate(1.4) brightness(1.1)' },
+  evil_wizard: { ...jellyfishCharSprite, filter: 'hue-rotate(270deg) saturate(1.3) brightness(1.1)' },
+  void_king: { ...turtlebossSprite, filter: 'hue-rotate(180deg) saturate(1.5) brightness(1.2)' },
+  water_elemental: { ...jellybossSprite, filter: 'hue-rotate(160deg) saturate(1.4) brightness(1.1)' },
+  nature_elemental: { ...seahorseSprite, filter: 'hue-rotate(60deg) saturate(1.3) brightness(1.1)' },
+  grand_shaman: wormCharSprite,
+  canyon_warlord: { ...crabbossSprite, filter: 'hue-rotate(20deg) saturate(1.5)' },
+  frost_wyrm: { ...anglerSprite, filter: 'hue-rotate(160deg) saturate(1.2) brightness(1.3)' },
+  shadow_beast: { ...pufferbossSprite, filter: 'hue-rotate(240deg) saturate(1.5) brightness(0.9)' },
+  corrupted_grove_keeper: { ...seahorseSprite, filter: 'hue-rotate(100deg) saturate(1.4) brightness(1.1)' },
+  void_sentinel: { ...jellybossSprite, filter: 'hue-rotate(200deg) saturate(1.5) brightness(1.1)' },
+  abyssal_demon: { ...anglerSprite, filter: 'hue-rotate(350deg) saturate(1.6) brightness(1.0)' },
+  eldritch_horror: { ...jellyfishCharSprite, filter: 'hue-rotate(120deg) saturate(1.3) brightness(0.8)' },
+  frost_titan: { ...turtlebossSprite, filter: 'hue-rotate(170deg) saturate(1.2) brightness(1.4)' },
+  god_odin: { ...pufferbossSprite, filter: 'hue-rotate(190deg) saturate(1.6) brightness(1.3)' },
+  god_madra: { ...crabbossSprite, filter: 'hue-rotate(330deg) saturate(1.8) brightness(1.1)' },
+  god_omni: { ...turtlebossSprite, filter: 'hue-rotate(260deg) saturate(1.5) brightness(1.2)' },
   loreon_knight: fishEnemySprite('fish_blue'),
-  medieval_warrior: mudfishSprite,
-  fantasy_warrior: salmonSprite,
+  medieval_warrior: greenFishCharSprite,
+  fantasy_warrior: { ...anglerSprite, filter: 'hue-rotate(40deg) saturate(1.3)' },
 };
 
 export const effectSprites = {
