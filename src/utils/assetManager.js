@@ -1,7 +1,7 @@
 const VIDEOS = [
   '/videos/bg-clear.mp4',
   '/videos/bg-blur.mp4',
-  '/videos/loading.mp4',
+  '/images/loading.gif',
 ];
 
 const CRITICAL_IMAGES = [

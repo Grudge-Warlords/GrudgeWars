@@ -158,7 +158,7 @@ function GameApp() {
         {transitionPhase !== 'none' && (
           <div style={{
             position: 'absolute', inset: 0, zIndex: 10500,
-            backgroundImage: 'url(/images/loading-2.gif)',
+            backgroundImage: 'url(/images/loading.gif)',
             backgroundSize: 'cover', backgroundPosition: 'center',
             opacity: transitionPhase === 'in' ? 1 : transitionPhase === 'hold' ? 1 : 0,
             transition: transitionPhase === 'in' ? 'opacity 0.4s ease-in' : 'opacity 0.4s ease-out',
