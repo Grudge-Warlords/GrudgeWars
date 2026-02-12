@@ -407,6 +407,10 @@ export default function MapBottomBar({
         display: 'flex',
         alignItems: 'stretch',
         padding: '0',
+        backgroundImage: 'url(/images/ui-bottombar-bg.png)',
+        backgroundSize: '100% 100%',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
       }}>
         <div style={{
           flex: '0 0 28%',
