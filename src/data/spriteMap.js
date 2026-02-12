@@ -1014,7 +1014,7 @@ export const enemySpriteMap = {
   flying_eye: starfishCharSprite,
   mushroom: eggCharSprite,
   skeleton_knight: turtlebossSprite,
-  shadow_bat: fishEnemySprite('fish_purple'),
+  shadow_bat: gifCharSprite('boot_char', 2),
   imp: tadpoleCharSprite,
   mimic: { ...greenFishCharSprite, filter: 'hue-rotate(30deg) saturate(1.2)' },
   crow_knight: fishEnemySprite('fish_blue'),
