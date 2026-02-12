@@ -651,21 +651,24 @@ function HeroDetailPanel({ hero, onClose }) {
                 />
 
                 <div style={{
-                  display: 'flex', gap: 12, justifyContent: 'center', width: '100%',
-                  background: 'rgba(0,0,0,0.2)', borderRadius: 6, padding: '6px 10px',
-                  border: '1px solid var(--border)',
+                  background: 'rgba(0,0,0,0.2)', borderRadius: 8, padding: '10px 14px',
+                  border: '1px solid var(--border)', width: '100%',
                 }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>Power</div>
-                    <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fbbf24', fontFamily: 'monospace' }}>{cp.toLocaleString()}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>Combat Power</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fbbf24', fontFamily: 'monospace' }}>{cp.toLocaleString()}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>Build Rating</div>
+                      <div style={{
+                        fontSize: '1.2rem', fontWeight: 700, fontFamily: 'monospace',
+                        color: build.rating.startsWith('S') ? '#fbbf24' : build.rating === 'A' ? '#a855f7' : 'var(--text)',
+                      }}>{build.rating}</div>
+                    </div>
                   </div>
-                  <div style={{ width: 1, background: 'var(--border)' }} />
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>Rating</div>
-                    <div style={{
-                      fontSize: '1rem', fontWeight: 700, fontFamily: 'monospace',
-                      color: build.rating.startsWith('S') ? '#fbbf24' : build.rating === 'A' ? '#a855f7' : 'var(--text)',
-                    }}>{build.rating}</div>
+                  <div style={{ marginTop: 6, fontSize: '0.6rem', color: 'var(--muted)', fontStyle: 'italic' }}>
+                    {build.desc}
                   </div>
                 </div>
               </div>
