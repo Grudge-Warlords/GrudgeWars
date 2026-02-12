@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useGameStore from '../stores/gameStore';
 import { EssentialIcon } from '../data/uiSprites';
 import {
@@ -7,6 +7,16 @@ import {
   playClick,
 } from '../utils/audioManager';
 
+const STORAGE_KEY = 'bw-settings';
+function loadSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch { return {}; }
+}
+function saveSettings(s) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+
 export default function SettingsMenu() {
   const [open, setOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -14,6 +24,12 @@ export default function SettingsMenu() {
   const [sfxOff, setSfxOff] = useState(getSfxMuted());
   const [musicVol, setMusicVol] = useState(getMusicVolume());
   const [sfxVol, setSfxVol] = useState(getSfxVolume());
+  const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement);
+  const [reducedMotion, setReducedMotion] = useState(() => loadSettings().reducedMotion || false);
+  const [textSize, setTextSize] = useState(() => loadSettings().textSize || 'normal');
+  const [screenShake, setScreenShake] = useState(() => loadSettings().screenShake !== false);
+  const [showFps, setShowFps] = useState(() => loadSettings().showFps || false);
+
   const resetGame = useGameStore(s => s.resetGame);
   const screen = useGameStore(s => s.screen);
   const playerName = useGameStore(s => s.playerName);
@@ -44,11 +60,31 @@ export default function SettingsMenu() {
     return () => window.removeEventListener('toggle-settings', handler);
   }, []);
 
-  const handleMusicToggle = () => {
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const scale = textSize === 'small' ? '0.9' : textSize === 'large' ? '1.15' : '1';
+    root.style.setProperty('--bw-text-scale', scale);
+    if (reducedMotion) {
+      root.classList.add('bw-reduced-motion');
+    } else {
+      root.classList.remove('bw-reduced-motion');
+    }
+    window.__bwScreenShake = screenShake;
+    window.__bwShowFps = showFps;
+    saveSettings({ reducedMotion, textSize, screenShake, showFps });
+  }, [reducedMotion, textSize, screenShake, showFps]);
+
+  const handleMusicToggle = useCallback(() => {
     const next = !musicOff;
     setMusicOff(next);
     setMusicMuted(next);
-  };
+  }, [musicOff]);
 
   const handleSfxToggle = () => {
     const next = !sfxOff;
@@ -69,6 +105,16 @@ export default function SettingsMenu() {
     setSfxVolume(v);
   };
 
+  const handleFullscreen = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch {}
+  };
+
   const handleReset = () => {
     if (!confirmReset) {
       setConfirmReset(true);
@@ -77,6 +123,12 @@ export default function SettingsMenu() {
     resetGame();
     setOpen(false);
     setConfirmReset(false);
+  };
+
+  const quickMusicToggle = () => {
+    const next = !musicOff;
+    setMusicOff(next);
+    setMusicMuted(next);
   };
 
   const toggleStyle = (active) => ({
@@ -94,79 +146,128 @@ export default function SettingsMenu() {
   });
 
   const sliderStyle = {
-    width: '100%', height: 4, appearance: 'none', background: 'rgba(255,255,255,0.15)',
-    borderRadius: 2, outline: 'none', cursor: 'pointer',
+    width: '100%', height: 6, appearance: 'none', background: 'rgba(255,255,255,0.15)',
+    borderRadius: 3, outline: 'none', cursor: 'pointer',
     accentColor: 'var(--accent)',
   };
 
+  const topBtnStyle = (active) => ({
+    width: 40, height: 40, borderRadius: 10,
+    background: active ? 'rgba(110,231,183,0.2)' : 'rgba(14,22,48,0.85)',
+    border: `2px solid ${active ? 'var(--accent)' : 'rgba(255,255,255,0.12)'}`,
+    color: active ? 'var(--accent)' : 'rgba(255,255,255,0.65)',
+    fontSize: '1.2rem', cursor: 'pointer', display: 'flex',
+    alignItems: 'center', justifyContent: 'center',
+    transition: 'all 0.2s',
+    backdropFilter: 'blur(8px)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+    pointerEvents: 'auto',
+    WebkitTapHighlightColor: 'transparent',
+    touchAction: 'manipulation',
+  });
+
+  const sectionTitle = (icon, label) => (
+    <div style={{
+      color: 'var(--gold)', fontSize: '0.72rem', fontWeight: 700,
+      marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase',
+      display: 'flex', alignItems: 'center', gap: 5,
+    }}>
+      <EssentialIcon name={icon} size={13} />{label}
+    </div>
+  );
+
+  const settingRow = (label, control) => (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      marginBottom: 10, minHeight: 28,
+    }}>
+      <span style={{ color: 'var(--text)', fontSize: '0.84rem' }}>{label}</span>
+      {control}
+    </div>
+  );
+
   return (
     <>
-      <button
-        onClick={() => { setOpen(!open); setConfirmReset(false); }}
-        style={{
-          position: 'fixed', top: 98, left: 16, zIndex: 10700,
-          width: 34, height: 34, borderRadius: '50%',
-          background: open ? 'rgba(110,231,183,0.2)' : 'rgba(14,22,48,0.7)',
-          border: `1px solid ${open ? 'var(--accent)' : 'rgba(255,255,255,0.12)'}`,
-          color: open ? 'var(--accent)' : 'rgba(255,255,255,0.6)',
-          fontSize: '1.2rem', cursor: 'pointer', display: 'flex',
-          alignItems: 'center', justifyContent: 'center',
-          transition: 'all 0.2s',
-          backdropFilter: 'blur(8px)',
-        }}
-        title="Settings"
-      >
-        <EssentialIcon name="Gear" size={20} />
-      </button>
+      <div style={{
+        position: 'fixed', top: 10, left: 10, zIndex: 10700,
+        display: 'flex', gap: 6, alignItems: 'center',
+        pointerEvents: 'auto',
+      }}>
+        <button
+          onClick={() => { setOpen(!open); setConfirmReset(false); }}
+          style={topBtnStyle(open)}
+          title="Settings"
+        >
+          <EssentialIcon name="Gear" size={20} />
+        </button>
+
+        <button
+          onClick={quickMusicToggle}
+          style={topBtnStyle(false)}
+          title={musicOff ? 'Unmute Music' : 'Mute Music'}
+        >
+          <EssentialIcon name={musicOff ? 'SpeakerMute' : 'MusicNotes'} size={20} />
+          {musicOff && (
+            <div style={{
+              position: 'absolute', top: -4, right: -4,
+              width: 14, height: 14, borderRadius: '50%',
+              background: '#ef4444', border: '2px solid rgba(14,22,48,0.9)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '0.5rem', color: '#fff', fontWeight: 700,
+            }}>✕</div>
+          )}
+        </button>
+      </div>
 
       {open && (
         <div ref={panelRef} style={{
-          position: 'fixed', top: 138, left: 16, zIndex: 10701,
-          width: 280,
+          position: 'fixed', top: 58, left: 10, zIndex: 10701,
+          width: 300, maxHeight: 'calc(100vh - 70px)', overflowY: 'auto',
           backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
-          border: '1px solid rgba(110,231,183,0.25)',
+          border: '2px solid rgba(110,231,183,0.25)',
           borderRadius: 14, padding: 0, overflow: 'hidden',
           boxShadow: '0 8px 40px rgba(0,0,0,0.7), 0 0 20px rgba(110,231,183,0.08)',
           animation: 'fadeIn 0.15s ease-out',
+          WebkitOverflowScrolling: 'touch',
         }}>
           <div style={{
             padding: '14px 16px 10px',
             borderBottom: '1px solid rgba(255,255,255,0.08)',
             background: 'linear-gradient(135deg, rgba(110,231,183,0.08), transparent)',
+            position: 'sticky', top: 0, zIndex: 1,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span className="font-cinzel" style={{ color: 'var(--accent)', fontSize: '0.95rem', fontWeight: 700 }}>
-                <EssentialIcon name="Gear" size={14} style={{ marginRight: 6 }} />Settings
+              <span className="font-cinzel" style={{ color: 'var(--accent)', fontSize: '1rem', fontWeight: 700 }}>
+                <EssentialIcon name="Gear" size={15} style={{ marginRight: 6 }} />Settings
               </span>
               <button onClick={() => { setOpen(false); setConfirmReset(false); }} style={{
-                background: 'none', border: 'none', color: 'var(--muted)', fontSize: '1.1rem', cursor: 'pointer',
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 8, color: 'var(--muted)', fontSize: '1.1rem', cursor: 'pointer',
+                width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                touchAction: 'manipulation',
               }}>&times;</button>
             </div>
           </div>
 
-          <div style={{ padding: '12px 16px' }}>
-            <div style={{ color: 'var(--gold)', fontSize: '0.7rem', fontWeight: 700, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase' }}>
-              <EssentialIcon name="SpeakerOn" size={12} style={{ marginRight: 4 }} />Sound
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ color: 'var(--text)', fontSize: '0.82rem' }}><EssentialIcon name="MusicNotes" size={12} style={{ marginRight: 4 }} />Music</span>
+          <div style={{ padding: '14px 16px 8px' }}>
+            {sectionTitle('SpeakerOn', 'Audio')}
+            {settingRow(
+              <><EssentialIcon name="MusicNotes" size={13} style={{ marginRight: 4 }} />Music</>,
               <button onClick={handleMusicToggle} style={toggleStyle(!musicOff)}>
                 <div style={toggleKnob(!musicOff)} />
               </button>
-            </div>
+            )}
             {!musicOff && (
               <div style={{ marginBottom: 12, paddingLeft: 4 }}>
                 <input type="range" min="0" max="0.4" step="0.01" value={musicVol} onChange={handleMusicVol} style={sliderStyle} />
               </div>
             )}
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ color: 'var(--text)', fontSize: '0.82rem' }}><EssentialIcon name="SpeakerOn" size={12} style={{ marginRight: 4 }} />Sound Effects</span>
+            {settingRow(
+              <><EssentialIcon name="SpeakerOn" size={13} style={{ marginRight: 4 }} />Sound Effects</>,
               <button onClick={handleSfxToggle} style={toggleStyle(!sfxOff)}>
                 <div style={toggleKnob(!sfxOff)} />
               </button>
-            </div>
+            )}
             {!sfxOff && (
               <div style={{ marginBottom: 12, paddingLeft: 4 }}>
                 <input type="range" min="0" max="0.5" step="0.01" value={sfxVol} onChange={handleSfxVol} style={sliderStyle} />
@@ -174,51 +275,100 @@ export default function SettingsMenu() {
             )}
           </div>
 
-          {playerName && (
-            <div style={{ padding: '0 16px 12px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12 }}>
-              <div style={{ color: 'var(--gold)', fontSize: '0.7rem', fontWeight: 700, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase' }}>
-                <EssentialIcon name="Info" size={12} style={{ marginRight: 4 }} />Game Info
+          <div style={{ padding: '0 16px 8px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 14 }}>
+            {sectionTitle('Gamepad', 'Display')}
+            {settingRow(
+              'Fullscreen',
+              <button onClick={handleFullscreen} style={{
+                padding: '5px 14px', borderRadius: 8, fontSize: '0.78rem', fontWeight: 600,
+                background: isFullscreen ? 'rgba(110,231,183,0.15)' : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${isFullscreen ? 'var(--accent)' : 'rgba(255,255,255,0.12)'}`,
+                color: isFullscreen ? 'var(--accent)' : 'var(--text)',
+                cursor: 'pointer', touchAction: 'manipulation',
+              }}>
+                {isFullscreen ? 'Exit' : 'Enter'}
+              </button>
+            )}
+            {settingRow(
+              'Text Size',
+              <div style={{ display: 'flex', gap: 4 }}>
+                {['small', 'normal', 'large'].map(sz => (
+                  <button key={sz} onClick={() => setTextSize(sz)} style={{
+                    padding: '4px 10px', borderRadius: 6,
+                    fontSize: sz === 'small' ? '0.65rem' : sz === 'large' ? '0.9rem' : '0.75rem',
+                    fontWeight: textSize === sz ? 700 : 400,
+                    background: textSize === sz ? 'rgba(110,231,183,0.18)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${textSize === sz ? 'var(--accent)' : 'rgba(255,255,255,0.08)'}`,
+                    color: textSize === sz ? 'var(--accent)' : 'var(--muted)',
+                    cursor: 'pointer', textTransform: 'capitalize',
+                    touchAction: 'manipulation',
+                  }}>{sz}</button>
+                ))}
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: 4 }}>
+            )}
+            {settingRow(
+              'Reduced Motion',
+              <button onClick={() => setReducedMotion(!reducedMotion)} style={toggleStyle(reducedMotion)}>
+                <div style={toggleKnob(reducedMotion)} />
+              </button>
+            )}
+            {settingRow(
+              'Screen Shake',
+              <button onClick={() => setScreenShake(!screenShake)} style={toggleStyle(screenShake)}>
+                <div style={toggleKnob(screenShake)} />
+              </button>
+            )}
+            {settingRow(
+              'Show FPS',
+              <button onClick={() => setShowFps(!showFps)} style={toggleStyle(showFps)}>
+                <div style={toggleKnob(showFps)} />
+              </button>
+            )}
+          </div>
+
+          {playerName && (
+            <div style={{ padding: '0 16px 12px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 14 }}>
+              {sectionTitle('Info', 'Game Info')}
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-dim)', marginBottom: 5 }}>
                 <span>Warlord</span><span style={{ color: 'var(--text)' }}>{playerName}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: 4 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-dim)', marginBottom: 5 }}>
                 <span>Level</span><span style={{ color: 'var(--text)' }}>{level}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-dim)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-dim)' }}>
                 <span>Victories</span><span style={{ color: 'var(--text)' }}>{victories}</span>
               </div>
             </div>
           )}
 
-          <div style={{ padding: '0 16px 14px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12 }}>
-            <div style={{ color: 'var(--gold)', fontSize: '0.7rem', fontWeight: 700, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase' }}>
-              <EssentialIcon name="Gamepad" size={12} style={{ marginRight: 4 }} />Game
-            </div>
+          <div style={{ padding: '0 16px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 14 }}>
+            {sectionTitle('Restart', 'Danger Zone')}
             {!confirmReset ? (
               <button onClick={handleReset} style={{
-                width: '100%', padding: '9px 0', borderRadius: 8,
+                width: '100%', padding: '10px 0', borderRadius: 8,
                 background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)',
-                color: '#ef4444', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
-                transition: 'all 0.2s',
+                color: '#ef4444', fontSize: '0.84rem', fontWeight: 600, cursor: 'pointer',
+                transition: 'all 0.2s', touchAction: 'manipulation',
               }}>
                 <EssentialIcon name="Restart" size={14} style={{ marginRight: 6 }} />Restart Game
               </button>
             ) : (
               <div>
-                <div style={{ color: '#ef4444', fontSize: '0.78rem', marginBottom: 8, textAlign: 'center' }}>
+                <div style={{ color: '#ef4444', fontSize: '0.8rem', marginBottom: 8, textAlign: 'center' }}>
                   This will erase all progress. Are you sure?
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={() => setConfirmReset(false)} style={{
-                    flex: 1, padding: '8px 0', borderRadius: 8,
+                    flex: 1, padding: '10px 0', borderRadius: 8,
                     background: 'rgba(100,100,100,0.2)', border: '1px solid rgba(255,255,255,0.1)',
-                    color: 'var(--text-dim)', fontSize: '0.8rem', cursor: 'pointer',
+                    color: 'var(--text-dim)', fontSize: '0.82rem', cursor: 'pointer',
+                    touchAction: 'manipulation',
                   }}>Cancel</button>
                   <button onClick={handleReset} style={{
-                    flex: 1, padding: '8px 0', borderRadius: 8,
+                    flex: 1, padding: '10px 0', borderRadius: 8,
                     background: 'rgba(239,68,68,0.25)', border: '1px solid #ef4444',
-                    color: '#ef4444', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer',
+                    color: '#ef4444', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer',
+                    touchAction: 'manipulation',
                   }}>Yes, Restart</button>
                 </div>
               </div>
