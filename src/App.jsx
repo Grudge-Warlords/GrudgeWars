@@ -31,6 +31,8 @@ function GameApp() {
   const clearMessage = useGameStore(s => s.clearMessage);
   const pendingLoot = useGameStore(s => s.pendingLoot);
 
+  const [splashDone, setSplashDone] = useState(false);
+  const [splashFading, setSplashFading] = useState(false);
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState({ loaded: 0, total: 1 });
   const prevScreenRef = useRef(screen);
@@ -38,6 +40,13 @@ function GameApp() {
   const [transitionPhase, setTransitionPhase] = useState('none');
 
   useEffect(() => {
+    const fadeTimer = setTimeout(() => setSplashFading(true), 1600);
+    const doneTimer = setTimeout(() => setSplashDone(true), 2000);
+    return () => { clearTimeout(fadeTimer); clearTimeout(doneTimer); };
+  }, []);
+
+  useEffect(() => {
+    if (!splashDone) return;
     const minTime = new Promise(r => setTimeout(r, 3000));
 
     const loadAssets = isReady()
@@ -49,7 +58,7 @@ function GameApp() {
     Promise.all([minTime, loadAssets]).then(() => {
       setReady(true);
     });
-  }, []);
+  }, [splashDone]);
 
   useEffect(() => {
     const prev = prevScreenRef.current;
@@ -80,6 +89,28 @@ function GameApp() {
       prevScreenRef.current = screen;
     }
   }, [screen]);
+
+  if (!splashDone) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 99999,
+        background: '#000',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        opacity: splashFading ? 0 : 1,
+        transition: 'opacity 0.4s ease-out',
+      }}>
+        <img
+          src="/images/splash_logo.png"
+          alt="Betta Warlords"
+          style={{
+            maxWidth: '100%', maxHeight: '100%',
+            width: '100%', height: '100%',
+            objectFit: 'contain',
+          }}
+        />
+      </div>
+    );
+  }
 
   if (!ready) {
     return (
