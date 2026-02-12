@@ -108,11 +108,31 @@ section .section-sub{text-align:center;color:var(--muted);font-size:0.95rem;marg
 .zone-body .zone-god-tag{background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.25);color:#c084fc}
 
 .city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
-.city-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative}
-.city-card h3{margin-bottom:4px}
-.city-card .city-desc{color:var(--muted);font-size:0.82rem;line-height:1.5;margin-bottom:10px}
-.city-card .city-services{display:flex;flex-wrap:wrap;gap:4px}
-.city-card .city-services span{font-size:0.62rem;padding:2px 8px;border-radius:8px;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.15);color:var(--teal);text-transform:capitalize}
+.city-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative}
+.city-banner{height:120px;background-size:cover;background-position:center;position:relative}
+.city-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,var(--panel) 100%)}
+.city-body{padding:16px 20px 20px}
+.city-body h3{margin-bottom:4px}
+.city-body .city-desc{color:var(--muted);font-size:0.82rem;line-height:1.5;margin-bottom:10px}
+.city-body .city-services{display:flex;flex-wrap:wrap;gap:4px}
+.city-body .city-services span{font-size:0.62rem;padding:2px 8px;border-radius:8px;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.15);color:var(--teal);text-transform:capitalize}
+
+.building-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.building-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s}
+.building-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(34,211,238,0.1)}
+.building-img{height:140px;background-size:cover;background-position:center;position:relative}
+.building-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,var(--panel) 100%)}
+.building-body{padding:10px 14px 14px}
+.building-body h4{color:var(--gold);font-size:0.88rem;margin-bottom:2px}
+.building-body p{color:var(--muted);font-size:0.72rem;line-height:1.4}
+
+.attr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.attr-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:center;transition:transform 0.2s}
+.attr-card:hover{transform:translateY(-3px)}
+.attr-card img{width:56px;height:56px;border-radius:12px;border:2px solid var(--border);object-fit:cover;flex-shrink:0}
+.attr-info h4{font-size:0.9rem;margin-bottom:2px}
+.attr-info .attr-abbr{font-size:0.65rem;padding:1px 6px;border-radius:6px;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.15);color:var(--teal);font-weight:600;display:inline-block;margin-bottom:4px}
+.attr-info p{color:var(--muted);font-size:0.75rem;line-height:1.4}
 
 .lore-section{position:relative}
 .lore-section .lore-bg{position:absolute;inset:0;background:url('/backgrounds/abyssal_depths.png') center/cover;opacity:0.08;pointer-events:none}
@@ -140,7 +160,7 @@ section .section-sub{text-align:center;color:var(--muted);font-size:0.95rem;marg
 
 @media(max-width:768px){
   .breed-grid,.class-grid,.boss-grid,.city-grid,.genetics-grid{grid-template-columns:1fr}
-  .card-grid,.enemy-grid,.zone-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .card-grid,.enemy-grid,.zone-grid,.building-grid,.attr-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
   .boss-ability-grid{grid-template-columns:1fr}
   nav.toc ul{justify-content:flex-start}
 }
@@ -163,12 +183,14 @@ section .section-sub{text-align:center;color:var(--muted);font-size:0.95rem;marg
     <li><a href="#breeds">Breeds</a></li>
     <li><a href="#genetics">Genetics</a></li>
     <li><a href="#classes">Classes</a></li>
+    <li><a href="#attributes">Attributes</a></li>
     <li><a href="#combos">Combinations</a></li>
     <li><a href="#enemies">Enemies</a></li>
     <li><a href="#bosses">Bosses</a></li>
     <li><a href="#gods">Gods</a></li>
     <li><a href="#zones">Zones</a></li>
     <li><a href="#cities">Cities</a></li>
+    <li><a href="#buildings">Buildings</a></li>
     <li><a href="#resources">Resources</a></li>
   </ul>
 </nav>
@@ -402,63 +424,137 @@ section .section-sub{text-align:center;color:var(--muted);font-size:0.95rem;marg
     <div class="class-card" style="border-color:rgba(239,68,68,0.2)">
       <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#ef4444;border-radius:16px 16px 0 0"></div>
       <h3 class="cinzel" style="color:#ef4444">
-        <img src="/sprites/ui/icons/icon_crossed_swords.png" style="width:20px;height:20px;vertical-align:middle;margin-right:6px" alt="">Warrior
+        <img src="/icons/spells/slash-red-1.png" style="width:20px;height:20px;vertical-align:middle;margin-right:6px" alt="">Warrior
       </h3>
       <p class="class-desc">A fearless frontline fighter specializing in raw power and defense.</p>
-      <p class="class-lore">"Forged in the crucible of the Grudge Wars, Warriors are the backbone of any warband. Their strength and endurance are unmatched on the battlefield."</p>
+      <p class="class-lore">"Forged in the fury of the First Tide War, Warriors are the backbone of any school. Their strength and endurance are unmatched in the deep ocean trenches."</p>
       <div class="ability-list">
-        <div class="ability"><img src="/sprites/ui/icons/icon_crossed_swords.png" alt=""><div><div class="ab-name">Slash</div><div class="ab-desc">A steady strike that restores resources</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_bomb.png" alt=""><div><div class="ab-name">Power Strike</div><div class="ab-desc">Devastating blow dealing 2x damage</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_battle.png" alt=""><div><div class="ab-name">War Cry</div><div class="ab-desc">Boost damage by 30% for 3 turns</div></div><span class="ab-type" style="background:rgba(251,191,36,0.12);color:#fbbf24">Buff</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_shield_blue.png" alt=""><div><div class="ab-name">Shield Bash</div><div class="ab-desc">Stun the enemy for 1 turn</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_target.png" alt=""><div><div class="ab-name">Cleave</div><div class="ab-desc">Deep slash causing bleed for 3 turns</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_sword.png" alt=""><div><div class="ab-name">Demon Blade</div><div class="ab-desc">Transform for +40% dmg, +15 def for 3 turns</div></div><span class="ab-type" style="background:rgba(168,85,247,0.12);color:#a855f7">Ultimate</span></div>
+        <div class="ability"><img src="/icons/spells/slash-red-1.png" alt=""><div><div class="ab-name">Slash</div><div class="ab-desc">A steady strike that restores resources</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
+        <div class="ability"><img src="/icons/spells/explosion-red-1.png" alt=""><div><div class="ab-name">Power Strike</div><div class="ab-desc">Devastating blow dealing 2x damage</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
+        <div class="ability"><img src="/icons/spells/beam-gold-1.png" alt=""><div><div class="ab-name">War Cry</div><div class="ab-desc">Boost damage by 30% for 3 turns</div></div><span class="ab-type" style="background:rgba(251,191,36,0.12);color:#fbbf24">Buff</span></div>
+        <div class="ability"><img src="/icons/spells/rock-blue-1.png" alt=""><div><div class="ab-name">Shield Bash</div><div class="ab-desc">Stun the enemy for 1 turn</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
+        <div class="ability"><img src="/icons/spells/slash-crimson-1.png" alt=""><div><div class="ab-name">Cleave</div><div class="ab-desc">Deep slash causing bleed for 3 turns</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
+        <div class="ability"><img src="/icons/spells/beam-eerie-1.png" alt=""><div><div class="ab-name">Demon Blade</div><div class="ab-desc">Transform for +40% dmg, +15 def for 3 turns</div></div><span class="ab-type" style="background:rgba(168,85,247,0.12);color:#a855f7">Ultimate</span></div>
       </div>
     </div>
 
     <div class="class-card" style="border-color:rgba(139,92,246,0.2)">
       <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#8b5cf6;border-radius:16px 16px 0 0"></div>
       <h3 class="cinzel" style="color:#8b5cf6">
-        <img src="/sprites/ui/icons/icon_crystal.png" style="width:20px;height:20px;vertical-align:middle;margin-right:6px" alt="">Mage Priest
+        <img src="/icons/spells/beam-blue-1.png" style="width:20px;height:20px;vertical-align:middle;margin-right:6px" alt="">Mage Priest
       </h3>
       <p class="class-desc">Master of arcane magic and divine healing arts.</p>
-      <p class="class-lore">"Drawing power from ancient ley lines and forgotten gods, Mage Priests wield destructive magic alongside sacred healing &mdash; a balance few can master."</p>
+      <p class="class-lore">"Drawing power from the ancient ocean currents and forgotten sea gods, Mage Priests wield destructive tidal magic alongside sacred healing &mdash; a balance few can master in the crushing depths."</p>
       <div class="ability-list">
-        <div class="ability"><img src="/sprites/ui/icons/icon_sparkle.png" alt=""><div><div class="ab-name">Arcane Bolt</div><div class="ab-desc">Focused arcane pulse that restores resources</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_fire.png" alt=""><div><div class="ab-name">Fireball</div><div class="ab-desc">Massive damage + burn over time</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_heart.png" alt=""><div><div class="ab-name">Divine Heal</div><div class="ab-desc">Restore 30% of max HP</div></div><span class="ab-type" style="background:rgba(34,197,94,0.12);color:#22c55e">Heal</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_ice.png" alt=""><div><div class="ab-name">Ice Storm</div><div class="ab-desc">Freezes enemy, reducing their damage</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
+        <div class="ability"><img src="/icons/spells/beam-blue-1.png" alt=""><div><div class="ab-name">Arcane Bolt</div><div class="ab-desc">Focused arcane pulse that restores resources</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
+        <div class="ability"><img src="/icons/spells/explosion-red-2.png" alt=""><div><div class="ab-name">Fireball</div><div class="ab-desc">Massive damage + burn over time</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
+        <div class="ability"><img src="/icons/spells/vines-jade-1.png" alt=""><div><div class="ab-name">Divine Heal</div><div class="ab-desc">Restore 30% of max HP</div></div><span class="ab-type" style="background:rgba(34,197,94,0.12);color:#22c55e">Heal</span></div>
+        <div class="ability"><img src="/icons/spells/ice-blue-1.png" alt=""><div><div class="ab-name">Ice Storm</div><div class="ab-desc">Freezes enemy, reducing their damage</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
       </div>
     </div>
 
     <div class="class-card" style="border-color:rgba(217,119,6,0.2)">
       <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#d97706;border-radius:16px 16px 0 0"></div>
       <h3 class="cinzel" style="color:#d97706">
-        <img src="/sprites/ui/icons/icon_wolf.png" alt="" style="width:20px;height:20px;vertical-align:middle;margin-right:6px">Worge
+        <img src="/icons/spells/rock-orange-1.png" alt="" style="width:20px;height:20px;vertical-align:middle;margin-right:6px">Worge
       </h3>
-      <p class="class-desc">A shapeshifter who wields nature and storm magic, then transforms into a devastating beast.</p>
-      <p class="class-lore">"Worges walk between worlds &mdash; scholars of storm and root in mortal guise, unstoppable predators in beast form."</p>
+      <p class="class-desc">A shapeshifter who wields current and reef magic, then transforms into a devastating deep-sea predator.</p>
+      <p class="class-lore">"Worges swim between worlds &mdash; channelers of storm and coral in their natural form, unstoppable leviathans in beast form. The ocean's fury made flesh."</p>
       <div class="ability-list">
-        <div class="ability"><img src="/sprites/ui/icons/icon_hammer.png" alt=""><div><div class="ab-name">Mace Strike</div><div class="ab-desc">Storm-charged blow that restores resources</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_lightning.png" alt=""><div><div class="ab-name">Lightning Lash</div><div class="ab-desc">Call down lightning + burn</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_nature.png" alt=""><div><div class="ab-name">Nature's Grasp</div><div class="ab-desc">Heal over time for 3 turns</div></div><span class="ab-type" style="background:rgba(34,197,94,0.12);color:#22c55e">Heal</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_wolf.png" alt=""><div><div class="ab-name">Bear Form</div><div class="ab-desc">Transform: +25% dmg, +10 def, new abilities</div></div><span class="ab-type" style="background:rgba(168,85,247,0.12);color:#a855f7">Ultimate</span></div>
+        <div class="ability"><img src="/icons/spells/rock-orange-1.png" alt=""><div><div class="ab-name">Mace Strike</div><div class="ab-desc">Current-charged blow that restores resources</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
+        <div class="ability"><img src="/icons/spells/lightning-gold-1.png" alt=""><div><div class="ab-name">Lightning Lash</div><div class="ab-desc">Call down lightning + burn</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
+        <div class="ability"><img src="/icons/spells/vines-jade-2.png" alt=""><div><div class="ab-name">Nature's Grasp</div><div class="ab-desc">Heal over time for 3 turns</div></div><span class="ab-type" style="background:rgba(34,197,94,0.12);color:#22c55e">Heal</span></div>
+        <div class="ability"><img src="/icons/spells/beam-eerie-2.png" alt=""><div><div class="ab-name">Bear Form</div><div class="ab-desc">Transform: +25% dmg, +10 def, new abilities</div></div><span class="ab-type" style="background:rgba(168,85,247,0.12);color:#a855f7">Ultimate</span></div>
       </div>
     </div>
 
     <div class="class-card" style="border-color:rgba(34,197,94,0.2)">
       <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#22c55e;border-radius:16px 16px 0 0"></div>
       <h3 class="cinzel" style="color:#22c55e">
-        <img src="/sprites/ui/icons/icon_bow.png" alt="" style="width:20px;height:20px;vertical-align:middle;margin-right:6px">Ranger
+        <img src="/icons/spells/air-burst-air-1.png" alt="" style="width:20px;height:20px;vertical-align:middle;margin-right:6px">Ranger
       </h3>
       <p class="class-desc">A deadly marksman with precise long-range attacks.</p>
-      <p class="class-lore">"Silent and patient, Rangers strike from the shadows with lethal precision. Their arrows find gaps in even the thickest armor."</p>
+      <p class="class-lore">"Silent and patient, Rangers strike from the murky depths with lethal precision. Their harpoons find gaps in even the thickest shell armor."</p>
       <div class="ability-list">
-        <div class="ability"><img src="/sprites/ui/icons/icon_bow.png" alt=""><div><div class="ab-name">Quick Shot</div><div class="ab-desc">Swift arrow that restores resources</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_target.png" alt=""><div><div class="ab-name">Aimed Shot</div><div class="ab-desc">Carefully aimed shot, always crits</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_skull.png" alt=""><div><div class="ab-name">Poison Arrow</div><div class="ab-desc">Poisons for damage over time</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_energy.png" alt=""><div><div class="ab-name">Evasive Roll</div><div class="ab-desc">+50% evasion for 2 turns</div></div><span class="ab-type" style="background:rgba(251,191,36,0.12);color:#fbbf24">Buff</span></div>
-        <div class="ability"><img src="/sprites/ui/icons/icon_target.png" alt=""><div><div class="ab-name">Focus</div><div class="ab-desc">Passive crit stacking, active guaranteed crit</div></div><span class="ab-type" style="background:rgba(168,85,247,0.12);color:#a855f7">Ultimate</span></div>
+        <div class="ability"><img src="/icons/spells/air-burst-air-1.png" alt=""><div><div class="ab-name">Quick Shot</div><div class="ab-desc">Swift harpoon that restores resources</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
+        <div class="ability"><img src="/icons/spells/beam-crimson-1.png" alt=""><div><div class="ab-name">Aimed Shot</div><div class="ab-desc">Carefully aimed shot, always crits</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
+        <div class="ability"><img src="/icons/spells/explosion-acid-1.png" alt=""><div><div class="ab-name">Poison Arrow</div><div class="ab-desc">Poisons for damage over time</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
+        <div class="ability"><img src="/icons/spells/wind-grasp-air-1.png" alt=""><div><div class="ab-name">Evasive Roll</div><div class="ab-desc">+50% evasion for 2 turns</div></div><span class="ab-type" style="background:rgba(251,191,36,0.12);color:#fbbf24">Buff</span></div>
+        <div class="ability"><img src="/icons/spells/beam-gold-2.png" alt=""><div><div class="ab-name">Focus</div><div class="ab-desc">Passive crit stacking, active guaranteed crit</div></div><span class="ab-type" style="background:rgba(168,85,247,0.12);color:#a855f7">Ultimate</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ATTRIBUTES ===== -->
+<section id="attributes">
+  <h2 class="cinzel">Hero Attributes</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Eight core attributes define every Warlord's combat capabilities. Each breed and class modifies these stats differently.</p>
+
+  <div class="attr-grid">
+    <div class="attr-card">
+      <img src="/images/attributes/strength.png" alt="Strength">
+      <div class="attr-info">
+        <h4 class="cinzel" style="color:#ef4444">Strength</h4>
+        <span class="attr-abbr">STR</span>
+        <p>Physical power and melee damage. Determines how hard your strikes hit.</p>
+      </div>
+    </div>
+    <div class="attr-card">
+      <img src="/images/attributes/vitality.png" alt="Vitality">
+      <div class="attr-info">
+        <h4 class="cinzel" style="color:#22c55e">Vitality</h4>
+        <span class="attr-abbr">VIT</span>
+        <p>Max HP and survivability. More vitality means more hits you can take.</p>
+      </div>
+    </div>
+    <div class="attr-card">
+      <img src="/images/attributes/endurance.png" alt="Endurance">
+      <div class="attr-info">
+        <h4 class="cinzel" style="color:#f59e0b">Endurance</h4>
+        <span class="attr-abbr">END</span>
+        <p>Defense and damage reduction. Reduces incoming physical and magical damage.</p>
+      </div>
+    </div>
+    <div class="attr-card">
+      <img src="/images/attributes/intellect.png" alt="Intellect">
+      <div class="attr-info">
+        <h4 class="cinzel" style="color:#8b5cf6">Intellect</h4>
+        <span class="attr-abbr">INT</span>
+        <p>Magic damage and spell power. Amplifies arcane and elemental abilities.</p>
+      </div>
+    </div>
+    <div class="attr-card">
+      <img src="/images/attributes/wisdom.png" alt="Wisdom">
+      <div class="attr-info">
+        <h4 class="cinzel" style="color:#ec4899">Wisdom</h4>
+        <span class="attr-abbr">WIS</span>
+        <p>Healing power and magic defense. Boosts restorative abilities and arcane resistance.</p>
+      </div>
+    </div>
+    <div class="attr-card">
+      <img src="/images/attributes/dexterity.png" alt="Dexterity">
+      <div class="attr-info">
+        <h4 class="cinzel" style="color:#f97316">Dexterity</h4>
+        <span class="attr-abbr">DEX</span>
+        <p>Critical hit chance. Higher dexterity means more devastating critical strikes.</p>
+      </div>
+    </div>
+    <div class="attr-card">
+      <img src="/images/attributes/agility.png" alt="Agility">
+      <div class="attr-info">
+        <h4 class="cinzel" style="color:#06b6d4">Agility</h4>
+        <span class="attr-abbr">AGI</span>
+        <p>Speed and evasion. Determines turn order and chance to dodge attacks.</p>
+      </div>
+    </div>
+    <div class="attr-card">
+      <img src="/images/attributes/tactics.png" alt="Tactics">
+      <div class="attr-info">
+        <h4 class="cinzel" style="color:#22d3ee">Tactics</h4>
+        <span class="attr-abbr">TAC</span>
+        <p>Turn order and combo efficiency. Enables better tactical decisions in battle.</p>
       </div>
     </div>
   </div>
@@ -769,7 +865,7 @@ section .section-sub{text-align:center;color:var(--muted);font-size:0.95rem;marg
       </div>
       <div class="boss-body">
         <h3 class="cinzel" style="color:#c084fc">The Leviathan, Weaver of Currents</h3>
-        <div class="boss-title" style="color:#7c3aed">FABLED FACTION &mdash; The Weaver's Abyss</div>
+        <div class="boss-title" style="color:#7c3aed">FABLED FACTION &mdash; Leviathan Sanctum</div>
         <div class="boss-stats-row">
           <span style="background:rgba(34,197,94,0.12);color:#22c55e">1600 HP</span>
           <span style="background:rgba(239,68,68,0.12);color:#ef4444">70 DMG</span>
@@ -800,27 +896,69 @@ section .section-sub{text-align:center;color:var(--muted);font-size:0.95rem;marg
   <p class="section-sub">32 explorable underwater zones spanning sunlit shallows to the crushing depths of the hadal trenches. Each zone hides enemies, resources, and fragments of the shattered Coral Crown.</p>
 
   <div class="zone-grid">
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#064e3b,#0d9488,#0891b2)"></div><div class="zone-body"><h4>Coral Shallows</h4><div class="zone-level">Level 1-3 &bull; Starting Zone</div><p>Sunlit waters dance over vibrant coral beds where the first fragment of the shattered Coral Crown was found.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#042f2e,#134e4a,#0f766e)"></div><div class="zone-body"><h4>Kelp Forest</h4><div class="zone-level">Level 3-5</div><p>Towering kelp canopies sway in the currents, casting shifting shadows where predators lie in wait.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#0e7490,#06b6d4,#22d3ee)"></div><div class="zone-body"><h4>Anemone Garden</h4><div class="zone-level">Level 4-6</div><p>Giant sea anemones pulse with ancient magic, their tendrils weaving spells older than the Coral Crown.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#0c4a6e,#1e3a5f,#164e63)"></div><div class="zone-body"><h4>Biolume Caves</h4><div class="zone-level">Level 3-5</div><p>Twisting caverns aglow with bioluminescent life, where hermit mimics disguise among the glowing walls.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#064e3b,#065f46,#0c4a6e)"></div><div class="zone-body"><h4>Sargasso Maze</h4><div class="zone-level">Level 5-7</div><p>A suffocating labyrinth of sargassum where the drowned drift among rotting fronds.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#1e1b4b,#0f172a,#020617)"></div><div class="zone-body"><h4>Sunken Citadel</h4><div class="zone-level">Level 6-9</div><p>The drowned fortress of an ancient betta kingdom, guarding secrets of the shattered Crown.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#0e7490,#0891b2,#06b6d4)"></div><div class="zone-body"><h4>Crystal Grotto</h4><div class="zone-level">Level 7-9</div><p>Glittering caverns of living crystal hum with the resonance of the Coral Crown.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#155e75,#164e63,#0e7490)"></div><div class="zone-body"><h4>Shipwreck Hollow</h4><div class="zone-level">Level 7-9</div><p>A shattered hull serving as fortress for the Reef Shaman.</p><span class="zone-boss-tag">BOSS: Reef Shaman</span></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#134e4a,#0f766e,#115e59)"></div><div class="zone-body"><h4>Coral Fortress</h4><div class="zone-level">Level 8-11</div><p>A massive fortification of hardened coral &mdash; the Abyss King's first stronghold.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#7c2d12,#9a3412,#431407)"></div><div class="zone-body"><h4>Thermal Vent</h4><div class="zone-level">Level 9-12</div><p>Superheated water erupts in blinding geysers of mineral-rich fury.</p><span class="zone-boss-tag">BOSS: Trench Warlord</span></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#0c4a6e,#7dd3fc,#bae6fd)"></div><div class="zone-body"><h4>Frozen Depths</h4><div class="zone-level">Level 10-13</div><p>Arctic currents have frozen these waters into a silent kingdom of ice.</p><span class="zone-boss-tag">BOSS: Frost Serpent</span></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#0d9488,#14b8a6,#0f766e)"></div><div class="zone-body"><h4>Leviathan's Wake</h4><div class="zone-level">Level 11-14</div><p>Volcanic peaks scarred by the passage of ancient leviathans.</p><span class="zone-boss-tag">BOSS: Storm Elemental</span></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#991b1b,#b91c1c,#7f1d1d)"></div><div class="zone-body"><h4>Volcanic Hearth</h4><div class="zone-level">Level 12-14</div><p>Rivers of magma snake beneath the ocean floor, turning water into a boiling cauldron.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#1e1b4b,#312e81,#1e1b4b)"></div><div class="zone-body"><h4>Mushroom Forest</h4><div class="zone-level">Level 12-15</div><p>Towering fungal growths twist upward, their caps glowing with corrupted bioluminescence.</p><span class="zone-boss-tag">BOSS: Corrupted Reef Keeper</span></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#0f172a,#020617,#000)"></div><div class="zone-body"><h4>Shadow Citadel</h4><div class="zone-level">Level 14-17</div><p>A fortress of living shadow where the Kraken Lich commands legions of the drowned dead.</p><span class="zone-boss-tag">BOSS: Kraken Lich</span></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#1e1b4b,#312e81,#0f172a)"></div><div class="zone-body"><h4>Abyssal Gate</h4><div class="zone-level">Level 15-18</div><p>A massive cavern where the barrier between the ocean and the Abyss grows thin.</p><span class="zone-boss-tag">BOSS: Leviathan</span></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#020617,#0f172a,#000)"></div><div class="zone-body"><h4>Hadal Trench</h4><div class="zone-level">Level 16-18</div><p>Lightless depths where the crushing pressure warps reality itself.</p></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#020617,#0c4a6e,#000)"></div><div class="zone-body"><h4>The Abyss Throne</h4><div class="zone-level">Level 18-20</div><p>In the crushing darkness, the Abyss King sits upon a throne of devoured light.</p><span class="zone-boss-tag">FINAL BOSS: The Abyss King</span></div></div>
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/coral_shallows.png') center/cover"></div><div class="zone-body"><h4>Coral Shallows</h4><div class="zone-level">Level 1-3 &bull; Starting Zone</div><p>Sunlit waters dance over vibrant coral beds where the first fragment of the shattered Coral Crown was found.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/kelp_forest.png') center/cover"></div><div class="zone-body"><h4>Kelp Forest</h4><div class="zone-level">Level 3-5</div><p>Towering kelp canopies sway in the currents, casting shifting shadows where predators lie in wait.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/biolume_caves.png') center/cover"></div><div class="zone-body"><h4>Biolume Caves</h4><div class="zone-level">Level 3-5</div><p>Twisting caverns aglow with bioluminescent life, where hermit mimics disguise among the glowing walls.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/anemone_garden.png') center/cover"></div><div class="zone-body"><h4>Anemone Garden</h4><div class="zone-level">Level 4-6</div><p>Giant sea anemones pulse with ancient magic, their tendrils weaving spells older than the Coral Crown.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/sargasso_maze.png') center/cover"></div><div class="zone-body"><h4>Sargasso Maze</h4><div class="zone-level">Level 5-7</div><p>A suffocating labyrinth of sargassum where the drowned drift among rotting fronds.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/shadow_citadel.png') center/cover"></div><div class="zone-body"><h4>Sunken Citadel</h4><div class="zone-level">Level 6-9</div><p>The drowned fortress of an ancient betta kingdom, guarding secrets of the shattered Crown.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/tide_stream.png') center/cover"></div><div class="zone-body"><h4>Tide Stream</h4><div class="zone-level">Level 6-8</div><p>A powerful underwater current that sweeps through narrow reef passages, carrying debris and unwary travelers.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/crystal_grotto.png') center/cover"></div><div class="zone-body"><h4>Crystal Grotto</h4><div class="zone-level">Level 7-9</div><p>Glittering caverns of living crystal hum with the resonance of the Coral Crown.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/sunken_wreck.png') center/cover"></div><div class="zone-body"><h4>Shipwreck Hollow</h4><div class="zone-level">Level 7-9</div><p>A shattered hull serving as fortress for the Reef Shaman.</p><span class="zone-boss-tag">BOSS: Reef Shaman</span></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/iron_peaks.png') center/cover"></div><div class="zone-body"><h4>Coral Fortress</h4><div class="zone-level">Level 8-11</div><p>A massive fortification of hardened coral &mdash; the Abyss King's first stronghold.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/thermal_vent.png') center/cover"></div><div class="zone-body"><h4>Thermal Vent</h4><div class="zone-level">Level 9-12</div><p>Superheated water erupts in blinding geysers of mineral-rich fury.</p><span class="zone-boss-tag">BOSS: Trench Warlord</span></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/frozen_depths.png') center/cover"></div><div class="zone-body"><h4>Frozen Depths</h4><div class="zone-level">Level 10-13</div><p>Arctic currents have frozen these waters into a silent kingdom of ice.</p><span class="zone-boss-tag">BOSS: Frost Serpent</span></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/sandy_wastes.png') center/cover"></div><div class="zone-body"><h4>Sandy Wastes</h4><div class="zone-level">Level 10-13</div><p>Vast stretches of barren seafloor where sandstorms rage and buried ruins hide ancient dangers.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/dragon_peaks.png') center/cover"></div><div class="zone-body"><h4>Leviathan's Wake</h4><div class="zone-level">Level 11-14</div><p>Volcanic peaks scarred by the passage of ancient leviathans.</p><span class="zone-boss-tag">BOSS: Storm Elemental</span></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/windswept_ridge.png') center/cover"></div><div class="zone-body"><h4>Riptide Shelf</h4><div class="zone-level">Level 11-14</div><p>A treacherous underwater cliff face battered by powerful riptides that tear at unwary swimmers.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/blood_canyon.png') center/cover"></div><div class="zone-body"><h4>Volcanic Hearth</h4><div class="zone-level">Level 12-14</div><p>Rivers of magma snake beneath the ocean floor, turning water into a boiling cauldron.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/mushroom_forest.png') center/cover"></div><div class="zone-body"><h4>Mushroom Forest</h4><div class="zone-level">Level 12-15</div><p>Towering fungal growths twist upward, their caps glowing with corrupted bioluminescence.</p><span class="zone-boss-tag">BOSS: Corrupted Reef Keeper</span></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/obsidian_wastes.png') center/cover"></div><div class="zone-body"><h4>Obsidian Flats</h4><div class="zone-level">Level 13-15</div><p>A vast plane of volcanic glass stretching into darkness, its razor edges slicing through the current.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/ruins_of_ashenmoor.png') center/cover"></div><div class="zone-body"><h4>Ruins of the Deep</h4><div class="zone-level">Level 13-16</div><p>The crumbling remains of an ancient underwater civilization, haunted by spectral guardians.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/blight_hollow.png') center/cover"></div><div class="zone-body"><h4>Blight Hollow</h4><div class="zone-level">Level 14-16</div><p>A corrupted depression in the seafloor where toxic sludge pools and mutated creatures thrive.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/shadow_citadel.png') center/cover"></div><div class="zone-body"><h4>Shadow Citadel</h4><div class="zone-level">Level 14-17</div><p>A fortress of living shadow where the Kraken Lich commands legions of the drowned dead.</p><span class="zone-boss-tag">BOSS: Kraken Lich</span></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/stormspire_peak.png') center/cover"></div><div class="zone-body"><h4>Maelstrom Peak</h4><div class="zone-level">Level 14-17</div><p>A towering underwater spire surrounded by perpetual whirlpools and crackling energy storms.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/demon_gate.png') center/cover"></div><div class="zone-body"><h4>Abyssal Gate</h4><div class="zone-level">Level 15-18</div><p>A massive cavern where the barrier between the ocean and the Abyss grows thin.</p><span class="zone-boss-tag">BOSS: Leviathan</span></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/abyssal_depths.png') center/cover"></div><div class="zone-body"><h4>Hadal Trench</h4><div class="zone-level">Level 16-18</div><p>Lightless depths where the crushing pressure warps reality itself.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/infernal_forge.png') center/cover"></div><div class="zone-body"><h4>Magma Forge</h4><div class="zone-level">Level 16-18</div><p>An ancient volcanic forge where the ocean's heat is harnessed to create weapons of terrible power.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/dreadmaw_canyon.png') center/cover"></div><div class="zone-body"><h4>Dreadmaw Rift</h4><div class="zone-level">Level 17-19</div><p>A jagged tear in the ocean floor where the Abyss King's corruption seeps into the world.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/void_threshold.png') center/cover"></div><div class="zone-body"><h4>Void Threshold</h4><div class="zone-level">Level 17-19</div><p>The boundary between the living ocean and the void beyond, guarded by a sentinel of pure darkness.</p><span class="zone-boss-tag">BOSS: Void Sentinel</span></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/corrupted_spire.png') center/cover"></div><div class="zone-body"><h4>Corrupted Spire</h4><div class="zone-level">Level 18-20</div><p>A once-sacred coral tower now twisted by abyssal corruption, pulsing with dark energy.</p></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/void_throne.png') center/cover"></div><div class="zone-body"><h4>The Abyss Throne</h4><div class="zone-level">Level 18-20</div><p>In the crushing darkness, the Abyss King sits upon a throne of devoured light.</p><span class="zone-boss-tag">FINAL BOSS: The Abyss King</span></div></div>
+
     <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#0c4a6e,#0284c7,#0c4a6e)"></div><div class="zone-body"><h4>Temple of Tides</h4><div class="zone-level">Level 20 &bull; God Fight</div><p>Poseidon's grand temple where only Crusade champions may challenge divine authority.</p><span class="zone-boss-tag zone-god-tag">GOD: Poseidon</span></div></div>
+
     <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#450a0a,#be123c,#450a0a)"></div><div class="zone-body"><h4>The Devourer's Maw</h4><div class="zone-level">Level 20 &bull; God Fight</div><p>A churning whirlpool of blood and shadow where Charybdis feasts on souls.</p><span class="zone-boss-tag zone-god-tag">GOD: Charybdis</span></div></div>
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#2e1065,#7c3aed,#2e1065)"></div><div class="zone-body"><h4>The Weaver's Abyss</h4><div class="zone-level">Level 20 &bull; God Fight</div><p>The infinite abyss where The Leviathan weaves the fabric of reality.</p><span class="zone-boss-tag zone-god-tag">GOD: The Leviathan</span></div></div>
+
+    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#2e1065,#7c3aed,#2e1065)"></div><div class="zone-body"><h4>Leviathan Sanctum</h4><div class="zone-level">Level 20 &bull; God Fight</div><p>The infinite abyss where The Leviathan weaves the fabric of reality. <span style="color:var(--muted);font-size:0.7rem;font-style:italic">(Also known as The Weaver's Abyss)</span></p><span class="zone-boss-tag zone-god-tag">GOD: The Leviathan</span></div></div>
   </div>
 </section>
 
@@ -832,38 +970,127 @@ section .section-sub{text-align:center;color:var(--muted);font-size:0.95rem;marg
 
   <div class="city-grid">
     <div class="city-card" style="border-color:rgba(34,211,238,0.3)">
-      <h3 class="cinzel" style="color:#22d3ee">Reef Camp</h3>
-      <p class="city-desc">Your basecamp at the edge of the Coral Shallows. A merchant offers supplies and buys your ocean treasures.</p>
-      <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade</span><span>Rest</span><span>Upgrade</span></div>
-      <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 5 Pearls &bull; Trade: Standard</div>
+      <div class="city-banner" style="background:url('/backgrounds/coral_reef_city.png') center/cover"></div>
+      <div class="city-body">
+        <h3 class="cinzel" style="color:#22d3ee">Reef Camp</h3>
+        <p class="city-desc">Your basecamp at the edge of the Coral Shallows. A merchant offers supplies and buys your ocean treasures.</p>
+        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade</span><span>Rest</span><span>Upgrade</span></div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 5 Pearls &bull; Trade: Standard</div>
+      </div>
     </div>
     <div class="city-card" style="border-color:rgba(251,191,36,0.3)">
-      <h3 class="cinzel" style="color:#fbbf24">Shell Fortress</h3>
-      <p class="city-desc">A fortified stronghold built into a giant conch shell. The finest pearl smiths work their craft here.</p>
-      <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Reef Shaman (Lv.6+)</div>
-      <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (-10%)</span><span>Rest</span><span>Upgrade</span></div>
-      <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 10 Pearls &bull; Trade: 10% Discount</div>
+      <div class="city-banner" style="background:url('/backgrounds/sunken_temple.png') center/cover"></div>
+      <div class="city-body">
+        <h3 class="cinzel" style="color:#fbbf24">Shell Fortress</h3>
+        <p class="city-desc">A fortified stronghold built into a giant conch shell. The finest pearl smiths work their craft here.</p>
+        <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Reef Shaman (Lv.6+)</div>
+        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (-10%)</span><span>Rest</span><span>Upgrade</span></div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 10 Pearls &bull; Trade: 10% Discount</div>
+      </div>
     </div>
     <div class="city-card" style="border-color:rgba(167,139,250,0.3)">
-      <h3 class="cinzel" style="color:#a78bfa">Ink Haven</h3>
-      <p class="city-desc">A lawless deep-sea port where smuggler fish and mercenary eels trade in secrets and shells.</p>
-      <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Shadow Shark (Lv.11+)</div>
-      <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (+10%)</span><span>Rest</span><span>Upgrade</span></div>
-      <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 20 Pearls &bull; Trade: 10% Markup (black market)</div>
+      <div class="city-banner" style="background:url('/backgrounds/shadow_citadel.png') center/cover"></div>
+      <div class="city-body">
+        <h3 class="cinzel" style="color:#a78bfa">Ink Haven</h3>
+        <p class="city-desc">A lawless deep-sea port where smuggler fish and mercenary eels trade in secrets and shells.</p>
+        <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Shadow Shark (Lv.11+)</div>
+        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (+10%)</span><span>Rest</span><span>Upgrade</span></div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 20 Pearls &bull; Trade: 10% Markup (black market)</div>
+      </div>
     </div>
     <div class="city-card" style="border-color:rgba(249,115,22,0.3)">
-      <h3 class="cinzel" style="color:#f97316">Vent City</h3>
-      <p class="city-desc">A deep-sea city built around volcanic vents. The heat of the thermal forges never dies.</p>
-      <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Trench Warlord (Lv.8+)</div>
-      <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (-15%)</span><span>Rest</span><span>Upgrade</span></div>
-      <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 35 Pearls &bull; Trade: 15% Discount (best prices)</div>
+      <div class="city-banner" style="background:url('/backgrounds/volcanic_vent.png') center/cover"></div>
+      <div class="city-body">
+        <h3 class="cinzel" style="color:#f97316">Vent City</h3>
+        <p class="city-desc">A deep-sea city built around volcanic vents. The heat of the thermal forges never dies.</p>
+        <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Trench Warlord (Lv.8+)</div>
+        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (-15%)</span><span>Rest</span><span>Upgrade</span></div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 35 Pearls &bull; Trade: 15% Discount (best prices)</div>
+      </div>
     </div>
     <div class="city-card" style="border-color:rgba(167,139,250,0.3)">
-      <h3 class="cinzel" style="color:#a78bfa">Crystal Spire</h3>
-      <p class="city-desc">An ancient underwater citadel suspended by arcane currents. The most powerful ocean mages convene here.</p>
-      <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Kraken Lich (Lv.13+)</div>
-      <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (+20%)</span><span>Rest</span><span>Upgrade</span></div>
-      <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 50 Pearls &bull; Trade: 20% Markup (rare goods)</div>
+      <div class="city-banner" style="background:url('/backgrounds/crystal_caves.png') center/cover"></div>
+      <div class="city-body">
+        <h3 class="cinzel" style="color:#a78bfa">Crystal Spire</h3>
+        <p class="city-desc">An ancient underwater citadel suspended by arcane currents. The most powerful ocean mages convene here.</p>
+        <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Kraken Lich (Lv.13+)</div>
+        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (+20%)</span><span>Rest</span><span>Upgrade</span></div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 50 Pearls &bull; Trade: 20% Markup (rare goods)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BUILDINGS ===== -->
+<section id="buildings">
+  <h2 class="cinzel">Buildings &amp; Structures</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Discover various structures across the ocean zones &mdash; from resource nodes and shops to rest points and dangerous lairs.</p>
+
+  <div class="building-grid">
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/weapons_shop.png') center/cover"></div>
+      <div class="building-body"><h4>Weapons Shop</h4><p>Purchase and upgrade weapons for your school of warriors.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/armor_shop.png') center/cover"></div>
+      <div class="building-body"><h4>Armor Shop</h4><p>Browse and buy protective shell armor and enchanted gear.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/potions_shop.png') center/cover"></div>
+      <div class="building-body"><h4>Potions Shop</h4><p>Stock up on healing elixirs, buffs, and alchemical brews.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/healing_shrine.png') center/cover"></div>
+      <div class="building-body"><h4>Healing Shrine</h4><p>A sacred reef shrine that fully restores health and mana.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/campfire.png') center/cover"></div>
+      <div class="building-body"><h4>Campfire</h4><p>A warm rest point where your school can recover between battles.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/sleeping_bag.png') center/cover"></div>
+      <div class="building-body"><h4>Rest Camp</h4><p>A temporary camp for quick recovery in hostile waters.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/dungeon_gate.png') center/cover"></div>
+      <div class="building-body"><h4>Dungeon Gate</h4><p>An ominous entrance to underwater dungeons filled with danger and loot.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/boss_lair.png') center/cover"></div>
+      <div class="building-body"><h4>Boss Lair</h4><p>The den of a powerful boss creature. Enter at your own risk.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/enemy_patrol.png') center/cover"></div>
+      <div class="building-body"><h4>Enemy Patrol</h4><p>A roaming group of hostile sea creatures guarding their territory.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/treasure_chest.png') center/cover"></div>
+      <div class="building-body"><h4>Treasure Chest</h4><p>A sunken chest containing pearls, gear, and rare items.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/coral_grove.png') center/cover"></div>
+      <div class="building-body"><h4>Coral Grove</h4><p>A resource node &mdash; harvest coral for crafting weapons and armor.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/algae_garden.png') center/cover"></div>
+      <div class="building-body"><h4>Algae Garden</h4><p>A resource node &mdash; gather algae for potions and enchantments.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/pearl_beds.png') center/cover"></div>
+      <div class="building-body"><h4>Pearl Beds</h4><p>A resource node &mdash; collect pearls, the currency of Abyssia.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/shell_deposit.png') center/cover"></div>
+      <div class="building-body"><h4>Shell Deposit</h4><p>A resource node &mdash; mine shells for forging heavy armor and shields.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/crystal_cave.png') center/cover"></div>
+      <div class="building-body"><h4>Crystal Cave</h4><p>A resource node &mdash; extract rare crystals for high-tier enchantments.</p></div>
+    </div>
+    <div class="building-card">
+      <div class="building-img" style="background:url('/images/buildings/crystal_grotto.png') center/cover"></div>
+      <div class="building-body"><h4>Crystal Grotto</h4><p>A sparkling underwater grotto rich with crystalline formations and arcane energy.</p></div>
     </div>
   </div>
 </section>
@@ -881,7 +1108,7 @@ section .section-sub{text-align:center;color:var(--muted);font-size:0.95rem;marg
     </div>
     <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px">
       <img src="/sprites/ui/icons/icon_coral.png" alt="Coral" style="width:36px;height:36px">
-      <div><h3 class="cinzel" style="color:#f97316;font-size:0.95rem">Coral</h3><p>Harvested from coral groves. Used in crafting weapons and armor. Equivalent to wood in surface economies.</p></div>
+      <div><h3 class="cinzel" style="color:#f97316;font-size:0.95rem">Coral</h3><p>Harvested from coral groves. Used in crafting weapons and armor. The building material of the deep.</p></div>
     </div>
     <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px">
       <img src="/sprites/ui/icons/icon_shell.png" alt="Shells" style="width:36px;height:36px">
