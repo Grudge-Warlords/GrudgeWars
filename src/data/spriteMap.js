@@ -1034,6 +1034,15 @@ const shieldDroidSprite = {
   shield_done: { src: '/sprites/shield_droid/shield_done.png', frames: 4 },
 };
 
+const toasterBotSprite = {
+  folder: 'toaster_bot', frameWidth: 106, frameHeight: 22,
+  idle: { src: '/sprites/toaster_bot/idle.png', frames: 5 },
+  walk: { src: '/sprites/toaster_bot/walk.png', frames: 8 },
+  attack1: { src: '/sprites/toaster_bot/attack.png', frames: 11 },
+  hurt: { src: '/sprites/toaster_bot/hit.png', frames: 2 },
+  death: { src: '/sprites/toaster_bot/death.png', frames: 5 },
+};
+
 export const enemySpriteMap = {
   goblin: fishEnemySprite('fish_tan'),
   skeleton: eelSprite,
@@ -1076,6 +1085,7 @@ export const enemySpriteMap = {
   medieval_warrior: greenFishCharSprite,
   fantasy_warrior: { ...pufferfishBrownSprite, filter: 'hue-rotate(40deg) saturate(1.3)' },
   shield_droid: shieldDroidSprite,
+  toaster_bot: toasterBotSprite,
 };
 
 export function getClassBuffClass(classId, variant = 1) {
