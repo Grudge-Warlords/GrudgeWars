@@ -979,6 +979,27 @@ const jellybossSprite = underwaterBossSprite('jellyfish_boss');
 const crabbossSprite = underwaterBossSprite('crab_boss');
 const turtlebossSprite = underwaterBossSprite('turtle_boss', false, 4);
 
+function craftpixSeaSprite(name, idleFrames = 4, attackFrames = 4, walkFrames = 4, deathFrames = 6) {
+  return {
+    folder: `enemies/${name}`,
+    frameWidth: 48,
+    frameHeight: 48,
+    swimming: true,
+    idle: { src: `/sprites/enemies/${name}/Idle.png`, frames: idleFrames },
+    attack1: { src: `/sprites/enemies/${name}/Attack.png`, frames: attackFrames },
+    hurt: { src: `/sprites/enemies/${name}/Hurt.png`, frames: 2 },
+    walk: { src: `/sprites/enemies/${name}/Walk.png`, frames: walkFrames },
+    death: { src: `/sprites/enemies/${name}/Death.png`, frames: deathFrames },
+  };
+}
+
+const jellyfishPurpleSprite = craftpixSeaSprite('jellyfish_purple', 4, 4, 4, 6);
+const turtleGreenSprite = craftpixSeaSprite('turtle_green', 4, 6, 4, 6);
+const sharkBlueSprite = craftpixSeaSprite('shark_blue', 4, 6, 4, 6);
+const pufferfishBrownSprite = craftpixSeaSprite('pufferfish_brown', 4, 6, 4, 6);
+const eelSprite = craftpixSeaSprite('eel', 4, 6, 6, 6);
+const octopusRedSprite = craftpixSeaSprite('octopus_red', 6, 6, 6, 6);
+
 function gifCharSprite(name, idleFrames, hurtFrames = 2) {
   return {
     folder: `enemies/${name}`,
@@ -1003,45 +1024,45 @@ const eggCharSprite = gifCharSprite('egg_char', 5);
 
 export const enemySpriteMap = {
   goblin: fishEnemySprite('fish_tan'),
-  skeleton: fishEnemySprite('fish_dark'),
-  wolf: fishEnemySprite('fish_red'),
-  dark_mage: jellyfishCharSprite,
+  skeleton: eelSprite,
+  wolf: sharkBlueSprite,
+  dark_mage: jellyfishPurpleSprite,
   dark_knight: anglerSprite,
-  shadow_warrior: fishEnemySprite('fish_crimson'),
+  shadow_warrior: { ...sharkBlueSprite, filter: 'hue-rotate(300deg) saturate(1.4)' },
   water_priestess_mage: pinkFishCharSprite,
-  orc: crabbossSprite,
+  orc: octopusRedSprite,
   dragon_whelp: seahorseSprite,
   flying_eye: starfishCharSprite,
-  mushroom: eggCharSprite,
-  skeleton_knight: turtlebossSprite,
-  shadow_bat: gifCharSprite('boot_char', 2),
+  mushroom: pufferfishBrownSprite,
+  skeleton_knight: turtleGreenSprite,
+  shadow_bat: { ...eelSprite, filter: 'hue-rotate(200deg) saturate(1.3) brightness(0.8)' },
   imp: tadpoleCharSprite,
-  mimic: { ...greenFishCharSprite, filter: 'hue-rotate(30deg) saturate(1.2)' },
+  mimic: { ...pufferfishBrownSprite, filter: 'hue-rotate(30deg) saturate(1.2)' },
   crow_knight: fishEnemySprite('fish_blue'),
-  stone_guardian: { ...crabbossSprite, filter: 'hue-rotate(30deg) saturate(0.8) brightness(0.9)' },
+  stone_guardian: { ...turtleGreenSprite, filter: 'hue-rotate(30deg) saturate(0.8) brightness(0.9)' },
   forest_guardian: { ...seahorseSprite, filter: 'hue-rotate(90deg) saturate(1.3)' },
-  elite_orc: { ...anglerSprite, filter: 'hue-rotate(350deg) saturate(1.4)' },
-  lich: pufferbossSprite,
-  demon_lord: { ...jellybossSprite, filter: 'hue-rotate(30deg) saturate(1.4) brightness(1.1)' },
-  evil_wizard: { ...jellyfishCharSprite, filter: 'hue-rotate(270deg) saturate(1.3) brightness(1.1)' },
-  void_king: { ...turtlebossSprite, filter: 'hue-rotate(180deg) saturate(1.5) brightness(1.2)' },
-  water_elemental: { ...jellybossSprite, filter: 'hue-rotate(160deg) saturate(1.4) brightness(1.1)' },
-  nature_elemental: { ...seahorseSprite, filter: 'hue-rotate(60deg) saturate(1.3) brightness(1.1)' },
+  elite_orc: { ...octopusRedSprite, filter: 'hue-rotate(350deg) saturate(1.4)' },
+  lich: { ...jellyfishPurpleSprite, filter: 'hue-rotate(180deg) saturate(1.5) brightness(1.2)' },
+  demon_lord: { ...octopusRedSprite, filter: 'hue-rotate(30deg) saturate(1.4) brightness(1.1)' },
+  evil_wizard: { ...jellyfishPurpleSprite, filter: 'hue-rotate(270deg) saturate(1.3) brightness(1.1)' },
+  void_king: { ...sharkBlueSprite, filter: 'hue-rotate(180deg) saturate(1.5) brightness(1.2)' },
+  water_elemental: jellybossSprite,
+  nature_elemental: { ...turtleGreenSprite, filter: 'hue-rotate(60deg) saturate(1.3) brightness(1.1)' },
   grand_shaman: wormCharSprite,
   canyon_warlord: { ...crabbossSprite, filter: 'hue-rotate(20deg) saturate(1.5)' },
-  frost_wyrm: { ...anglerSprite, filter: 'hue-rotate(160deg) saturate(1.2) brightness(1.3)' },
-  shadow_beast: { ...pufferbossSprite, filter: 'hue-rotate(240deg) saturate(1.5) brightness(0.9)' },
-  corrupted_grove_keeper: { ...seahorseSprite, filter: 'hue-rotate(100deg) saturate(1.4) brightness(1.1)' },
-  void_sentinel: { ...jellybossSprite, filter: 'hue-rotate(200deg) saturate(1.5) brightness(1.1)' },
+  frost_wyrm: { ...sharkBlueSprite, filter: 'hue-rotate(160deg) saturate(1.2) brightness(1.3)' },
+  shadow_beast: { ...eelSprite, filter: 'hue-rotate(240deg) saturate(1.5) brightness(0.9)' },
+  corrupted_grove_keeper: { ...turtleGreenSprite, filter: 'hue-rotate(100deg) saturate(1.4) brightness(1.1)' },
+  void_sentinel: { ...octopusRedSprite, filter: 'hue-rotate(200deg) saturate(1.5) brightness(1.1)' },
   abyssal_demon: { ...anglerSprite, filter: 'hue-rotate(350deg) saturate(1.6) brightness(1.0)' },
-  eldritch_horror: { ...jellyfishCharSprite, filter: 'hue-rotate(120deg) saturate(1.3) brightness(0.8)' },
-  frost_titan: { ...turtlebossSprite, filter: 'hue-rotate(170deg) saturate(1.2) brightness(1.4)' },
-  god_odin: { ...pufferbossSprite, filter: 'hue-rotate(190deg) saturate(1.6) brightness(1.3)' },
-  god_madra: { ...crabbossSprite, filter: 'hue-rotate(330deg) saturate(1.8) brightness(1.1)' },
-  god_omni: { ...turtlebossSprite, filter: 'hue-rotate(260deg) saturate(1.5) brightness(1.2)' },
-  loreon_knight: fishEnemySprite('fish_blue'),
+  eldritch_horror: { ...jellyfishPurpleSprite, filter: 'hue-rotate(120deg) saturate(1.3) brightness(0.8)' },
+  frost_titan: { ...turtleGreenSprite, filter: 'hue-rotate(170deg) saturate(1.2) brightness(1.4)' },
+  god_odin: { ...sharkBlueSprite, filter: 'hue-rotate(190deg) saturate(1.6) brightness(1.3)' },
+  god_madra: { ...octopusRedSprite, filter: 'hue-rotate(330deg) saturate(1.8) brightness(1.1)' },
+  god_omni: { ...turtleGreenSprite, filter: 'hue-rotate(260deg) saturate(1.5) brightness(1.2)' },
+  loreon_knight: { ...eelSprite, filter: 'hue-rotate(40deg) saturate(1.2)' },
   medieval_warrior: greenFishCharSprite,
-  fantasy_warrior: { ...anglerSprite, filter: 'hue-rotate(40deg) saturate(1.3)' },
+  fantasy_warrior: { ...pufferfishBrownSprite, filter: 'hue-rotate(40deg) saturate(1.3)' },
 };
 
 export function getClassBuffClass(classId, variant = 1) {
