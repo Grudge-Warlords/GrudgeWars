@@ -59,9 +59,10 @@ export const UI_ICONS = {
   eqRing: `${ICON}/eq_ring.png`,
   mannequin: `${ICON}/mannequin.png`,
 
-  gold: `${ICON}/icon_pearl.png`,
-  pearl: `${ICON}/icon_pearl.png`,
-  coin: `${ICON}/icon_pearl.png`,
+  gold: `/images/icons/gbux.png`,
+  pearl: `/images/icons/gbux.png`,
+  coin: `/images/icons/gbux.png`,
+  gbux: `/images/icons/gbux.png`,
   camp: `${ICON}/icon_anchor.png`,
   coral: `${ICON}/icon_coral.png`,
   shell: `${ICON}/icon_shell.png`,
