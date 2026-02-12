@@ -6,7 +6,7 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 ## Theme
 - **Setting:** Underwater ocean world with betta fish characters
 - **Color Palette:** Teal (#22d3ee), Cyan (#06b6d4), Purple (#a855f7), Deep Blue (#041225)
-- **Races:** Blue Veil (blue_betta), Crimson Fang (red_betta), Mystic Fin (purple_betta), Ghost Tide (white_betta), Reef Striker (green_betta), Crown Tail (gold_betta), Ember Scale (orange_betta), Coral Dancer (pink_betta)
+- **Breeds:** Halfmoon (blue_betta), Plakat (red_betta), Doubletail (purple_betta), Cambodian (white_betta), Giant (green_betta), Crowntail (gold_betta), Dragonscale (orange_betta), Butterfly (pink_betta)
 - **Currency:** Pearls (formerly gold)
 - **Resources:** Coral (wood), Shells (ore), Algae (herbs), Crystals, Pearls
 - **Enemies:** Sea creatures (Reef Bandit, Mantis Shrimp, Ink Sorcerer, Hammerhead Brute, Kraken Lich, Sea Drake, Leviathan, etc.)
@@ -16,6 +16,18 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
+- **2026-02-12:** IBC breed system, class buff overlays, new enemy sprites, motion tuning
+  - Renamed "Race" → "Breed" across all UI (CharacterCreate, HeroCreate, LobbyScreen, AccountPage, AdminSprite, TitleScreen)
+  - Updated 8 breeds with IBC betta terminology: Halfmoon, Plakat, Doubletail, Cambodian, Giant, Crowntail, Dragonscale, Butterfly
+  - Added IBC-inspired lore (tail types, fault system, genetic rarity) to all breed descriptions
+  - Created 24 animated class buff overlays (4 classes × 6 hue variants) with pulse/shimmer/ring CSS animations
+  - Added `getClassBuffClass()` utility for applying class-colored aura overlays to hero sprites in battle
+  - Added 6 underwater boss sprites (48x48): angler, seahorse, pufferfish_boss, jellyfish_boss, crab_boss, turtle_boss
+  - Added 8 GIF character sprites (128x128 converted to strips): green_fish, pink_fish, jellyfish, starfish, tadpole, worm, egg, boot
+  - Remapped all 36+ enemy types to use expanded sprite library with boss/character/fish tiers
+  - Slowed NPC fish movement by 20% and increased wander area for more realistic swimming
+  - Increased hero wander jitter range on world map for wider fish-like movement
+  - NpcSprite now accepts `onPositionUpdate` callback for chat bubble anchoring
 - **2026-02-12:** AI pathfinding, auto-generated node areas, deployment prep
   - Replaced BFS pathfinding with A* (distance-weighted) for optimal route calculation between map nodes
   - Created `src/utils/mapPathfinding.js` utility module with A* algorithm, wander area generator, and road path generator

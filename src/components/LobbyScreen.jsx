@@ -227,7 +227,7 @@ function MainTab({ hasExistingSave, onContinue, onNewGame, playerName, playerLev
               New Campaign
             </div>
             <div style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: 4 }}>
-              Begin your journey through the realms. Choose your race and class.
+              Begin your journey through the realms. Choose your breed and class.
             </div>
           </div>
           <LobbyButton label="NEW GAME" onClick={onNewGame} icon="Restart" />

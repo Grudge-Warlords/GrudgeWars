@@ -7,7 +7,7 @@ import SpriteAnimation from './SpriteAnimation';
 import WorgeMorphPreview from './WorgeMorphPreview';
 import { getPlayerSprite } from '../data/spriteMap';
 
-const stepLabels = ['Name', 'Race', 'Class', 'Attributes'];
+const stepLabels = ['Name', 'Breed', 'Class', 'Attributes'];
 
 const RACE_BG = {
   blue_betta: '/backgrounds/card_blue_betta.png',
@@ -154,10 +154,10 @@ export default function CharacterCreate() {
         {step === 2 && (
           <div style={{ animation: 'fadeIn 0.4s ease' }}>
             <h2 className="font-cinzel" style={{ color: 'var(--gold)', textAlign: 'center', marginBottom: 6, fontSize: '1.3rem' }}>
-              Choose Your Race
+              Choose Your Breed
             </h2>
             <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.8rem', marginBottom: 20 }}>
-              8 Species &times; 4 Classes = 32 Warlord Combinations
+              8 Breeds &times; 4 Classes = 32 Warlord Combinations
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
               {raceList.map(race => {
@@ -210,7 +210,7 @@ export default function CharacterCreate() {
                 </p>
               ) : (
                 <p style={{ color: 'var(--muted)', fontSize: '0.8rem', fontStyle: 'italic', opacity: 0.5, margin: 0 }}>
-                  Select a race to learn more
+                  Select a breed to learn more
                 </p>
               )}
             </div>
@@ -375,7 +375,7 @@ export default function CharacterCreate() {
                   }}>{cls.icon} {cls.name}</span>
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: 6 }}>
-                  Base stats: 20 from Race + Class
+                  Base stats: 20 from Breed + Class
                 </div>
                 <div style={{
                   background: unspentPoints === 0 ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',

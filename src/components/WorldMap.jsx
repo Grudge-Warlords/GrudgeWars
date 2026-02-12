@@ -827,13 +827,13 @@ export default function WorldMap() {
 
     const scheduleHero = (hero) => {
       clearHeroTimers(hero.id);
-      const idleTime = 1500 + Math.random() * 3500;
-      const moveTime = 1200 + Math.random() * 1600;
+      const idleTime = 1800 + Math.random() * 4200;
+      const moveTime = 1440 + Math.random() * 1920;
 
       wanderTimersRef.current[hero.id] = setTimeout(() => {
         const target = getRandomPoint();
-        const jitterX = (Math.random() - 0.5) * 0.6;
-        const jitterY = (Math.random() - 0.5) * 0.4;
+        const jitterX = (Math.random() - 0.5) * 1.0;
+        const jitterY = (Math.random() - 0.5) * 0.7;
         const newX = target.x + jitterX;
 
         setWanderOffsets(prev => {

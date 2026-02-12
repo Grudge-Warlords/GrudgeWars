@@ -542,7 +542,7 @@ export default function AdminSprite() {
                 <h3 style={S.h3}>Character</h3>
                 <div style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
                   <div>
-                    <div style={{ fontSize: 11, color: '#8a7d65', marginBottom: 3 }}>Race</div>
+                    <div style={{ fontSize: 11, color: '#8a7d65', marginBottom: 3 }}>Breed</div>
                     <select value={race} onChange={e => setRace(e.target.value)} style={S.select}>
                       {races.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
                     </select>

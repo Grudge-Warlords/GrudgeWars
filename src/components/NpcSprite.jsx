@@ -11,7 +11,7 @@ function pickTarget(homeX, homeY, rangeX, rangeY) {
   };
 }
 
-export default function NpcSprite({ npcId, scale = 3, flip: initialFlip = false, name, wanderRange = 18, wanderRangeY = 10 }) {
+export default function NpcSprite({ npcId, scale = 3, flip: initialFlip = false, name, wanderRange = 26, wanderRangeY = 14, onPositionUpdate }) {
   const canvasRef = useRef(null);
   const frameRef = useRef(0);
   const imgRef = useRef(null);
@@ -21,7 +21,7 @@ export default function NpcSprite({ npcId, scale = 3, flip: initialFlip = false,
   const offsetY = useRef(0);
   const targetX = useRef(0);
   const targetY = useRef(0);
-  const speed = useRef(rand(0.3, 0.7));
+  const speed = useRef(rand(0.24, 0.56));
   const currentFlip = useRef(initialFlip);
   const [flipState, setFlipState] = useState(initialFlip);
   const phase = useRef('idle');
@@ -30,6 +30,7 @@ export default function NpcSprite({ npcId, scale = 3, flip: initialFlip = false,
   const dartCooldown = useRef(0);
   const animRef = useRef(null);
   const lastTime = useRef(0);
+  const lastPosUpdate = useRef(0);
 
   const npcData = npcSpriteMap[npcId];
   if (!npcData) return null;
@@ -95,21 +96,21 @@ export default function NpcSprite({ npcId, scale = 3, flip: initialFlip = false,
             const t = pickTarget(0, 0, wanderRange, wanderRangeY);
             targetX.current = t.x;
             targetY.current = t.y;
-            speed.current = rand(0.4, 0.8);
-            phaseTimer.current = rand(2000, 5000);
+            speed.current = rand(0.32, 0.64);
+            phaseTimer.current = rand(2400, 6000);
           } else if (r < 0.85) {
             phase.current = 'drift';
             targetX.current = offsetX.current + rand(-3, 3);
             targetY.current = offsetY.current + rand(-2, 2);
-            speed.current = rand(0.08, 0.2);
-            phaseTimer.current = rand(1500, 3500);
+            speed.current = rand(0.064, 0.16);
+            phaseTimer.current = rand(1800, 4200);
           } else {
             phase.current = 'dart';
             const t = pickTarget(0, 0, wanderRange * 0.7, wanderRangeY * 0.7);
             targetX.current = t.x;
             targetY.current = t.y;
-            speed.current = rand(2.0, 4.0);
-            phaseTimer.current = rand(300, 700);
+            speed.current = rand(1.6, 3.2);
+            phaseTimer.current = rand(360, 840);
             dartCooldown.current = 8000;
           }
         } else {
@@ -162,6 +163,11 @@ export default function NpcSprite({ npcId, scale = 3, flip: initialFlip = false,
             ? ((targetX.current - offsetX.current) > 0 ? -4 : 4)
             : Math.sin(tailWag.current * 1.1) * 3;
           el.style.rotate = `${tiltDeg.toFixed(1)}deg`;
+          if (onPositionUpdate && timestamp - lastPosUpdate.current > 200) {
+            lastPosUpdate.current = timestamp;
+            const rect = el.getBoundingClientRect();
+            onPositionUpdate({ x: rect.left + rect.width / 2, y: rect.top });
+          }
         }
       }
 

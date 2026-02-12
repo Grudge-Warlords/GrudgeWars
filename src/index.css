@@ -501,3 +501,66 @@ body {
   20% { opacity: 1; }
   100% { opacity: 0; transform: translate(var(--px, 10px), var(--py, -30px)) scale(0); }
 }
+
+@keyframes buffPulse {
+  0% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.08); }
+  100% { opacity: 0.25; transform: scale(1); }
+}
+@keyframes buffShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes buffRing {
+  0% { box-shadow: 0 0 6px 2px var(--buff-color); opacity: 0.3; }
+  50% { box-shadow: 0 0 18px 6px var(--buff-color); opacity: 0.6; }
+  100% { box-shadow: 0 0 6px 2px var(--buff-color); opacity: 0.3; }
+}
+@keyframes buffRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.class-buff-overlay {
+  position: absolute; inset: -4px; border-radius: 50%; pointer-events: none; z-index: 2;
+  animation: buffPulse 2.5s ease-in-out infinite;
+}
+.class-buff-overlay::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: linear-gradient(90deg, transparent 0%, var(--buff-color) 50%, transparent 100%);
+  background-size: 200% 100%; opacity: 0.3;
+  animation: buffShimmer 3s linear infinite;
+}
+.class-buff-overlay::after {
+  content: ''; position: absolute; inset: -2px; border-radius: 50%;
+  border: 2px solid var(--buff-color); opacity: 0.4;
+  animation: buffRing 2s ease-in-out infinite;
+}
+
+.buff-warrior-1 { --buff-color: rgba(239,68,68,0.6); filter: hue-rotate(0deg); }
+.buff-warrior-2 { --buff-color: rgba(239,68,68,0.6); filter: hue-rotate(15deg) saturate(1.2); }
+.buff-warrior-3 { --buff-color: rgba(239,68,68,0.6); filter: hue-rotate(-10deg) brightness(1.1); }
+.buff-warrior-4 { --buff-color: rgba(239,100,68,0.6); filter: hue-rotate(25deg) saturate(1.3); }
+.buff-warrior-5 { --buff-color: rgba(220,50,50,0.6); filter: hue-rotate(-20deg) brightness(0.9); }
+.buff-warrior-6 { --buff-color: rgba(255,80,80,0.6); filter: hue-rotate(35deg) saturate(1.1); }
+
+.buff-mage-1 { --buff-color: rgba(139,92,246,0.6); filter: hue-rotate(0deg); }
+.buff-mage-2 { --buff-color: rgba(139,92,246,0.6); filter: hue-rotate(20deg) saturate(1.2); }
+.buff-mage-3 { --buff-color: rgba(139,92,246,0.6); filter: hue-rotate(-15deg) brightness(1.15); }
+.buff-mage-4 { --buff-color: rgba(160,100,255,0.6); filter: hue-rotate(35deg) saturate(1.3); }
+.buff-mage-5 { --buff-color: rgba(120,80,220,0.6); filter: hue-rotate(-25deg) brightness(0.9); }
+.buff-mage-6 { --buff-color: rgba(180,120,255,0.6); filter: hue-rotate(45deg) saturate(1.15); }
+
+.buff-worge-1 { --buff-color: rgba(217,119,6,0.6); filter: hue-rotate(0deg); }
+.buff-worge-2 { --buff-color: rgba(217,119,6,0.6); filter: hue-rotate(15deg) saturate(1.2); }
+.buff-worge-3 { --buff-color: rgba(217,119,6,0.6); filter: hue-rotate(-12deg) brightness(1.1); }
+.buff-worge-4 { --buff-color: rgba(230,140,20,0.6); filter: hue-rotate(28deg) saturate(1.25); }
+.buff-worge-5 { --buff-color: rgba(200,100,0,0.6); filter: hue-rotate(-22deg) brightness(0.9); }
+.buff-worge-6 { --buff-color: rgba(245,158,11,0.6); filter: hue-rotate(40deg) saturate(1.15); }
+
+.buff-ranger-1 { --buff-color: rgba(34,197,94,0.6); filter: hue-rotate(0deg); }
+.buff-ranger-2 { --buff-color: rgba(34,197,94,0.6); filter: hue-rotate(18deg) saturate(1.2); }
+.buff-ranger-3 { --buff-color: rgba(34,197,94,0.6); filter: hue-rotate(-14deg) brightness(1.1); }
+.buff-ranger-4 { --buff-color: rgba(50,210,110,0.6); filter: hue-rotate(30deg) saturate(1.3); }
+.buff-ranger-5 { --buff-color: rgba(20,180,80,0.6); filter: hue-rotate(-24deg) brightness(0.9); }
+.buff-ranger-6 { --buff-color: rgba(60,220,120,0.6); filter: hue-rotate(42deg) saturate(1.1); }

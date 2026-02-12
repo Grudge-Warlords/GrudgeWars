@@ -227,7 +227,7 @@ export default function HeroCreate() {
 
         {step === 2 && (
           <div>
-            <h2 className="font-cinzel" style={{ color: 'var(--text)', marginBottom: 16, textAlign: 'center' }}>Choose Race</h2>
+            <h2 className="font-cinzel" style={{ color: 'var(--text)', marginBottom: 16, textAlign: 'center' }}>Choose Breed</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
               {Object.entries(raceDefinitions).map(([id, race]) => (
                 <div key={id} onClick={() => setSelectedRace(id)}

@@ -1044,6 +1044,13 @@ export const enemySpriteMap = {
   fantasy_warrior: { ...anglerSprite, filter: 'hue-rotate(40deg) saturate(1.3)' },
 };
 
+export function getClassBuffClass(classId, variant = 1) {
+  const v = Math.max(1, Math.min(6, variant));
+  const classMap = { warrior: 'warrior', mage: 'mage', worge: 'worge', ranger: 'ranger' };
+  const cls = classMap[classId] || 'warrior';
+  return `class-buff-overlay buff-${cls}-${v}`;
+}
+
 export const effectSprites = {
   magicSpell: { src: '/effects/pixel/1_magicspell_spritesheet.png', size: 900, frames: 81 },
   magic8: { src: '/effects/pixel/2_magic8_spritesheet.png', size: 800, frames: 64 },

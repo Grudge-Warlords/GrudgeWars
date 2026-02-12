@@ -1033,7 +1033,7 @@ function HeroDetailPanel({ hero, onClose }) {
                     <span style={{ color: cls?.color || 'var(--accent)', fontWeight: 600 }}>{cls?.name || '?'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem' }}>
-                    <span style={{ color: 'var(--muted)' }}>Race</span>
+                    <span style={{ color: 'var(--muted)' }}>Breed</span>
                     <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{race?.name || '?'}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem' }}>
@@ -1195,7 +1195,7 @@ function HeroDetailPanel({ hero, onClose }) {
 
               {race && (
                 <div style={sectionStyle}>
-                  {sectionTitle(race.icon ? '' : 'gift', `Racial Trait — ${race.name}`)}
+                  {sectionTitle(race.icon ? '' : 'gift', `Breed Trait — ${race.name}`)}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     {race.icon && <img src={race.icon} alt={race.name} style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }} />}
                     <div>

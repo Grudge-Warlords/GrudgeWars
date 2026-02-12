@@ -4,7 +4,7 @@ import { classDefinitions } from '../data/classes';
 import { raceDefinitions } from '../data/races';
 import { PLAYER_ROWS, getAdjacentRows } from '../data/battleRows';
 import SpriteAnimation, { buildEquipmentOverlays } from './SpriteAnimation';
-import { getPlayerSprite, getEnemySprite, getWorgTransformSprite, getWorgBearTransformSprite, warriorTransformSprite, getEliteTransformSprite, getAbilityEffect, beamTrails, effectSprites } from '../data/spriteMap';
+import { getPlayerSprite, getEnemySprite, getWorgTransformSprite, getWorgBearTransformSprite, warriorTransformSprite, getEliteTransformSprite, getAbilityEffect, beamTrails, effectSprites, getClassBuffClass } from '../data/spriteMap';
 import AmbientParticles, { CastingParticles, HitParticles, HealParticles } from './BattleParticles';
 import { UI_PANELS, UI_SLOTS, UI_ICONS, SpriteIcon, getItemSpriteIcon, InlineIcon } from '../data/uiSprites.jsx';
 import { TIERS, EQUIPMENT_SLOTS } from '../data/equipment';
@@ -2369,6 +2369,9 @@ export default function BattleScreen() {
                   loop={anim === 'idle' || anim === 'walk'}
                   equipmentOverlays={unit.team === 'player' ? buildEquipmentOverlays(heroRoster.find(h => h.id === unit.id), TIERS) : null}
                 />
+                {unit.team === 'player' && unit.alive && unit.classId && (
+                  <div className={getClassBuffClass(unit.classId, ((unit.id?.charCodeAt?.(unit.id.length - 1) || 0) % 6) + 1)} style={{ width: spriteSize * 0.7, height: spriteSize * 0.7, top: '15%', left: '15%' }} />
+                )}
               </div>
 
               {unit.alive && unit.stunned && (
