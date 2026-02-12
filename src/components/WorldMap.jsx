@@ -7,7 +7,7 @@ import { missionTemplates, arenaTemplates } from '../data/missions';
 import { classDefinitions } from '../data/classes';
 import { raceDefinitions } from '../data/races';
 import SpriteAnimation, { buildEquipmentOverlays } from './SpriteAnimation';
-import { getPlayerSprite, getEnemySprite } from '../data/spriteMap';
+import { getPlayerSprite, getEnemySprite, merchantSprite } from '../data/spriteMap';
 import GameUIOverlay from './GameUIOverlay';
 import { setBgm } from '../utils/audioManager';
 import { TIERS, UPGRADE_COSTS, EQUIPMENT_SLOTS, WEAPON_TYPES, ARMOR_TYPES, getItemPrice, getSellPrice } from '../data/equipment';
@@ -689,6 +689,11 @@ export default function WorldMap() {
   const footprintIdRef = useRef(0);
   const footprintCleanupRef = useRef([]);
   const [harvestTick, setHarvestTick] = useState(0);
+  const [merchantNpc, setMerchantNpc] = useState(() => {
+    const cities = ['reef_camp', 'shell_fortress', 'ink_haven', 'vent_city', 'crystal_spire'];
+    const start = cities[Math.floor(Math.random() * cities.length)];
+    return { currentNode: start, targetNode: null, progress: 0, showShop: false };
+  });
   const [camZoom, setCamZoom] = useState(3);
   const [camPos, setCamPos] = useState({ x: 0, y: 0 });
   const [devUnlocked, setDevUnlocked] = useState({});
@@ -994,6 +999,28 @@ export default function WorldMap() {
       wanderTimersRef.current = {};
     };
   }, [heroRoster, activeHeroIds, currentZone, movementAreas, isPathing]);
+
+  useEffect(() => {
+    const cities = ['reef_camp', 'shell_fortress', 'ink_haven', 'vent_city', 'crystal_spire'];
+    const timer = setInterval(() => {
+      setMerchantNpc(prev => {
+        if (prev.targetNode) {
+          const newProgress = prev.progress + 0.02;
+          if (newProgress >= 1) {
+            return { ...prev, currentNode: prev.targetNode, targetNode: null, progress: 0 };
+          }
+          return { ...prev, progress: newProgress };
+        }
+        if (Math.random() < 0.03) {
+          const available = cities.filter(c => c !== prev.currentNode);
+          const target = available[Math.floor(Math.random() * available.length)];
+          return { ...prev, targetNode: target, progress: 0 };
+        }
+        return prev;
+      });
+    }, 200);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (!movePath || movePath.length < 2 || moveStep >= movePath.length - 1) {
@@ -2340,6 +2367,48 @@ export default function WorldMap() {
                 </div>
               )}
 
+            </div>
+          );
+        })()}
+
+        {(() => {
+          const mPos = getNodePos(merchantNpc.currentNode);
+          const mTarget = merchantNpc.targetNode ? getNodePos(merchantNpc.targetNode) : null;
+          if (!mPos) return null;
+          const isMoving = merchantNpc.targetNode && mTarget;
+          const mx = isMoving ? mPos.x + (mTarget.x - mPos.x) * merchantNpc.progress : mPos.x;
+          const my = isMoving ? mPos.y + (mTarget.y - mPos.y) * merchantNpc.progress : mPos.y;
+          const flipMerchant = isMoving && mTarget && mTarget.x < mPos.x;
+          const mScale = Math.max(0.5, 0.8 / camZoom);
+          return (
+            <div
+              style={{
+                position: 'absolute', left: `${mx}%`, top: `${my - 2}%`,
+                transform: `translate(-50%, -100%) scale(${mScale})`,
+                zIndex: MAP_LAYERS.HERO - 2,
+                cursor: 'pointer', pointerEvents: 'auto',
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMerchantNpc(prev => ({ ...prev, showShop: !prev.showShop }));
+              }}
+            >
+              <div style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))',
+              }}>
+                <SpriteAnimation
+                  spriteData={merchantSprite}
+                  animation={isMoving ? 'walk' : 'idle'}
+                  flip={flipMerchant}
+                  scale={1.2}
+                  speed={isMoving ? 120 : 200}
+                />
+                <div style={{
+                  fontSize: '0.5rem', color: 'var(--gold)', fontWeight: 700,
+                  textShadow: '0 1px 4px rgba(0,0,0,0.9)', whiteSpace: 'nowrap', marginTop: -2,
+                }}>Wandering Merchant</div>
+              </div>
             </div>
           );
         })()}

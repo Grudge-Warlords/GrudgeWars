@@ -697,15 +697,26 @@ export const worgTransformSprite = {
   pink_betta: leafRangerSprite,
 };
 
+const babyBoxerSprite = {
+  folder: 'baby_boxer', frameWidth: 128, frameHeight: 48,
+  idle: { src: '/sprites/baby_boxer/idle.png', frames: 6 },
+  peek: { src: '/sprites/baby_boxer/peek.png', frames: 7 },
+  walk: { src: '/sprites/baby_boxer/walk.png', frames: 5 },
+  attack1: { src: '/sprites/baby_boxer/attack1.png', frames: 10 },
+  teleport: { src: '/sprites/baby_boxer/teleport.png', frames: 6 },
+  hurt: { src: '/sprites/baby_boxer/hurt.png', frames: 3 },
+  death: { src: '/sprites/baby_boxer/death.png', frames: 4 },
+};
+
 export const worgBearTransformSprite = {
-  blue_betta: crystalMaulerSprite,
-  red_betta: crystalMaulerSprite,
-  purple_betta: crystalMaulerSprite,
-  white_betta: crystalMaulerSprite,
-  green_betta: crystalMaulerSprite,
-  gold_betta: crystalMaulerSprite,
-  orange_betta: crystalMaulerSprite,
-  pink_betta: crystalMaulerSprite,
+  blue_betta: babyBoxerSprite,
+  red_betta: babyBoxerSprite,
+  purple_betta: babyBoxerSprite,
+  white_betta: babyBoxerSprite,
+  green_betta: babyBoxerSprite,
+  gold_betta: babyBoxerSprite,
+  orange_betta: babyBoxerSprite,
+  pink_betta: babyBoxerSprite,
 };
 
 export const eliteTransformSprites = {
@@ -1003,6 +1014,49 @@ const jellybossSprite = underwaterBossSprite('jellyfish_boss');
 const crabbossSprite = underwaterBossSprite('crab_boss');
 const turtlebossSprite = underwaterBossSprite('turtle_boss', false, 4);
 
+const shockSweeperSprite = {
+  folder: 'shock_sweeper', frameWidth: 88, frameHeight: 30,
+  idle: { src: '/sprites/shock_sweeper/idle.png', frames: 1 },
+  wake: { src: '/sprites/shock_sweeper/wake.png', frames: 6 },
+  walk: { src: '/sprites/shock_sweeper/walk.png', frames: 8 },
+  attack1: { src: '/sprites/shock_sweeper/attack1.png', frames: 10 },
+  attack2: { src: '/sprites/shock_sweeper/attack2.png', frames: 9 },
+  attack3: { src: '/sprites/shock_sweeper/attack3.png', frames: 8 },
+  hurt: { src: '/sprites/shock_sweeper/hurt.png', frames: 2 },
+  death: { src: '/sprites/shock_sweeper/death.png', frames: 5 },
+};
+
+const spiritBoxerSprite = {
+  folder: 'spirit_boxer', frameWidth: 137, frameHeight: 44,
+  idle: { src: '/sprites/spirit_boxer/idle.png', frames: 4 },
+  walk: { src: '/sprites/spirit_boxer/walk.png', frames: 6 },
+  attack1: { src: '/sprites/spirit_boxer/attack1.png', frames: 6 },
+  attack2: { src: '/sprites/spirit_boxer/attack2.png', frames: 13 },
+  attack3: { src: '/sprites/spirit_boxer/attack3.png', frames: 10 },
+  hurt: { src: '/sprites/spirit_boxer/hurt.png', frames: 4 },
+  death: { src: '/sprites/spirit_boxer/death.png', frames: 8 },
+};
+
+function barrelBomberSprite(variant = 'barrel_bomber') {
+  return {
+    folder: variant, frameWidth: 195, frameHeight: 80,
+    idle: { src: `/sprites/${variant}/idle.png`, frames: 15 },
+    walk: { src: `/sprites/${variant}/walk.png`, frames: 6 },
+    attack1: { src: `/sprites/${variant}/attack1.png`, frames: 17 },
+    hurt: { src: `/sprites/${variant}/hurt.png`, frames: 4 },
+    death: { src: `/sprites/${variant}/death.png`, frames: 7 },
+  };
+}
+const barrelBomberDefault = barrelBomberSprite('barrel_bomber');
+const barrelBombBlack = barrelBomberSprite('barrel_bomb');
+const barrelTrapGreen = barrelBomberSprite('barrel_trap');
+
+const merchantSprite = {
+  folder: 'merchant', frameWidth: 64, frameHeight: 64,
+  idle: { src: '/sprites/merchant/idle.png', frames: 4 },
+  walk: { src: '/sprites/merchant/walk.png', frames: 5 },
+};
+
 function craftpixSeaSprite(name, idleFrames = 4, attackFrames = 4, walkFrames = 4, deathFrames = 6) {
   return {
     folder: `enemies/${name}`,
@@ -1084,8 +1138,8 @@ export const enemySpriteMap = {
   imp: tadpoleCharSprite,
   mimic: { ...pufferfishBrownSprite, filter: 'hue-rotate(30deg) saturate(1.2)' },
   crow_knight: fishEnemySprite('fish_blue'),
-  stone_guardian: { ...turtleGreenSprite, filter: 'hue-rotate(30deg) saturate(0.8) brightness(0.9)' },
-  forest_guardian: { ...seahorseSprite, filter: 'hue-rotate(90deg) saturate(1.3)' },
+  stone_guardian: shockSweeperSprite,
+  forest_guardian: spiritBoxerSprite,
   elite_orc: { ...octopusRedSprite, filter: 'hue-rotate(350deg) saturate(1.4)' },
   lich: { ...jellyfishPurpleSprite, filter: 'hue-rotate(180deg) saturate(1.5) brightness(1.2)' },
   demon_lord: { ...octopusRedSprite, filter: 'hue-rotate(30deg) saturate(1.4) brightness(1.1)' },
@@ -1110,6 +1164,11 @@ export const enemySpriteMap = {
   fantasy_warrior: { ...pufferfishBrownSprite, filter: 'hue-rotate(40deg) saturate(1.3)' },
   shield_droid: shieldDroidSprite,
   toaster_bot: toasterBotSprite,
+  shock_sweeper: shockSweeperSprite,
+  spirit_boxer: spiritBoxerSprite,
+  barrel_bomber: barrelBomberDefault,
+  barrel_bomb: barrelBombBlack,
+  barrel_trap: barrelTrapGreen,
 };
 
 export function getClassBuffClass(classId, variant = 1) {
@@ -1544,7 +1603,10 @@ export function getEnemySprite(templateId) {
   return enemySpriteMap[templateId] || enemySpriteMap.goblin;
 }
 
+export { merchantSprite, babyBoxerSprite, barrelBomberDefault as barrelBomberSprite, barrelBombBlack as barrelBombSprite, barrelTrapGreen as barrelTrapSprite, shockSweeperSprite, spiritBoxerSprite };
+
 export const npcSpriteMap = {
+  merchant: merchantSprite,
   clownfish: { src: '/sprites/npcs/fish/clownfish.png', frameWidth: 16, frameHeight: 16, frames: 1 },
   anchovy: { src: '/sprites/npcs/fish/anchovy.png', frameWidth: 16, frameHeight: 16, frames: 1 },
   pufferfish: { src: '/sprites/npcs/fish/pufferfish.png', frameWidth: 16, frameHeight: 16, frames: 1 },
