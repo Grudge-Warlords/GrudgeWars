@@ -1144,7 +1144,7 @@ export default function BattleScreen() {
     playerMaxHealth, playerMaxMana, playerMaxStamina,
     inventory, useConsumable, useGrudge,
     autoBattleEnabled, toggleAutoBattle,
-    heroRoster,
+    heroRoster, battleResults,
   } = useGameStore();
 
   const [unitAnims, setUnitAnims] = useState({});
@@ -2661,48 +2661,164 @@ export default function BattleScreen() {
           </div>
         ))}
 
-        {(isVictory || isDefeat) && (
+        {(isVictory || isDefeat) && (() => {
+          const r = battleResults;
+          const xpGained = r?.xpGained || battleUnits.filter(u => u.team === 'enemy').reduce((s, e) => s + (e.xpReward || 0), 0);
+          const pearlsGained = r?.pearlsGained || Math.floor(battleUnits.filter(u => u.team === 'enemy').reduce((s, e) => s + (e.goldReward || 0), 0) * 0.1);
+          const xpPct = r && r.xpToNext > 0 ? Math.min(100, Math.floor((r.xpCurrent / r.xpToNext) * 100)) : 0;
+          const loot = r?.lootDrops || [];
+          return (
           <div style={{
             position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
             textAlign: 'center', animation: 'slideUp 0.5s ease', zIndex: 100,
-            backgroundImage: isDefeat ? 'linear-gradient(135deg, rgba(11,16,32,0.85), rgba(30,0,0,0.8)), url(/backgrounds/wc_gold.png)' : 'url(/images/ui-panel-bg.png)',
+            backgroundImage: isDefeat ? 'linear-gradient(135deg, rgba(11,16,32,0.95), rgba(30,0,0,0.9))' : 'linear-gradient(135deg, rgba(6,10,24,0.95), rgba(15,25,50,0.95))',
             backgroundSize: 'cover', backgroundPosition: 'center',
-            padding: '24px 40px', borderRadius: 16,
+            padding: '20px 32px', borderRadius: 16,
             border: `2px solid ${isVictory ? 'var(--gold)' : 'var(--danger)'}`,
-            backdropFilter: 'blur(8px)',
+            backdropFilter: 'blur(12px)',
+            boxShadow: `0 0 40px ${isVictory ? 'rgba(255,215,0,0.2)' : 'rgba(239,68,68,0.2)'}, 0 8px 32px rgba(0,0,0,0.6)`,
+            minWidth: 280, maxWidth: 360,
           }}>
+            {r?.flawless && isVictory && (
+              <div style={{
+                position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
+                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                color: '#0b1020', fontSize: '0.55rem', fontWeight: 800,
+                padding: '2px 12px', borderRadius: 10,
+                letterSpacing: '0.1em',
+                boxShadow: '0 2px 8px rgba(251,191,36,0.4)',
+              }}>FLAWLESS</div>
+            )}
             <div className="font-cinzel" style={{
-              fontSize: '1.8rem',
+              fontSize: '1.6rem',
               color: isVictory ? 'var(--gold)' : 'var(--danger)',
-              textShadow: `0 0 20px ${isVictory ? 'rgba(255,215,0,0.4)' : 'rgba(239,68,68,0.4)'}`
+              textShadow: `0 0 24px ${isVictory ? 'rgba(255,215,0,0.5)' : 'rgba(239,68,68,0.5)'}`,
+              marginBottom: 8,
             }}>
-              {isVictory ? 'VICTORY!' : 'DEFEAT'}
+              {isVictory ? (r?.isBoss ? 'BOSS SLAIN!' : 'VICTORY!') : 'DEFEAT'}
             </div>
+
+            {r?.leveledUp && (
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(168,85,247,0.3), rgba(168,85,247,0.1))',
+                border: '1px solid rgba(168,85,247,0.5)',
+                borderRadius: 8, padding: '4px 12px', marginBottom: 8,
+                animation: 'pulse 1.5s infinite',
+              }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7' }}>LEVEL UP!</span>
+                <span style={{ fontSize: '0.7rem', color: '#c084fc', marginLeft: 6 }}>Lv.{r.oldLevel} → Lv.{r.newLevel}</span>
+              </div>
+            )}
+
             {isVictory && (
-              <div style={{ color: 'var(--accent)', marginTop: 8, fontSize: '0.8rem' }}>
-                +{battleUnits.filter(u => u.team === 'enemy').reduce((s, e) => s + (e.xpReward || 0), 0)} XP |
-                +{Math.floor(battleUnits.filter(u => u.team === 'enemy').reduce((s, e) => s + (e.goldReward || 0), 0) * 0.1)} Pearls
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 8 }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--teal)' }}>+{xpGained}</div>
+                    <div style={{ fontSize: '0.5rem', color: 'var(--muted)', fontWeight: 600, letterSpacing: '0.05em' }}>XP GAINED</div>
+                  </div>
+                  <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--gold)' }}>+{pearlsGained}</div>
+                    <div style={{ fontSize: '0.5rem', color: 'var(--muted)', fontWeight: 600, letterSpacing: '0.05em' }}>PEARLS</div>
+                  </div>
+                  <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ef4444' }}>{r?.enemiesDefeated || '?'}</div>
+                    <div style={{ fontSize: '0.5rem', color: 'var(--muted)', fontWeight: 600, letterSpacing: '0.05em' }}>SLAIN</div>
+                  </div>
+                </div>
+
+                {r && (
+                  <div style={{ marginBottom: 6 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.5rem', color: 'var(--muted)', marginBottom: 2 }}>
+                      <span>XP Progress</span>
+                      <span>Lv.{r.newLevel} ({xpPct}%)</span>
+                    </div>
+                    <div style={{
+                      height: 6, borderRadius: 3,
+                      background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
+                    }}>
+                      <div style={{
+                        width: `${xpPct}%`, height: '100%',
+                        background: 'linear-gradient(90deg, var(--teal), #06b6d4)',
+                        borderRadius: 3,
+                        transition: 'width 0.5s ease',
+                        boxShadow: '0 0 6px rgba(34,211,238,0.4)',
+                      }} />
+                    </div>
+                  </div>
+                )}
+
+                {r?.conquerGain > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.5rem', color: 'var(--muted)', marginBottom: 2 }}>
+                    <span>Zone Conquest</span>
+                    <span style={{ color: r.conquerTotal >= 100 ? 'var(--gold)' : 'var(--teal)' }}>+{r.conquerGain}% → {Math.floor(r.conquerTotal)}%</span>
+                  </div>
+                )}
+
+                {loot.length > 0 && (
+                  <div style={{
+                    background: 'rgba(255,215,0,0.06)',
+                    border: '1px solid rgba(255,215,0,0.15)',
+                    borderRadius: 6, padding: '4px 8px', marginTop: 6,
+                  }}>
+                    <div style={{ fontSize: '0.5rem', color: 'var(--gold)', fontWeight: 700, marginBottom: 2 }}>LOOT FOUND</div>
+                    {loot.slice(0, 4).map((item, i) => (
+                      <div key={i} style={{
+                        fontSize: '0.5rem', color: item.tier === 'legendary' ? '#fbbf24' : item.tier === 'epic' ? '#a855f7' : item.tier === 'rare' ? '#3b82f6' : '#9ca3af',
+                        textAlign: 'left',
+                      }}>
+                        {item.name || 'Unknown Item'}
+                      </div>
+                    ))}
+                    {loot.length > 4 && <div style={{ fontSize: '0.45rem', color: 'var(--muted)' }}>+{loot.length - 4} more...</div>}
+                  </div>
+                )}
+
+                {r?.heroSlotUnlocked && (
+                  <div style={{
+                    background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.3)',
+                    borderRadius: 6, padding: '3px 8px', marginTop: 4,
+                    fontSize: '0.55rem', color: '#c084fc', fontWeight: 700,
+                  }}>New Hero Slot Unlocked!</div>
+                )}
               </div>
             )}
+
             {isDefeat && (
-              <div style={{ color: 'var(--muted)', marginTop: 8, fontSize: '0.75rem' }}>
-                Recover at 50% HP, lose 10% pearls.
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ color: 'var(--muted)', fontSize: '0.75rem', marginBottom: 4 }}>
+                  Your party has fallen...
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ef4444' }}>50%</div>
+                    <div style={{ fontSize: '0.45rem', color: 'var(--muted)' }}>HP RESTORED</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fbbf24' }}>-10%</div>
+                    <div style={{ fontSize: '0.45rem', color: 'var(--muted)' }}>PEARLS LOST</div>
+                  </div>
+                </div>
               </div>
             )}
-            <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'center' }}>
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               {isVictory && currentLocation && !battleState?.isTraining && (
                 <button onClick={() => startBattle(currentLocation)} style={{
                   background: 'linear-gradient(135deg, var(--accent), #10b981)',
                   border: 'none', borderRadius: 10, padding: '8px 16px',
-                  color: '#0b1020', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem'
+                  color: '#0b1020', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem',
+                  boxShadow: '0 2px 10px rgba(110,231,183,0.3)',
                 }}>Fight Again</button>
               )}
               <button onClick={() => {
                 if (battleState?.isTraining) returnFromTraining(battleState.trainingRound);
                 else returnToWorld();
               }} style={{
-                background: isDefeat ? 'linear-gradient(135deg, rgba(239,68,68,0.3), rgba(239,68,68,0.1))' : 'var(--border)',
-                border: isDefeat ? '2px solid var(--danger)' : 'none',
+                background: isDefeat ? 'linear-gradient(135deg, rgba(239,68,68,0.3), rgba(239,68,68,0.1))' : 'rgba(255,255,255,0.08)',
+                border: isDefeat ? '2px solid var(--danger)' : '1px solid rgba(255,255,255,0.15)',
                 borderRadius: 10, padding: '8px 16px',
                 color: isDefeat ? 'var(--danger)' : 'var(--text)',
                 fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem'
@@ -2712,7 +2828,8 @@ export default function BattleScreen() {
               </button>
             </div>
           </div>
-        )}
+          );
+        })()}
 
       </div>
 

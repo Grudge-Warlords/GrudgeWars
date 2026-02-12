@@ -396,6 +396,7 @@ const useGameStore = create(persist((set, get) => ({
   shopInventory: [],
   shopLastRefresh: 0,
   pendingLoot: [],
+  battleResults: null,
   harvestNodes: [
     { id: 'gold_mine', name: 'Pearl Beds', icon: 'pickaxe', resource: 'gold', baseRate: 3, unlockLevel: 1 },
     { id: 'herb_garden', name: 'Algae Garden', icon: 'nature', resource: 'herbs', baseRate: 2, unlockLevel: 2 },
@@ -2008,8 +2009,27 @@ const useGameStore = create(persist((set, get) => ({
       return { ...hero, ...updates };
     });
 
+    const battleResults = {
+      xpGained: adjustedTotalXp,
+      pearlsGained: totalGold,
+      leveledUp,
+      newLevel,
+      oldLevel: state.level,
+      lootDrops,
+      isBoss: isBossWin,
+      enemiesDefeated: deadEnemyCount,
+      heroCount: participatingHeroes,
+      conquerGain,
+      conquerTotal: newConquer,
+      xpCurrent: newXp,
+      xpToNext: newXpToNext,
+      flawless: state.battleUnits.filter(u => u.team === 'player').every(u => u.health > 0),
+      heroSlotUnlocked: !!heroMsg,
+    };
+
     set({
       battleState: { ...state.battleState, phase: 'victory' },
+      battleResults,
       xp: newXp,
       level: newLevel,
       xpToNext: newXpToNext,
@@ -2060,6 +2080,16 @@ const useGameStore = create(persist((set, get) => ({
       losses: state.losses + 1,
       heroRoster: updatedRoster,
       battleLog: [...state.battleLog, 'Your party has been defeated...'],
+      battleResults: {
+        xpGained: 0,
+        pearlsGained: 0,
+        leveledUp: false,
+        lootDrops: [],
+        enemiesDefeated: state.battleUnits.filter(u => u.team === 'enemy' && u.health <= 0).length,
+        flawless: false,
+        xpCurrent: state.xp,
+        xpToNext: state.xpToNext || 100,
+      },
     });
   },
 
@@ -2120,6 +2150,7 @@ const useGameStore = create(persist((set, get) => ({
     const updates = {
       screen: returnScreen,
       battleState: null,
+      battleResults: null,
       battleUnits: [],
       battleTurnOrder: [],
       battleCurrentTurn: 0,

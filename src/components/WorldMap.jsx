@@ -2174,7 +2174,7 @@ export default function WorldMap() {
             <div key={city.id}
               onClick={(e) => handleCityClick(e, city)}
               onContextMenu={(e) => handleNodeRightClick(e, city)}
-              onMouseEnter={() => { if (!selectedLocation && !selectedCity && !selectedEvent) setHoveredNode({ type: 'city', id: city.id, x: pos.x, y: pos.y, name: city.name }); }}
+              onMouseEnter={() => { if (!selectedLocation && !selectedCity && !selectedEvent) setHoveredNode({ type: 'city', id: city.id, cityId: city.id, x: pos.x, y: pos.y, name: city.name }); }}
               onMouseLeave={() => setHoveredNode(null)}
               style={mapNodeStyle(pos, cs, isCityDragging ? MAP_LAYERS.DEV_DRAGGING : isSelected ? MAP_LAYERS.SELECTED : MAP_LAYERS.CITIES, {
                 cursor: isCityDragging ? 'grabbing' : isCityUnlocked ? 'pointer' : 'not-allowed',
@@ -2346,6 +2346,22 @@ export default function WorldMap() {
 
         {hoveredNode && (() => {
           const tipScale = Math.max(0.55, 1 / camZoom);
+          const arrowStyle = (borderColor) => ({
+            width: 6, height: 6,
+            background: 'rgba(6,10,24,0.95)',
+            transform: 'rotate(45deg)',
+            marginRight: -3, flexShrink: 0,
+            borderLeft: `1px solid ${borderColor}`,
+            borderBottom: `1px solid ${borderColor}`,
+          });
+          const tipWrap = (x, y) => ({
+            position: 'absolute',
+            left: `${x}%`, top: `${y}%`,
+            transform: `translate(10px, -50%) scale(${tipScale})`,
+            transformOrigin: 'left center',
+            zIndex: MAP_LAYERS.HOVER_INFO, pointerEvents: 'none',
+            display: 'flex', alignItems: 'center', gap: 0,
+          });
           if (hoveredNode.type === 'location') {
             const loc = locations.find(l => l.id === hoveredNode.id);
             if (!loc) return null;
@@ -2353,84 +2369,120 @@ export default function WorldMap() {
             const hasBoss = loc.boss && !bossesDefeated.includes(loc.boss);
             const bossDown = loc.boss && bossesDefeated.includes(loc.boss);
             const isConquered = conquer >= 100;
+            const nodeBlocked = hoveredNode.blocked;
+            const icon = locationIcons[loc.id];
+            const borderClr = nodeBlocked ? 'rgba(255,80,80,0.4)' : 'rgba(34,211,238,0.3)';
+            const enemyNames = (loc.enemies || []).slice(0, 3).map(e => {
+              const n = e.replace(/_/g, ' ');
+              return n.charAt(0).toUpperCase() + n.slice(1);
+            });
+            const isCleared = locationsCleared.includes(loc.id);
+            const levelOk = level >= (loc.levelRange?.[0] || 1);
             return (
-              <div style={{
-                position: 'absolute',
-                left: `${hoveredNode.x}%`, top: `${hoveredNode.y}%`,
-                transform: `translate(8px, -50%) scale(${tipScale})`,
-                transformOrigin: 'left center',
-                zIndex: MAP_LAYERS.HOVER_INFO, pointerEvents: 'none',
-                display: 'flex', alignItems: 'center', gap: 0,
-              }}>
+              <div style={tipWrap(hoveredNode.x, hoveredNode.y)}>
+                <div style={arrowStyle(borderClr)} />
                 <div style={{
-                  width: 6, height: 6,
-                  background: 'rgba(8,12,28,0.92)',
-                  transform: 'rotate(45deg)',
-                  marginRight: -3, flexShrink: 0,
-                  borderLeft: '1px solid rgba(34,211,238,0.25)',
-                  borderBottom: '1px solid rgba(34,211,238,0.25)',
-                }} />
-                <div style={{
-                  background: 'rgba(8,12,28,0.92)',
-                  border: '1px solid rgba(34,211,238,0.25)',
-                  borderRadius: 6, padding: '4px 8px',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                  whiteSpace: 'nowrap',
+                  background: 'rgba(6,10,24,0.95)',
+                  border: `1px solid ${borderClr}`,
+                  borderRadius: 8, padding: '6px 10px',
+                  boxShadow: `0 4px 16px rgba(0,0,0,0.7), 0 0 8px ${nodeBlocked ? 'rgba(255,60,60,0.15)' : 'rgba(34,211,238,0.1)'}`,
+                  minWidth: 130, maxWidth: 200,
                   animation: 'tooltipSlideIn 0.15s ease-out',
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ fontSize: '0.5rem', fontWeight: 700, color: '#fff', lineHeight: 1 }}>{loc.name}</span>
-                    <span style={{ fontSize: '0.4rem', color: 'var(--teal)', fontWeight: 600 }}>Lv.{loc.levelRange[0]}-{loc.levelRange[1]}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 }}>
+                    <span className="font-cinzel" style={{ fontSize: '0.55rem', fontWeight: 700, color: nodeBlocked ? '#ff8888' : '#fff', lineHeight: 1 }}>{loc.name}</span>
+                    {isConquered && <span style={{ fontSize: '0.4rem', color: 'var(--gold)', fontWeight: 700 }}>CONQUERED</span>}
+                    {isCleared && !isConquered && <span style={{ fontSize: '0.4rem', color: '#22c55e' }}>CLEARED</span>}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                    <span style={{ fontSize: '0.42rem', color: levelOk ? 'var(--teal)' : '#ef4444', fontWeight: 600 }}>Lv.{loc.levelRange[0]}-{loc.levelRange[1]}</span>
+                    {loc.terrain && <span style={{ fontSize: '0.38rem', color: icon?.color || 'var(--muted)', opacity: 0.7 }}>{loc.terrain}</span>}
+                  </div>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4,
+                  }}>
                     <div style={{
-                      width: 40, height: 2, borderRadius: 1,
-                      background: 'rgba(255,255,255,0.1)', overflow: 'hidden',
+                      flex: 1, height: 3, borderRadius: 2,
+                      background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
                     }}>
                       <div style={{
                         width: `${Math.min(100, conquer)}%`, height: '100%',
                         background: isConquered ? 'var(--gold)' : 'var(--teal)',
-                        borderRadius: 1,
+                        borderRadius: 2,
+                        transition: 'width 0.3s',
                       }} />
                     </div>
-                    <span style={{ fontSize: '0.35rem', color: isConquered ? 'var(--gold)' : 'var(--muted)' }}>{Math.floor(conquer)}%</span>
-                    {hasBoss && <span style={{ fontSize: '0.35rem', color: '#ef4444', fontWeight: 700 }}>BOSS</span>}
-                    {bossDown && <span style={{ fontSize: '0.35rem', color: '#22c55e' }}>✓</span>}
+                    <span style={{ fontSize: '0.38rem', color: isConquered ? 'var(--gold)' : 'var(--muted)', fontWeight: 600, minWidth: 20, textAlign: 'right' }}>{Math.floor(conquer)}%</span>
                   </div>
+                  {enemyNames.length > 0 && (
+                    <div style={{ fontSize: '0.38rem', color: 'var(--muted)', marginBottom: 3 }}>
+                      Enemies: {enemyNames.join(', ')}{(loc.enemies || []).length > 3 ? '...' : ''}
+                    </div>
+                  )}
+                  {hasBoss && (
+                    <div style={{
+                      fontSize: '0.42rem', color: '#ef4444', fontWeight: 700,
+                      background: 'rgba(239,68,68,0.1)', borderRadius: 4, padding: '2px 5px',
+                      display: 'inline-block',
+                    }}>
+                      BOSS AWAITS
+                    </div>
+                  )}
+                  {bossDown && (
+                    <div style={{ fontSize: '0.4rem', color: '#22c55e', fontWeight: 600 }}>
+                      Boss defeated
+                    </div>
+                  )}
+                  {nodeBlocked && hoveredNode.blockerMsg && (
+                    <div style={{
+                      fontSize: '0.42rem', color: '#ff9999', fontWeight: 600,
+                      background: 'rgba(255,60,60,0.1)', borderRadius: 4, padding: '2px 5px',
+                      marginTop: 2,
+                    }}>
+                      {hoveredNode.blockerMsg}
+                    </div>
+                  )}
+                  {!nodeBlocked && !levelOk && (
+                    <div style={{ fontSize: '0.4rem', color: '#fbbf24', marginTop: 2 }}>
+                      Recommended: Level {loc.levelRange[0]}+
+                    </div>
+                  )}
                 </div>
               </div>
             );
           }
           if (hoveredNode.type === 'city') {
+            const cityObj = cities.find(c => c.id === hoveredNode.cityId);
+            const services = [];
+            if (cityObj?.hasInn) services.push('Inn');
+            if (cityObj?.hasShop) services.push('Shop');
+            if (cityObj?.hasArena) services.push('Arena');
+            if (cityObj?.hasMissions) services.push('Missions');
             return (
-              <div style={{
-                position: 'absolute',
-                left: `${hoveredNode.x}%`, top: `${hoveredNode.y}%`,
-                transform: `translate(8px, -50%) scale(${tipScale})`,
-                transformOrigin: 'left center',
-                zIndex: MAP_LAYERS.HOVER_INFO, pointerEvents: 'none',
-                display: 'flex', alignItems: 'center', gap: 0,
-              }}>
+              <div style={tipWrap(hoveredNode.x, hoveredNode.y)}>
+                <div style={arrowStyle('rgba(74,222,128,0.3)')} />
                 <div style={{
-                  width: 6, height: 6,
-                  background: 'rgba(8,12,28,0.92)',
-                  transform: 'rotate(45deg)',
-                  marginRight: -3, flexShrink: 0,
-                  borderLeft: '1px solid rgba(74,222,128,0.25)',
-                  borderBottom: '1px solid rgba(74,222,128,0.25)',
-                }} />
-                <div style={{
-                  background: 'rgba(8,12,28,0.92)',
-                  border: '1px solid rgba(74,222,128,0.25)',
-                  borderRadius: 6, padding: '4px 8px',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                  whiteSpace: 'nowrap',
+                  background: 'rgba(6,10,24,0.95)',
+                  border: '1px solid rgba(74,222,128,0.3)',
+                  borderRadius: 8, padding: '6px 10px',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.7), 0 0 8px rgba(74,222,128,0.1)',
+                  minWidth: 100,
                   animation: 'tooltipSlideIn 0.15s ease-out',
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ fontSize: '0.5rem', fontWeight: 700, color: '#4ade80', lineHeight: 1 }}>{hoveredNode.name}</span>
-                    <span style={{ fontSize: '0.38rem', color: 'var(--muted)', fontWeight: 500 }}>City</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+                    <span className="font-cinzel" style={{ fontSize: '0.55rem', fontWeight: 700, color: '#4ade80', lineHeight: 1 }}>{hoveredNode.name}</span>
+                    <span style={{ fontSize: '0.38rem', color: 'rgba(74,222,128,0.6)', fontWeight: 500 }}>City</span>
                   </div>
+                  {services.length > 0 && (
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                      {services.map(s => (
+                        <span key={s} style={{
+                          fontSize: '0.38rem', color: 'var(--muted)',
+                          background: 'rgba(255,255,255,0.06)', borderRadius: 3, padding: '1px 4px',
+                        }}>{s}</span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             );

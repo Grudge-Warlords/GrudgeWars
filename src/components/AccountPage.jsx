@@ -115,49 +115,75 @@ function HeroCard({ hero, isSelected, onClick, isActive }) {
   const stats = getHeroStatsWithBonuses(hero);
   const cp = calculateCombatPower(stats);
   const hasPoints = (hero.unspentPoints || 0) > 0 || (hero.skillPoints || 0) > 0;
+  const raceColor = race?.color || 'rgba(110,231,183)';
+  const clsColor = cls?.color || 'var(--accent)';
 
   const raceBg = RACE_BG[hero.raceId] || RACE_BG.human;
   const spriteData = getPlayerSprite(hero.classId, hero.raceId);
   const cardScale = getCardScale(spriteData);
 
+  const classIcons = { warrior: '⚔️', mage: '🔮', ranger: '🏹', worge: '🐾' };
+  const levelPct = hero.level >= 20 ? 100 : Math.floor(((hero.xp || 0) / (hero.xpToNext || 100)) * 100);
+  const record = hero.battleRecord || { wins: 0, losses: 0, kills: 0 };
+
   return (
     <div onClick={onClick} style={{
-      backgroundImage: `linear-gradient(135deg, ${isSelected ? `${race?.color || 'rgba(110,231,183)'}40` : `${race?.color || 'rgba(14,22,48)'}25`}, rgba(11,16,32,0.85)), url(${raceBg})`,
+      backgroundImage: `linear-gradient(160deg, ${isSelected ? `${raceColor}30` : `${raceColor}12`}, rgba(6,10,24,0.92)), url(${raceBg})`,
       backgroundSize: 'cover', backgroundPosition: 'center',
-      border: `2px solid ${isSelected ? (race?.color || 'var(--accent)') : 'var(--border)'}`,
-      borderRadius: 14, padding: 16, cursor: 'pointer',
+      border: `2px solid ${isSelected ? raceColor : 'rgba(255,255,255,0.08)'}`,
+      borderRadius: 14, padding: 0, cursor: 'pointer',
       transition: 'all 0.3s', position: 'relative', overflow: 'hidden',
-      minWidth: 170,
+      minWidth: 175,
+      boxShadow: isSelected ? `0 0 16px ${raceColor}30, 0 4px 16px rgba(0,0,0,0.4)` : '0 2px 8px rgba(0,0,0,0.3)',
     }}
-    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.borderColor = (race?.color || 'rgba(110,231,183)') + '80'; }}
-    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.borderColor = 'var(--border)'; }}
+    onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = raceColor + '60'; e.currentTarget.style.boxShadow = `0 0 12px ${raceColor}20, 0 4px 12px rgba(0,0,0,0.3)`; }}}
+    onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)'; }}}
     >
-      {hasPoints && (
+      {isSelected && (
         <div style={{
-          position: 'absolute', top: 6, right: 6, width: 10, height: 10,
-          borderRadius: '50%', background: 'var(--danger)',
-          animation: 'pulse 1.5s infinite',
-          boxShadow: '0 0 8px rgba(239,68,68,0.6)',
+          position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+          background: `linear-gradient(90deg, transparent, ${raceColor}, transparent)`,
         }} />
       )}
 
-      {isActive && (
+      {hasPoints && (
         <div style={{
-          position: 'absolute', top: 6, left: 6,
-          background: 'rgba(110,231,183,0.2)', border: '1px solid var(--accent)',
-          borderRadius: 4, padding: '1px 6px', fontSize: '0.5rem',
-          color: 'var(--accent)', fontWeight: 700, letterSpacing: 1,
-        }}>ACTIVE</div>
+          position: 'absolute', top: 8, right: 8, width: 12, height: 12,
+          borderRadius: '50%', background: 'var(--danger)',
+          animation: 'pulse 1.5s infinite',
+          boxShadow: '0 0 8px rgba(239,68,68,0.6)',
+          zIndex: 2,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '0.45rem', color: '#fff', fontWeight: 800,
+        }}>{(hero.unspentPoints || 0) + (hero.skillPoints || 0)}</div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, marginTop: isActive ? 12 : 0, position: 'relative', minHeight: 260 }}>
+      <div style={{ padding: '10px 10px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+        {isActive && (
+          <div style={{
+            background: 'rgba(110,231,183,0.15)', border: '1px solid var(--accent)',
+            borderRadius: 4, padding: '1px 5px', fontSize: '0.42rem',
+            color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.08em',
+          }}>ACTIVE</div>
+        )}
         <div style={{
-          width: '100%', height: 220, position: 'relative',
+          fontSize: '0.42rem', color: clsColor, fontWeight: 600,
+          marginLeft: 'auto',
+          display: 'flex', alignItems: 'center', gap: 2,
+        }}>
+          <span>{classIcons[hero.classId] || ''}</span>
+          <span>{cls?.name || ''}</span>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', minHeight: 240 }}>
+        <div style={{
+          width: '100%', height: 185, position: 'relative',
         }}>
           <div style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 80,
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 60,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            filter: isSelected ? `drop-shadow(0 0 8px ${cls?.color || 'var(--accent)'}40)` : 'none',
+            filter: isSelected ? `drop-shadow(0 0 10px ${raceColor}50)` : `drop-shadow(0 0 4px ${raceColor}20)`,
             transition: 'filter 0.3s',
           }}>
             <SpriteAnimation spriteData={spriteData} animation="idle" scale={cardScale} speed={150} equipmentOverlays={buildEquipmentOverlays(hero, TIERS)} />
@@ -165,30 +191,73 @@ function HeroCard({ hero, isSelected, onClick, isActive }) {
 
           <div style={{
             position: 'absolute', bottom: 0, left: 0, right: 0,
-            padding: '16px 6px 6px',
+            padding: '8px 10px 0',
             textAlign: 'center',
+            background: 'linear-gradient(transparent, rgba(6,10,24,0.8))',
           }}>
             <div className="font-cinzel" style={{
-              color: isSelected ? 'var(--gold)' : 'var(--text)',
-              fontSize: '0.85rem', fontWeight: 700,
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 170, margin: '0 auto',
+              color: isSelected ? 'var(--gold)' : '#fff',
+              fontSize: '0.8rem', fontWeight: 700,
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 160, margin: '0 auto',
+              textShadow: '0 1px 4px rgba(0,0,0,0.8)',
             }}>
               {hero.name}
             </div>
-            <div style={{ color: cls?.color || 'var(--muted)', fontSize: '0.7rem', fontWeight: 600 }}>
-              Lv.{hero.level} {race?.name || ''} {cls?.name || ''}
-            </div>
-            <div style={{ width: '100%', marginTop: 4 }}>
-              <MiniBar current={hero.currentHealth} max={stats.health} color="#22c55e" height={4} />
-              <MiniBar current={hero.currentMana} max={stats.mana} color="#3b82f6" height={3} />
-            </div>
-            <div style={{
-              fontSize: '0.6rem', color: 'var(--gold)', fontWeight: 600,
-              background: 'rgba(255,215,0,0.1)', padding: '2px 8px', borderRadius: 4, marginTop: 4, display: 'inline-block',
-            }}>
-              CP: {cp.toLocaleString()}
+            <div style={{ fontSize: '0.6rem', color: raceColor, fontWeight: 600, opacity: 0.9 }}>
+              Lv.{hero.level} {race?.name || ''}
             </div>
           </div>
+        </div>
+
+        <div style={{ width: '100%', padding: '6px 10px 10px' }}>
+          <div style={{ marginBottom: 4 }}>
+            <MiniBar current={hero.currentHealth} max={stats.health} color="#22c55e" height={5} />
+            <MiniBar current={hero.currentMana} max={stats.mana} color="#3b82f6" height={3} />
+          </div>
+
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 3, marginBottom: 5,
+          }}>
+            <div style={{ fontSize: '0.4rem', color: 'var(--muted)', minWidth: 14 }}>XP</div>
+            <div style={{
+              flex: 1, height: 3, borderRadius: 2,
+              background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
+            }}>
+              <div style={{
+                width: `${hero.level >= 20 ? 100 : levelPct}%`, height: '100%',
+                background: hero.level >= 20 ? 'var(--gold)' : 'var(--teal)',
+                borderRadius: 2,
+              }} />
+            </div>
+            <div style={{ fontSize: '0.38rem', color: 'var(--muted)', minWidth: 20, textAlign: 'right' }}>
+              {hero.level >= 20 ? 'MAX' : `${levelPct}%`}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 6, fontSize: '0.42rem', color: 'var(--muted)' }}>
+              <span title="Strength" style={{ color: '#ef4444' }}>⚔{stats.strength}</span>
+              <span title="Defense" style={{ color: '#3b82f6' }}>🛡{stats.defense}</span>
+              <span title="Speed" style={{ color: '#22c55e' }}>⚡{stats.speed}</span>
+            </div>
+            <div style={{
+              fontSize: '0.55rem', color: 'var(--gold)', fontWeight: 700,
+              background: 'rgba(255,215,0,0.08)', padding: '1px 6px', borderRadius: 4,
+            }}>
+              {cp.toLocaleString()}
+            </div>
+          </div>
+
+          {record.wins > 0 && (
+            <div style={{
+              display: 'flex', justifyContent: 'center', gap: 8, marginTop: 4,
+              fontSize: '0.38rem', color: 'var(--muted)', opacity: 0.7,
+            }}>
+              <span>{record.wins}W</span>
+              <span>{record.kills} kills</span>
+              {record.bossKills > 0 && <span style={{ color: 'var(--gold)' }}>{record.bossKills} boss</span>}
+            </div>
+          )}
         </div>
       </div>
     </div>
