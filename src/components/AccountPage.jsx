@@ -582,10 +582,38 @@ function HeroDetailPanel({ hero, onClose }) {
 
       <div style={{
         flex: 1, overflow: 'auto', padding: 12,
-        backgroundImage: `linear-gradient(135deg, rgba(14,22,48,0.92), rgba(20,26,43,0.88)), url(${TAB_BG[tab] || ''})`,
-        backgroundSize: 'cover', backgroundPosition: 'center',
-        transition: 'background-image 0.3s',
+        position: 'relative',
       }}>
+        {['skills', 'attributes', 'abilities'].includes(tab) && (
+          <>
+            <svg style={{ position: 'absolute', width: 0, height: 0, pointerEvents: 'none' }}>
+              <defs>
+                <filter id="water-distort">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="3" seed="3" result="noise">
+                    <animate attributeName="seed" values="1;5;1" dur="8s" repeatCount="indefinite" />
+                  </feTurbulence>
+                  <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+                </filter>
+              </defs>
+            </svg>
+            <div style={{
+              position: 'absolute', inset: 0,
+              backgroundImage: `url(${TAB_BG[tab] || ''})`,
+              backgroundSize: 'cover', backgroundPosition: 'center',
+              filter: 'url(#water-distort)',
+              opacity: 0.12,
+              pointerEvents: 'none',
+              zIndex: 0,
+            }} />
+          </>
+        )}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `linear-gradient(135deg, rgba(14,22,48,0.92), rgba(20,26,43,0.88))`,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }} />
+        <div style={{ position: 'relative', zIndex: 1 }}>
         {tab === 'stats' && (() => {
           const build = getBuildClassification(stats, hero.attributePoints || {});
           const radar = getRadarData(stats);
@@ -1631,6 +1659,7 @@ function HeroDetailPanel({ hero, onClose }) {
             })}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
