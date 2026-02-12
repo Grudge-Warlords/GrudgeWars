@@ -16,6 +16,16 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
+- **2026-02-12:** Reef Hunt parallax + surface leap mechanics
+  - Added 3-layer parallax background: far mountains (0.2x scroll), mid reef tiles (0.5x), foreground (1.0x)
+  - Procedural mountain silhouettes with ocean depth gradient in far layer
+  - Surface jump "dolphin leap" mechanic: Space bar near surface launches fish into air
+  - Air physics: gravity pulls fish back, reduced horizontal control, max 3s air time
+  - Air collectibles above surface: air bubbles (+20 energy), seagull drops (+3 pearls), flying fish (+100 score)
+  - Splash particles on surface crossing, leap trail particles while airborne, fish tilts with velocity
+  - Sky gradient with cloud wisps above surface, animated wave line at water surface
+  - "SPACE to Leap!" prompt near surface, "Returning to water!" warning when air time low
+  - Updated reef_hunt_bg.png with new coral platform art
 - **2026-02-12:** Reef Hunt mini-game, Character Power fix
   - Added Odell Down Under-inspired "Reef Hunt" mini-game accessible from Camp Scene
   - Canvas-based mini-game with requestAnimationFrame loop: fish follows mouse cursor, click to collect food/resources
