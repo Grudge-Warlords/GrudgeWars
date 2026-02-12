@@ -115,7 +115,7 @@ export default function SettingsMenu() {
 
       {open && (
         <div ref={panelRef} style={{
-          position: 'fixed', bottom: 64, left: 16, zIndex: 10701,
+          position: 'fixed', bottom: 116, left: 16, zIndex: 10701,
           width: 280,
           backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
           border: '1px solid rgba(110,231,183,0.25)',
