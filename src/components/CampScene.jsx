@@ -41,14 +41,17 @@ export default function CampScene() {
   const [heroY, setHeroY] = useState(SPAWN_POS.y);
   const [walking, setWalking] = useState(false);
   const [facingLeft, setFacingLeft] = useState(false);
+  const [exiting, setExiting] = useState(false);
+  const [exitScale, setExitScale] = useState(1);
   const walkTimeout = useRef(null);
+  const exitTimeout = useRef(null);
 
   React.useEffect(() => {
     const interval = setInterval(() => tickHarvests(), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => { return () => { if (walkTimeout.current) clearTimeout(walkTimeout.current); }; }, []);
+  useEffect(() => { return () => { if (walkTimeout.current) clearTimeout(walkTimeout.current); if (exitTimeout.current) clearTimeout(exitTimeout.current); }; }, []);
 
   const availableHeroes = heroRoster.filter(h => {
     const isHarvesting = Object.values(activeHarvests).includes(h.id);
@@ -71,7 +74,31 @@ export default function CampScene() {
     }, 600);
   };
 
+  const handleExit = () => {
+    if (exiting) return;
+    if (walkTimeout.current) clearTimeout(walkTimeout.current);
+    setExiting(true);
+    setSelectedNode(null);
+    setShowSellPanel(false);
+    setFacingLeft(heroX > 50);
+    setWalking(true);
+    setHeroX(50);
+    setHeroY(-5);
+    let scaleStep = 0;
+    const shrinkInterval = setInterval(() => {
+      scaleStep++;
+      const progress = Math.min(scaleStep / 20, 1);
+      setExitScale(1 - progress * 0.7);
+      if (progress >= 1) clearInterval(shrinkInterval);
+    }, 50);
+    exitTimeout.current = setTimeout(() => {
+      clearInterval(shrinkInterval);
+      exitScene();
+    }, 1000);
+  };
+
   const handleNodeClick = (node) => {
+    if (exiting) return;
     if (selectedNode === node.id) {
       setSelectedNode(null);
       return;
@@ -111,9 +138,12 @@ export default function CampScene() {
       {primarySprite && (
         <div style={{
           position: 'absolute', left: `${heroX}%`, top: `${heroY}%`,
-          transform: `translate(-50%, -50%)`,
+          transform: `translate(-50%, -50%) scale(${exitScale})`,
           zIndex: 10,
-          transition: 'left 0.6s ease, top 0.6s ease',
+          transition: exiting
+            ? 'left 1s ease-in, top 1s ease-in'
+            : 'left 0.6s ease, top 0.6s ease',
+          opacity: exiting ? (exitScale < 0.4 ? 0 : 1) : 1,
         }}>
           <SpriteAnimation
             spriteData={primarySprite}
@@ -271,9 +301,11 @@ export default function CampScene() {
         </div>
       ))}
 
-      <div onClick={exitScene} style={{
+      <div onClick={handleExit} style={{
         position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)',
-        zIndex: 30, cursor: 'pointer', textAlign: 'center',
+        zIndex: 30, cursor: exiting ? 'default' : 'pointer', textAlign: 'center',
+        opacity: exiting ? 0.4 : 1, transition: 'opacity 0.3s',
+        pointerEvents: exiting ? 'none' : 'auto',
       }}>
         <div style={{
           width: 50, height: 50, borderRadius: '50%',
