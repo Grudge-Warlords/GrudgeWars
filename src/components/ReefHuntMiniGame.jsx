@@ -16,8 +16,6 @@ const MAX_ITEMS = 40;
 const MAX_ENEMIES = 6;
 const INVULN_TIME = 1500;
 const PLAYER_SIZE = 40;
-const BG_TILE_W = 800;
-const BG_TILE_H = 600;
 
 const SURFACE_Y = 120;
 const AIR_GRAVITY = 0.18;
@@ -29,14 +27,17 @@ const SPLASH_PARTICLE_COUNT = 12;
 const PARALLAX_FAR = 0.2;
 const PARALLAX_MID = 0.5;
 
-const TILE_COLLISIONS = [
-  { x: 0, y: 280, w: 250, h: 120 },
-  { x: 560, y: 300, w: 240, h: 110 },
-  { x: 0, y: 480, w: 200, h: 120 },
-  { x: 600, y: 500, w: 200, h: 100 },
-  { x: 340, y: 180, w: 50, h: 60 },
-  { x: 520, y: 100, w: 50, h: 60 },
-  { x: 120, y: 230, w: 60, h: 50 },
+const WORLD_COLLISIONS = [
+  { x: 0, y: 750, w: 600, h: 300 },
+  { x: 0, y: 1350, w: 500, h: 450 },
+  { x: 1500, y: 800, w: 600, h: 280 },
+  { x: 1800, y: 1400, w: 600, h: 400 },
+  { x: 700, y: 1100, w: 300, h: 200 },
+  { x: 1050, y: 500, w: 200, h: 150 },
+  { x: 400, y: 500, w: 150, h: 120 },
+  { x: 900, y: 1500, w: 500, h: 300 },
+  { x: 2000, y: 600, w: 400, h: 200 },
+  { x: 100, y: 1100, w: 350, h: 250 },
 ];
 
 const COLLECTIBLES = [
@@ -74,19 +75,7 @@ const FAR_MOUNTAINS = [];
 })();
 
 function buildCollisionMap() {
-  const rects = [];
-  const tilesX = Math.ceil(WORLD_W / BG_TILE_W);
-  const tilesY = Math.ceil(WORLD_H / BG_TILE_H);
-  for (let ty = 0; ty < tilesY; ty++) {
-    for (let tx = 0; tx < tilesX; tx++) {
-      const ox = tx * BG_TILE_W;
-      const oy = ty * BG_TILE_H;
-      for (const c of TILE_COLLISIONS) {
-        rects.push({ x: ox + c.x, y: oy + c.y, w: c.w, h: c.h });
-      }
-    }
-  }
-  return rects;
+  return WORLD_COLLISIONS.map(c => ({ ...c }));
 }
 
 function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
@@ -702,31 +691,13 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
     const midCamY = g.camY * PARALLAX_MID;
 
     ctx.globalAlpha = 0.35;
-    const tilesX = Math.ceil(WORLD_W / BG_TILE_W) + 1;
-    const tilesY = Math.ceil(WORLD_H / BG_TILE_H) + 1;
-    for (let ty = 0; ty < tilesY; ty++) {
-      for (let tx = 0; tx < tilesX; tx++) {
-        const drawX = tx * BG_TILE_W - midCamX;
-        const drawY = ty * BG_TILE_H - midCamY + 50;
-        if (drawX > VIEWPORT_W + 50 || drawY > VIEWPORT_H + 50 || drawX + BG_TILE_W < -50 || drawY + BG_TILE_H < -50) continue;
-        ctx.drawImage(bgImg, drawX, drawY, BG_TILE_W, BG_TILE_H);
-      }
-    }
+    ctx.drawImage(bgImg, -midCamX, -midCamY + 50, WORLD_W, WORLD_H);
     ctx.globalAlpha = 1;
   }
 
   function renderForegroundBg(ctx, g, bgImg) {
     if (!bgImg.complete || bgImg.naturalWidth <= 0) return;
-    const tilesX = Math.ceil(WORLD_W / BG_TILE_W);
-    const tilesY = Math.ceil(WORLD_H / BG_TILE_H);
-    for (let ty = 0; ty < tilesY; ty++) {
-      for (let tx = 0; tx < tilesX; tx++) {
-        const drawX = tx * BG_TILE_W - g.camX;
-        const drawY = ty * BG_TILE_H - g.camY;
-        if (drawX > VIEWPORT_W || drawY > VIEWPORT_H || drawX + BG_TILE_W < 0 || drawY + BG_TILE_H < 0) continue;
-        ctx.drawImage(bgImg, drawX, drawY, BG_TILE_W, BG_TILE_H);
-      }
-    }
+    ctx.drawImage(bgImg, -g.camX, -g.camY, WORLD_W, WORLD_H);
   }
 
   function renderSurface(ctx, g, now) {
