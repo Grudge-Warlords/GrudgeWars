@@ -16,6 +16,15 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
+- **2026-02-12:** Game Index wiki page comprehensive update
+  - Rewrote `public/game-index.html` with all 32 zones (added 11 missing zones), node images from `/map_nodes/`
+  - Added Buildings section (16 structures with images from `/images/buildings/`)
+  - Added Attributes section (8 hero stats with images from `/images/attributes/`)
+  - City cards now show banner images from `/backgrounds/`
+  - Updated class ability icons to use painterly spell icons from `/icons/spells/`
+  - Fixed all remaining medieval references ("Grudge Wars" → "First Tide War", etc.)
+  - Updated navigation with Buildings and Attributes links
+  - Fixed god zone naming (Leviathan Sanctum with subtitle)
 - **2026-02-12:** Mobile responsiveness + painterly spell icons
   - Made game fully playable on phone dimensions (360px-480px+)
   - Added 358 painterly spell icons (256x256 PNG) to `public/icons/spells/`
