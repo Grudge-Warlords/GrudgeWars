@@ -2285,33 +2285,59 @@ export default function WorldMap() {
         })()}
 
         {hoveredNode && (() => {
+          const tipScale = Math.max(0.55, 1 / camZoom);
           if (hoveredNode.type === 'location') {
             const loc = locations.find(l => l.id === hoveredNode.id);
             if (!loc) return null;
             const conquer = (zoneConquer || {})[loc.id] || 0;
             const hasBoss = loc.boss && !bossesDefeated.includes(loc.boss);
             const bossDown = loc.boss && bossesDefeated.includes(loc.boss);
+            const isConquered = conquer >= 100;
             return (
               <div style={{
                 position: 'absolute',
                 left: `${hoveredNode.x}%`, top: `${hoveredNode.y}%`,
-                transform: 'translate(-50%, -120%)',
-                marginTop: -40,
+                transform: `translate(8px, -50%) scale(${tipScale})`,
+                transformOrigin: 'left center',
                 zIndex: MAP_LAYERS.HOVER_INFO, pointerEvents: 'none',
-                background: 'rgba(8,12,28,0.95)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: 8, padding: '8px 12px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.7)',
-                whiteSpace: 'nowrap',
-                animation: 'fadeIn 0.1s ease-out',
+                display: 'flex', alignItems: 'center', gap: 0,
               }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff', marginBottom: 2 }}>{loc.name}</div>
-                <div style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>
-                  Lv.{loc.levelRange[0]}-{loc.levelRange[1]} · {Math.floor(conquer)}% conquered
-                  {conquer >= 100 && <div style={{ color: 'var(--gold)', fontWeight: 700, marginTop: 2 }}>🏆 100% CONQUERED</div>}
+                <div style={{
+                  width: 6, height: 6,
+                  background: 'rgba(8,12,28,0.92)',
+                  transform: 'rotate(45deg)',
+                  marginRight: -3, flexShrink: 0,
+                  borderLeft: '1px solid rgba(34,211,238,0.25)',
+                  borderBottom: '1px solid rgba(34,211,238,0.25)',
+                }} />
+                <div style={{
+                  background: 'rgba(8,12,28,0.92)',
+                  border: '1px solid rgba(34,211,238,0.25)',
+                  borderRadius: 6, padding: '4px 8px',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                  whiteSpace: 'nowrap',
+                  animation: 'tooltipSlideIn 0.15s ease-out',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ fontSize: '0.5rem', fontWeight: 700, color: '#fff', lineHeight: 1 }}>{loc.name}</span>
+                    <span style={{ fontSize: '0.4rem', color: 'var(--teal)', fontWeight: 600 }}>Lv.{loc.levelRange[0]}-{loc.levelRange[1]}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 1 }}>
+                    <div style={{
+                      width: 40, height: 2, borderRadius: 1,
+                      background: 'rgba(255,255,255,0.1)', overflow: 'hidden',
+                    }}>
+                      <div style={{
+                        width: `${Math.min(100, conquer)}%`, height: '100%',
+                        background: isConquered ? 'var(--gold)' : 'var(--teal)',
+                        borderRadius: 1,
+                      }} />
+                    </div>
+                    <span style={{ fontSize: '0.35rem', color: isConquered ? 'var(--gold)' : 'var(--muted)' }}>{Math.floor(conquer)}%</span>
+                    {hasBoss && <span style={{ fontSize: '0.35rem', color: '#ef4444', fontWeight: 700 }}>BOSS</span>}
+                    {bossDown && <span style={{ fontSize: '0.35rem', color: '#22c55e' }}>✓</span>}
+                  </div>
                 </div>
-                {hasBoss && <div style={{ fontSize: '0.55rem', color: '#ef4444', marginTop: 2 }}>⚠ Boss Active</div>}
-                {bossDown && <div style={{ fontSize: '0.55rem', color: '#22c55e', marginTop: 2 }}>✅ Boss Defeated</div>}
               </div>
             );
           }
@@ -2320,18 +2346,32 @@ export default function WorldMap() {
               <div style={{
                 position: 'absolute',
                 left: `${hoveredNode.x}%`, top: `${hoveredNode.y}%`,
-                transform: 'translate(-50%, -120%)',
-                marginTop: -40,
+                transform: `translate(8px, -50%) scale(${tipScale})`,
+                transformOrigin: 'left center',
                 zIndex: MAP_LAYERS.HOVER_INFO, pointerEvents: 'none',
-                background: 'rgba(8,12,28,0.95)',
-                border: '1px solid rgba(74,222,128,0.3)',
-                borderRadius: 8, padding: '8px 12px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.7)',
-                whiteSpace: 'nowrap',
-                animation: 'fadeIn 0.1s ease-out',
+                display: 'flex', alignItems: 'center', gap: 0,
               }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#4ade80' }}>{hoveredNode.name}</div>
-                <div style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>City</div>
+                <div style={{
+                  width: 6, height: 6,
+                  background: 'rgba(8,12,28,0.92)',
+                  transform: 'rotate(45deg)',
+                  marginRight: -3, flexShrink: 0,
+                  borderLeft: '1px solid rgba(74,222,128,0.25)',
+                  borderBottom: '1px solid rgba(74,222,128,0.25)',
+                }} />
+                <div style={{
+                  background: 'rgba(8,12,28,0.92)',
+                  border: '1px solid rgba(74,222,128,0.25)',
+                  borderRadius: 6, padding: '4px 8px',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                  whiteSpace: 'nowrap',
+                  animation: 'tooltipSlideIn 0.15s ease-out',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ fontSize: '0.5rem', fontWeight: 700, color: '#4ade80', lineHeight: 1 }}>{hoveredNode.name}</span>
+                    <span style={{ fontSize: '0.38rem', color: 'var(--muted)', fontWeight: 500 }}>City</span>
+                  </div>
+                </div>
               </div>
             );
           }
