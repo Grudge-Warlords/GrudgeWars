@@ -2641,8 +2641,7 @@ export default function BattleScreen() {
           <div style={{
             position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
             textAlign: 'center', animation: 'slideUp 0.5s ease', zIndex: 100,
-            backgroundImage: isDefeat ? 'linear-gradient(135deg, rgba(11,16,32,0.85), rgba(30,0,0,0.8)), url(/backgrounds/wc_gold.png)' : undefined,
-            background: isDefeat ? undefined : 'rgba(11,16,32,0.9)',
+            backgroundImage: isDefeat ? 'linear-gradient(135deg, rgba(11,16,32,0.85), rgba(30,0,0,0.8)), url(/backgrounds/wc_gold.png)' : 'url(/images/ui-panel-bg.png)',
             backgroundSize: 'cover', backgroundPosition: 'center',
             padding: '24px 40px', borderRadius: 16,
             border: `2px solid ${isVictory ? 'var(--gold)' : 'var(--danger)'}`,

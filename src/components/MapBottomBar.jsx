@@ -28,7 +28,8 @@ function HarvestingPopup({ onClose }) {
   return (
     <div style={{
       position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
-      background: 'rgba(14,22,48,0.97)', border: '1px solid rgba(251,191,36,0.3)',
+      backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+      border: '1px solid rgba(251,191,36,0.3)',
       borderRadius: 12, padding: 16, width: 360, maxHeight: 400, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
       animation: 'fadeIn 0.15s ease-out',
@@ -121,7 +122,8 @@ function GearPopup({ onClose }) {
   return (
     <div style={{
       position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
-      background: 'rgba(14,22,48,0.97)', border: '1px solid rgba(110,231,183,0.3)',
+      backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+      border: '1px solid rgba(110,231,183,0.3)',
       borderRadius: 12, padding: 16, width: 380, maxHeight: 450, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
       animation: 'fadeIn 0.15s ease-out',
@@ -206,7 +208,8 @@ function CharacterPopup({ onClose }) {
   return (
     <div style={{
       position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
-      background: 'rgba(14,22,48,0.97)', border: '1px solid rgba(168,85,247,0.3)',
+      backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+      border: '1px solid rgba(168,85,247,0.3)',
       borderRadius: 12, padding: 16, width: 400, maxHeight: 500, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
       animation: 'fadeIn 0.15s ease-out',

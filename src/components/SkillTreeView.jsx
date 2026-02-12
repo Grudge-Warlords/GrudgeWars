@@ -27,7 +27,7 @@ export default function SkillTreeView() {
       background: 'linear-gradient(180deg, rgba(5,10,21,0.8), rgba(11,16,32,0.75), rgba(20,26,43,0.7))'
     }}>
       <header style={{
-        background: 'linear-gradient(135deg, rgba(14,22,48,0.9), rgba(20,26,43,0.7))',
+        backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
         borderBottom: `2px solid ${tree.color}`, padding: '12px 20px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center'
       }}>

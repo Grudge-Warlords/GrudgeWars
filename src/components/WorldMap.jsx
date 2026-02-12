@@ -2315,7 +2315,7 @@ export default function WorldMap() {
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: MAP_LAYERS.POPUPS,
-            background: 'linear-gradient(135deg, rgba(14,22,48,0.97), rgba(20,26,43,0.97))',
+            backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
             border: `2px solid ${locationIcons[selectedLoc.id]?.color || 'var(--accent)'}`,
             borderRadius: 14,
             padding: 0,
@@ -2606,7 +2606,7 @@ export default function WorldMap() {
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: MAP_LAYERS.POPUPS,
-              background: 'linear-gradient(135deg, rgba(14,22,48,0.97), rgba(20,26,43,0.97))',
+              backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
               border: '2px solid #4ade80',
               borderRadius: 14,
               padding: 0,
@@ -3082,7 +3082,7 @@ export default function WorldMap() {
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: MAP_LAYERS.POPUPS,
-            background: 'linear-gradient(135deg, rgba(14,22,48,0.97), rgba(20,26,43,0.97))',
+            backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
             border: `2px solid ${selectedEvent.color}`,
             borderRadius: 14, padding: 0,
             minWidth: 240, maxHeight: '60vh', overflowY: 'auto',
@@ -3255,7 +3255,8 @@ export default function WorldMap() {
           const panelContent = (
           <div style={{
             position: 'absolute', top: 70, right: 12, zIndex: 10600, pointerEvents: 'auto',
-            background: 'rgba(14,22,48,0.95)', border: '1px solid rgba(110,231,183,0.2)',
+            backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+            border: '1px solid rgba(110,231,183,0.2)',
             borderRadius: 12, padding: 14, maxWidth: 380, width: 370,
             boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
             animation: 'fadeIn 0.15s ease-out',
@@ -3457,7 +3458,8 @@ export default function WorldMap() {
           const grudaContent = (
           <div style={{
             position: 'absolute', top: 70, right: 12, zIndex: 10600, pointerEvents: 'auto',
-            background: 'rgba(14,22,48,0.95)', border: '1px solid rgba(239,68,68,0.25)',
+            backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+            border: '1px solid rgba(239,68,68,0.25)',
             borderRadius: 12, padding: 14, maxWidth: 380, width: 360,
             boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
             animation: 'fadeIn 0.15s ease-out',

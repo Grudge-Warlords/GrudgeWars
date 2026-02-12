@@ -117,7 +117,7 @@ export default function SettingsMenu() {
         <div ref={panelRef} style={{
           position: 'fixed', bottom: 64, left: 16, zIndex: 10701,
           width: 280,
-          background: 'linear-gradient(135deg, rgba(14,22,48,0.97), rgba(20,26,43,0.97))',
+          backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
           border: '1px solid rgba(110,231,183,0.25)',
           borderRadius: 14, padding: 0, overflow: 'hidden',
           boxShadow: '0 8px 40px rgba(0,0,0,0.7), 0 0 20px rgba(110,231,183,0.08)',

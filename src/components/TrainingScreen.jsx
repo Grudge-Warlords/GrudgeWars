@@ -29,7 +29,7 @@ export default function TrainingScreen() {
   const tree = skillTrees[playerClass];
 
   const panelStyle = {
-    background: 'linear-gradient(135deg, rgba(20,26,43,0.95), rgba(30,41,59,0.95))',
+    backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
     border: '2px solid var(--gold)',
     borderRadius: 16,
     padding: '40px 50px',
@@ -119,7 +119,7 @@ export default function TrainingScreen() {
     return (
       <div style={{ ...bgStyle, overflow: 'auto' }}>
         <header style={{
-          background: 'linear-gradient(135deg, rgba(14,22,48,0.9), rgba(20,26,43,0.7))',
+          backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
           borderBottom: '2px solid var(--gold)', padding: '12px 20px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>

@@ -367,7 +367,8 @@ export default function LocationView() {
 
           <div style={{
             flex: 1, overflowY: 'auto',
-            background: 'rgba(14,22,48,0.85)', border: '1px solid rgba(255,255,255,0.06)',
+            backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+            border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: 12, padding: '12px 14px',
             backdropFilter: 'blur(10px)',
           }}>

@@ -509,7 +509,7 @@ function HeroDetailPanel({ hero, onClose }) {
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, rgba(14,22,48,0.98), rgba(20,26,43,0.95))',
+      backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
       border: '1px solid var(--border)', borderRadius: 16,
       overflow: 'hidden', display: 'flex', flexDirection: 'column',
       height: '100%',

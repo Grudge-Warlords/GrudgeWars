@@ -50,7 +50,7 @@ export default function CharacterSheet() {
       background: 'rgba(11,16,32,0.75)'
     }}>
       <header style={{
-        background: 'linear-gradient(135deg, rgba(14,22,48,0.9), rgba(20,26,43,0.7))',
+        backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
         borderBottom: '2px solid var(--border)', padding: '12px 20px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center'
       }}>
@@ -63,7 +63,7 @@ export default function CharacterSheet() {
       </header>
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-        <div style={{ background: 'rgba(20,26,43,0.8)', border: '1px solid var(--border)', borderRadius: 14, padding: 20 }}>
+        <div style={{ backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center', border: '1px solid var(--border)', borderRadius: 14, padding: 20 }}>
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
               <SpriteAnimation spriteData={getPlayerSprite(playerClass, playerRace)} animation="idle" scale={4} speed={150} />
@@ -119,7 +119,7 @@ export default function CharacterSheet() {
           </div>
         </div>
 
-        <div style={{ background: 'rgba(20,26,43,0.8)', border: '1px solid var(--border)', borderRadius: 14, padding: 20 }}>
+        <div style={{ backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center', border: '1px solid var(--border)', borderRadius: 14, padding: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h3 style={{ color: 'var(--gold)', fontSize: '1.1rem' }}>Attributes</h3>
             <div style={{
