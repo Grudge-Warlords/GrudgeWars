@@ -2236,6 +2236,24 @@ const useGameStore = create(persist((set, get) => ({
     set({ heroRoster: updatedRoster, inventory: [...state.inventory, item] });
   },
 
+  addForageRewards: (resources, buffs) => {
+    const state = get();
+    const newResources = { ...state.harvestResources };
+    Object.entries(resources).forEach(([key, val]) => {
+      if (val > 0 && newResources.hasOwnProperty(key)) {
+        newResources[key] = (newResources[key] || 0) + val;
+      }
+    });
+    const updates = { harvestResources: newResources };
+    if (resources.gold > 0) {
+      updates.gold = state.gold + resources.gold;
+    }
+    if (buffs && buffs.length > 0) {
+      updates.activeForageBuff = { types: buffs, appliedAt: Date.now(), battlesRemaining: 3 };
+    }
+    set(updates);
+  },
+
   restAtCamp: () => {
     const state = get();
     const stats = state.getStats();

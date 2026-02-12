@@ -16,6 +16,16 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
+- **2026-02-12:** Reef Hunt mini-game, Character Power fix
+  - Added Odell Down Under-inspired "Reef Hunt" mini-game accessible from Camp Scene
+  - Canvas-based mini-game with requestAnimationFrame loop: fish follows mouse cursor, click to collect food/resources
+  - 8 collectible types (pearls, algae, coral, shells, crystals, plankton, shrimp, starfish) with weighted spawning
+  - 3 predator types (shark, eel, jellyfish) with wander/chase AI that drain energy on contact
+  - Energy timer system (45s + energy drain), combo multiplier, size-up progression (collect 15 items = bigger fish)
+  - Starfish grants temporary "Lucky Catch" buff (+20% rare drops for 3 battles)
+  - Resources earned feed directly into existing harvest/economy system via `addForageRewards` store action
+  - Reef Hunt node added to CampScene at position (55, 35)
+  - Fixed Character Power panel (GameUIOverlay + MapBottomBar) to use correct 8 attributes and calculateCombatPower
 - **2026-02-12:** Main menu background, farewell screen, equip panel alignment
   - Updated TitleScreen to use new "A Betta Coinmunity" promotional art as background (`/backgrounds/main_menu_bg.png`)
   - Added farewell screen overlay on logout showing main menu art with "Until Next Tide..." message for 2.5s before returning to title

@@ -7,6 +7,7 @@ import { InlineIcon } from '../data/uiSprites';
 import { setBgm } from '../utils/audioManager';
 import NpcSprite from './NpcSprite';
 import BubbleEmitter from './BubbleEmitter';
+import ReefHuntMiniGame from './ReefHuntMiniGame';
 
 const RESOURCE_NODES = [
   { id: 'gold_mine', name: 'Pearl Beds', icon: 'pickaxe', resource: 'gold', x: 18, y: 30, color: '#fbbf24', img: '/images/buildings/pearl_beds.png' },
@@ -18,6 +19,7 @@ const RESOURCE_NODES = [
 
 const REST_NODE = { id: 'rest_spot', name: 'Rest', x: 35, y: 55, color: '#818cf8', img: '/images/buildings/sleeping_bag.png' };
 const CHEST_NODE = { id: 'inventory_chest', name: 'Inventory', x: 90, y: 48, color: '#f59e0b', img: '/images/buildings/treasure_chest.png' };
+const REEF_HUNT_NODE = { id: 'reef_hunt', name: 'Reef Hunt', x: 55, y: 35, color: '#22d3ee', img: '/images/buildings/crystal_grotto.png' };
 
 const SELL_PRICES = { gold: 1, herbs: 2, wood: 2, ore: 4, crystals: 8 };
 
@@ -59,11 +61,13 @@ export default function CampScene() {
   const unequipItem = useGameStore(s => s.unequipItem);
   const removeFromInventory = useGameStore(s => s.removeFromInventory);
   const sellItem = useGameStore(s => s.sellItem);
+  const addForageRewards = useGameStore(s => s.addForageRewards);
 
   const [selectedNode, setSelectedNode] = useState(null);
   const [showSellPanel, setShowSellPanel] = useState(false);
   const [showRestPanel, setShowRestPanel] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
+  const [showReefHunt, setShowReefHunt] = useState(false);
   const [resting, setResting] = useState(false);
   const [restDone, setRestDone] = useState(false);
   const [invTab, setInvTab] = useState('items');
@@ -271,6 +275,28 @@ export default function CampScene() {
       setSelectedInvItem(null);
       setSelectedEquipHero(null);
     }, 600);
+  };
+
+  const handleReefHuntClick = () => {
+    if (exiting || entering) return;
+    if (walkTimeout.current) clearTimeout(walkTimeout.current);
+    setFacingLeft(REEF_HUNT_NODE.x < heroX);
+    setWalking(true);
+    setHeroX(REEF_HUNT_NODE.x - 6);
+    setHeroY(REEF_HUNT_NODE.y + 8);
+    setSelectedNode(null);
+    setShowRestPanel(false);
+    setShowInventory(false);
+    walkTimeout.current = setTimeout(() => {
+      setWalking(false);
+      setShowReefHunt(true);
+    }, 600);
+  };
+
+  const handleReefHuntComplete = (results) => {
+    if (results && results.resources) {
+      addForageRewards(results.resources, results.buffs || []);
+    }
   };
 
   const doRest = () => {
@@ -484,6 +510,7 @@ export default function CampScene() {
 
       {renderInteractiveNode(REST_NODE, handleRestClick)}
       {renderInteractiveNode(CHEST_NODE, handleChestClick)}
+      {renderInteractiveNode(REEF_HUNT_NODE, handleReefHuntClick)}
 
       {showRestPanel && (
         <div style={{
@@ -876,6 +903,13 @@ export default function CampScene() {
           textShadow: '0 1px 4px rgba(0,0,0,0.8)',
         }}>Return to Map</div>
       </div>
+
+      {showReefHunt && (
+        <ReefHuntMiniGame
+          onClose={() => setShowReefHunt(false)}
+          onComplete={handleReefHuntComplete}
+        />
+      )}
     </div>
   );
 }
