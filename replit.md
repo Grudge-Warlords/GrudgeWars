@@ -16,6 +16,13 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
+- **2026-02-12:** Main menu background, farewell screen, equip panel alignment
+  - Updated TitleScreen to use new "A Betta Coinmunity" promotional art as background (`/backgrounds/main_menu_bg.png`)
+  - Added farewell screen overlay on logout showing main menu art with "Until Next Tide..." message for 2.5s before returning to title
+  - Updated equip_panel_small slot positions in AccountPage and BattleScreen to match updated 67x79px panel artwork
+  - Added Rest node (sleeping bag) and Inventory chest to CampScene with full UI panels
+  - Rest node heals entire party via `restAtCamp()` store action; shows individual hero health bars
+  - Inventory chest opens side panel with Equipment/Consumables tabs, equip-to-hero, sell, and drop actions
 - **2026-02-12:** IBC breed system, class buff overlays, new enemy sprites, motion tuning
   - Renamed "Race" → "Breed" across all UI (CharacterCreate, HeroCreate, LobbyScreen, AccountPage, AdminSprite, TitleScreen)
   - Updated 8 breeds with IBC betta terminology: Halfmoon, Plakat, Doubletail, Cambodian, Giant, Crowntail, Dragonscale, Butterfly
