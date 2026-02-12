@@ -148,7 +148,7 @@ function GearPopup({ onClose }) {
       {hero && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <div style={{ width: 56, height: 56, overflow: 'hidden', borderRadius: 8, border: '2px solid var(--accent)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+            <div style={{ width: 56, height: 56, overflow: 'visible', borderRadius: 8, border: '2px solid var(--accent)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
               <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={0.7} speed={150} />
             </div>
             <div>
@@ -233,7 +233,7 @@ function CharacterPopup({ onClose }) {
       {hero && stats && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-            <div style={{ width: 64, height: 64, overflow: 'hidden', borderRadius: 10, border: '2px solid #a855f7', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'rgba(0,0,0,0.3)' }}>
+            <div style={{ width: 64, height: 64, overflow: 'visible', borderRadius: 10, border: '2px solid #a855f7', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'rgba(0,0,0,0.3)' }}>
               <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={0.8} speed={150} />
             </div>
             <div>
@@ -507,7 +507,7 @@ export default function MapBottomBar({
                 const hpPercent = heroStats ? Math.round((hero.currentHealth / heroStats.health) * 100) : 100;
                 return (
                   <div key={`bar_${hero.id}`} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ width: 28, height: 28, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                    <div style={{ width: 28, height: 28, overflow: 'visible', flexShrink: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
                       <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={0.36} speed={180} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>

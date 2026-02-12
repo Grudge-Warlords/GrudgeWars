@@ -135,7 +135,7 @@ function GearPopup({ onClose }) {
       {hero && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <div style={{ width: 56, height: 56, overflow: 'hidden', borderRadius: 6, border: '2px solid #22d3ee', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
+            <div style={{ width: 56, height: 56, overflow: 'visible', borderRadius: 6, border: '2px solid #22d3ee', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
               <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={0.7} speed={150} />
             </div>
             <div>
@@ -213,7 +213,7 @@ function CharacterPopup({ onClose }) {
       {hero && stats && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-            <div style={{ width: 64, height: 64, overflow: 'hidden', borderRadius: 6, border: '2px solid #a855f7', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
+            <div style={{ width: 64, height: 64, overflow: 'visible', borderRadius: 6, border: '2px solid #a855f7', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
               <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={0.8} speed={150} />
             </div>
             <div>
@@ -414,7 +414,7 @@ export default function GameUIOverlay({
               <div style={{ display: 'flex', padding: 8, gap: 8, height: '100%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: 50 }}>
                   <div style={{
-                    width: 40, height: 40, borderRadius: '50%', overflow: 'hidden',
+                    width: 40, height: 40, borderRadius: '50%', overflow: 'visible',
                     border: '2px solid #c5a059', background: '#000',
                     display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
                   }}>
@@ -435,7 +435,7 @@ export default function GameUIOverlay({
                     const hpPct = hStats ? Math.round((hero.currentHealth / hStats.health) * 100) : 100;
                     return (
                       <div key={hero.id} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-                        <div style={{ width: 18, height: 18, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                        <div style={{ width: 18, height: 18, overflow: 'visible', flexShrink: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
                           <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={0.24} speed={180} />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>

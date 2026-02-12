@@ -2329,6 +2329,7 @@ export default function BattleScreen() {
               <div style={{
                 position: 'absolute', top: 0, left: 0,
                 width: spriteSize, height: spriteSize,
+                overflow: 'visible',
                 filter: anim === 'hurt'
                   ? 'brightness(2) sepia(1) saturate(10) hue-rotate(-10deg) drop-shadow(0 0 12px rgba(255,0,0,0.8))'
                   : isBearForm && unit.alive

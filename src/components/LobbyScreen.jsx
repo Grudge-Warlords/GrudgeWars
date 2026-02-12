@@ -285,7 +285,7 @@ function CharactersTab({ heroRoster, panelStyle }) {
             display: 'flex', alignItems: 'center', gap: 16, padding: 16,
           }}>
             <div style={{
-              width: 48, height: 48, overflow: 'hidden',
+              width: 48, height: 48, overflow: 'visible',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <SpriteAnimation
