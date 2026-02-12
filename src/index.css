@@ -614,3 +614,52 @@ input[type="range"]::-moz-range-thumb {
   0%, 100% { opacity: 0.5; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.08); }
 }
+
+.gorgon-aura-1 {
+  position: absolute; top: -15%; left: -15%; width: 130%; height: 130%;
+  pointer-events: none; z-index: 0; border-radius: 50%;
+  background: radial-gradient(circle, rgba(168,85,247,0.25) 0%, rgba(168,85,247,0.08) 40%, transparent 70%);
+  animation: gorgonPulse1 2.5s ease-in-out infinite;
+  box-shadow: 0 0 30px rgba(168,85,247,0.3), inset 0 0 20px rgba(168,85,247,0.15);
+}
+@keyframes gorgonPulse1 {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+
+.gorgon-aura-2 {
+  position: absolute; top: -15%; left: -15%; width: 130%; height: 130%;
+  pointer-events: none; z-index: 0; border-radius: 50%;
+  background: radial-gradient(circle, rgba(239,68,68,0.25) 0%, rgba(234,88,12,0.1) 40%, transparent 70%);
+  animation: gorgonPulse2 2s ease-in-out infinite;
+  box-shadow: 0 0 35px rgba(239,68,68,0.3), inset 0 0 20px rgba(234,88,12,0.15);
+}
+@keyframes gorgonPulse2 {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.7; }
+  50% { transform: scale(1.15) rotate(3deg); opacity: 1; }
+}
+
+.gorgon-aura-3 {
+  position: absolute; top: -15%; left: -15%; width: 130%; height: 130%;
+  pointer-events: none; z-index: 0; border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,211,238,0.25) 0%, rgba(6,182,212,0.1) 40%, transparent 70%);
+  animation: gorgonPulse3 3s ease-in-out infinite;
+  box-shadow: 0 0 30px rgba(34,211,238,0.3), inset 0 0 25px rgba(6,182,212,0.15);
+}
+@keyframes gorgonPulse3 {
+  0%, 100% { transform: scale(1); opacity: 0.6; filter: hue-rotate(0deg); }
+  33% { transform: scale(1.1); opacity: 0.9; filter: hue-rotate(15deg); }
+  66% { transform: scale(1.05); opacity: 1; filter: hue-rotate(-15deg); }
+}
+
+.gorgon-crown {
+  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 20px; pointer-events: none; z-index: 5;
+  font-size: 18px; text-align: center; line-height: 20px;
+  filter: drop-shadow(0 0 6px rgba(255,215,0,0.6));
+  animation: crownFloat 2s ease-in-out infinite;
+}
+@keyframes crownFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
+}

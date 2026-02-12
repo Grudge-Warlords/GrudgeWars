@@ -1428,7 +1428,7 @@ export default function BattleScreen() {
         if (spriteData[desired]) return desired;
       }
       if (abilityType === 'heal' || abilityType === 'heal_over_time') return spriteData.heal ? 'heal' : spriteData.cast ? 'cast' : 'attack1';
-      if (abilityType === 'buff') return spriteData.cast ? 'cast' : spriteData.block ? 'block' : 'attack1';
+      if (abilityType === 'buff') return spriteData.special ? 'special' : spriteData.cast ? 'cast' : spriteData.block ? 'block' : 'attack1';
       if (abilityType === 'item' || abilityType === 'stance') return spriteData.cast ? 'cast' : spriteData.block ? 'block' : 'attack1';
       const anims = ['attack1', 'attack2', 'attack3'].filter(a => spriteData[a]);
       if (anims.length > 2 && (abilityType === 'physical' || abilityType === 'magical')) return anims[Math.floor(Math.random() * anims.length)];
@@ -2371,6 +2371,12 @@ export default function BattleScreen() {
                 />
                 {unit.team === 'player' && unit.alive && unit.classId && (
                   <div className={getClassBuffClass(unit.classId, ((unit.id?.charCodeAt?.(unit.id.length - 1) || 0) % 6) + 1)} style={{ width: spriteSize * 0.7, height: spriteSize * 0.7, top: '15%', left: '15%' }} />
+                )}
+                {unit.alive && spriteData?.isBoss && spriteData?.folder?.startsWith('gorgon_siren_') && (
+                  <>
+                    <div className={`gorgon-aura-${spriteData.folder.slice(-1)}`} />
+                    <div className="gorgon-crown">👑</div>
+                  </>
                 )}
               </div>
 

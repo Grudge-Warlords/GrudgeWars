@@ -16,6 +16,15 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
+- **2026-02-12:** Gorgon Siren zone boss sprites
+  - Extracted 3 Gorgon Siren sprite sets from craftpix pack (128x128 frames)
+  - Gorgon_1 (purple/original), Gorgon_2 (red variant), Gorgon_3 (teal hue-shifted from Gorgon_1)
+  - 10 animations per siren: idle (7f), idle2 (5f), walk (13f), run (7f), attack1 (16f), attack2 (7f), attack3 (10f), hurt (3f), death (3f), special (5f)
+  - Mapped to 3 god-tier bosses: Poseidon (gorgon_siren_1), Charybdis (gorgon_siren_2), Leviathan (gorgon_siren_3)
+  - Custom CSS boss aura effects per siren: purple pulse, red/orange rotate, teal shimmer with hue cycling
+  - Floating crown icon above gorgon bosses in battle
+  - Battle system uses `special` animation for buff abilities when available
+  - Random attack animation selection (attack1/2/3) for visual variety in combat
 - **2026-02-12:** Reef Hunt parallax + surface leap mechanics
   - Added 3-layer parallax background: far mountains (0.2x scroll), mid reef tiles (0.5x), foreground (1.0x)
   - Procedural mountain silhouettes with ocean depth gradient in far layer

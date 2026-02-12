@@ -972,6 +972,30 @@ function underwaterBossSprite(name, hasAttack2 = false, walkFrames = 6) {
   return base;
 }
 
+function gorgonSirenSprite(variant) {
+  const folder = `gorgon_siren_${variant}`;
+  return {
+    folder,
+    frameWidth: 128,
+    frameHeight: 128,
+    swimming: true,
+    isBoss: true,
+    idle: { src: `/sprites/${folder}/idle.png`, frames: 7 },
+    idle2: { src: `/sprites/${folder}/idle_2.png`, frames: 5 },
+    walk: { src: `/sprites/${folder}/walk.png`, frames: 13 },
+    run: { src: `/sprites/${folder}/run.png`, frames: 7 },
+    attack1: { src: `/sprites/${folder}/attack_1.png`, frames: 16 },
+    attack2: { src: `/sprites/${folder}/attack_2.png`, frames: 7 },
+    attack3: { src: `/sprites/${folder}/attack_3.png`, frames: 10 },
+    hurt: { src: `/sprites/${folder}/hurt.png`, frames: 3 },
+    death: { src: `/sprites/${folder}/dead.png`, frames: 3 },
+    special: { src: `/sprites/${folder}/special.png`, frames: 5 },
+  };
+}
+const gorgonSiren1 = gorgonSirenSprite(1);
+const gorgonSiren2 = gorgonSirenSprite(2);
+const gorgonSiren3 = gorgonSirenSprite(3);
+
 const anglerSprite = underwaterBossSprite('angler');
 const seahorseSprite = underwaterBossSprite('seahorse');
 const pufferbossSprite = underwaterBossSprite('pufferfish_boss', true);
@@ -1078,9 +1102,9 @@ export const enemySpriteMap = {
   abyssal_demon: { ...anglerSprite, filter: 'hue-rotate(350deg) saturate(1.6) brightness(1.0)' },
   eldritch_horror: { ...jellyfishPurpleSprite, filter: 'hue-rotate(120deg) saturate(1.3) brightness(0.8)' },
   frost_titan: { ...turtleGreenSprite, filter: 'hue-rotate(170deg) saturate(1.2) brightness(1.4)' },
-  god_odin: { ...sharkBlueSprite, filter: 'hue-rotate(190deg) saturate(1.6) brightness(1.3)' },
-  god_madra: { ...octopusRedSprite, filter: 'hue-rotate(330deg) saturate(1.8) brightness(1.1)' },
-  god_omni: { ...turtleGreenSprite, filter: 'hue-rotate(260deg) saturate(1.5) brightness(1.2)' },
+  god_odin: gorgonSiren1,
+  god_madra: gorgonSiren2,
+  god_omni: gorgonSiren3,
   loreon_knight: { ...eelSprite, filter: 'hue-rotate(40deg) saturate(1.2)' },
   medieval_warrior: greenFishCharSprite,
   fantasy_warrior: { ...pufferfishBrownSprite, filter: 'hue-rotate(40deg) saturate(1.3)' },
