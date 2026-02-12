@@ -2790,11 +2790,12 @@ const useGameStore = create(persist((set, get) => ({
 
   resetGame: () => {
     localStorage.removeItem('grudge-warlords-save');
+    localStorage.removeItem('grudge-session');
     if (isPuterAvailable()) { puterKV.remove('betta-warlords-save').catch(() => {}); }
     const zero = { Strength: 0, Vitality: 0, Endurance: 0, Dexterity: 0, Agility: 0, Intellect: 0, Wisdom: 0, Tactics: 0 };
     set({
       screen: 'title',
-      playerName: 'Hero',
+      playerName: '',
       playerRace: null,
       playerClass: null,
       level: 1,
