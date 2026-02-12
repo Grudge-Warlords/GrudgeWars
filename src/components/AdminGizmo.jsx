@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import FrameEditor, { applyFrameSettings } from './FrameEditor';
-
 const GIZMO_Z = 99990;
 
 function AdminGizmo() {
   const [enabled, setEnabled] = useState(false);
-  const [showFrameEditor, setShowFrameEditor] = useState(false);
   const [selected, setSelected] = useState(null);
   const [selRect, setSelRect] = useState(null);
   const [props, setProps] = useState({});
@@ -122,10 +119,6 @@ function AdminGizmo() {
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
   }, [draggingPanel]);
 
-  useEffect(() => {
-    applyFrameSettings();
-  }, []);
-
   const labelStyle = {
     fontSize: '0.6rem', color: '#94a3b8', textTransform: 'uppercase',
     letterSpacing: 1, marginBottom: 2, marginTop: 6,
@@ -150,24 +143,6 @@ function AdminGizmo() {
         display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center',
       }}>
         <button
-          onClick={() => setShowFrameEditor(f => !f)}
-          style={{
-            width: 38, height: 38, borderRadius: '50%',
-            background: showFrameEditor
-              ? 'linear-gradient(135deg, #7c3aed, #6d28d9)'
-              : 'linear-gradient(135deg, #334155, #1e293b)',
-            border: `2px solid ${showFrameEditor ? '#a78bfa' : '#475569'}`,
-            color: showFrameEditor ? '#fff' : '#94a3b8',
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '0.85rem', fontWeight: 700,
-            boxShadow: showFrameEditor ? '0 0 16px rgba(124,58,237,0.5)' : '0 2px 6px rgba(0,0,0,0.3)',
-            transition: 'all 0.3s',
-          }}
-          title={showFrameEditor ? 'Close Frame Editor' : 'Frame Editor'}
-        >
-          F
-        </button>
-        <button
           onClick={() => setEnabled(e => !e)}
           style={{
             width: 44, height: 44, borderRadius: '50%',
@@ -186,8 +161,6 @@ function AdminGizmo() {
           {enabled ? '⚙' : '⚙'}
         </button>
       </div>
-
-      {showFrameEditor && <FrameEditor onClose={() => setShowFrameEditor(false)} />}
 
       {enabled && selRect && (
         <div style={{

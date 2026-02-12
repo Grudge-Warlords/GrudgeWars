@@ -8,7 +8,7 @@ import { classDefinitions } from '../data/classes';
 import { raceDefinitions } from '../data/races';
 import SpriteAnimation, { buildEquipmentOverlays } from './SpriteAnimation';
 import { getPlayerSprite, getEnemySprite } from '../data/spriteMap';
-import MapBottomBar from './MapBottomBar';
+import GameUIOverlay from './GameUIOverlay';
 import { setBgm } from '../utils/audioManager';
 import { TIERS, UPGRADE_COSTS, EQUIPMENT_SLOTS, WEAPON_TYPES, ARMOR_TYPES, getItemPrice, getSellPrice } from '../data/equipment';
 import { generateDialogue } from '../data/dialogue';
@@ -3573,7 +3573,7 @@ export default function WorldMap() {
           return hudOverlay ? createPortal(grudaContent, hudOverlay) : grudaContent;
         })()}
 
-        <MapBottomBar
+        <GameUIOverlay
           chatLog={chatLog}
           chatInput={chatInput}
           setChatInput={setChatInput}

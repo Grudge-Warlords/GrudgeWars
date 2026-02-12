@@ -24,7 +24,6 @@ import IntroCinematic from './components/IntroCinematic';
 import DiscordAuth from './components/DiscordAuth';
 import { InlineIcon } from './data/uiSprites';
 import AdminGizmo from './components/AdminGizmo';
-import { FrameMaskLayer } from './components/FrameEditor';
 import GameTooltipRenderer from './components/GameTooltip';
 
 function GameApp() {
@@ -120,7 +119,6 @@ function GameApp() {
         }}>
           {renderScreen()}
         </div>
-        <FrameMaskLayer />
       </div>
       <div id="hud-overlay" style={{ position: 'absolute', inset: 0, zIndex: 10600, pointerEvents: 'none' }}>
         <GameTooltipRenderer />
