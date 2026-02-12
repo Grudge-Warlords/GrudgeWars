@@ -2255,31 +2255,23 @@ export default function WorldMap() {
                 );
               })}
 
-            </div>
-          );
-        })()}
+              {bubbleQueue.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  left: containerW / 2,
+                  top: 0,
+                  width: 0, height: 0,
+                  zIndex: 9999,
+                  pointerEvents: 'none',
+                }}>
+                  <ChatBubbleSystem
+                    bubbleQueue={bubbleQueue}
+                    onDismiss={dismissBubble}
+                    camZoom={camZoom}
+                  />
+                </div>
+              )}
 
-        {bubbleQueue.length > 0 && (() => {
-          const baseZonePos2 = getNodePos(currentZone) || locationPositions.verdant_plains;
-          const zonePos2 = isPathing ? heroPos : baseZonePos2;
-          const heroScale2 = calcNodeScale(camZoom, 0.35);
-
-          return (
-            <div style={{
-              position: 'absolute',
-              left: `${zonePos2.x}%`,
-              top: `${zonePos2.y}%`,
-              transform: `translate(-50%, 0) scale(${heroScale2})`,
-              zIndex: 9999,
-              pointerEvents: 'none',
-              width: 0,
-              height: 0,
-            }}>
-              <ChatBubbleSystem
-                bubbleQueue={bubbleQueue}
-                onDismiss={dismissBubble}
-                camZoom={camZoom}
-              />
             </div>
           );
         })()}
