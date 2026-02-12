@@ -32,6 +32,14 @@ const CLASS_BG = {
 };
 
 const RACE_BG = {
+  blue_betta: '/backgrounds/card_blue_betta.png',
+  red_betta: '/backgrounds/card_red_betta.png',
+  purple_betta: '/backgrounds/card_purple_betta.png',
+  white_betta: '/backgrounds/card_white_betta.png',
+  green_betta: '/backgrounds/card_green_betta.png',
+  gold_betta: '/backgrounds/card_gold_betta.png',
+  orange_betta: '/backgrounds/card_orange_betta.png',
+  pink_betta: '/backgrounds/card_pink_betta.png',
   human: '/backgrounds/card_blue_betta.png',
   elf: '/backgrounds/card_purple_betta.png',
   dwarf: '/backgrounds/card_green_betta.png',
@@ -114,14 +122,14 @@ function HeroCard({ hero, isSelected, onClick, isActive }) {
 
   return (
     <div onClick={onClick} style={{
-      backgroundImage: `linear-gradient(135deg, ${isSelected ? 'rgba(110,231,183,0.25)' : 'rgba(14,22,48,0.70)'}, rgba(11,16,32,0.80)), url(${raceBg})`,
+      backgroundImage: `linear-gradient(135deg, ${isSelected ? `${race?.color || 'rgba(110,231,183)'}40` : `${race?.color || 'rgba(14,22,48)'}25`}, rgba(11,16,32,0.85)), url(${raceBg})`,
       backgroundSize: 'cover', backgroundPosition: 'center',
-      border: `2px solid ${isSelected ? 'var(--accent)' : 'var(--border)'}`,
+      border: `2px solid ${isSelected ? (race?.color || 'var(--accent)') : 'var(--border)'}`,
       borderRadius: 14, padding: 16, cursor: 'pointer',
       transition: 'all 0.3s', position: 'relative', overflow: 'hidden',
       minWidth: 170,
     }}
-    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.borderColor = 'rgba(110,231,183,0.5)'; }}
+    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.borderColor = (race?.color || 'rgba(110,231,183)') + '80'; }}
     onMouseLeave={e => { if (!isSelected) e.currentTarget.style.borderColor = 'var(--border)'; }}
     >
       {hasPoints && (
