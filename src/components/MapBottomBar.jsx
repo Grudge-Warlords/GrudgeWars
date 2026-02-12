@@ -358,25 +358,25 @@ export default function MapBottomBar({
   const hasUnspent = unspentPoints > 0 || skillPoints > 0 || heroRoster.some(h => (h.unspentPoints || 0) > 0 || (h.skillPoints || 0) > 0);
 
   const buttons = [
-    { id: 'camp', label: 'Camp', icon: 'camp', img: '/images/icons/btn-camp.png', color: '#4ade80', action: () => enterScene('camp', 'world') },
-    { id: 'points', label: 'Points', icon: 'star', img: '/images/icons/btn-points.png', color: hasUnspent ? '#ef4444' : '#94a3b8', action: () => setScreen('account'), pulse: hasUnspent },
-    { id: 'council', label: 'Council', icon: 'battle', img: '/images/icons/btn-council.png', color: 'var(--gold)', action: () => setScreen('account') },
-    { id: 'party', label: 'Party', icon: 'shield', img: '/images/icons/btn-party.png', color: 'var(--accent)', action: () => onToggleWarParty(), badge: Object.keys(activeHarvests).length > 0 ? Object.keys(activeHarvests).length : null },
-    { id: 'gruda', label: 'Gruda', icon: 'skull', color: '#f87171', action: () => onToggleGruda() },
-    { id: 'settings', label: 'Settings', icon: 'scroll', img: '/images/icons/btn-settings.png', color: '#94a3b8', action: () => setScreen('account') },
-    { id: 'music', label: musicMuted ? 'Unmute' : 'Mute', icon: 'energy', color: musicMuted ? '#ef4444' : '#6ee7b7', action: () => {
+    { id: 'camp', label: 'Camp', img: '/images/icons/btn-camp.png', color: '#4ade80', action: () => enterScene('camp', 'world') },
+    { id: 'points', label: 'Points', img: '/images/icons/btn-points.png', color: hasUnspent ? '#ef4444' : '#94a3b8', action: () => setScreen('account'), pulse: hasUnspent },
+    { id: 'council', label: 'Council', img: '/images/icons/btn-council.png', color: 'var(--gold)', action: () => setScreen('account') },
+    { id: 'party', label: 'Party', img: '/images/icons/btn-party.png', color: 'var(--accent)', action: () => onToggleWarParty(), badge: Object.keys(activeHarvests).length > 0 ? Object.keys(activeHarvests).length : null },
+    { id: 'gruda', label: 'Gruda', iconSrc: '/sprites/ui/icons/icon_skull.png', color: '#f87171', action: () => onToggleGruda() },
+    { id: 'settings', label: 'Settings', img: '/images/icons/btn-settings.png', color: '#94a3b8', action: () => setScreen('account') },
+    { id: 'music', label: musicMuted ? 'Unmute' : 'Mute', iconSrc: '/sprites/ui/icons/icon_energy.png', color: musicMuted ? '#ef4444' : '#6ee7b7', action: () => {
       const newVal = !musicMuted;
       setMusicMutedState(newVal);
       setMusicMuted(newVal);
       setSfxMuted(newVal);
     }},
-    { id: 'quests', label: 'Quests', icon: 'scroll', color: '#fbbf24', action: () => setScreen('account') },
+    { id: 'quests', label: 'Quests', iconSrc: '/sprites/ui/icons/icon_sea_scroll.png', color: '#fbbf24', action: () => setScreen('account') },
   ];
 
   const popupButtons = [
-    { id: 'harvest', icon: 'pickaxe', color: 'var(--gold)', label: 'Harvest', active: showHarvesting },
-    { id: 'gear', icon: 'shield', color: 'var(--accent)', label: 'Gear', active: showGear },
-    { id: 'character', icon: 'chart', color: '#a855f7', label: 'Power', active: showCharacter },
+    { id: 'harvest', iconSrc: '/sprites/ui/icons/icon_pickaxe.png', color: 'var(--gold)', label: 'Harvest', active: showHarvesting },
+    { id: 'gear', iconSrc: '/sprites/ui/icons/icon_shield_blue.png', color: 'var(--accent)', label: 'Gear', active: showGear },
+    { id: 'character', iconSrc: '/sprites/ui/icons/icon_chart.png', color: '#a855f7', label: 'Power', active: showCharacter },
   ];
 
   const sendChat = () => {
@@ -506,6 +506,8 @@ export default function MapBottomBar({
                 >
                   {btn.img ? (
                     <img src={btn.img} alt={btn.label} style={{ width: '70%', height: '70%', objectFit: 'contain', borderRadius: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
+                  ) : btn.iconSrc ? (
+                    <img src={btn.iconSrc} alt={btn.label} style={{ width: '60%', height: '60%', objectFit: 'contain', imageRendering: 'pixelated', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
                   ) : (
                     <InlineIcon name={btn.icon} size={20} />
                   )}
@@ -548,7 +550,11 @@ export default function MapBottomBar({
                 onMouseMove={e => updateTooltipPosition(e)}
                 onMouseLeave={e => { hideTooltip(); if (!pb.active) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.boxShadow = 'none'; } }}
               >
-                <InlineIcon name={pb.icon} size={14} />
+                {pb.iconSrc ? (
+                  <img src={pb.iconSrc} alt={pb.label} style={{ width: 16, height: 16, objectFit: 'contain', imageRendering: 'pixelated' }} />
+                ) : (
+                  <InlineIcon name={pb.icon} size={14} />
+                )}
               </button>
             ))}
           </div>

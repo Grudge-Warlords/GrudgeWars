@@ -2384,7 +2384,7 @@ export default function WorldMap() {
                 const isConquered = ((zoneConquer || {})[selectedLoc.id] || 0) >= 100;
 
                 menuItems.push({ key: idx++, props: {
-                  iconSrc: '/sprites/ui/icons/icon_crossed_swords.png',
+                  iconSrc: '/sprites/ui/icons/icon_trident.png',
                   label: 'Hunt Monsters', sublabel: `Lv.${selectedLoc.levelRange[0]}-${selectedLoc.levelRange[1]}`,
                   color: 'var(--accent)', onClick: () => handleBattle(selectedLoc.id), compact: true,
                 }});
@@ -2398,7 +2398,7 @@ export default function WorldMap() {
                 }
 
                 menuItems.push({ key: idx++, props: {
-                  iconSrc: '/backgrounds/trade_day.png',
+                  iconSrc: '/sprites/ui/icons/icon_heart.png',
                   label: 'Rest', sublabel: `${level * 5}g`,
                   color: '#60a5fa', onClick: handleRest, compact: true,
                 }});
@@ -2411,7 +2411,7 @@ export default function WorldMap() {
 
                 if (selectedLoc.levelRange && selectedLoc.levelRange[0] >= 8) {
                   menuItems.push({ key: idx++, props: {
-                    icon: 'castle', label: 'Dungeon', sublabel: 'Multi-fight',
+                    iconSrc: '/sprites/ui/icons/icon_portal.png', label: 'Dungeon', sublabel: 'Multi-fight',
                     color: '#f97316', onClick: () => {
                       setSelectedLocation(null);
                       useGameStore.getState().startDungeon(selectedLoc.id);
@@ -2421,7 +2421,7 @@ export default function WorldMap() {
 
                 if (!selectedLoc.isCity) {
                   menuItems.push({ key: idx++, props: {
-                    icon: '🌾', label: 'Field', sublabel: 'Roam terrain',
+                    iconSrc: '/sprites/ui/icons/icon_nature.png', label: 'Field', sublabel: 'Roam terrain',
                     color: '#6ee7b3', onClick: () => {
                       setSelectedLocation(null);
                       enterScene('field', selectedLoc.id);
@@ -2431,11 +2431,11 @@ export default function WorldMap() {
 
                 if (isConquered) {
                   menuItems.push({ key: idx++, props: {
-                    icon: 'gold', label: 'Trade', sublabel: 'Buy/Sell',
+                    iconSrc: '/sprites/ui/icons/icon_pearl.png', label: 'Trade', sublabel: 'Buy/Sell',
                     color: '#fbbf24', onClick: () => setCitySubmenu('trade'), compact: true,
                   }});
                   menuItems.push({ key: idx++, props: {
-                    icon: 'scroll', label: 'Weapon', sublabel: 'Unlock rare',
+                    iconSrc: '/sprites/ui/icons/icon_sea_scroll.png', label: 'Weapon', sublabel: 'Unlock rare',
                     color: '#f59e0b', onClick: () => {
                       setGameMessage(`The masters of ${selectedLoc.name} have unlocked a legendary weapon path for you!`);
                     }, compact: true,
