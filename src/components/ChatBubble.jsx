@@ -30,7 +30,7 @@ function FishPortrait({ spriteData, size = 68 }) {
   );
 }
 
-function BubbleTail({ colorHex }) {
+function BubbleTail() {
   return (
     <svg
       width="24"
@@ -57,9 +57,11 @@ function BubbleTail({ colorHex }) {
 function FloatingBubble({ bubble, index, totalVisible, onDismiss }) {
   const [visible, setVisible] = useState(false);
   const [exiting, setExiting] = useState(false);
-  const [floatY, setFloatY] = useState(0);
+  const posRef = useRef({ y: 0, x: 0 });
   const floatRef = useRef(null);
   const startTime = useRef(Date.now());
+  const elemRef = useRef(null);
+  const seedRef = useRef(Math.random() * Math.PI * 2);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 60);
@@ -67,9 +69,19 @@ function FloatingBubble({ bubble, index, totalVisible, onDismiss }) {
   }, []);
 
   useEffect(() => {
+    const seed = seedRef.current;
     const tick = () => {
       const elapsed = (Date.now() - startTime.current) / 1000;
-      setFloatY(-elapsed * 8);
+      const speed = 12 + Math.sin(seed) * 4;
+      const yRaw = -elapsed * speed;
+      const maxRise = -180;
+      const y = Math.max(maxRise, yRaw * (1 - Math.min(1, Math.abs(yRaw) / (Math.abs(maxRise) * 1.5))));
+      const wobbleX = Math.sin(elapsed * 1.2 + seed) * 12 + Math.sin(elapsed * 2.5 + seed * 2) * 5;
+
+      posRef.current = { y, x: wobbleX };
+      if (elemRef.current) {
+        elemRef.current.style.transform = `translate(${wobbleX}px, ${y}px)`;
+      }
       floatRef.current = requestAnimationFrame(tick);
     };
     floatRef.current = requestAnimationFrame(tick);
@@ -88,20 +100,21 @@ function FloatingBubble({ bubble, index, totalVisible, onDismiss }) {
     }
   }, [bubble.autoExpire, handleDismiss]);
 
-  const opacity = exiting ? 0 : (visible ? (Math.max(0, 1 - Math.abs(floatY) / 200)) : 0);
+  const opacity = exiting ? 0 : (visible ? 1 : 0);
 
   return (
     <div
+      ref={elemRef}
       style={{
-        transition: exiting ? 'opacity 0.3s ease' : 'opacity 0.4s ease',
+        transition: exiting ? 'opacity 0.3s ease' : 'opacity 0.5s ease',
         opacity,
-        transform: `translateY(${floatY}px)`,
         pointerEvents: opacity > 0.3 ? 'auto' : 'none',
         cursor: 'pointer',
         marginBottom: 10,
         maxWidth: 380,
         minWidth: 240,
         width: 'auto',
+        willChange: 'transform',
       }}
       onClick={(e) => { e.stopPropagation(); handleDismiss(); }}
     >
@@ -153,7 +166,7 @@ function FloatingBubble({ bubble, index, totalVisible, onDismiss }) {
           </div>
         </div>
 
-        <BubbleTail colorHex={bubble.colorHex} />
+        <BubbleTail />
       </div>
     </div>
   );
@@ -162,7 +175,7 @@ function FloatingBubble({ bubble, index, totalVisible, onDismiss }) {
 export default function ChatBubbleSystem({ bubbleQueue, onDismiss, camZoom = 3, heroSpriteOffset }) {
   if (!bubbleQueue || bubbleQueue.length === 0) return null;
 
-  const bubbleScale = Math.max(0.5, 1.0 / camZoom);
+  const bubbleScale = Math.max(0.6, 1.4 / camZoom);
   const offsetX = heroSpriteOffset?.x || 0;
   const offsetY = heroSpriteOffset?.y || 0;
 
