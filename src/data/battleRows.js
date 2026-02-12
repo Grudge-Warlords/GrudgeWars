@@ -136,27 +136,27 @@ export function getRowPositions(units, side) {
   const positions = {};
 
   if (side === 'player') {
-    const rowXBase = { protection: 22, battle: 32, back: 18 };
-    const rowYBase = { protection: 88, battle: 88, back: 88 };
+    const rowXBase = { protection: 18, battle: 28, back: 12 };
+    const ySlots = [72, 88, 80, 96];
     rows.forEach(row => {
       const ru = rowUnits[row];
       const xBase = rowXBase[row];
-      const yBase = rowYBase[row];
       ru.forEach((u, i) => {
-        const ySpread = ru.length > 1 ? (i - (ru.length - 1) / 2) * 10 : 0;
-        positions[u.id] = { x: xBase, y: yBase + ySpread };
+        const yPos = ySlots[i % ySlots.length];
+        const xOffset = (i % 2 === 0) ? 0 : 6;
+        positions[u.id] = { x: xBase + xOffset, y: yPos, column: i % 4 };
       });
     });
   } else {
-    const rowXBase = { charge: 55, vanguard: 65, formation: 74 };
-    const rowYBase = { charge: 88, vanguard: 88, formation: 88 };
+    const rowXBase = { charge: 60, vanguard: 70, formation: 80 };
+    const ySlots = [72, 88, 80, 96];
     rows.forEach(row => {
       const ru = rowUnits[row];
       const xBase = rowXBase[row];
-      const yBase = rowYBase[row];
       ru.forEach((u, i) => {
-        const ySpread = ru.length > 1 ? (i - (ru.length - 1) / 2) * 10 : 0;
-        positions[u.id] = { x: xBase, y: yBase + ySpread };
+        const yPos = ySlots[i % ySlots.length];
+        const xOffset = (i % 2 === 0) ? 0 : -6;
+        positions[u.id] = { x: xBase + xOffset, y: yPos, column: i % 4 };
       });
     });
   }

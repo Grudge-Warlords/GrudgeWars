@@ -147,7 +147,7 @@ function StackedSlashImpact({ x, y, level, color = 'red' }) {
   }, []);
 
   return (
-    <div style={{ position: 'absolute', left: `${x}%`, top: `calc(${y}% - 45px)`, transform: 'translate(-50%, -50%)', zIndex: 260, pointerEvents: 'none' }}>
+    <div style={{ position: 'absolute', left: `${x}%`, top: `calc(${y}% - 30px)`, transform: 'translate(-50%, -50%)', zIndex: 260, pointerEvents: 'none' }}>
       {layers.map((layer, i) => {
         const sprite = effectSprites[layer.key];
         if (!sprite) return null;
@@ -215,7 +215,7 @@ function EffectSprite({ x, y, sprite, filter: filterProp }) {
   return (
     <div style={{
       position: 'absolute',
-      left: `${x}%`, top: `calc(${y}% - 45px)`,
+      left: `${x}%`, top: `calc(${y}% - 30px)`,
       transform: 'translate(-50%, -50%)',
       width: displaySize, height: displaySize,
       overflow: 'hidden',
@@ -272,7 +272,7 @@ function GrowingEffectSprite({ x, y, sprite, filter: filterProp, startScale = 0.
   return (
     <div style={{
       position: 'absolute',
-      left: `${x}%`, top: `calc(${y}% - 45px)`,
+      left: `${x}%`, top: `calc(${y}% - 30px)`,
       transform: 'translate(-50%, -50%)',
       width: displaySize, height: displaySize,
       overflow: 'hidden',
@@ -398,7 +398,7 @@ function DodgeFlashSprite({ x, y }) {
   const col = frame % cols;
   return (
     <div style={{
-      position: 'absolute', left: `${x}%`, top: `calc(${y}% - 45px)`,
+      position: 'absolute', left: `${x}%`, top: `calc(${y}% - 30px)`,
       transform: 'translate(-50%, -50%)',
       width: displaySize, height: displaySize, overflow: 'hidden',
       pointerEvents: 'none', zIndex: 210, opacity: 0.9,
@@ -440,7 +440,7 @@ function CastingSpriteEffect({ x, y }) {
   const row = Math.floor(frame / cols);
   return (
     <div style={{
-      position: 'absolute', left: `${x}%`, top: `calc(${y}% - 45px)`,
+      position: 'absolute', left: `${x}%`, top: `calc(${y}% - 30px)`,
       transform: 'translate(-50%, -50%)',
       width: displaySize, height: displaySize, overflow: 'hidden',
       pointerEvents: 'none', zIndex: 205, opacity: 0.8,
@@ -491,7 +491,7 @@ function WeaponContactSprite({ x, y, playCount = 1 }) {
   const row = Math.floor(frame / cols);
   return (
     <div style={{
-      position: 'absolute', left: `${x}%`, top: `calc(${y}% - 45px)`,
+      position: 'absolute', left: `${x}%`, top: `calc(${y}% - 30px)`,
       transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`,
       width: displaySize, height: displaySize, overflow: 'hidden',
       pointerEvents: 'none', zIndex: 205, opacity: 0.9,
@@ -696,7 +696,7 @@ function ResurrectEffect({ x, y, onComplete }) {
     <div style={{
       position: 'absolute',
       left: `${x}%`,
-      top: `calc(${y}% - 45px)`,
+      top: `calc(${y}% - 30px)`,
       transform: 'translate(-50%, -70%)',
       zIndex: 220, pointerEvents: 'none',
       animation: 'resurrectGlow 1.1s ease-out forwards',
@@ -1340,7 +1340,7 @@ export default function BattleScreen() {
 
   const bodyY = useCallback((unit) => {
     if (!unit?.position) return 50;
-    return unit.position.y - 10;
+    return unit.position.y - 7;
   }, []);
 
   const addParticle = useCallback((type, x, y, color) => {
@@ -2231,7 +2231,7 @@ export default function BattleScreen() {
           const flipSprite = spriteData?.facesLeft ? unit.team === 'player' : unit.team === 'enemy';
           const introDelay = introComplete ? 0 : (idx * 100);
           const baseFrameSize = spriteData?.frameWidth || spriteData?.frameHeight || 100;
-          const targetDisplaySize = 200;
+          const targetDisplaySize = 140;
           const isBearForm = unit.classId === 'worge' && unit.bearForm;
           const isBossUnit = unit.team === 'enemy' && unit.isBoss;
           const bossScaleVal = isBossUnit ? (unit.bossScale || 1.6) : 1;
@@ -2241,6 +2241,23 @@ export default function BattleScreen() {
           const footCrop = 0.82;
           const visibleHeight = Math.round(spriteSize * footCrop);
           const footY = visibleHeight;
+
+          const swimDelay = (idx * 0.7 + (unit.position?.column || 0) * 0.4).toFixed(2);
+          const swimDuration = (2.5 + (idx % 3) * 0.5).toFixed(2);
+          const isAttacking = anim && anim !== 'idle' && anim !== 'walk' && anim !== 'death';
+
+          const shouldFlipForAttack = (() => {
+            if (!isAttacking || !dash) return false;
+            const origX = unit.position?.x || 0;
+            const dashX = dash.x;
+            if (unit.team === 'player') {
+              return dashX < origX;
+            } else {
+              return dashX > origX;
+            }
+          })();
+          const attackFlip = shouldFlipForAttack ? !flipSprite : flipSprite;
+          const activeFlip = isAttacking ? attackFlip : flipSprite;
 
           return (
             <div
@@ -2264,6 +2281,9 @@ export default function BattleScreen() {
                 border: 'none',
               }}
             >
+            <div style={{
+              animation: unit.alive && !isAttacking && introComplete ? `battleFishSwim ${swimDuration}s ease-in-out ${swimDelay}s infinite` : 'none',
+            }}>
               {isCurrentTurnUnit && unit.alive && (
                 <div style={{
                   position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
@@ -2292,7 +2312,7 @@ export default function BattleScreen() {
                         spriteData={spriteData}
                         animation={anim}
                         scale={spriteScale}
-                        flip={flipSprite}
+                        flip={activeFlip}
                         speed={autoBattleEnabled ? 150 : 188}
                         loop={anim === 'idle' || anim === 'walk'}
                       />
@@ -2344,7 +2364,7 @@ export default function BattleScreen() {
                   spriteData={spriteData}
                   animation={anim}
                   scale={spriteScale}
-                  flip={flipSprite}
+                  flip={activeFlip}
                   speed={autoBattleEnabled ? 150 : 188}
                   loop={anim === 'idle' || anim === 'walk'}
                   equipmentOverlays={unit.team === 'player' ? buildEquipmentOverlays(heroRoster.find(h => h.id === unit.id), TIERS) : null}
@@ -2492,6 +2512,7 @@ export default function BattleScreen() {
                   </div>
                 )}
               </div>
+            </div>
             </div>
           );
         })}
