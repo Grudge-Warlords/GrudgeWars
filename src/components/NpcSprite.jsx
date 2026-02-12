@@ -1,11 +1,35 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { npcSpriteMap } from '../data/spriteMap';
 
-export default function NpcSprite({ npcId, scale = 3, flip = false, name }) {
+function lerp(a, b, t) { return a + (b - a) * t; }
+function rand(min, max) { return Math.random() * (max - min) + min; }
+
+function pickTarget(homeX, homeY, rangeX, rangeY) {
+  return {
+    x: homeX + rand(-rangeX, rangeX),
+    y: homeY + rand(-rangeY, rangeY),
+  };
+}
+
+export default function NpcSprite({ npcId, scale = 3, flip: initialFlip = false, name, wanderRange = 18, wanderRangeY = 10 }) {
   const canvasRef = useRef(null);
   const frameRef = useRef(0);
   const imgRef = useRef(null);
   const [loaded, setLoaded] = useState(false);
+
+  const offsetX = useRef(0);
+  const offsetY = useRef(0);
+  const targetX = useRef(0);
+  const targetY = useRef(0);
+  const speed = useRef(rand(0.3, 0.7));
+  const currentFlip = useRef(initialFlip);
+  const [flipState, setFlipState] = useState(initialFlip);
+  const phase = useRef('idle');
+  const phaseTimer = useRef(rand(500, 2000));
+  const tailWag = useRef(0);
+  const dartCooldown = useRef(0);
+  const animRef = useRef(null);
+  const lastTime = useRef(0);
 
   const npcData = npcSpriteMap[npcId];
   if (!npcData) return null;
@@ -30,10 +54,18 @@ export default function NpcSprite({ npcId, scale = 3, flip = false, name }) {
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    const draw = () => {
+    let frameInterval = 0;
+    const frameDuration = 1000 / 6;
+
+    const draw = (dt) => {
+      frameInterval += dt;
+      if (frameInterval >= frameDuration) {
+        frameInterval -= frameDuration;
+        frameRef.current = (frameRef.current + 1) % Math.max(frames, 1);
+      }
       ctx.clearRect(0, 0, displayWidth, displayHeight);
       ctx.save();
-      if (flip) {
+      if (currentFlip.current) {
         ctx.translate(displayWidth, 0);
         ctx.scale(-1, 1);
       }
@@ -45,22 +77,109 @@ export default function NpcSprite({ npcId, scale = 3, flip = false, name }) {
         displayWidth, displayHeight
       );
       ctx.restore();
-      frameRef.current = (frameRef.current + 1) % Math.max(frames, 1);
     };
 
-    draw();
-    if (!isStatic) {
-      const interval = setInterval(draw, 1000 / 6);
-      return () => clearInterval(interval);
-    }
-  }, [loaded, displayWidth, displayHeight, frames, frameWidth, frameHeight, flip, isStatic]);
+    const tick = (timestamp) => {
+      if (!lastTime.current) lastTime.current = timestamp;
+      const dt = Math.min(timestamp - lastTime.current, 100);
+      lastTime.current = timestamp;
 
-  const swimDelay = Math.random() * 3;
+      phaseTimer.current -= dt;
+      dartCooldown.current -= dt;
+
+      if (phaseTimer.current <= 0) {
+        const r = Math.random();
+        if (phase.current === 'idle') {
+          if (r < 0.6) {
+            phase.current = 'swim';
+            const t = pickTarget(0, 0, wanderRange, wanderRangeY);
+            targetX.current = t.x;
+            targetY.current = t.y;
+            speed.current = rand(0.4, 0.8);
+            phaseTimer.current = rand(2000, 5000);
+          } else if (r < 0.85) {
+            phase.current = 'drift';
+            targetX.current = offsetX.current + rand(-3, 3);
+            targetY.current = offsetY.current + rand(-2, 2);
+            speed.current = rand(0.08, 0.2);
+            phaseTimer.current = rand(1500, 3500);
+          } else {
+            phase.current = 'dart';
+            const t = pickTarget(0, 0, wanderRange * 0.7, wanderRangeY * 0.7);
+            targetX.current = t.x;
+            targetY.current = t.y;
+            speed.current = rand(2.0, 4.0);
+            phaseTimer.current = rand(300, 700);
+            dartCooldown.current = 8000;
+          }
+        } else {
+          phase.current = 'idle';
+          phaseTimer.current = rand(800, 3000);
+        }
+      }
+
+      if (phase.current === 'dart' && dartCooldown.current > 7500) {
+        speed.current *= 0.98;
+      }
+
+      const sec = dt / 1000;
+      if (phase.current !== 'idle') {
+        const dx = targetX.current - offsetX.current;
+        const dy = targetY.current - offsetY.current;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > 0.3) {
+          const moveSpeed = speed.current * 30 * sec;
+          const step = Math.min(moveSpeed, dist);
+          offsetX.current += (dx / dist) * step;
+          offsetY.current += (dy / dist) * step;
+
+          if (Math.abs(dx) > 0.5) {
+            const newFlip = dx < 0;
+            if (newFlip !== currentFlip.current) {
+              currentFlip.current = newFlip;
+              setFlipState(newFlip);
+            }
+          }
+        } else if (phase.current === 'swim' || phase.current === 'dart') {
+          phase.current = 'idle';
+          phaseTimer.current = rand(800, 2500);
+        }
+      }
+
+      tailWag.current += dt * 0.004;
+      const wobbleX = Math.sin(tailWag.current * 1.3) * (phase.current === 'dart' ? 0.3 : 0.8);
+      const wobbleY = Math.cos(tailWag.current * 0.9) * 1.2;
+
+      const finalX = offsetX.current + wobbleX;
+      const finalY = offsetY.current + wobbleY;
+
+      if (canvasRef.current) {
+        const el = canvasRef.current.parentElement;
+        if (el) {
+          el.style.transform = `translate(calc(-50% + ${finalX.toFixed(1)}px), calc(-50% + ${finalY.toFixed(1)}px))`;
+          const tiltDeg = phase.current === 'dart'
+            ? ((targetX.current - offsetX.current) > 0 ? -4 : 4)
+            : Math.sin(tailWag.current * 1.1) * 3;
+          el.style.rotate = `${tiltDeg.toFixed(1)}deg`;
+        }
+      }
+
+      draw(dt);
+      animRef.current = requestAnimationFrame(tick);
+    };
+
+    animRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, [loaded, displayWidth, displayHeight, frames, frameWidth, frameHeight, isStatic, wanderRange, wanderRangeY]);
 
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      animation: `npcSwim 3s ease-in-out ${swimDelay.toFixed(1)}s infinite`,
+      willChange: 'transform',
+      transition: 'none',
     }}>
       <canvas
         ref={canvasRef}
