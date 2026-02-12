@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useGameStore from '../stores/gameStore';
 import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite, SCENE_NPCS } from '../data/spriteMap';
@@ -17,7 +17,14 @@ const RESOURCE_NODES = [
 
 const SELL_PRICES = { gold: 1, herbs: 2, wood: 2, ore: 4, crystals: 8 };
 
-const SPAWN_POS = { x: 45, y: 75 };
+const SPAWN_POS = { x: 50, y: -8 };
+const LAND_POS = { x: 45, y: 75 };
+
+const NPC_EDGES = [
+  { from: 'left', x: -10, y: null },
+  { from: 'right', x: 110, y: null },
+  { from: 'top', x: null, y: -10 },
+];
 
 export default function CampScene() {
   useEffect(() => { setBgm('scene'); }, []);
@@ -40,19 +47,80 @@ export default function CampScene() {
   const [showSellPanel, setShowSellPanel] = useState(false);
   const [heroX, setHeroX] = useState(SPAWN_POS.x);
   const [heroY, setHeroY] = useState(SPAWN_POS.y);
-  const [walking, setWalking] = useState(false);
+  const [heroScale, setHeroScale] = useState(0.3);
+  const [walking, setWalking] = useState(true);
   const [facingLeft, setFacingLeft] = useState(false);
   const [exiting, setExiting] = useState(false);
-  const [exitScale, setExitScale] = useState(1);
+  const [entering, setEntering] = useState(true);
+  const [npcVisible, setNpcVisible] = useState({});
+  const [npcPositions, setNpcPositions] = useState({});
   const walkTimeout = useRef(null);
   const exitTimeout = useRef(null);
+  const sceneRef = useRef(null);
+  const mountedRef = useRef(true);
+  const npcTimers = useRef([]);
 
   React.useEffect(() => {
     const interval = setInterval(() => tickHarvests(), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => { return () => { if (walkTimeout.current) clearTimeout(walkTimeout.current); if (exitTimeout.current) clearTimeout(exitTimeout.current); }; }, []);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (walkTimeout.current) clearTimeout(walkTimeout.current);
+      if (exitTimeout.current) clearTimeout(exitTimeout.current);
+      npcTimers.current.forEach(t => clearTimeout(t));
+      npcTimers.current = [];
+    };
+  }, []);
+
+  useEffect(() => {
+    const npcs = SCENE_NPCS.camp || [];
+    const entranceStagger = {};
+    npcs.forEach((npc, i) => {
+      const edge = NPC_EDGES[i % NPC_EDGES.length];
+      const startX = edge.x !== null ? edge.x : npc.x;
+      const startY = edge.y !== null ? edge.y : npc.y;
+      entranceStagger[npc.id] = { startX, startY, delay: 800 + i * 400 };
+    });
+    setNpcPositions(
+      Object.fromEntries(npcs.map(npc => {
+        const e = entranceStagger[npc.id];
+        return [npc.id, { x: e.startX, y: e.startY, scale: 0.3 }];
+      }))
+    );
+
+    npcs.forEach(npc => {
+      const e = entranceStagger[npc.id];
+      const t1 = setTimeout(() => {
+        if (!mountedRef.current) return;
+        setNpcPositions(prev => ({ ...prev, [npc.id]: { x: npc.x, y: npc.y, scale: 1 } }));
+        const t2 = setTimeout(() => {
+          if (!mountedRef.current) return;
+          setNpcVisible(prev => ({ ...prev, [npc.id]: true }));
+        }, 800);
+        npcTimers.current.push(t2);
+      }, e.delay);
+      npcTimers.current.push(t1);
+    });
+  }, []);
+
+  useEffect(() => {
+    const enterTimer = setTimeout(() => {
+      if (!mountedRef.current) return;
+      setHeroX(LAND_POS.x);
+      setHeroY(LAND_POS.y);
+      setHeroScale(1);
+    }, 100);
+    const landTimer = setTimeout(() => {
+      if (!mountedRef.current) return;
+      setWalking(false);
+      setEntering(false);
+    }, 1200);
+    return () => { clearTimeout(enterTimer); clearTimeout(landTimer); };
+  }, []);
 
   const availableHeroes = heroRoster.filter(h => {
     const isHarvesting = Object.values(activeHarvests).includes(h.id);
@@ -60,6 +128,26 @@ export default function CampScene() {
   });
 
   const primarySprite = getPlayerSprite(playerRace, playerClass);
+
+  const handleRightClick = useCallback((e) => {
+    e.preventDefault();
+    if (exiting || entering) return;
+    const rect = sceneRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const pctX = ((e.clientX - rect.left) / rect.width) * 100;
+    const pctY = ((e.clientY - rect.top) / rect.height) * 100;
+    const clampedX = Math.max(5, Math.min(95, pctX));
+    const clampedY = Math.max(10, Math.min(88, pctY));
+    if (walkTimeout.current) clearTimeout(walkTimeout.current);
+    setFacingLeft(clampedX < heroX);
+    setWalking(true);
+    setHeroX(clampedX);
+    setHeroY(clampedY);
+    setSelectedNode(null);
+    walkTimeout.current = setTimeout(() => {
+      setWalking(false);
+    }, 600);
+  }, [exiting, entering, heroX]);
 
   const walkToNode = (node) => {
     if (walkTimeout.current) clearTimeout(walkTimeout.current);
@@ -76,7 +164,7 @@ export default function CampScene() {
   };
 
   const handleExit = () => {
-    if (exiting) return;
+    if (exiting || entering) return;
     if (walkTimeout.current) clearTimeout(walkTimeout.current);
     setExiting(true);
     setSelectedNode(null);
@@ -89,9 +177,29 @@ export default function CampScene() {
     const shrinkInterval = setInterval(() => {
       scaleStep++;
       const progress = Math.min(scaleStep / 20, 1);
-      setExitScale(1 - progress * 0.7);
+      setHeroScale(1 - progress * 0.7);
       if (progress >= 1) clearInterval(shrinkInterval);
     }, 50);
+
+    npcTimers.current.forEach(t => clearTimeout(t));
+    npcTimers.current = [];
+    const npcs = SCENE_NPCS.camp || [];
+    npcs.forEach((npc, i) => {
+      const edge = NPC_EDGES[i % NPC_EDGES.length];
+      const t = setTimeout(() => {
+        if (!mountedRef.current) return;
+        setNpcPositions(prev => ({
+          ...prev,
+          [npc.id]: {
+            x: edge.x !== null ? edge.x : npc.x,
+            y: edge.y !== null ? edge.y : npc.y,
+            scale: 0.3,
+          }
+        }));
+      }, i * 150);
+      npcTimers.current.push(t);
+    });
+
     exitTimeout.current = setTimeout(() => {
       clearInterval(shrinkInterval);
       exitScene();
@@ -99,7 +207,7 @@ export default function CampScene() {
   };
 
   const handleNodeClick = (node) => {
-    if (exiting) return;
+    if (exiting || entering) return;
     if (selectedNode === node.id) {
       setSelectedNode(null);
       return;
@@ -108,7 +216,11 @@ export default function CampScene() {
   };
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
+    <div
+      ref={sceneRef}
+      onContextMenu={handleRightClick}
+      style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}
+    >
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: 'url(/backgrounds/scene_camp_ocean.png)',
@@ -155,12 +267,14 @@ export default function CampScene() {
       {primarySprite && (
         <div style={{
           position: 'absolute', left: `${heroX}%`, top: `${heroY}%`,
-          transform: `translate(-50%, -50%) scale(${exitScale})`,
+          transform: `translate(-50%, -50%) scale(${heroScale})`,
           zIndex: 10,
-          transition: exiting
-            ? 'left 1s ease-in, top 1s ease-in'
-            : 'left 0.6s ease, top 0.6s ease',
-          opacity: exiting ? (exitScale < 0.4 ? 0 : 1) : 1,
+          transition: entering
+            ? 'left 1s ease-out, top 1s ease-out, transform 1s ease-out'
+            : exiting
+              ? 'left 1s ease-in, top 1s ease-in'
+              : 'left 0.6s ease, top 0.6s ease',
+          opacity: heroScale < 0.35 ? 0 : 1,
         }}>
           <SpriteAnimation
             spriteData={primarySprite}
@@ -309,14 +423,24 @@ export default function CampScene() {
         </div>
       )}
 
-      {(SCENE_NPCS.camp || []).map(npc => (
-        <div key={npc.id} style={{
-          position: 'absolute', left: `${npc.x}%`, top: `${npc.y}%`,
-          transform: 'translate(-50%, -50%)', zIndex: 5, pointerEvents: 'none',
-        }}>
-          <NpcSprite npcId={npc.npc} scale={3} flip={npc.flip} name={npc.name} />
-        </div>
-      ))}
+      {(SCENE_NPCS.camp || []).map(npc => {
+        const pos = npcPositions[npc.id];
+        const arrived = npcVisible[npc.id];
+        const px = pos ? pos.x : npc.x;
+        const py = pos ? pos.y : npc.y;
+        const sc = pos ? pos.scale : 1;
+        return (
+          <div key={npc.id} style={{
+            position: 'absolute', left: `${px}%`, top: `${py}%`,
+            transform: `translate(-50%, -50%) scale(${sc})`,
+            zIndex: 5, pointerEvents: 'none',
+            transition: arrived ? 'none' : 'left 0.8s ease-out, top 0.8s ease-out, transform 0.8s ease-out',
+            opacity: sc < 0.35 ? 0 : 1,
+          }}>
+            <NpcSprite npcId={npc.npc} scale={3} flip={npc.flip} name={npc.name} />
+          </div>
+        );
+      })}
 
       <div onClick={handleExit} style={{
         position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)',
