@@ -72,11 +72,11 @@ export const cities = [
 ];
 
 export const cityPositions = {
-  greenhollow:   { x: 8,  y: 90 },
-  ironkeep:      { x: 5,  y: 48 },
-  shadowhaven:   { x: 48, y: 88 },
-  emberpeak:     { x: 88, y: 58 },
-  crystalspire:  { x: 92, y: 82 },
+  greenhollow:   { x: 4,  y: 84 },
+  ironkeep:      { x: 6,  y: 50 },
+  shadowhaven:   { x: 56, y: 84 },
+  emberpeak:     { x: 92, y: 48 },
+  crystalspire:  { x: 92, y: 84 },
 };
 
 export const cityConnections = [

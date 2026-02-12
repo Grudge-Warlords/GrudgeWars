@@ -4,7 +4,7 @@ import { raceDefinitions } from './races.js';
 
 export const enemyTemplates = {
   goblin: {
-    name: 'Puffer Scout', icon: 'sword', color: '#0ea5e9', portrait: '/images/enemies/puffer_scout.png',
+    name: 'Reef Bandit', icon: 'sword', color: '#0ea5e9', portrait: '/images/enemies/puffer_scout.png',
     baseHealth: 80, baseDamage: 12, baseDefense: 5, baseMana: 20,
     xpReward: 15, goldReward: 8, speed: 14,
     abilities: [
@@ -22,7 +22,7 @@ export const enemyTemplates = {
     ]
   },
   wolf: {
-    name: 'Barracuda', icon: 'wolf', color: '#64748b', portrait: '/images/enemies/barracuda.png',
+    name: 'Mantis Shrimp', icon: 'wolf', color: '#64748b', portrait: '/images/enemies/barracuda.png',
     baseHealth: 100, baseDamage: 22, baseDefense: 8, baseMana: 0,
     xpReward: 18, goldReward: 6, speed: 18,
     abilities: [
@@ -41,7 +41,7 @@ export const enemyTemplates = {
     ]
   },
   dark_knight: {
-    name: 'Armored Crab', icon: 'skull', color: '#1e3a5f', portrait: '/images/enemies/armored_crab.png',
+    name: 'Abyssal Knight', icon: 'skull', color: '#1e3a5f', portrait: '/images/enemies/armored_crab.png',
     baseHealth: 160, baseDamage: 26, baseDefense: 22, baseMana: 30,
     xpReward: 32, goldReward: 18, speed: 10,
     abilities: [
@@ -61,7 +61,7 @@ export const enemyTemplates = {
     ]
   },
   water_priestess_mage: {
-    name: 'Water Priestess', icon: 'ice', color: '#0891b2', portrait: '/images/enemies/water_priestess.png',
+    name: 'Coral Priestess', icon: 'ice', color: '#0891b2', portrait: '/images/enemies/water_priestess.png',
     baseHealth: 110, baseDamage: 20, baseMagicDamage: 32, baseDefense: 12, baseMana: 150,
     xpReward: 38, goldReward: 24, speed: 12,
     abilities: [
@@ -71,7 +71,7 @@ export const enemyTemplates = {
     ]
   },
   orc: {
-    name: 'Giant Mantis Shrimp', icon: 'sword', color: '#dc2626', portrait: '/images/enemies/mantis_shrimp.png',
+    name: 'Hammerhead Brute', icon: 'sword', color: '#dc2626', portrait: '/images/enemies/mantis_shrimp.png',
     baseHealth: 180, baseDamage: 28, baseDefense: 20, baseMana: 0,
     xpReward: 35, goldReward: 18, speed: 8,
     abilities: [
@@ -81,7 +81,7 @@ export const enemyTemplates = {
     ]
   },
   dragon_whelp: {
-    name: 'Sea Serpent Hatchling', icon: 'fire', color: '#0d9488', portrait: '/images/enemies/sea_serpent.png',
+    name: 'Sea Drake', icon: 'fire', color: '#0d9488', portrait: '/images/enemies/sea_serpent.png',
     baseHealth: 150, baseDamage: 30, baseDefense: 18, baseMana: 80,
     xpReward: 45, goldReward: 30, speed: 15,
     abilities: [
@@ -106,7 +106,7 @@ export const enemyTemplates = {
     ]
   },
   demon_lord: {
-    name: 'Volcanic Leviathan', icon: 'fire', color: '#ea580c', portrait: '/images/enemies/demon_lord.png',
+    name: 'Leviathan', icon: 'fire', color: '#ea580c', portrait: '/images/enemies/demon_lord.png',
     baseHealth: 900, baseDamage: 52, baseDefense: 35, baseMana: 250,
     xpReward: 160, goldReward: 120, speed: 13,
     isBoss: true,
@@ -119,7 +119,7 @@ export const enemyTemplates = {
     ]
   },
   evil_wizard: {
-    name: 'Abyssal Sorcerer', icon: 'crystal', color: '#7e22ce', portrait: '/images/enemies/abyss_king.png',
+    name: 'Void Sorcerer', icon: 'crystal', color: '#7e22ce', portrait: '/images/enemies/abyss_king.png',
     baseHealth: 1400, baseDamage: 65, baseDefense: 35, baseMana: 600,
     xpReward: 350, goldReward: 250, speed: 14,
     isBoss: true,
@@ -206,7 +206,7 @@ export const enemyTemplates = {
     ]
   },
   water_elemental: {
-    name: 'Grand Water Elemental', icon: 'ice', color: '#06b6d4', portrait: '/images/enemies/water_elemental.png',
+    name: 'Storm Elemental', icon: 'ice', color: '#06b6d4', portrait: '/images/enemies/water_elemental.png',
     baseHealth: 550, baseDamage: 50, baseDefense: 38, baseMana: 300,
     xpReward: 175, goldReward: 120, speed: 14,
     isBoss: true,
@@ -220,7 +220,7 @@ export const enemyTemplates = {
     ]
   },
   nature_elemental: {
-    name: 'Coral Elemental', icon: 'nature', color: '#f472b6', portrait: '/images/enemies/nature_elemental.png',
+    name: 'Tide Guardian', icon: 'nature', color: '#f472b6', portrait: '/images/enemies/nature_elemental.png',
     baseHealth: 600, baseDamage: 44, baseDefense: 42, baseMana: 250,
     xpReward: 175, goldReward: 120, speed: 12,
     isBoss: true,
@@ -312,7 +312,7 @@ export const enemyTemplates = {
     ]
   },
   void_sentinel: {
-    name: 'Void Angler', icon: 'crystal', color: '#7c3aed', portrait: '/images/enemies/void_sentinel.png',
+    name: 'Void Sentinel', icon: 'crystal', color: '#7c3aed', portrait: '/images/enemies/void_sentinel.png',
     baseHealth: 1000, baseDamage: 55, baseDefense: 42, baseMana: 400,
     xpReward: 200, goldReward: 150, speed: 13,
     isBoss: true,
@@ -327,7 +327,7 @@ export const enemyTemplates = {
     ]
   },
   abyssal_demon: {
-    name: 'Abyssal Leviathan', icon: 'fire', color: '#b91c1c', portrait: '/images/enemies/demon_lord.png',
+    name: 'Abyssal Kraken', icon: 'fire', color: '#b91c1c', portrait: '/images/enemies/demon_lord.png',
     baseHealth: 1600, baseDamage: 72, baseDefense: 40, baseMana: 400,
     xpReward: 400, goldReward: 300, speed: 15,
     isBoss: true,
@@ -343,7 +343,7 @@ export const enemyTemplates = {
     ]
   },
   eldritch_horror: {
-    name: 'The Deep Horror', icon: 'chaos', color: '#065f46', portrait: '/images/enemies/void_sentinel.png',
+    name: 'The Devourer', icon: 'chaos', color: '#065f46', portrait: '/images/enemies/void_sentinel.png',
     baseHealth: 1800, baseDamage: 68, baseDefense: 35, baseMana: 500,
     xpReward: 450, goldReward: 350, speed: 12,
     isBoss: true,
@@ -360,7 +360,7 @@ export const enemyTemplates = {
     ]
   },
   frost_titan: {
-    name: 'Frost Leviathan', icon: 'ice', color: '#67e8f9', portrait: '/images/enemies/frost_titan.png',
+    name: 'Glacial Titan', icon: 'ice', color: '#67e8f9', portrait: '/images/enemies/frost_titan.png',
     baseHealth: 1500, baseDamage: 65, baseDefense: 50, baseMana: 350,
     xpReward: 380, goldReward: 280, speed: 10,
     isBoss: true,
@@ -376,7 +376,7 @@ export const enemyTemplates = {
     ]
   },
   flying_eye: {
-    name: 'Jellyfish Scout', icon: 'crystal', color: '#c084fc', portrait: '/images/enemies/jellyfish_eye.png',
+    name: 'Lantern Jellyfish', icon: 'crystal', color: '#c084fc', portrait: '/images/enemies/jellyfish_eye.png',
     baseHealth: 70, baseDamage: 16, baseDefense: 4, baseMana: 40,
     xpReward: 14, goldReward: 7, speed: 19,
     abilities: [
@@ -385,7 +385,7 @@ export const enemyTemplates = {
     ]
   },
   mushroom: {
-    name: 'Sea Urchin', icon: 'nature', color: '#a855f7', portrait: '/images/enemies/sea_mushroom.png',
+    name: 'Toxic Urchin', icon: 'nature', color: '#a855f7', portrait: '/images/enemies/sea_mushroom.png',
     baseHealth: 90, baseDamage: 10, baseDefense: 8, baseMana: 60,
     xpReward: 13, goldReward: 6, speed: 8,
     abilities: [
@@ -404,7 +404,7 @@ export const enemyTemplates = {
     ]
   },
   shadow_bat: {
-    name: 'Moray Eel', icon: 'energy', color: '#4c1d95', portrait: '/images/enemies/shadow_manta.png',
+    name: 'Manta Ray', icon: 'energy', color: '#4c1d95', portrait: '/images/enemies/shadow_manta.png',
     baseHealth: 55, baseDamage: 14, baseDefense: 3, baseMana: 30,
     xpReward: 12, goldReward: 5, speed: 22,
     abilities: [
@@ -414,7 +414,7 @@ export const enemyTemplates = {
     ]
   },
   imp: {
-    name: 'Pufferfish Imp', icon: 'fire', color: '#0891b2', portrait: '/images/enemies/sea_devil.png',
+    name: 'Electric Eel', icon: 'fire', color: '#0891b2', portrait: '/images/enemies/sea_devil.png',
     baseHealth: 65, baseDamage: 11, baseDefense: 4, baseMana: 50,
     xpReward: 13, goldReward: 7, speed: 17,
     abilities: [
@@ -424,7 +424,7 @@ export const enemyTemplates = {
     ]
   },
   mimic: {
-    name: 'Mimic Clam', icon: 'shield', color: '#0e7490', portrait: '/images/enemies/ocean_mimic.png',
+    name: 'Hermit Mimic', icon: 'shield', color: '#0e7490', portrait: '/images/enemies/ocean_mimic.png',
     baseHealth: 200, baseDamage: 26, baseDefense: 22, baseMana: 80,
     xpReward: 40, goldReward: 35, speed: 7,
     abilities: [
@@ -435,7 +435,7 @@ export const enemyTemplates = {
     ]
   },
   crow_knight: {
-    name: 'Swordfish Knight', icon: 'sword', color: '#1e3a5f', portrait: '/images/enemies/swordfish_knight.png',
+    name: 'Barracuda Knight', icon: 'sword', color: '#1e3a5f', portrait: '/images/enemies/swordfish_knight.png',
     baseHealth: 170, baseDamage: 24, baseDefense: 16, baseMana: 40,
     xpReward: 32, goldReward: 18, speed: 16,
     abilities: [
@@ -446,7 +446,7 @@ export const enemyTemplates = {
     ]
   },
   stone_guardian: {
-    name: 'Coral Guardian', icon: 'shield', color: '#f472b6', portrait: '/images/enemies/stone_guardian.png',
+    name: 'Stone Crab', icon: 'shield', color: '#f472b6', portrait: '/images/enemies/stone_guardian.png',
     baseHealth: 250, baseDamage: 20, baseDefense: 30, baseMana: 60,
     xpReward: 38, goldReward: 22, speed: 6,
     abilities: [
@@ -463,7 +463,7 @@ export const locations = [
   {
     id: 'verdant_plains',
     name: 'Coral Shallows',
-    description: 'Peaceful shallow reefs teeming with colorful fish. A good place to begin your underwater journey.',
+    description: 'Sunlit waters dance over vibrant coral beds where the first fragment of the shattered Coral Crown was found. Reef bandits and mantis shrimp prowl the shallows, emboldened by the fading light of the old world.',
     levelRange: [1, 3],
     enemies: ['goblin', 'wolf', 'mushroom', 'imp', 'shadow_bat'],
     bgGradient: 'linear-gradient(135deg, #064e3b 0%, #0d9488 50%, #0891b2 100%)',
@@ -481,7 +481,7 @@ export const locations = [
   {
     id: 'dark_forest',
     name: 'Kelp Forest',
-    description: 'Towering kelp fronds block out the light above. Dangerous creatures lurk in every shadow.',
+    description: 'Towering kelp canopies sway in the currents, casting shifting shadows where predators lie in wait. Whispers among the fronds speak of a Crown fragment hidden deep within the tangled growth.',
     levelRange: [3, 5],
     enemies: ['wolf', 'goblin', 'skeleton', 'mushroom', 'flying_eye', 'shadow_bat', 'imp'],
     bgGradient: 'linear-gradient(135deg, #042f2e 0%, #134e4a 50%, #0f766e 100%)',
@@ -499,7 +499,7 @@ export const locations = [
   {
     id: 'mystic_grove',
     name: 'Anemone Garden',
-    description: 'A mystical garden of giant sea anemones where ancient magic hums through the currents.',
+    description: 'Giant sea anemones pulse with ancient magic, their tendrils weaving spells older than the Coral Crown itself. Ink sorcerers gather here to channel the garden\'s power for dark purposes.',
     levelRange: [4, 6],
     enemies: ['goblin', 'wolf', 'dark_mage', 'mushroom', 'flying_eye', 'imp'],
     bgGradient: 'linear-gradient(135deg, #0e7490 0%, #06b6d4 50%, #22d3ee 100%)',
@@ -518,7 +518,7 @@ export const locations = [
   {
     id: 'whispering_caverns',
     name: 'Biolume Caves',
-    description: 'Twisting underwater caverns lit by bioluminescent organisms. Strange echoes ripple through the water.',
+    description: 'Twisting caverns aglow with bioluminescent life, where eerie echoes ripple through crystal-clear water. Hermit mimics disguise themselves among the glowing walls, luring the unwary deeper.',
     levelRange: [3, 5],
     enemies: ['goblin', 'skeleton', 'flying_eye', 'shadow_bat', 'mimic'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #1e3a5f 50%, #164e63 100%)',
@@ -537,7 +537,7 @@ export const locations = [
   {
     id: 'haunted_marsh',
     name: 'Sargasso Maze',
-    description: 'A tangled maze of sargassum seaweed where lost creatures drift endlessly. The dead float among the fronds.',
+    description: 'A suffocating labyrinth of sargassum where the drowned drift among rotting fronds. The Abyss King\'s corruption seeps through these waters, raising barnacle warriors from their resting places.',
     levelRange: [5, 7],
     enemies: ['skeleton', 'dark_mage', 'wolf', 'mushroom', 'flying_eye', 'shadow_bat'],
     bgGradient: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #0c4a6e 100%)',
@@ -555,8 +555,8 @@ export const locations = [
   },
   {
     id: 'cursed_ruins',
-    name: 'Ancient Ruins',
-    description: 'The sunken remnants of a lost civilization, now haunted by spectral sea creatures and dark ocean magic.',
+    name: 'Sunken Citadel',
+    description: 'The drowned fortress of an ancient betta kingdom, its coral spires crumbling into the abyss. Abyssal knights and shadow eels patrol these haunted halls, guarding secrets of the shattered Crown.',
     levelRange: [6, 9],
     enemies: ['skeleton', 'dark_mage', 'skeleton_knight', 'mimic', 'crow_knight', 'dark_knight', 'shadow_warrior'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #020617 100%)',
@@ -575,7 +575,7 @@ export const locations = [
   {
     id: 'crystal_caves',
     name: 'Crystal Grotto',
-    description: 'Glittering underwater caverns filled with crystalline formations. Ancient sea dwarves carved these halls.',
+    description: 'Glittering caverns of living crystal hum with the resonance of the Coral Crown. Stone crabs and coral priestesses guard these sacred halls, carved by ancient artisans of the deep.',
     levelRange: [7, 9],
     enemies: ['skeleton', 'goblin', 'orc', 'skeleton_knight', 'mimic', 'stone_guardian', 'water_priestess_mage'],
     bgGradient: 'linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #06b6d4 100%)',
@@ -594,7 +594,7 @@ export const locations = [
   {
     id: 'thornwood_pass',
     name: 'Tide Stream',
-    description: 'A treacherous underwater passage swept by powerful tidal currents. Ambushes are common along this narrow channel.',
+    description: 'A treacherous channel carved by relentless tidal forces, where powerful currents sweep the unwary into ambushes. Barracuda knights and hammerhead brutes control this vital passage between the shallows and the deep.',
     levelRange: [6, 8],
     enemies: ['wolf', 'goblin', 'orc', 'mushroom', 'crow_knight', 'imp'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%)',
@@ -612,8 +612,8 @@ export const locations = [
   },
   {
     id: 'sunken_temple',
-    name: 'Sunken Wreck',
-    description: 'An ancient shipwreck resting on the ocean floor. A powerful reef shaman guards the inner hull.',
+    name: 'Shipwreck Hollow',
+    description: 'The shattered hull of a once-great vessel now serves as a fortress for the Reef Shaman, who hoards a Crown fragment within its rotting timbers. The wreck teems with corrupted guardians and ink sorcerers.',
     levelRange: [7, 9],
     enemies: ['skeleton', 'dark_mage', 'goblin', 'skeleton_knight', 'flying_eye', 'mimic', 'stone_guardian', 'water_priestess_mage'],
     bgGradient: 'linear-gradient(135deg, #155e75 0%, #164e63 50%, #0e7490 100%)',
@@ -632,7 +632,7 @@ export const locations = [
   {
     id: 'iron_peaks',
     name: 'Coral Fortress',
-    description: 'Rugged coral formations where rival sea creatures clash over territory and precious resources.',
+    description: 'A massive fortification of hardened coral where the Abyss King\'s armies have established their first stronghold. The deep current brings organized war parties of abyssal knights and barracuda knights.',
     levelRange: [8, 11],
     enemies: ['orc', 'skeleton', 'dark_mage', 'stone_guardian', 'crow_knight', 'dark_knight'],
     bgGradient: 'linear-gradient(135deg, #134e4a 0%, #0f766e 50%, #115e59 100%)',
@@ -651,7 +651,7 @@ export const locations = [
   {
     id: 'blood_canyon',
     name: 'Thermal Vent',
-    description: 'A scorching hydrothermal vent field stained by mineral deposits. A brutal trench warlord commands the stronghold.',
+    description: 'Superheated water erupts from the ocean floor in blinding geysers of mineral-rich fury. The Trench Warlord commands this volcanic stronghold, forging weapons in the scalding vents for the Abyss King\'s armies.',
     levelRange: [9, 12],
     enemies: ['orc', 'skeleton', 'dark_mage', 'crow_knight', 'dark_knight', 'shadow_warrior'],
     bgGradient: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #431407 100%)',
@@ -670,7 +670,7 @@ export const locations = [
   {
     id: 'frozen_tundra',
     name: 'Frozen Depths',
-    description: 'Endless frigid waters where ice formations drift and a mighty frost serpent rules the darkness below.',
+    description: 'Arctic currents have frozen these waters into a silent kingdom of ice, where a mighty Frost Serpent coils in the darkness below. The cold here is ancient, predating even the Coral Crown.',
     levelRange: [10, 13],
     enemies: ['orc', 'skeleton', 'dark_mage', 'shadow_bat', 'water_priestess_mage'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #7dd3fc 50%, #bae6fd 100%)',
@@ -688,8 +688,8 @@ export const locations = [
   },
   {
     id: 'dragon_peaks',
-    name: 'Sea Serpent Nest',
-    description: 'Volcanic underwater peaks where young sea serpents nest. The water burns with each breath.',
+    name: "Leviathan's Wake",
+    description: 'Volcanic peaks scarred by the passage of ancient leviathans, where sea drakes nest among the smoldering rock. A Storm Elemental guards a Crown fragment lodged in the volcanic heart.',
     levelRange: [11, 14],
     enemies: ['dragon_whelp', 'orc', 'dark_mage'],
     bgGradient: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #0f766e 100%)',
@@ -708,7 +708,7 @@ export const locations = [
   {
     id: 'ashen_battlefield',
     name: 'Sandy Wastes',
-    description: 'Barren ocean floor littered with the remnants of ancient battles. Scavengers and drifters roam freely.',
+    description: 'A desolate expanse of ocean floor strewn with the bones and shells of warriors who fell in the First Tide War. Scavengers pick through the remains while stone crabs guard buried relics.',
     levelRange: [10, 13],
     enemies: ['orc', 'skeleton', 'dark_mage', 'crow_knight', 'stone_guardian'],
     bgGradient: 'linear-gradient(135deg, #1e3a5f 0%, #475569 50%, #334155 100%)',
@@ -726,8 +726,8 @@ export const locations = [
   },
   {
     id: 'windswept_ridge',
-    name: 'Current Ridge',
-    description: 'A narrow underwater ridge battered by relentless ocean currents. Only the hardiest survive the crossing.',
+    name: 'Riptide Shelf',
+    description: 'A narrow ridge battered by violent riptides that tear through the water with terrifying force. Sea drakes ride the currents overhead while barracuda knights ambush travelers from crevices below.',
     levelRange: [11, 14],
     enemies: ['orc', 'dragon_whelp', 'dark_mage', 'crow_knight'],
     bgGradient: 'linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0c4a6e 100%)',
@@ -745,8 +745,8 @@ export const locations = [
   },
   {
     id: 'molten_core',
-    name: 'Volcanic Core',
-    description: 'Deep volcanic vents where rivers of magma meet the ocean. Superheated water and fire creatures thrive.',
+    name: 'Volcanic Hearth',
+    description: 'Rivers of magma snake beneath the ocean floor, turning the water into a boiling cauldron of fire and steam. Sea drakes are drawn to the volcanic heat, nesting in the molten crevasses.',
     levelRange: [12, 14],
     enemies: ['dragon_whelp', 'orc', 'dark_mage'],
     bgGradient: 'linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #7f1d1d 100%)',
@@ -765,7 +765,7 @@ export const locations = [
   {
     id: 'shadow_forest',
     name: 'Mushroom Forest',
-    description: 'An otherworldly underwater forest of giant fungi corrupted by dark magic. Shadows move with malicious intent.',
+    description: 'Towering fungal growths twist upward from the seafloor, their caps glowing with corrupted bioluminescence. The Corrupted Reef Keeper has turned this once-beautiful forest into a breeding ground for the Abyss King\'s forces.',
     levelRange: [12, 15],
     enemies: ['dark_mage', 'orc', 'skeleton', 'mushroom', 'flying_eye', 'shadow_bat', 'crow_knight'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%)',
@@ -784,8 +784,8 @@ export const locations = [
   },
   {
     id: 'obsidian_wastes',
-    name: 'Obsidian Wastes',
-    description: 'A desolate underwater volcanic wasteland of black glass and ash. Nothing grows here but hatred and toxic vents.',
+    name: 'Obsidian Flats',
+    description: 'A blasted wasteland of volcanic glass and black ash where nothing survives but the Abyss King\'s most hardened warriors. Toxic vents belch poisonous clouds across the desolate seafloor.',
     levelRange: [13, 15],
     enemies: ['orc', 'dark_mage', 'dragon_whelp'],
     bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #020617 100%)',
@@ -804,7 +804,7 @@ export const locations = [
   {
     id: 'ruins_of_ashenmoor',
     name: 'Ruins of the Deep',
-    description: 'The sunken remains of an ancient deep-sea city destroyed by volcanic eruptions. Dark spirits haunt the rubble.',
+    description: 'The crumbling remains of Abyssia\'s greatest city, destroyed when the Coral Crown shattered. Dark spirits haunt the rubble, and ink sorcerers search the ruins for forbidden knowledge.',
     levelRange: [13, 16],
     enemies: ['skeleton', 'dark_mage', 'orc', 'skeleton_knight', 'mimic', 'stone_guardian'],
     bgGradient: 'linear-gradient(135deg, #164e63 0%, #0e7490 50%, #1e293b 100%)',
@@ -823,7 +823,7 @@ export const locations = [
   {
     id: 'blight_hollow',
     name: 'Blight Hollow',
-    description: 'A toxic underwater trench where poisonous chemicals seep from the seafloor. Corrosion and decay consume everything.',
+    description: 'A festering trench where the Abyss King\'s corruption has poisoned the water itself. Toxic chemicals seep from the seafloor, corroding everything they touch and birthing twisted creatures.',
     levelRange: [14, 16],
     enemies: ['dark_mage', 'skeleton', 'orc', 'mushroom', 'skeleton_knight', 'imp'],
     bgGradient: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #042f2e 100%)',
@@ -842,7 +842,7 @@ export const locations = [
   {
     id: 'shadow_citadel',
     name: 'Shadow Citadel',
-    description: 'A fortress of pure darkness on the ocean floor. The Kraken Lich commands undead armies from within its black walls.',
+    description: 'A fortress of living shadow rising from the ocean floor, where the Kraken Lich commands legions of the drowned dead. Within its black walls lies a Crown fragment pulsing with stolen light.',
     levelRange: [14, 17],
     enemies: ['dark_mage', 'dragon_whelp', 'orc'],
     bgGradient: 'linear-gradient(135deg, #0f172a 0%, #020617 50%, #000000 100%)',
@@ -861,7 +861,7 @@ export const locations = [
   {
     id: 'stormspire_peak',
     name: 'Maelstrom Peak',
-    description: 'An underwater mountain summit perpetually caught in a churning maelstrom. Raw elemental energy crackles through the water.',
+    description: 'An underwater summit caught in an eternal churning vortex where raw elemental energy crackles through the water. The maelstrom\'s fury masks the approach to the Abyss King\'s inner territories.',
     levelRange: [14, 17],
     enemies: ['dark_mage', 'dragon_whelp', 'orc', 'skeleton_knight', 'flying_eye', 'crow_knight'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #0369a1 100%)',
@@ -879,8 +879,8 @@ export const locations = [
   },
   {
     id: 'demon_gate',
-    name: 'Leviathan Lair',
-    description: 'A massive underwater cavern where the barrier between worlds grows thin. Sea monsters pour through the cracks.',
+    name: 'Abyssal Gate',
+    description: 'A massive cavern where the barrier between the ocean and the Abyss grows thin, and monstrous creatures pour through the widening cracks. A Leviathan guards the passage with volcanic fury.',
     levelRange: [15, 18],
     enemies: ['dark_mage', 'dragon_whelp', 'orc', 'skeleton_knight', 'crow_knight', 'imp'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #0f172a 100%)',
@@ -898,8 +898,8 @@ export const locations = [
   },
   {
     id: 'abyssal_depths',
-    name: 'Abyssal Trench',
-    description: 'Lightless trenches that plunge into the deepest void. Reality warps in the suffocating darkness.',
+    name: 'Hadal Trench',
+    description: 'Lightless depths where the crushing pressure warps reality itself. The darkness here is alive, reaching out with tendrils of void energy to consume any light that dares enter.',
     levelRange: [16, 18],
     enemies: ['dark_mage', 'orc', 'dragon_whelp', 'shadow_bat', 'mimic'],
     bgGradient: 'linear-gradient(135deg, #020617 0%, #0f172a 50%, #000000 100%)',
@@ -917,8 +917,8 @@ export const locations = [
   },
   {
     id: 'infernal_forge',
-    name: 'Infernal Forge',
-    description: 'A volcanic underwater forge where superheated water meets magma. The hiss of cursed metal echoes endlessly.',
+    name: 'Magma Forge',
+    description: 'A volcanic forge where the Abyss King\'s weapons are tempered in magma and quenched in cursed brine. The endless hiss of superheated metal echoes through the scorching depths.',
     levelRange: [16, 18],
     enemies: ['orc', 'dark_mage', 'dragon_whelp', 'stone_guardian'],
     bgGradient: 'linear-gradient(135deg, #7c2d12 0%, #c2410c 50%, #9a3412 100%)',
@@ -936,8 +936,8 @@ export const locations = [
   },
   {
     id: 'dreadmaw_canyon',
-    name: 'Dreadmaw Canyon',
-    description: 'A massive underwater ravine filled with the bones of ancient sea beasts. The canyon itself seems alive and hungry.',
+    name: 'Dreadmaw Rift',
+    description: 'A yawning rift in the ocean floor filled with the bones of ancient leviathans, its walls lined with razor-sharp coral teeth. The rift pulses like a living maw, hungry for those who enter.',
     levelRange: [17, 19],
     enemies: ['dark_mage', 'orc', 'dragon_whelp', 'crow_knight', 'mimic'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #2e1065 100%)',
@@ -956,7 +956,7 @@ export const locations = [
   {
     id: 'void_threshold',
     name: 'Void Threshold',
-    description: 'The edge of the known ocean. A Void Angler guards the passage to the realm beyond the deepest trenches.',
+    description: 'The edge of the known ocean, where light ends and the Abyss begins. A Void Sentinel stands eternal watch over the passage to the realm beyond, testing all who would challenge the darkness.',
     levelRange: [17, 19],
     enemies: ['dark_mage', 'dragon_whelp', 'orc'],
     bgGradient: 'linear-gradient(135deg, #020617 0%, #0f172a 50%, #000000 100%)',
@@ -975,7 +975,7 @@ export const locations = [
   {
     id: 'corrupted_spire',
     name: 'Corrupted Spire',
-    description: 'A twisted underwater tower of pure evil that rises from the ocean floor. Dark energy radiates from every coral stone.',
+    description: 'A twisted tower of blackened coral that pierces upward from the ocean floor, radiating waves of abyssal corruption. The last Crown fragment pulses faintly within its peak, calling out for rescue.',
     levelRange: [18, 20],
     enemies: ['dark_mage', 'dragon_whelp', 'orc'],
     bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%)',
@@ -993,8 +993,8 @@ export const locations = [
   },
   {
     id: 'void_throne',
-    name: 'Abyssal Throne',
-    description: 'Beyond the deepest trench sits the Abyss King on his throne of darkness. This is the final battle.',
+    name: 'The Abyss Throne',
+    description: 'In the crushing darkness beyond the deepest trench, the Abyss King sits upon a throne of devoured light. Here, where the ocean\'s heart beats its last, the final battle for the Coral Crown begins.',
     levelRange: [18, 20],
     enemies: ['dark_mage', 'dragon_whelp', 'orc'],
     bgGradient: 'linear-gradient(135deg, #020617 0%, #0c4a6e 50%, #000000 100%)',
@@ -1012,8 +1012,8 @@ export const locations = [
   },
   {
     id: 'hall_of_odin',
-    name: 'Temple of Poseidon',
-    description: 'The grand underwater temple where Poseidon, Lord of Tides, awaits those who dare challenge divine authority. Only true Crusade champions may enter.',
+    name: 'Temple of Tides',
+    description: 'A grand temple of pearl and gold where Poseidon, Lord of Tides, holds dominion over the ocean\'s currents. Only true Crusade champions may enter these hallowed waters and challenge divine authority.',
     levelRange: [20, 20],
     enemies: ['dark_mage', 'orc'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #0c4a6e 100%)',
@@ -1035,8 +1035,8 @@ export const locations = [
   },
   {
     id: 'maw_of_madra',
-    name: 'Maw of Charybdis',
-    description: 'A churning whirlpool of blood and shadow where Charybdis, The Devourer, feasts on mortal souls. Only those who conquered the Legion may survive.',
+    name: "The Devourer's Maw",
+    description: 'A churning whirlpool of blood and shadow where Charybdis, The Devourer, feasts on the souls of the fallen. Only those who conquered the Legion\'s mightiest champions may survive the descent into her maw.',
     levelRange: [20, 20],
     enemies: ['dark_mage', 'skeleton'],
     bgGradient: 'linear-gradient(135deg, #450a0a 0%, #be123c 50%, #450a0a 100%)',
@@ -1058,8 +1058,8 @@ export const locations = [
   },
   {
     id: 'sanctum_of_omni',
-    name: 'Sanctum of the Leviathan',
-    description: 'A realm beyond mortal comprehension where The Leviathan, Weaver of Currents, reshapes the ocean at will. Only Fabled champions may challenge destiny.',
+    name: 'Leviathan Sanctum',
+    description: 'A realm beyond mortal comprehension where The Leviathan, Weaver of Currents, reshapes the ocean at will. Only Fabled champions may enter this sanctum and challenge the weaver of destiny itself.',
     levelRange: [20, 20],
     enemies: ['dark_mage', 'dragon_whelp'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #7c3aed 50%, #1e1b4b 100%)',

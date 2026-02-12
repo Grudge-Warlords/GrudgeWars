@@ -9,19 +9,29 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Races:** Blue Veil (blue_betta), Crimson Fang (red_betta), Mystic Fin (purple_betta), Ghost Tide (white_betta), Reef Striker (green_betta), Crown Tail (gold_betta), Ember Scale (orange_betta), Coral Dancer (pink_betta)
 - **Currency:** Pearls (formerly gold)
 - **Resources:** Coral (wood), Shells (ore), Algae (herbs), Crystals, Pearls
-- **Enemies:** Sea creatures (Puffer Scout, Barracuda, Ink Sorcerer, Sea Serpent, Kraken Lich, etc.)
-- **Locations:** 32 underwater zones (Coral Shallows, Kelp Forest, Abyssal Trench, Volcanic Core, etc.)
+- **Enemies:** Sea creatures (Reef Bandit, Mantis Shrimp, Ink Sorcerer, Hammerhead Brute, Kraken Lich, Sea Drake, Leviathan, etc.)
+- **Locations:** 32 underwater zones (Coral Shallows, Kelp Forest, Sunken Citadel, Hadal Trench, Volcanic Hearth, Leviathan's Wake, etc.)
 - **Cities:** Reef Camp, Shell Fortress, Ink Haven, Vent City, Crystal Spire
 - **Final Boss:** The Abyss King (formerly The Void King)
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
-- **2026-02-12:** Expanded betta species from 6 to 8 with dedicated fish sprites
-  - Added Ember Scale (orange_betta) and Coral Dancer (pink_betta) races with full stats, lore, and portraits
-  - Split fish sprite sheet into per-color animation strips (48×48 frames, 3-frame animations)
-  - Updated spriteMap.js with fish sprite definitions for all 8 species
+- **2026-02-12:** Major update - fish sprite improvements, new world map, complete lore overhaul
+  - Fixed fish sprite bottom cutoff by adding overflow:visible and swim padding to SpriteAnimation
+  - Added smooth swimming bobbing animation (fishBob/fishSwim CSS keyframes) for all fish sprites
+  - Slowed fish idle/walk animation speed for natural swimming feel
+  - Added `swimming: true` flag to all fish sprite definitions for automatic animation behavior
+  - Replaced world map background with new underwater crystal/coral temple scene
+  - Repositioned all 32 location nodes and 5 cities for new map layout
+  - Updated terrain regions to match new map geography
+  - Complete lore overhaul: "The Sunken Kingdom of Abyssia" story framework
+  - Rewrote all 32 location descriptions with underwater atmosphere and Coral Crown narrative
+  - Renamed locations to fit underwater theme (Sunken Citadel, Leviathan's Wake, Hadal Trench, etc.)
+  - Updated all enemy display names to sea creatures (Reef Bandit, Mantis Shrimp, Hammerhead Brute, etc.)
+  - Rewrote all mission and arena templates with underwater lore
+  - Expanded from 6 to 8 betta species with dedicated fish sprites
+  - Added Ember Scale (orange_betta) and Coral Dancer (pink_betta) races
   - Updated all UI text to reflect "8 Species / 32 Warlord Combinations"
-  - Fixed RACE_BG mappings and fallbacks across CharacterCreate and HeroCreate
 - **2026-02-11:** Complete re-theme from medieval fantasy to underwater betta fish ocean adventure
   - Generated 30+ AI ocean backgrounds and 20+ underwater map node images
   - Re-themed all 6 races to betta fish species with new portraits

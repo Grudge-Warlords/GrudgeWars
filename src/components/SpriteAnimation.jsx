@@ -32,9 +32,20 @@ function injectOverlayStyles() {
       0% { background-position: -100% 0; }
       100% { background-position: 200% 0; }
     }
+    @keyframes fishBob {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-3px) rotate(1.5deg); }
+      50% { transform: translateY(0px) rotate(0deg); }
+      75% { transform: translateY(3px) rotate(-1.5deg); }
+    }
+    @keyframes fishSwim {
+      0%, 100% { transform: translateY(-1px) rotate(2deg); }
+      50% { transform: translateY(1px) rotate(-2deg); }
+    }
   `;
   document.head.appendChild(style);
 }
+injectOverlayStyles();
 
 function EquipmentOverlay({ slot, color, tier, displayWidth, displayHeight }) {
   const region = EQUIPMENT_OVERLAY_REGIONS[slot];
@@ -102,6 +113,10 @@ export default function SpriteAnimation({
 
   const anim = spriteData?.[animation] || spriteData?.idle;
   const totalFrames = anim?.frames || 1;
+  const isSwimmingSprite = spriteData?.swimming;
+  const effectiveSpeed = isSwimmingSprite && (animation === 'idle' || animation === 'walk')
+    ? Math.max(speed, 280)
+    : speed;
 
   useEffect(() => {
     if (prevAnimRef.current !== animation) {
@@ -126,9 +141,9 @@ export default function SpriteAnimation({
         }
       }
       setFrame(f);
-    }, speed);
+    }, effectiveSpeed);
     return () => clearInterval(intervalRef.current);
-  }, [animation, totalFrames, loop, speed]);
+  }, [animation, totalFrames, loop, effectiveSpeed]);
 
   if (!anim) return null;
 
@@ -157,17 +172,27 @@ export default function SpriteAnimation({
       ));
   }, [equipmentOverlays, displayWidth, displayHeight]);
 
+  const isSwimming = spriteData?.swimming;
+  const swimPadding = isSwimming ? Math.round(frameHeight * scale * 0.15) : 0;
+  const containerHeight = displayHeight + swimPadding;
+
   return (
     <div style={{
       width: displayWidth,
-      height: displayHeight,
-      overflow: 'hidden',
+      height: containerHeight,
+      overflow: 'visible',
       imageRendering: 'pixelated',
       transform: flip ? 'scaleX(-1)' : 'none',
       position: 'relative',
       mixBlendMode: blendMode,
       outline: 'none',
       border: 'none',
+      ...(isSwimming && animation === 'idle' ? {
+        animation: 'fishBob 2.4s ease-in-out infinite',
+      } : {}),
+      ...(isSwimming && animation === 'walk' ? {
+        animation: 'fishSwim 1.6s ease-in-out infinite',
+      } : {}),
     }}>
       <div style={{
         width: displayWidth,
