@@ -32,21 +32,22 @@ function GameApp() {
   const clearMessage = useGameStore(s => s.clearMessage);
   const pendingLoot = useGameStore(s => s.pendingLoot);
 
-  const [ready, setReady] = useState(isReady());
+  const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState({ loaded: 0, total: 1 });
   const prevScreenRef = useRef(screen);
   const [transitioning, setTransitioning] = useState(false);
   const [transitionPhase, setTransitionPhase] = useState('none');
 
   useEffect(() => {
-    if (isReady()) {
-      setReady(true);
-      return;
-    }
+    const minTime = new Promise(r => setTimeout(r, 3000));
 
-    startPreload((loaded, total) => {
-      setProgress({ loaded, total });
-    }).then(() => {
+    const loadAssets = isReady()
+      ? (() => { setProgress({ loaded: 1, total: 1 }); return Promise.resolve(); })()
+      : startPreload((loaded, total) => {
+          setProgress({ loaded, total });
+        });
+
+    Promise.all([minTime, loadAssets]).then(() => {
       setReady(true);
     });
   }, []);

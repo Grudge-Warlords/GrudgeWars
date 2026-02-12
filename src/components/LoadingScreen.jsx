@@ -1,7 +1,18 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 export default function LoadingScreen({ progress = 0, total = 1, message = 'Loading...' }) {
   const pct = total > 0 ? Math.round((progress / total) * 100) : 0;
+  const videoRef = useRef(null);
+  const [videoReady, setVideoReady] = useState(false);
+
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.play().catch(() => {
+      vid.muted = true;
+      vid.play().catch(() => {});
+    });
+  }, []);
 
   return (
     <div style={{
@@ -10,17 +21,39 @@ export default function LoadingScreen({ progress = 0, total = 1, message = 'Load
       alignItems: 'center', justifyContent: 'center',
       background: '#020a18', overflow: 'hidden'
     }}>
+      <video
+        ref={videoRef}
+        src="/videos/loading.mp4"
+        muted
+        loop
+        playsInline
+        preload="auto"
+        onCanPlay={() => setVideoReady(true)}
+        style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          minWidth: '100%', minHeight: '100%',
+          width: 'auto', height: 'auto',
+          objectFit: 'cover',
+          opacity: videoReady ? 0.75 : 0,
+          transition: 'opacity 0.6s ease',
+        }}
+      />
+
       <div style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
         backgroundImage: 'url(/images/loading-1.gif)',
         backgroundSize: 'cover', backgroundPosition: 'center',
-        opacity: 0.7,
+        opacity: videoReady ? 0 : 0.7,
+        transition: 'opacity 0.6s ease',
       }} />
+
       <div style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-        background: 'rgba(5,10,21,0.4)',
+        background: 'linear-gradient(180deg, rgba(4,18,37,0.3) 0%, rgba(2,10,24,0.5) 100%)',
         pointerEvents: 'none'
       }} />
+
       <div style={{
         position: 'relative', zIndex: 1, textAlign: 'center',
         animation: 'fadeIn 0.5s ease'
