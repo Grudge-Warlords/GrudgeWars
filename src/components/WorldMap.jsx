@@ -35,6 +35,108 @@ const bossMapSprites = {
   god_omni: { glow: 'rgba(167,139,250,0.8)', terrain: '/backgrounds/ocean_palace.png', shape: 'godgate', effect: 'void', color1: '#a8f', color2: '#508' },
 };
 
+function MapBubbles({ locationPositions, heroZonePos, activeEvents }) {
+  const [bubbles, setBubbles] = useState([]);
+  const rafRef = useRef(null);
+  const bubblesRef = useRef([]);
+  const frameCount = useRef(0);
+
+  useEffect(() => {
+    const sources = [];
+
+    Object.values(locationPositions).forEach(pos => {
+      sources.push({ x: pos.x, y: pos.y, rate: 0.008, sizeMin: 0.15, sizeMax: 0.4 });
+    });
+
+    if (heroZonePos) {
+      sources.push({ x: heroZonePos.x, y: heroZonePos.y, rate: 0.04, sizeMin: 0.2, sizeMax: 0.5, hero: true });
+    }
+
+    (activeEvents || []).forEach(ev => {
+      const pos = locationPositions[ev.locationId];
+      if (pos) {
+        sources.push({ x: pos.x + 3, y: pos.y - 1, rate: 0.025, sizeMin: 0.18, sizeMax: 0.45, event: true });
+      }
+    });
+
+    for (let i = 0; i < 40; i++) {
+      sources.push({
+        x: Math.random() * 100, y: Math.random() * 100,
+        rate: 0.003, sizeMin: 0.1, sizeMax: 0.3, ambient: true,
+      });
+    }
+
+    let lastTime = performance.now();
+
+    const tick = (now) => {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+      frameCount.current++;
+
+      sources.forEach(src => {
+        if (Math.random() < src.rate) {
+          const size = src.sizeMin + Math.random() * (src.sizeMax - src.sizeMin);
+          bubblesRef.current.push({
+            id: now + Math.random(),
+            x: src.x + (Math.random() - 0.5) * (src.ambient ? 0 : 3),
+            y: src.y,
+            size,
+            opacity: 0.15 + Math.random() * 0.35,
+            speed: 1.5 + Math.random() * 2.5,
+            wobbleSpeed: 0.5 + Math.random() * 1.5,
+            wobbleAmp: 0.3 + Math.random() * 0.6,
+            phase: Math.random() * Math.PI * 2,
+            life: 0,
+            hero: src.hero,
+            event: src.event,
+          });
+        }
+      });
+
+      bubblesRef.current.forEach(b => {
+        b.life += dt;
+        b.y -= b.speed * dt;
+        b.x += Math.sin(b.life * b.wobbleSpeed + b.phase) * b.wobbleAmp * dt;
+      });
+
+      bubblesRef.current = bubblesRef.current.filter(b => b.y > -5 && b.life < 30);
+
+      if (bubblesRef.current.length > 300) {
+        bubblesRef.current = bubblesRef.current.slice(-300);
+      }
+
+      if (frameCount.current % 3 === 0) {
+        setBubbles([...bubblesRef.current]);
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [heroZonePos?.x, heroZonePos?.y, activeEvents?.length]);
+
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none"
+      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: MAP_LAYERS.EFFECTS }}>
+      {bubbles.map(b => {
+        const fadeIn = Math.min(1, b.life * 3);
+        const alpha = b.opacity * fadeIn * (b.y > 0 ? 1 : Math.max(0, 1 + b.y / 5));
+        return (
+          <circle key={b.id}
+            cx={b.x} cy={b.y} r={b.size}
+            fill="none"
+            stroke={b.hero ? 'rgba(34,211,238,0.6)' : b.event ? 'rgba(251,191,36,0.5)' : 'rgba(125,211,252,0.4)'}
+            strokeWidth={0.08}
+            opacity={alpha}
+          />
+        );
+      })}
+    </svg>
+  );
+}
 
 const locationPositions = {
   verdant_plains:     { x: 8,  y: 88 },
@@ -1370,6 +1472,32 @@ export default function WorldMap() {
           background: 'rgba(255,180,80,0.03)',
           animation: 'dayNightCycle 120s linear infinite',
         })} />
+
+        <div style={fullCoverStyle(MAP_LAYERS.TERRAIN_FILL, {
+          background: 'linear-gradient(180deg, rgba(6,182,212,0.06) 0%, rgba(4,18,37,0.12) 40%, rgba(4,18,37,0.25) 100%)',
+          pointerEvents: 'none',
+        })} />
+
+        <div style={fullCoverStyle(MAP_LAYERS.TERRAIN_FILL, {
+          background: 'radial-gradient(ellipse at 30% 20%, rgba(34,211,238,0.04), transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(168,85,247,0.03), transparent 50%)',
+          pointerEvents: 'none',
+        })} />
+
+        <div className="map-light-rays" style={fullCoverStyle(MAP_LAYERS.TERRAIN_FILL, {
+          pointerEvents: 'none', overflow: 'hidden',
+        })} />
+
+        <div className="map-caustics" style={fullCoverStyle(MAP_LAYERS.TERRAIN_FILL, {
+          pointerEvents: 'none', overflow: 'hidden', opacity: 0.04,
+        })} />
+
+        <MapBubbles locationPositions={locationPositions} heroZonePos={(() => {
+          const basePos = (() => {
+            const nodePos = locationPositions[currentZone] || cityPositions[currentZone];
+            return nodePos || locationPositions.verdant_plains;
+          })();
+          return isPathing ? heroPos : basePos;
+        })()} activeEvents={randomEvents} />
 
         {showDebugGrid && (
           <svg {...svgOverlayProps(MAP_LAYERS.DEBUG_GRID)}>
@@ -3704,6 +3832,48 @@ export default function WorldMap() {
           @keyframes bossFlashIn {
             0% { opacity: 1; }
             100% { opacity: 0; }
+          }
+
+          .map-light-rays::before,
+          .map-light-rays::after {
+            content: '';
+            position: absolute;
+            top: -20%;
+            width: 12%;
+            height: 120%;
+            background: linear-gradient(180deg, rgba(34,211,238,0.06) 0%, transparent 80%);
+            transform: rotate(15deg);
+            animation: mapLightRaySway 12s ease-in-out infinite;
+          }
+          .map-light-rays::before {
+            left: 20%;
+            animation-delay: 0s;
+          }
+          .map-light-rays::after {
+            left: 55%;
+            width: 8%;
+            animation-delay: -5s;
+            background: linear-gradient(180deg, rgba(34,211,238,0.04) 0%, transparent 70%);
+            transform: rotate(10deg);
+          }
+          @keyframes mapLightRaySway {
+            0%, 100% { transform: rotate(12deg) translateX(0); opacity: 0.7; }
+            50% { transform: rotate(18deg) translateX(3%); opacity: 1; }
+          }
+
+          .map-caustics {
+            background:
+              radial-gradient(ellipse at 25% 30%, rgba(34,211,238,0.3), transparent 25%),
+              radial-gradient(ellipse at 60% 50%, rgba(34,211,238,0.2), transparent 20%),
+              radial-gradient(ellipse at 40% 70%, rgba(34,211,238,0.25), transparent 22%),
+              radial-gradient(ellipse at 75% 25%, rgba(34,211,238,0.2), transparent 18%),
+              radial-gradient(ellipse at 15% 60%, rgba(34,211,238,0.15), transparent 20%);
+            animation: mapCausticsShift 20s ease-in-out infinite;
+          }
+          @keyframes mapCausticsShift {
+            0%, 100% { background-position: 0% 0%, 10% 5%, 5% 0%, 0% 10%, 8% 3%; }
+            33% { background-position: 3% 2%, 7% 8%, 8% 3%, 2% 6%, 5% 7%; }
+            66% { background-position: 5% 5%, 3% 3%, 2% 6%, 6% 2%, 3% 5%; }
           }
         `}</style>
 
