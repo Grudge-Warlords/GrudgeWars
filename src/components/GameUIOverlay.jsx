@@ -350,8 +350,8 @@ export default function GameUIOverlay({
           <div ref={chatLogRef} className="ui-chat-scroll">
             {chatLog.length > 0 ? chatLog.slice(-8).map(entry => (
               <div key={entry.id} style={{ marginBottom: 2 }}>
-                <span style={{ fontWeight: 700, color: entry.color || '#c5a059', marginRight: 4, fontSize: '0.6rem', textTransform: 'uppercase' }}>{entry.speaker}</span>
-                <span style={{ color: '#ccc', fontWeight: 400 }}>{entry.line}</span>
+                <span style={{ fontWeight: 700, color: entry.color || '#c5a059', marginRight: 4, fontSize: '0.75rem', textTransform: 'uppercase' }}>{entry.speaker}</span>
+                <span style={{ color: '#ccc', fontWeight: 400, fontSize: '0.82rem' }}>{entry.line}</span>
               </div>
             )) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '0.6rem', color: '#555', fontStyle: 'italic' }}>Your party is quiet...</div>

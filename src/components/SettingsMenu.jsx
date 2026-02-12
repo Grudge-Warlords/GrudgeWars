@@ -98,8 +98,8 @@ export default function SettingsMenu() {
       <button
         onClick={() => { setOpen(!open); setConfirmReset(false); }}
         style={{
-          position: 'fixed', bottom: 16, left: 16, zIndex: 10700,
-          width: 40, height: 40, borderRadius: '50%',
+          position: 'fixed', top: 60, left: 16, zIndex: 10700,
+          width: 34, height: 34, borderRadius: '50%',
           background: open ? 'rgba(110,231,183,0.2)' : 'rgba(14,22,48,0.7)',
           border: `1px solid ${open ? 'var(--accent)' : 'rgba(255,255,255,0.12)'}`,
           color: open ? 'var(--accent)' : 'rgba(255,255,255,0.6)',
@@ -115,7 +115,7 @@ export default function SettingsMenu() {
 
       {open && (
         <div ref={panelRef} style={{
-          position: 'fixed', bottom: 116, left: 16, zIndex: 10701,
+          position: 'fixed', top: 100, left: 16, zIndex: 10701,
           width: 280,
           backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
           border: '1px solid rgba(110,231,183,0.25)',

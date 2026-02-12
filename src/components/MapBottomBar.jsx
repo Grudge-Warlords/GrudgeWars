@@ -386,13 +386,13 @@ export default function MapBottomBar({
           </div>
           <div ref={chatLogRef} style={{
             flex: 1, overflowY: 'auto', padding: '2px 8px',
-            fontSize: '0.65rem', lineHeight: 1.5,
+            fontSize: '0.82rem', lineHeight: 1.5,
             scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,215,0,0.15) transparent',
           }}>
             {chatLog.length > 0 ? chatLog.slice(-8).map(entry => (
               <div key={entry.id} style={{ marginBottom: 2 }}>
-                <span style={{ fontWeight: 700, color: entry.color, marginRight: 4, fontSize: '0.6rem', textTransform: 'uppercase' }}>{entry.speaker}</span>
-                <span style={{ color: 'rgba(226,232,240,0.8)', fontWeight: 400 }}>{entry.line}</span>
+                <span style={{ fontWeight: 700, color: entry.color, marginRight: 4, fontSize: '0.75rem', textTransform: 'uppercase' }}>{entry.speaker}</span>
+                <span style={{ color: 'rgba(226,232,240,0.9)', fontWeight: 400 }}>{entry.line}</span>
               </div>
             )) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '0.6rem', color: 'rgba(148,163,184,0.3)', fontStyle: 'italic' }}>Your party is quiet...</div>
@@ -409,7 +409,7 @@ export default function MapBottomBar({
                 flex: 1, background: 'rgba(0,0,0,0.4)',
                 border: '1px solid rgba(255,215,0,0.1)',
                 borderRadius: 4, padding: '3px 6px',
-                color: 'rgba(226,232,240,0.9)', fontSize: '0.6rem',
+                color: 'rgba(226,232,240,0.9)', fontSize: '0.75rem',
                 fontFamily: "'Jost', sans-serif", outline: 'none', minWidth: 0,
               }}
               onFocus={(e) => e.target.style.borderColor = 'rgba(255,215,0,0.3)'}

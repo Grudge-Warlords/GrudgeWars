@@ -599,6 +599,7 @@ export default function WorldMap() {
   const [routePoints, setRoutePoints] = useState([]);
   const paintingRouteRef = useRef(false);
   const [roadWidth, setRoadWidth] = useState(2.5);
+  const [showRoads, setShowRoads] = useState(true);
   const [editRoutes, setEditRoutes] = useState(() => {
     try {
       const stored = JSON.parse(localStorage.getItem('mapEditRoutes') || '[]');
@@ -1649,7 +1650,7 @@ export default function WorldMap() {
                 <feComposite in="SourceGraphic" in2="softEdge" operator="in" />
               </filter>
             </defs>
-            {editRoutes.length === 0 && defaultRoads.map((road, roadIdx) => {
+            {showRoads && editRoutes.length === 0 && defaultRoads.map((road, roadIdx) => {
               if (!road.points || road.points.length < 2) return null;
               const w = road.width || 2.5;
               const d = road.points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
@@ -1684,7 +1685,7 @@ export default function WorldMap() {
                 </g>
               );
             })}
-            {editRoutes.map((road, roadIdx) => {
+            {showRoads && editRoutes.map((road, roadIdx) => {
               if (!road.points || road.points.length < 2) return null;
               const w = road.width || 2.5;
               const d = road.points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
@@ -2316,33 +2317,33 @@ export default function WorldMap() {
             transform: 'translateY(-50%)',
             zIndex: MAP_LAYERS.POPUPS,
             backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
-            border: `2px solid ${locationIcons[selectedLoc.id]?.color || 'var(--accent)'}`,
-            borderRadius: 14,
+            border: `1.5px solid ${locationIcons[selectedLoc.id]?.color || 'var(--accent)'}`,
+            borderRadius: 10,
             padding: 0,
-            width: 260,
-            maxHeight: '70vh', overflowY: 'auto',
-            boxShadow: `0 8px 40px rgba(0,0,0,0.8), 0 0 20px ${locationIcons[selectedLoc.id]?.glow || 'rgba(110,231,183,0.2)'}`,
+            width: 190,
+            maxHeight: '60vh', overflowY: 'auto',
+            boxShadow: `0 4px 20px rgba(0,0,0,0.8), 0 0 12px ${locationIcons[selectedLoc.id]?.glow || 'rgba(110,231,183,0.2)'}`,
             ...popupPositionStyle(selectedLoc.id),
           }}>
             <div style={{
-              padding: '14px 16px 10px',
+              padding: '8px 10px 6px',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
               background: `linear-gradient(135deg, ${locationIcons[selectedLoc.id]?.glow || 'rgba(0,0,0,0.2)'}, transparent)`,
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <img src={locationIcons[selectedLoc.id]?.img} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: `1px solid ${locationIcons[selectedLoc.id]?.color || 'var(--accent)'}` }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                <img src={locationIcons[selectedLoc.id]?.img} alt="" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: `1px solid ${locationIcons[selectedLoc.id]?.color || 'var(--accent)'}` }} />
                 <div>
-                  <div className="font-cinzel" style={{ color: '#fff', fontSize: '0.95rem', fontWeight: 700 }}>
+                  <div className="font-cinzel" style={{ color: '#fff', fontSize: '0.72rem', fontWeight: 700 }}>
                     {selectedLoc.name}
                   </div>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>
-                    Level {selectedLoc.levelRange[0]}-{selectedLoc.levelRange[1]}
-                    {isCleared && <span style={{ color: 'var(--gold)', marginLeft: 6 }}>Cleared</span>}
+                  <div style={{ fontSize: '0.5rem', color: 'var(--muted)' }}>
+                    Lv.{selectedLoc.levelRange[0]}-{selectedLoc.levelRange[1]}
+                    {isCleared && <span style={{ color: 'var(--gold)', marginLeft: 4 }}>Cleared</span>}
                   </div>
                 </div>
               </div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--muted)', lineHeight: 1.4 }}>
-                {selectedLoc.description}
+              <div style={{ fontSize: '0.55rem', color: 'var(--muted)', lineHeight: 1.3 }}>
+                {selectedLoc.description?.length > 80 ? selectedLoc.description.slice(0, 80) + '...' : selectedLoc.description}
               </div>
               {(() => {
                 const selConquer = (zoneConquer || {})[selectedLoc.id] || 0;
@@ -2351,11 +2352,11 @@ export default function WorldMap() {
                 const harvestMod = Math.floor((selConquer / 100) * 300);
                 return (
                   <div style={{ marginTop: 8 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-                      <span style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>Conquered</span>
-                      <span style={{ fontSize: '0.6rem', fontWeight: 700, color: selConquer >= 100 ? 'var(--gold)' : locationIcons[selectedLoc.id]?.color }}>{selConquer}%</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                      <span style={{ fontSize: '0.5rem', color: 'var(--muted)' }}>Conquered</span>
+                      <span style={{ fontSize: '0.5rem', fontWeight: 700, color: selConquer >= 100 ? 'var(--gold)' : locationIcons[selectedLoc.id]?.color }}>{selConquer}%</span>
                     </div>
-                  <div style={{ height: 6, background: 'rgba(0,0,0,0.4)', borderRadius: 3, overflow: 'visible', position: 'relative' }}>
+                  <div style={{ height: 4, background: 'rgba(0,0,0,0.4)', borderRadius: 2, overflow: 'visible', position: 'relative' }}>
                     <div style={{
                       height: '100%', width: `${selConquer}%`, borderRadius: 3,
                       background: selConquer >= 100
@@ -2380,7 +2381,7 @@ export default function WorldMap() {
               })()}
             </div>
 
-            <div style={{ padding: '6px 8px' }}>
+            <div style={{ padding: '4px 6px' }}>
               {(() => {
                 const menuItems = [];
                 let idx = 1;
@@ -2388,60 +2389,60 @@ export default function WorldMap() {
 
                 menuItems.push({ key: idx++, props: {
                   iconSrc: '/sprites/ui/icons/icon_crossed_swords.png',
-                  label: 'Hunt Monsters', sublabel: `Fight Lv.${selectedLoc.levelRange[0]}-${selectedLoc.levelRange[1]} enemies`,
-                  color: 'var(--accent)', onClick: () => handleBattle(selectedLoc.id),
+                  label: 'Hunt Monsters', sublabel: `Lv.${selectedLoc.levelRange[0]}-${selectedLoc.levelRange[1]}`,
+                  color: 'var(--accent)', onClick: () => handleBattle(selectedLoc.id), compact: true,
                 }});
 
                 if (selectedLoc.boss && !bossDefeated) {
                   menuItems.push({ key: idx++, props: {
                     iconSrc: locationIcons[selectedLoc.id]?.img,
-                    label: 'Challenge Boss', sublabel: `Defeat the ${selectedLoc.boss.replace(/_/g, ' ')}`,
-                    color: '#ef4444', onClick: () => handleBoss(selectedLoc.id, selectedLoc.boss), glow: true,
+                    label: 'Challenge Boss', sublabel: selectedLoc.boss.replace(/_/g, ' '),
+                    color: '#ef4444', onClick: () => handleBoss(selectedLoc.id, selectedLoc.boss), glow: true, compact: true,
                   }});
                 }
 
                 menuItems.push({ key: idx++, props: {
                   iconSrc: '/backgrounds/trade_day.png',
-                  label: 'Rest at Inn', sublabel: `Heal party (${level * 5}g)`,
-                  color: '#60a5fa', onClick: handleRest,
+                  label: 'Rest', sublabel: `${level * 5}g`,
+                  color: '#60a5fa', onClick: handleRest, compact: true,
                 }});
 
                 menuItems.push({ key: idx++, props: {
                   iconSrc: locationIcons[selectedLoc.id]?.img,
-                  label: 'Visit Location', sublabel: 'Explore this area',
-                  color: '#c084fc', onClick: () => { enterLocation(selectedLoc.id); setSelectedLocation(null); },
+                  label: 'Visit', sublabel: 'Explore',
+                  color: '#c084fc', onClick: () => { enterLocation(selectedLoc.id); setSelectedLocation(null); }, compact: true,
                 }});
 
                 if (selectedLoc.levelRange && selectedLoc.levelRange[0] >= 8) {
                   menuItems.push({ key: idx++, props: {
-                    icon: 'castle', label: 'Enter Dungeon', sublabel: 'Multi-fight challenge',
+                    icon: 'castle', label: 'Dungeon', sublabel: 'Multi-fight',
                     color: '#f97316', onClick: () => {
                       setSelectedLocation(null);
                       useGameStore.getState().startDungeon(selectedLoc.id);
-                    },
+                    }, compact: true,
                   }});
                 }
 
                 if (!selectedLoc.isCity) {
                   menuItems.push({ key: idx++, props: {
-                    icon: '🌾', label: 'Explore Field', sublabel: 'Roam the open terrain',
+                    icon: '🌾', label: 'Field', sublabel: 'Roam terrain',
                     color: '#6ee7b3', onClick: () => {
                       setSelectedLocation(null);
                       enterScene('field', selectedLoc.id);
-                    },
+                    }, compact: true,
                   }});
                 }
 
                 if (isConquered) {
                   menuItems.push({ key: idx++, props: {
-                    icon: 'gold', label: 'Trade Goods', sublabel: 'Buy/Sell items here',
-                    color: '#fbbf24', onClick: () => setCitySubmenu('trade'),
+                    icon: 'gold', label: 'Trade', sublabel: 'Buy/Sell',
+                    color: '#fbbf24', onClick: () => setCitySubmenu('trade'), compact: true,
                   }});
                   menuItems.push({ key: idx++, props: {
-                    icon: 'scroll', label: 'Unlock Weapon', sublabel: 'Rare weapon master unlock',
+                    icon: 'scroll', label: 'Weapon', sublabel: 'Unlock rare',
                     color: '#f59e0b', onClick: () => {
                       setGameMessage(`The masters of ${selectedLoc.name} have unlocked a legendary weapon path for you!`);
-                    },
+                    }, compact: true,
                   }});
                 }
 
@@ -2449,9 +2450,9 @@ export default function WorldMap() {
                   <>
                     {selectedLoc.boss && bossDefeated && (
                       <div style={{
-                        padding: '6px 10px', margin: '4px 0', borderRadius: 8,
+                        padding: '3px 6px', margin: '2px 0', borderRadius: 6,
                         background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
-                        color: 'var(--success)', fontSize: '0.7rem', textAlign: 'center',
+                        color: 'var(--success)', fontSize: '0.55rem', textAlign: 'center',
                         fontFamily: "'Cinzel', serif", fontWeight: 600,
                       }}>Boss Defeated</div>
                     )}
@@ -2464,11 +2465,11 @@ export default function WorldMap() {
             </div>
 
             <div style={{
-              padding: '5px 16px 8px', borderTop: '1px solid rgba(255,255,255,0.05)',
+              padding: '3px 8px 5px', borderTop: '1px solid rgba(255,255,255,0.05)',
               textAlign: 'center',
             }}>
-              <span style={{ fontSize: '0.5rem', color: 'rgba(150,150,170,0.3)', fontFamily: "'Cinzel', serif" }}>
-                Press 1-{selectedLoc?.boss && !bossDefeated ? '4' : '3'} &bull; Esc to close
+              <span style={{ fontSize: '0.4rem', color: 'rgba(150,150,170,0.3)', fontFamily: "'Cinzel', serif" }}>
+                1-{selectedLoc?.boss && !bossDefeated ? '4' : '3'} &bull; Esc
               </span>
             </div>
           </div>,
@@ -2607,64 +2608,64 @@ export default function WorldMap() {
               transform: 'translateY(-50%)',
               zIndex: MAP_LAYERS.POPUPS,
               backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
-              border: '2px solid #4ade80',
-              borderRadius: 14,
+              border: '1.5px solid #4ade80',
+              borderRadius: 10,
               padding: 0,
-              width: 280,
-              maxHeight: '70vh', overflowY: 'auto',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.8), 0 0 20px rgba(74,222,128,0.3)',
+              width: 200,
+              maxHeight: '60vh', overflowY: 'auto',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.8), 0 0 12px rgba(74,222,128,0.3)',
               ...popupPositionStyle(city.id),
             }}>
               <div style={{
-                padding: '14px 16px 10px',
+                padding: '8px 10px 6px',
                 borderBottom: '1px solid rgba(255,255,255,0.08)',
                 background: 'linear-gradient(135deg, rgba(74,222,128,0.15), transparent)',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <span style={{ fontSize: '1.4rem' }}>{city.icon}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                  <span style={{ fontSize: '1rem' }}>{city.icon}</span>
                   <div>
-                    <div className="font-cinzel" style={{ color: '#4ade80', fontSize: '0.95rem', fontWeight: 700 }}>
+                    <div className="font-cinzel" style={{ color: '#4ade80', fontSize: '0.72rem', fontWeight: 700 }}>
                       {city.name}
                     </div>
-                    <div style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>City</div>
+                    <div style={{ fontSize: '0.5rem', color: 'var(--muted)' }}>City</div>
                   </div>
                 </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--muted)', lineHeight: 1.4 }}>
-                  {city.description}
+                <div style={{ fontSize: '0.55rem', color: 'var(--muted)', lineHeight: 1.3 }}>
+                  {city.description?.length > 80 ? city.description.slice(0, 80) + '...' : city.description}
                 </div>
               </div>
 
               {!citySubmenu && (
-                <div style={{ padding: '8px' }}>
+                <div style={{ padding: '4px 6px' }}>
                   <MenuButton
-                    icon="🏟️" label="Arena" sublabel={`${cityArenas.length} challenge${cityArenas.length !== 1 ? 's' : ''} available`}
+                    icon="🏟️" label="Arena" sublabel={`${cityArenas.length} available`}
                     color="#f97316" onClick={() => setCitySubmenu('arena')}
-                    disabled={cityArenas.length === 0}
+                    disabled={cityArenas.length === 0} compact
                   />
                   <MenuButton
-                    icon="scroll" label="Missions" sublabel={`${cityMissions.length} mission${cityMissions.length !== 1 ? 's' : ''} available`}
+                    icon="scroll" label="Missions" sublabel={`${cityMissions.length} available`}
                     color="#c084fc" onClick={() => setCitySubmenu('missions')}
-                    disabled={cityMissions.length === 0}
+                    disabled={cityMissions.length === 0} compact
                   />
                   <MenuButton
-                    icon="gold" label="Trading Post" sublabel="Visit the marketplace"
+                    icon="gold" label="Trade" sublabel="Marketplace"
                     color="var(--gold)" onClick={() => {
                       setSelectedCity(null);
                       setCitySubmenu(null);
                       enterScene('trading', 'world');
-                    }}
+                    }} compact
                   />
                   <MenuButton
-                    icon="🏨" label="Rest" sublabel={`Heal party (${city.innCost}g)`}
+                    icon="🏨" label="Rest" sublabel={`${city.innCost}g`}
                     color="#60a5fa" onClick={() => {
                       restAtInn(city.innCost);
                       setSelectedCity(null);
                       setCitySubmenu(null);
-                    }}
+                    }} compact
                   />
                   <MenuButton
-                    icon="hammer" label="Upgrade" sublabel="Enhance equipment tiers"
-                    color="#22d3ee" onClick={() => { setCitySubmenu('upgrade'); setUpgradeHeroId(null); setUpgradeMsg(null); }}
+                    icon="hammer" label="Upgrade" sublabel="Equipment"
+                    color="#22d3ee" onClick={() => { setCitySubmenu('upgrade'); setUpgradeHeroId(null); setUpgradeMsg(null); }} compact
                   />
                 </div>
               )}
@@ -4201,44 +4202,54 @@ export default function WorldMap() {
       )}
 
       <div style={{
-        position: 'absolute', bottom: 60, right: 12, zIndex: MAP_LAYERS.DEV_TOOLBAR,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-        background: 'rgba(0,0,0,0.7)', borderRadius: 8, padding: '6px 4px',
+        position: 'absolute', top: 60, right: 12, zIndex: MAP_LAYERS.DEV_TOOLBAR,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+        background: 'rgba(0,0,0,0.7)', borderRadius: 8, padding: '4px 3px',
         backdropFilter: 'blur(4px)', border: '1px solid rgba(255,215,0,0.15)',
       }}>
         <button onClick={() => { setCamZoom(z => { const nz = Math.min(5, z + 0.5); setCamPos(p => clampCam(p, nz)); return nz; }); }} style={{
           background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#ccc', cursor: 'pointer',
-          fontSize: '0.85rem', width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '0.75rem', width: 24, height: 24, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>+</button>
-        <span style={{ color: 'var(--gold)', fontSize: '0.5rem', fontWeight: 700, textAlign: 'center' }}>
+        <span style={{ color: 'var(--gold)', fontSize: '0.45rem', fontWeight: 700, textAlign: 'center' }}>
           {Math.round(camZoom * 100)}%
         </span>
         <button onClick={() => { setCamZoom(z => { const nz = Math.max(1, z - 0.5); setCamPos(p => clampCam(p, nz)); return nz; }); }} style={{
           background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#ccc', cursor: 'pointer',
-          fontSize: '0.85rem', width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '0.75rem', width: 24, height: 24, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>-</button>
         <button onClick={() => { setCamZoom(1); setCamPos({ x: 0, y: 0 }); }} style={{
           background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.25)', color: 'var(--gold)', cursor: 'pointer',
-          fontSize: '0.45rem', fontWeight: 700, width: 28, height: 20, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '0.4rem', fontWeight: 700, width: 24, height: 18, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>FIT</button>
+        <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.08)', margin: '1px 0' }} />
+        <button onClick={() => setShowRoads(r => !r)} title={showRoads ? 'Hide Paths' : 'Show Paths'} style={{
+          background: showRoads ? 'rgba(34,211,238,0.15)' : 'rgba(255,255,255,0.05)',
+          border: `1px solid ${showRoads ? 'rgba(34,211,238,0.4)' : 'rgba(255,255,255,0.1)'}`,
+          color: showRoads ? '#22d3ee' : 'rgba(255,255,255,0.3)',
+          cursor: 'pointer', fontSize: '0.55rem', fontWeight: 700, width: 24, height: 24, borderRadius: 5,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.2s',
+        }}>⟠</button>
       </div>
     </div>
   );
 }
 
-function MenuButton({ icon, iconSrc, label, sublabel, color, onClick, glow, disabled, hotkey }) {
+function MenuButton({ icon, iconSrc, label, sublabel, color, onClick, glow, disabled, hotkey, compact }) {
+  const isSmall = compact;
   return (
     <button
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        width: '100%', padding: '8px 10px', margin: '4px 0',
+        display: 'flex', alignItems: 'center', gap: isSmall ? 6 : 10,
+        width: '100%', padding: isSmall ? '4px 6px' : '8px 10px', margin: isSmall ? '2px 0' : '4px 0',
         background: disabled ? 'rgba(40,40,60,0.3)' : 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06))',
-        border: `1.5px solid ${disabled ? 'rgba(80,80,100,0.2)' : `${color}33`}`,
-        borderRadius: 10, cursor: disabled ? 'not-allowed' : 'pointer',
+        border: `1px solid ${disabled ? 'rgba(80,80,100,0.2)' : `${color}33`}`,
+        borderRadius: isSmall ? 6 : 10, cursor: disabled ? 'not-allowed' : 'pointer',
         color: disabled ? 'rgba(150,150,170,0.4)' : '#fff',
-        fontSize: '0.85rem', fontWeight: 600, textAlign: 'left',
+        fontSize: isSmall ? '0.7rem' : '0.85rem', fontWeight: 600, textAlign: 'left',
         transition: 'all 0.2s',
         animation: glow ? 'glow 2s infinite' : 'none',
         opacity: disabled ? 0.5 : 1,
@@ -4249,12 +4260,12 @@ function MenuButton({ icon, iconSrc, label, sublabel, color, onClick, glow, disa
     >
       {hotkey && (
         <div style={{
-          position: 'absolute', top: -6, right: -4,
-          width: 18, height: 18, borderRadius: 4,
+          position: 'absolute', top: isSmall ? -4 : -6, right: isSmall ? -2 : -4,
+          width: isSmall ? 14 : 18, height: isSmall ? 14 : 18, borderRadius: 3,
           background: 'linear-gradient(135deg, #2a2040, #1a1530)',
           border: `1px solid ${color}66`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '0.55rem', fontWeight: 800, color: color,
+          fontSize: isSmall ? '0.45rem' : '0.55rem', fontWeight: 800, color: color,
           fontFamily: "'Cinzel', serif",
           boxShadow: `0 0 6px ${color}30`,
           zIndex: 2,
@@ -4262,8 +4273,8 @@ function MenuButton({ icon, iconSrc, label, sublabel, color, onClick, glow, disa
       )}
       {iconSrc ? (
         <div style={{
-          width: 38, height: 38, borderRadius: 8, overflow: 'hidden', flexShrink: 0,
-          border: `2px solid ${disabled ? 'rgba(80,80,100,0.3)' : `${color}88`}`,
+          width: isSmall ? 24 : 38, height: isSmall ? 24 : 38, borderRadius: isSmall ? 5 : 8, overflow: 'hidden', flexShrink: 0,
+          border: `${isSmall ? '1px' : '2px'} solid ${disabled ? 'rgba(80,80,100,0.3)' : `${color}88`}`,
           boxShadow: disabled ? 'none' : `0 0 8px ${color}30, inset 0 0 10px rgba(0,0,0,0.5)`,
           position: 'relative',
         }}>
@@ -4274,21 +4285,21 @@ function MenuButton({ icon, iconSrc, label, sublabel, color, onClick, glow, disa
           <div style={{
             position: 'absolute', inset: 0,
             background: `linear-gradient(135deg, transparent 60%, ${color}30)`,
-            borderRadius: 6,
+            borderRadius: isSmall ? 4 : 6,
           }} />
         </div>
       ) : (
-        <span style={{ fontSize: '1.3rem', width: 38, textAlign: 'center', flexShrink: 0 }}>{icon}</span>
+        <span style={{ fontSize: isSmall ? '0.9rem' : '1.3rem', width: isSmall ? 24 : 38, textAlign: 'center', flexShrink: 0 }}>{icon}</span>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
           color: disabled ? 'rgba(150,150,170,0.4)' : color,
-          fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: '0.8rem',
+          fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: isSmall ? '0.6rem' : '0.8rem',
           textShadow: disabled ? 'none' : `0 0 8px ${color}40`,
           letterSpacing: '0.02em',
         }}>{label}</div>
-        {sublabel && <div style={{ fontSize: '0.58rem', color: 'var(--muted)', fontWeight: 400, lineHeight: 1.3 }}>
-          {sublabel}{disabled ? ' (Coming soon)' : ''}
+        {sublabel && <div style={{ fontSize: isSmall ? '0.45rem' : '0.58rem', color: 'var(--muted)', fontWeight: 400, lineHeight: 1.3 }}>
+          {sublabel}{disabled ? ' (Soon)' : ''}
         </div>}
       </div>
     </button>

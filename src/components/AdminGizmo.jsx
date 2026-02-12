@@ -139,13 +139,13 @@ function AdminGizmo() {
   return (
     <div id="admin-gizmo-root">
       <div style={{
-        position: 'fixed', bottom: 64, left: 16, zIndex: GIZMO_Z + 10,
-        display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center',
+        position: 'fixed', top: 98, left: 16, zIndex: GIZMO_Z + 10,
+        display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center',
       }}>
         <button
           onClick={() => setEnabled(e => !e)}
           style={{
-            width: 44, height: 44, borderRadius: '50%',
+            width: 34, height: 34, borderRadius: '50%',
             background: enabled
               ? 'linear-gradient(135deg, #f59e0b, #d97706)'
               : 'linear-gradient(135deg, #334155, #1e293b)',
