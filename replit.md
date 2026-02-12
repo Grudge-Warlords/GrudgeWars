@@ -16,6 +16,15 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
+- **2026-02-12:** AI pathfinding, auto-generated node areas, deployment prep
+  - Replaced BFS pathfinding with A* (distance-weighted) for optimal route calculation between map nodes
+  - Created `src/utils/mapPathfinding.js` utility module with A* algorithm, wander area generator, and road path generator
+  - Auto-generated walking areas (wander polygons) for all 32 locations + 5 cities so heroes always have areas to roam
+  - Auto-generated curved road paths between all connected nodes (rendered as subtle teal SVG lines on the map)
+  - Walking areas and roads serve as defaults; custom localStorage data takes priority when available
+  - Route network now uses auto-generated roads as fallback for hero walk-along-path animations
+  - Updated Combat Power/Build Rating layout to match original (space-between positioning)
+  - Configured autoscale deployment: `npm run build` → `node server.prod.js` serving dist/ + API
 - **2026-02-12:** Major update - fish sprite improvements, new world map, complete lore overhaul
   - Fixed fish sprite bottom cutoff by adding overflow:visible and swim padding to SpriteAnimation
   - Added smooth swimming bobbing animation (fishBob/fishSwim CSS keyframes) for all fish sprites
@@ -58,7 +67,7 @@ The application is a React 19 frontend developed with Vite, with an Express back
 - **Character System:** 32 unique Warlord combinations across 8 betta species and 4 classes, with 8 attributes and 0-20 level progression.
 - **Battle System:** Multi-unit tactical combat with speed-based initiative, up to 3 active heroes against AI enemies.
 - **Sprite System:** SpriteAnimation component for pixel art animations with equipment overlays and special transformation effects.
-- **World Map:** RTS-style 2D underwater map with zoom/pan, 32 unlockable locations across 5 ocean terrain regions (Coral Reefs, Abyssal Depths, Volcanic Vents, Frozen Currents, Ancient Ruins).
+- **World Map:** RTS-style 2D underwater map with zoom/pan, 32 unlockable locations across 5 ocean terrain regions. Features A* pathfinding (`src/utils/mapPathfinding.js`), auto-generated wander areas for hero idle animations, and auto-generated curved road paths between connected nodes.
 - **Audio System:** Web Audio API for synthesized combat sounds and adaptive background music.
 - **Economy:** Pearl gain from battles, harvest system for resource nodes (coral, shells, algae, crystals, pearls).
 - **Discord OAuth & Webhooks:** Backend server handles Discord login and webhook broadcasting.

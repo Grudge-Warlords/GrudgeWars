@@ -17,6 +17,7 @@ import { generateRandomEvent, getRewardDescription } from '../data/randomEvents'
 import { encodeGrudaShare, generateShareUrl, generateShareCode } from '../utils/grudaShare';
 import { MAP_LAYERS, svgOverlayProps, mapNodeStyle, mapCenterStyle, fullCoverStyle, nodeScale as calcNodeScale } from './mapConstants';
 import { InlineIcon, getIconSrc } from '../data/uiSprites';
+import { generateAllWanderAreas, generateAllRoadPaths, aStarPathfind, buildAStarAdjacency } from '../utils/mapPathfinding';
 
 const bossMapSprites = {
   nature_elemental: { glow: 'rgba(0,255,180,0.5)', terrain: '/backgrounds/kelp_forest.png', shape: 'archway', effect: 'vines', color1: '#0f4', color2: '#084' },
@@ -492,38 +493,15 @@ const buildSmoothPath = (points) => {
 
 const mapLandmarks = [];
 
-const buildAdjacency = () => {
-  const adj = {};
-  const addEdge = (a, b) => {
-    if (!adj[a]) adj[a] = [];
-    if (!adj[b]) adj[b] = [];
-    if (!adj[a].includes(b)) adj[a].push(b);
-    if (!adj[b].includes(a)) adj[b].push(a);
-  };
-  pathConnections.forEach(([a, b]) => addEdge(a, b));
-  cityConnections.forEach(([a, b]) => addEdge(a, b));
-  return adj;
-};
-const adjacencyMap = buildAdjacency();
+const adjacencyMap = buildAStarAdjacency(pathConnections, cityConnections);
+const allNodePositions = { ...locationPositions, ...cityPositions };
 
 const findPath = (start, end) => {
-  if (start === end) return [];
-  const queue = [[start]];
-  const visited = new Set([start]);
-  while (queue.length > 0) {
-    const path = queue.shift();
-    const node = path[path.length - 1];
-    const neighbors = adjacencyMap[node] || [];
-    for (const next of neighbors) {
-      if (next === end) return [...path, next];
-      if (!visited.has(next)) {
-        visited.add(next);
-        queue.push([...path, next]);
-      }
-    }
-  }
-  return null;
+  return aStarPathfind(start, end, adjacencyMap, allNodePositions);
 };
+
+const defaultWanderAreas = generateAllWanderAreas(locationPositions, cityPositions);
+const defaultRoads = generateAllRoadPaths(locationPositions, cityPositions, pathConnections, cityConnections);
 
 export default function WorldMap() {
   const {
@@ -607,7 +585,10 @@ export default function WorldMap() {
   const [drawingArea, setDrawingArea] = useState(null);
   const [drawingPoints, setDrawingPoints] = useState([]);
   const [movementAreas, setMovementAreas] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('mapMovementAreas') || '{}'); } catch { return {}; }
+    try {
+      const stored = JSON.parse(localStorage.getItem('mapMovementAreas') || '{}');
+      return { ...defaultWanderAreas, ...stored };
+    } catch { return { ...defaultWanderAreas }; }
   });
   const [drawingLandmark, setDrawingLandmark] = useState(null);
   const [landmarkPoints, setLandmarkPoints] = useState([]);
@@ -1023,7 +1004,8 @@ export default function WorldMap() {
   useEffect(() => { setBgm('ambient'); }, []);
 
   useEffect(() => {
-    routeNetworkRef.current = buildRouteNetwork(editRoutes, locationPositions);
+    const roads = editRoutes.length > 0 ? editRoutes : defaultRoads;
+    routeNetworkRef.current = buildRouteNetwork(roads, allNodePositions);
   }, [editRoutes]);
 
   useEffect(() => {
@@ -1646,7 +1628,7 @@ export default function WorldMap() {
           </svg>
         )}
 
-        {(editRoutes.length > 0 || editLandmarks.length > 0 || routePoints.length > 0 || landmarkPoints.length > 0) && (
+        {(true) && (
           <svg {...svgOverlayProps(MAP_LAYERS.ROADS)}>
             <defs>
               <pattern id="lavaTextureEdit" patternUnits="userSpaceOnUse" width="8" height="8">
@@ -1667,6 +1649,18 @@ export default function WorldMap() {
                 <feComposite in="SourceGraphic" in2="softEdge" operator="in" />
               </filter>
             </defs>
+            {editRoutes.length === 0 && defaultRoads.map((road, roadIdx) => {
+              if (!road.points || road.points.length < 2) return null;
+              const w = road.width || 2.5;
+              const d = road.points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+              return (
+                <g key={`droad_${roadIdx}`}>
+                  <path d={d} fill="none" stroke="rgba(34,211,238,0.04)" strokeWidth={w + 0.6} strokeLinecap="round" strokeLinejoin="round" />
+                  <path d={d} fill="none" stroke="rgba(34,211,238,0.12)" strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" />
+                  <path d={d} fill="none" stroke="rgba(6,182,212,0.08)" strokeWidth={w * 0.4} strokeLinecap="round" strokeLinejoin="round" />
+                </g>
+              );
+            })}
             {editLandmarks.map((lm, idx) => {
               if (!lm.points || lm.points.length < 2) return null;
               const d = lm.points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0]},${p[1]}`).join(' ');
