@@ -6,6 +6,7 @@ import { attributeDefinitions } from '../data/attributes';
 import SpriteAnimation from './SpriteAnimation';
 import WorgeMorphPreview from './WorgeMorphPreview';
 import { getPlayerSprite } from '../data/spriteMap';
+import useIsMobile from '../hooks/useIsMobile';
 
 const stepLabels = ['Name', 'Breed', 'Class', 'Attributes'];
 
@@ -21,6 +22,7 @@ const RACE_BG = {
 };
 
 export default function CharacterCreate() {
+  const isMobile = useIsMobile();
   const {
     setScreen, setPlayerName, selectRace, selectClass,
     playerClass, playerRace, playerName,
@@ -86,10 +88,10 @@ export default function CharacterCreate() {
       }} />
       <header style={{
         background: 'linear-gradient(135deg, rgba(14,22,48,0.8), rgba(20,26,43,0.6))',
-        borderBottom: '2px solid var(--border)', padding: '14px 20px', textAlign: 'center',
+        borderBottom: '2px solid var(--border)', padding: isMobile ? '10px 12px' : '14px 20px', textAlign: 'center',
         position: 'relative', zIndex: 1,
       }}>
-        <h1 className="font-cinzel" style={{ color: 'var(--accent)', fontSize: '1.4rem', marginBottom: 10 }}>
+        <h1 className="font-cinzel" style={{ color: 'var(--accent)', fontSize: isMobile ? '1.1rem' : '1.4rem', marginBottom: isMobile ? 6 : 10 }}>
           Create Your Warlord
         </h1>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -117,7 +119,7 @@ export default function CharacterCreate() {
         </div>
       </header>
 
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: 20, position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: isMobile ? 10 : 20, position: 'relative', zIndex: 1 }}>
 
         {step === 1 && (
           <div style={{ animation: 'fadeIn 0.4s ease', textAlign: 'center', paddingTop: 40 }}>
@@ -132,8 +134,9 @@ export default function CharacterCreate() {
               maxLength={20} autoFocus
               style={{
                 background: 'rgba(14,22,48,0.8)', border: '2px solid var(--border)',
-                borderRadius: 10, padding: '14px 28px', fontSize: '1.2rem',
-                color: 'var(--text)', textAlign: 'center', width: 340,
+                borderRadius: 10, padding: isMobile ? '12px 16px' : '14px 28px', fontSize: isMobile ? '1rem' : '1.2rem',
+                color: 'var(--text)', textAlign: 'center', width: isMobile ? '100%' : 340,
+                maxWidth: isMobile ? 'calc(100vw - 40px)' : 'none',
                 outline: 'none', fontFamily: "'Jost', sans-serif"
               }}
               onFocus={e => e.target.style.borderColor = 'var(--accent)'}
@@ -142,10 +145,11 @@ export default function CharacterCreate() {
             <div style={{ marginTop: 30 }}>
               <button onClick={handleStep1} disabled={!nameInput.trim()} style={{
                 background: nameInput.trim() ? 'linear-gradient(135deg, var(--accent), #10b981)' : 'var(--border)',
-                border: 'none', borderRadius: 10, padding: '14px 50px',
+                border: 'none', borderRadius: 10, padding: isMobile ? '12px 36px' : '14px 50px',
                 color: nameInput.trim() ? '#0b1020' : 'var(--muted)',
                 fontWeight: 700, fontSize: '1rem', cursor: nameInput.trim() ? 'pointer' : 'not-allowed',
-                fontFamily: "'Cinzel', serif", letterSpacing: 1, transition: 'all 0.3s'
+                fontFamily: "'Cinzel', serif", letterSpacing: 1, transition: 'all 0.3s',
+                minHeight: isMobile ? 36 : 'auto',
               }}>Continue</button>
             </div>
           </div>
@@ -159,7 +163,7 @@ export default function CharacterCreate() {
             <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.8rem', marginBottom: 20 }}>
               8 Breeds &times; 4 Classes = 32 Warlord Combinations
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? 8 : 12 }}>
               {raceList.map(race => {
                 const isSelected = selectedRace === race.id;
                 return (
@@ -167,11 +171,11 @@ export default function CharacterCreate() {
                     backgroundImage: `linear-gradient(135deg, ${isSelected ? race.color + '35' : 'rgba(20,26,43,0.85)'}, rgba(11,16,32,0.88)), url(${RACE_BG[race.id] || RACE_BG.blue_betta})`,
                     backgroundSize: 'cover', backgroundPosition: 'center',
                     border: `2px solid ${isSelected ? race.color : race.color + '30'}`,
-                    borderRadius: 12, padding: 16, cursor: 'pointer',
+                    borderRadius: 12, padding: isMobile ? 12 : 16, cursor: 'pointer',
                     transition: 'all 0.25s', textAlign: 'center', position: 'relative',
                     boxShadow: isSelected ? `0 0 20px ${race.color}25, inset 0 0 30px ${race.color}08` : 'none',
                     transform: isSelected ? 'scale(1.03)' : 'scale(1)',
-                    minHeight: 160,
+                    minHeight: isMobile ? 120 : 160,
                   }}
                   onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = race.color + '80'; e.currentTarget.style.transform = 'translateY(-2px)'; }}}
                   onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = race.color + '30'; e.currentTarget.style.transform = 'none'; }}}
@@ -247,7 +251,7 @@ export default function CharacterCreate() {
                 </span>
               )}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? 8 : 14 }}>
               {Object.entries(classDefinitions).map(([id, cls]) => {
                 const isSelected = selectedFaction === id;
                 const previewAttrs = { ...cls.startingAttributes };
@@ -343,13 +347,13 @@ export default function CharacterCreate() {
           return (
           <div style={{ animation: 'fadeIn 0.4s ease' }}>
             <div style={{
-              display: 'flex', alignItems: 'center', gap: 20, marginBottom: 20,
+              display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 20, marginBottom: 20,
               background: 'linear-gradient(135deg, rgba(14,22,48,0.9), rgba(20,26,43,0.7))',
-              border: `2px solid ${cls.color}40`, borderRadius: 14, padding: 18,
+              border: `2px solid ${cls.color}40`, borderRadius: 14, padding: isMobile ? 12 : 18,
               flexWrap: 'wrap', justifyContent: 'center'
             }}>
               <div style={{
-                width: 120, height: 120, borderRadius: 14,
+                width: isMobile ? 80 : 120, height: isMobile ? 80 : 120, borderRadius: 14,
                 background: `radial-gradient(circle, ${cls.color}15, transparent)`,
                 border: `2px solid ${cls.color}30`,
                 display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
@@ -391,7 +395,7 @@ export default function CharacterCreate() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', gap: isMobile ? 8 : 10 }}>
               {Object.entries(attributeDefinitions).map(([name, def]) => {
                 const base = (baseAttributePoints && baseAttributePoints[name]) || 0;
                 const current = attributePoints[name];
@@ -415,10 +419,11 @@ export default function CharacterCreate() {
                   <div style={{ color: 'var(--muted)', fontSize: '0.7rem', marginBottom: 6 }}>{def.description}</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <button onClick={() => deallocatePoint(name)} style={{
-                      width: 30, height: 30, borderRadius: '50%',
+                      width: isMobile ? 36 : 30, height: isMobile ? 36 : 30, borderRadius: '50%',
                       background: canRemove ? 'var(--danger)' : 'var(--border)',
                       border: 'none', color: 'white', fontWeight: 700, fontSize: '1rem',
-                      cursor: canRemove ? 'pointer' : 'not-allowed', opacity: canRemove ? 1 : 0.4
+                      cursor: canRemove ? 'pointer' : 'not-allowed', opacity: canRemove ? 1 : 0.4,
+                      minWidth: 36, minHeight: 36,
                     }}>-</button>
                     <div style={{
                       flex: 1, height: 8, background: 'var(--border)', borderRadius: 4, overflow: 'hidden', position: 'relative'
@@ -435,10 +440,11 @@ export default function CharacterCreate() {
                       }} />
                     </div>
                     <button onClick={() => allocatePoint(name)} style={{
-                      width: 30, height: 30, borderRadius: '50%',
+                      width: isMobile ? 36 : 30, height: isMobile ? 36 : 30, borderRadius: '50%',
                       background: unspentPoints > 0 ? 'var(--success)' : 'var(--border)',
                       border: 'none', color: 'white', fontWeight: 700, fontSize: '1rem',
-                      cursor: unspentPoints > 0 ? 'pointer' : 'not-allowed', opacity: unspentPoints > 0 ? 1 : 0.4
+                      cursor: unspentPoints > 0 ? 'pointer' : 'not-allowed', opacity: unspentPoints > 0 ? 1 : 0.4,
+                      minWidth: 36, minHeight: 36,
                     }}>+</button>
                   </div>
                 </div>

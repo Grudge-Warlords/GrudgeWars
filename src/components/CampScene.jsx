@@ -8,6 +8,7 @@ import { setBgm } from '../utils/audioManager';
 import NpcSprite from './NpcSprite';
 import BubbleEmitter from './BubbleEmitter';
 import ReefHuntMiniGame from './ReefHuntMiniGame';
+import useIsMobile from '../hooks/useIsMobile';
 
 const RESOURCE_NODES = [
   { id: 'gold_mine', name: 'Pearl Beds', icon: 'pickaxe', resource: 'gold', x: 18, y: 30, color: '#fbbf24', img: '/images/buildings/pearl_beds.png' },
@@ -39,6 +40,7 @@ const SLOT_LABELS = {
 };
 
 export default function CampScene() {
+  const isMobile = useIsMobile();
   useEffect(() => { setBgm('scene'); }, []);
   const exitScene = useGameStore(s => s.exitScene);
   const harvestResources = useGameStore(s => s.harvestResources);
@@ -322,6 +324,9 @@ export default function CampScene() {
   const equipItems = inventory.filter(i => i.slot && !i.consumable);
   const consumableItems = inventory.filter(i => i.consumable);
 
+  const nodeSize = isMobile ? 56 : 72;
+  const nodeImgSize = isMobile ? 44 : 60;
+
   const renderInteractiveNode = (node, onClick) => (
     <div key={node.id} onClick={onClick} style={{
       position: 'absolute', left: `${node.x}%`, top: `${node.y}%`,
@@ -329,17 +334,18 @@ export default function CampScene() {
       textAlign: 'center',
     }}>
       <div style={{
-        width: 72, height: 72, borderRadius: 10,
+        width: nodeSize, height: nodeSize, borderRadius: 10,
         background: `radial-gradient(circle, ${node.color}25, rgba(0,0,0,0.3))`,
         border: `2px solid ${node.color}80`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         boxShadow: `0 0 16px ${node.color}40, inset 0 0 20px rgba(0,0,0,0.3)`,
         overflow: 'hidden',
+        minWidth: 36, minHeight: 36,
       }}>
-        <img src={node.img} alt={node.name} style={{ width: 60, height: 60, objectFit: 'contain', imageRendering: 'auto' }} />
+        <img src={node.img} alt={node.name} style={{ width: nodeImgSize, height: nodeImgSize, objectFit: 'contain', imageRendering: 'auto' }} />
       </div>
       <div className="font-cinzel" style={{
-        color: node.color, fontSize: '0.85rem', fontWeight: 700, marginTop: 4,
+        color: node.color, fontSize: isMobile ? '0.65rem' : '0.85rem', fontWeight: 700, marginTop: 4,
         textShadow: `0 2px 6px rgba(0,0,0,0.95), 0 0 10px ${node.color}40`,
         whiteSpace: 'nowrap',
       }}>
@@ -391,8 +397,9 @@ export default function CampScene() {
           </span>
           <button onClick={() => setShowSellPanel(!showSellPanel)} style={{
             background: 'rgba(0,0,0,0.6)', border: '1px solid #fbbf24', borderRadius: 8,
-            padding: '4px 12px', color: '#fbbf24', cursor: 'pointer', fontSize: '0.65rem', fontWeight: 700,
+            padding: isMobile ? '8px 12px' : '4px 12px', color: '#fbbf24', cursor: 'pointer', fontSize: '0.65rem', fontWeight: 700,
             backdropFilter: 'blur(4px)',
+            minHeight: isMobile ? 36 : 'auto',
           }}>Sell Resources</button>
         </div>
       </div>
@@ -432,18 +439,19 @@ export default function CampScene() {
             textAlign: 'center',
           }}>
             <div style={{
-              width: 72, height: 72, borderRadius: 10,
+              width: nodeSize, height: nodeSize, borderRadius: 10,
               background: `radial-gradient(circle, ${node.color}25, rgba(0,0,0,0.3))`,
               border: `2px solid ${node.color}80`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: `0 0 16px ${node.color}40, inset 0 0 20px rgba(0,0,0,0.3)`,
               animation: assignedHero ? 'pulse 2s infinite' : 'none',
               overflow: 'hidden',
+              minWidth: 36, minHeight: 36,
             }}>
-              <img src={node.img} alt={node.name} style={{ width: 60, height: 60, objectFit: 'contain', imageRendering: 'auto' }} />
+              <img src={node.img} alt={node.name} style={{ width: nodeImgSize, height: nodeImgSize, objectFit: 'contain', imageRendering: 'auto' }} />
             </div>
             <div className="font-cinzel" style={{
-              color: node.color, fontSize: '0.85rem', fontWeight: 700, marginTop: 4,
+              color: node.color, fontSize: isMobile ? '0.65rem' : '0.85rem', fontWeight: 700, marginTop: 4,
               textShadow: `0 2px 6px rgba(0,0,0,0.95), 0 0 10px ${node.color}40`,
               whiteSpace: 'nowrap',
             }}>
@@ -481,8 +489,9 @@ export default function CampScene() {
                     </div>
                     <button onClick={() => recallHarvest(node.id)} style={{
                       width: '100%', background: 'rgba(239,68,68,0.2)', border: '1px solid #ef4444',
-                      borderRadius: 6, padding: '3px 8px', color: '#ef4444', cursor: 'pointer',
-                      fontSize: '0.5rem', fontWeight: 700,
+                      borderRadius: 6, padding: isMobile ? '8px' : '3px 8px', color: '#ef4444', cursor: 'pointer',
+                      fontSize: isMobile ? '0.55rem' : '0.5rem', fontWeight: 700,
+                      minHeight: isMobile ? 36 : 'auto',
                     }}>Recall</button>
                   </div>
                 ) : (
@@ -494,8 +503,9 @@ export default function CampScene() {
                       availableHeroes.map(hero => (
                         <button key={hero.id} onClick={() => { assignHarvest(node.id, hero.id); setSelectedNode(null); }} style={{
                           width: '100%', background: 'rgba(110,231,183,0.1)', border: '1px solid rgba(110,231,183,0.3)',
-                          borderRadius: 4, padding: '2px 6px', color: '#6ee7b3', cursor: 'pointer',
-                          fontSize: '0.5rem', fontWeight: 600, marginBottom: 2, textAlign: 'left',
+                          borderRadius: 4, padding: isMobile ? '6px' : '2px 6px', color: '#6ee7b3', cursor: 'pointer',
+                          fontSize: isMobile ? '0.55rem' : '0.5rem', fontWeight: 600, marginBottom: 2, textAlign: 'left',
+                          minHeight: isMobile ? 36 : 'auto',
                         }}>
                           {hero.name} (Lv{hero.level})
                         </button>
@@ -517,8 +527,10 @@ export default function CampScene() {
         <div style={{
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
           background: 'rgba(10,15,30,0.95)', border: '2px solid #818cf8',
-          borderRadius: 12, padding: 16, minWidth: 240, zIndex: 50,
+          borderRadius: 12, padding: isMobile ? 12 : 16, minWidth: isMobile ? 200 : 240, zIndex: 50,
           backdropFilter: 'blur(8px)',
+          maxWidth: isMobile ? 'calc(100vw - 16px)' : 'none',
+          width: isMobile ? '90%' : 'auto',
         }} onClick={e => e.stopPropagation()}>
           <div className="font-cinzel" style={{ color: '#818cf8', fontSize: '0.85rem', marginBottom: 10, textAlign: 'center' }}>
             Rest
@@ -598,10 +610,11 @@ export default function CampScene() {
               width: '100%',
               background: partyFullHp ? 'rgba(50,50,50,0.3)' : 'rgba(129,140,248,0.2)',
               border: `1px solid ${partyFullHp ? '#555' : '#818cf8'}`,
-              borderRadius: 8, padding: '6px 0',
+              borderRadius: 8, padding: isMobile ? '10px 0' : '6px 0',
               color: partyFullHp ? '#666' : '#818cf8',
               cursor: partyFullHp ? 'default' : 'pointer',
               fontSize: '0.65rem', fontWeight: 700,
+              minHeight: isMobile ? 36 : 'auto',
             }}>
               {partyFullHp ? 'Already at Full Health' : 'Rest & Heal All'}
             </button>
@@ -617,8 +630,13 @@ export default function CampScene() {
 
       {showInventory && (
         <div style={{
-          position: 'absolute', top: '5%', right: '3%', bottom: '12%',
-          width: '52%', maxWidth: 340,
+          position: 'absolute',
+          top: isMobile ? '2%' : '5%',
+          right: isMobile ? '2%' : '3%',
+          bottom: isMobile ? '8%' : '12%',
+          left: isMobile ? '2%' : 'auto',
+          width: isMobile ? 'auto' : '52%',
+          maxWidth: isMobile ? 'calc(100vw - 16px)' : 340,
           background: 'rgba(10,15,30,0.96)', border: '2px solid #f59e0b',
           borderRadius: 12, zIndex: 50,
           backdropFilter: 'blur(8px)',
@@ -821,8 +839,10 @@ export default function CampScene() {
         <div style={{
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
           background: 'rgba(10,15,30,0.95)', border: '2px solid #fbbf24',
-          borderRadius: 12, padding: 16, minWidth: 220, zIndex: 50,
+          borderRadius: 12, padding: isMobile ? 12 : 16, minWidth: isMobile ? 200 : 220, zIndex: 50,
           backdropFilter: 'blur(8px)',
+          maxWidth: isMobile ? 'calc(100vw - 16px)' : 'none',
+          width: isMobile ? '90%' : 'auto',
         }}>
           <div className="font-cinzel" style={{ color: '#fbbf24', fontSize: '0.8rem', marginBottom: 8, textAlign: 'center' }}>
             Sell Resources
@@ -890,12 +910,13 @@ export default function CampScene() {
         pointerEvents: exiting ? 'none' : 'auto',
       }}>
         <div style={{
-          width: 50, height: 50, borderRadius: '50%',
+          width: isMobile ? 44 : 50, height: isMobile ? 44 : 50, borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(110,231,183,0.4), rgba(110,231,183,0.1))',
           border: '2px solid #6ee7b3',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.4rem', boxShadow: '0 0 20px rgba(110,231,183,0.4)',
+          fontSize: isMobile ? '1.1rem' : '1.4rem', boxShadow: '0 0 20px rgba(110,231,183,0.4)',
           animation: 'pulse 2s infinite',
+          minWidth: 36, minHeight: 36,
         }}>
           <InlineIcon name="portal" />
         </div>

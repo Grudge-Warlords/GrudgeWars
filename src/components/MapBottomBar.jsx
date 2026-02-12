@@ -10,11 +10,12 @@ import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite } from '../data/spriteMap';
 import RadarChart from './RadarChart';
 import { setMusicMuted, setSfxMuted } from '../utils/audioManager';
+import useIsMobile from '../hooks/useIsMobile';
 
 const BAR_HEIGHT = '26.2%';
 const POPUP_BOTTOM_OFFSET = 'calc(26.2% + 8px)';
 
-function HarvestingPopup({ onClose }) {
+function HarvestingPopup({ onClose, isMobile }) {
   const {
     harvestNodes, activeHarvests, harvestResources,
     assignHarvest, recallHarvest, heroRoster, activeHeroIds, level
@@ -28,10 +29,10 @@ function HarvestingPopup({ onClose }) {
 
   return (
     <div style={{
-      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
+      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: isMobile ? 4 : 10, zIndex: 10600,
       backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
       border: '1px solid rgba(251,191,36,0.3)',
-      borderRadius: 12, padding: 16, width: 360, maxHeight: 400, overflowY: 'auto',
+      borderRadius: 12, padding: isMobile ? 10 : 16, width: isMobile ? 'auto' : 360, maxWidth: isMobile ? 'calc(100vw - 16px)' : undefined, maxHeight: 400, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
       animation: 'fadeIn 0.15s ease-out',
     }}>
@@ -112,7 +113,7 @@ function HarvestingPopup({ onClose }) {
   );
 }
 
-function GearPopup({ onClose }) {
+function GearPopup({ onClose, isMobile }) {
   const { heroRoster, activeHeroIds, inventory } = useGameStore();
   const activeHeroes = heroRoster.filter(h => activeHeroIds.includes(h.id));
   const [selectedHero, setSelectedHero] = useState(activeHeroes[0]?.id || null);
@@ -122,10 +123,10 @@ function GearPopup({ onClose }) {
 
   return (
     <div style={{
-      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
+      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: isMobile ? 4 : 10, zIndex: 10600,
       backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
       border: '1px solid rgba(110,231,183,0.3)',
-      borderRadius: 12, padding: 16, width: 380, maxHeight: 450, overflowY: 'auto',
+      borderRadius: 12, padding: isMobile ? 10 : 16, width: isMobile ? 'auto' : 380, maxWidth: isMobile ? 'calc(100vw - 16px)' : undefined, maxHeight: 450, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
       animation: 'fadeIn 0.15s ease-out',
     }}>
@@ -187,7 +188,7 @@ function GearPopup({ onClose }) {
   );
 }
 
-function CharacterPopup({ onClose }) {
+function CharacterPopup({ onClose, isMobile }) {
   const { heroRoster, activeHeroIds } = useGameStore();
   const [selectedHero, setSelectedHero] = useState(() => {
     const active = heroRoster.filter(h => activeHeroIds.includes(h.id));
@@ -223,10 +224,10 @@ function CharacterPopup({ onClose }) {
 
   return (
     <div style={{
-      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: 10, zIndex: 10600,
+      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: isMobile ? 4 : 10, zIndex: 10600,
       backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
       border: '1px solid rgba(168,85,247,0.3)',
-      borderRadius: 12, padding: 16, width: 420, maxHeight: 500, overflowY: 'auto',
+      borderRadius: 12, padding: isMobile ? 10 : 16, width: isMobile ? 'auto' : 420, maxWidth: isMobile ? 'calc(100vw - 16px)' : undefined, maxHeight: 500, overflowY: 'auto',
       boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
       animation: 'fadeIn 0.15s ease-out',
     }}>
@@ -270,9 +271,9 @@ function CharacterPopup({ onClose }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-            <div style={{ flex: '0 0 auto' }}>
-              <RadarChart labels={attrLabels} values={radarValues} size={160} color="#a855f7" />
+          <div style={{ display: 'flex', gap: isMobile ? 8 : 16, alignItems: 'flex-start', flexDirection: isMobile ? 'column' : 'row' }}>
+            <div style={{ flex: '0 0 auto', alignSelf: isMobile ? 'center' : undefined }}>
+              <RadarChart labels={attrLabels} values={radarValues} size={isMobile ? 120 : 160} color="#a855f7" />
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '0.5rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Attributes</div>
@@ -332,6 +333,8 @@ export default function MapBottomBar({
   showWarParty,
   showGruda,
 }) {
+  const isMobile = useIsMobile();
+
   const {
     heroRoster, activeHeroIds, activeHarvests, level,
     unspentPoints, skillPoints,
@@ -397,9 +400,9 @@ export default function MapBottomBar({
       zIndex: 10600,
       pointerEvents: 'none',
     }}>
-      {showHarvesting && <div style={{ pointerEvents: 'auto' }}><HarvestingPopup onClose={() => setShowHarvesting(false)} /></div>}
-      {showGear && <div style={{ pointerEvents: 'auto' }}><GearPopup onClose={() => setShowGear(false)} /></div>}
-      {showCharacter && <div style={{ pointerEvents: 'auto' }}><CharacterPopup onClose={() => setShowCharacter(false)} /></div>}
+      {showHarvesting && <div style={{ pointerEvents: 'auto' }}><HarvestingPopup onClose={() => setShowHarvesting(false)} isMobile={isMobile} /></div>}
+      {showGear && <div style={{ pointerEvents: 'auto' }}><GearPopup onClose={() => setShowGear(false)} isMobile={isMobile} /></div>}
+      {showCharacter && <div style={{ pointerEvents: 'auto' }}><CharacterPopup onClose={() => setShowCharacter(false)} isMobile={isMobile} /></div>}
 
       <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0, height: BAR_HEIGHT,
@@ -414,7 +417,7 @@ export default function MapBottomBar({
       }}>
         <div style={{
           flex: '0 0 28%',
-          display: 'flex', flexDirection: 'column',
+          display: isMobile ? 'none' : 'flex', flexDirection: 'column',
           padding: '24px 8px 12px 28px',
           overflow: 'hidden',
         }}>
@@ -466,13 +469,13 @@ export default function MapBottomBar({
         <div style={{
           flex: '1 1 0',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '8px 4px 4px',
+          padding: isMobile ? '4px 2px 2px' : '8px 4px 4px',
           position: 'relative',
         }}>
           <div style={{
             position: 'relative',
             width: '100%',
-            maxWidth: 520,
+            maxWidth: isMobile ? 360 : 520,
             aspectRatio: '1455 / 526',
             backgroundImage: 'url(/images/ui-toolbar-bg.png)',
             backgroundSize: '100% 100%',
@@ -480,12 +483,12 @@ export default function MapBottomBar({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '0 12.5% 0 12.5%',
+            padding: isMobile ? '0 8% 0 8%' : '0 12.5% 0 12.5%',
           }}>
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(8, 1fr)',
-              gap: '2.2%',
+              gap: isMobile ? '1.5%' : '2.2%',
               width: '100%',
               alignItems: 'center',
               paddingTop: '3%',
@@ -503,6 +506,8 @@ export default function MapBottomBar({
                   animation: btn.pulse ? 'glow 2s infinite' : 'none',
                   aspectRatio: '1 / 1',
                   width: '100%',
+                  minWidth: isMobile ? 36 : undefined,
+                  minHeight: isMobile ? 36 : undefined,
                 }}
                   onMouseEnter={e => { showTooltip(btn.label, e); e.currentTarget.style.filter = 'brightness(1.4)'; }}
                   onMouseMove={e => updateTooltipPosition(e)}
@@ -515,7 +520,7 @@ export default function MapBottomBar({
                   ) : (
                     <InlineIcon name={btn.icon} size={20} />
                   )}
-                  <span style={{ fontSize: '0.4rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif", lineHeight: 1 }}>{btn.label}</span>
+                  <span style={{ fontSize: isMobile ? '0.55rem' : '0.4rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif", lineHeight: 1 }}>{btn.label}</span>
                   {btn.badge && (
                     <span style={{
                       position: 'absolute', top: -2, right: -2,
@@ -531,18 +536,18 @@ export default function MapBottomBar({
         </div>
 
         <div style={{
-          flex: '0 0 20%',
+          flex: isMobile ? '0 0 25%' : '0 0 20%',
           display: 'flex', flexDirection: 'column',
-          padding: '20px 28px 14px 8px',
+          padding: isMobile ? '16px 8px 6px 4px' : '20px 28px 14px 8px',
           position: 'relative',
         }}>
           <div style={{
             position: 'absolute', top: -2, left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', gap: 6,
+            display: 'flex', gap: isMobile ? 4 : 6,
           }}>
             {popupButtons.map(pb => (
               <button key={pb.id} onClick={() => togglePopup(pb.id)} style={{
-                width: 30, height: 30, borderRadius: '50%',
+                width: isMobile ? 36 : 30, height: isMobile ? 36 : 30, borderRadius: '50%',
                 background: pb.active ? 'rgba(255,215,0,0.25)' : 'rgba(20,24,48,0.9)',
                 border: `2px solid ${pb.active ? 'var(--gold)' : 'rgba(255,255,255,0.15)'}`,
                 cursor: 'pointer',
@@ -555,7 +560,7 @@ export default function MapBottomBar({
                 onMouseLeave={e => { hideTooltip(); if (!pb.active) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.boxShadow = 'none'; } }}
               >
                 {pb.iconSrc ? (
-                  <img src={pb.iconSrc} alt={pb.label} style={{ width: 16, height: 16, objectFit: 'contain', imageRendering: 'pixelated' }} />
+                  <img src={pb.iconSrc} alt={pb.label} style={{ width: isMobile ? 18 : 16, height: isMobile ? 18 : 16, objectFit: 'contain', imageRendering: 'pixelated' }} />
                 ) : (
                   <InlineIcon name={pb.icon} size={14} />
                 )}
@@ -567,24 +572,24 @@ export default function MapBottomBar({
             flex: 1, overflowY: 'auto', paddingTop: 18,
             scrollbarWidth: 'thin', scrollbarColor: 'rgba(110,231,183,0.15) transparent',
           }}>
-            <div className="font-cinzel" style={{ fontSize: '0.5rem', color: 'var(--accent)', fontWeight: 700, marginBottom: 4, letterSpacing: '0.05em', textAlign: 'center' }}>
+            <div className="font-cinzel" style={{ fontSize: isMobile ? '0.55rem' : '0.5rem', color: 'var(--accent)', fontWeight: 700, marginBottom: isMobile ? 2 : 4, letterSpacing: '0.05em', textAlign: 'center' }}>
               WAR PARTY
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 2 : 3 }}>
               {heroRoster.filter(h => h.id === 'player' || activeHeroIds.includes(h.id)).map(hero => {
                 const heroCls = classDefinitions[hero.classId];
                 const heroStats = heroCls ? getHeroStatsWithBonuses(hero) : null;
                 const hpPercent = heroStats ? Math.round((hero.currentHealth / heroStats.health) * 100) : 100;
                 return (
-                  <div key={`bar_${hero.id}`} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ width: 28, height: 28, overflow: 'visible', flexShrink: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-                      <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={0.36} speed={180} />
+                  <div key={`bar_${hero.id}`} style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 6 }}>
+                    <div style={{ width: isMobile ? 22 : 28, height: isMobile ? 22 : 28, overflow: 'visible', flexShrink: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                      <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={isMobile ? 0.28 : 0.36} speed={180} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '0.5rem', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: isMobile ? '0.55rem' : '0.5rem', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {hero.name}
                       </div>
-                      <div style={{ fontSize: '0.4rem', color: 'var(--muted)' }}>Lv.{hero.level} {heroCls?.name}</div>
+                      <div style={{ fontSize: isMobile ? '0.55rem' : '0.4rem', color: 'var(--muted)' }}>Lv.{hero.level} {heroCls?.name}</div>
                       <div style={{ height: 3, background: 'rgba(255,255,255,0.1)', borderRadius: 2, marginTop: 2, overflow: 'hidden' }}>
                         <div style={{ height: '100%', width: `${hpPercent}%`, background: hpPercent > 50 ? '#22c55e' : hpPercent > 25 ? '#f59e0b' : '#ef4444', borderRadius: 2, transition: 'width 0.3s' }} />
                       </div>

@@ -11,6 +11,7 @@ import { TIERS, EQUIPMENT_SLOTS } from '../data/equipment';
 import { playSwordHit, playMagicCast, playHeal, playBuff, playHurt, playCrit, playDodge, playVictory, playDefeat, setBgm } from '../utils/audioManager';
 import AbilityIcon from './AbilityIcon';
 import { showTooltip, hideTooltip, updateTooltipPosition } from './GameTooltip';
+import useIsMobile from '../hooks/useIsMobile';
 
 const locationBackgrounds = {
   coral_shallows: '/backgrounds/ocean_battle_new.png',
@@ -1147,6 +1148,8 @@ export default function BattleScreen() {
     heroRoster, battleResults,
   } = useGameStore();
 
+  const isMobile = useIsMobile();
+
   const [unitAnims, setUnitAnims] = useState({});
   const [dashPositions, setDashPositions] = useState({});
   const [projectiles, setProjectiles] = useState([]);
@@ -2231,7 +2234,7 @@ export default function BattleScreen() {
           const flipSprite = spriteData?.facesLeft ? unit.team === 'player' : unit.team === 'enemy';
           const introDelay = introComplete ? 0 : (idx * 100);
           const baseFrameSize = spriteData?.frameWidth || spriteData?.frameHeight || 100;
-          const targetDisplaySize = 140;
+          const targetDisplaySize = isMobile ? 110 : 140;
           const isBearForm = unit.classId === 'worge' && unit.bearForm;
           const isBossUnit = unit.team === 'enemy' && unit.isBoss;
           const bossScaleVal = isBossUnit ? (unit.bossScale || 1.6) : 1;
@@ -2931,7 +2934,7 @@ export default function BattleScreen() {
       )}
 
       <div style={{
-          flex: '0 0 140px', height: 140, minHeight: 140, maxHeight: 140,
+          flex: isMobile ? '0 0 110px' : '0 0 140px', height: isMobile ? 110 : 140, minHeight: isMobile ? 110 : 140, maxHeight: isMobile ? 110 : 140,
           borderTop: `2px solid ${(!isVictory && !isDefeat && isPlayerTurn) ? '#8b7355' : (currentUnit?.team === 'enemy' ? '#6b3030' : '#4a5a7a')}`,
           zIndex: 10,
           display: 'flex', flexDirection: 'row',
@@ -2941,7 +2944,7 @@ export default function BattleScreen() {
           background: 'rgba(8,12,24,0.95)',
         }}>
           <div style={{
-            flex: '0 0 140px', width: 140,
+            flex: isMobile ? '0 0 100px' : '0 0 140px', width: isMobile ? 100 : 140,
             padding: '6px 6px',
             display: 'flex', flexDirection: 'column', gap: 3,
             justifyContent: 'center',
@@ -2955,12 +2958,12 @@ export default function BattleScreen() {
               return (
                 <div key={unit.id} style={{ opacity: unit.alive ? 1 : 0.4 }}>
                   <div style={{
-                    fontSize: '0.5rem', fontWeight: 700,
+                    fontSize: isMobile ? '0.55rem' : '0.5rem', fontWeight: 700,
                     color: unit.id === currentUnitId ? 'var(--accent)' : '#93c5fd',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     marginBottom: 1,
                   }}>{unit.name}</div>
-                  <MiniBar current={unit.health} max={unit.maxHealth} color={hpColor} height={5} width={128} />
+                  <MiniBar current={unit.health} max={unit.maxHealth} color={hpColor} height={5} width={isMobile ? 90 : 128} />
                   <div style={{ display: 'flex', gap: 2, marginTop: 1 }}>
                     <MiniBar current={unit.mana} max={unit.maxMana} color="#3b82f6" height={3} width={62} />
                     <MiniBar current={unit.stamina} max={unit.maxStamina} color="#f59e0b" height={3} width={62} />
@@ -3226,8 +3229,9 @@ export default function BattleScreen() {
                 <button onClick={autoAttack} style={{
                   background: 'rgba(0,0,0,0.4)',
                   border: '2px solid #8b4444', borderRadius: 4,
-                  padding: '4px 12px', color: '#ef4444', cursor: 'pointer',
-                  fontSize: '0.7rem', fontWeight: 700, transition: 'all 0.15s',
+                  padding: isMobile ? '6px 8px' : '4px 12px', color: '#ef4444', cursor: 'pointer',
+                  fontSize: isMobile ? '0.65rem' : '0.7rem', fontWeight: 700, transition: 'all 0.15s',
+                  minHeight: isMobile ? 36 : undefined,
                   display: 'flex', alignItems: 'center', gap: 4,
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,68,68,0.4)'; }}
@@ -3236,8 +3240,9 @@ export default function BattleScreen() {
                 <button onClick={defendTurn} style={{
                   background: 'rgba(0,0,0,0.4)',
                   border: '2px solid #445a8b', borderRadius: 4,
-                  padding: '4px 12px', color: '#60a5fa', cursor: 'pointer',
-                  fontSize: '0.7rem', fontWeight: 700, transition: 'all 0.15s',
+                  padding: isMobile ? '6px 8px' : '4px 12px', color: '#60a5fa', cursor: 'pointer',
+                  fontSize: isMobile ? '0.65rem' : '0.7rem', fontWeight: 700, transition: 'all 0.15s',
+                  minHeight: isMobile ? 36 : undefined,
                   display: 'flex', alignItems: 'center', gap: 4,
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(68,90,139,0.4)'; }}
@@ -3246,8 +3251,9 @@ export default function BattleScreen() {
                 <button onClick={skipTurn} style={{
                   background: 'rgba(0,0,0,0.3)',
                   border: '2px solid #5c5c6a', borderRadius: 4,
-                  padding: '4px 12px', color: 'rgba(180,180,200,0.8)', cursor: 'pointer',
-                  fontSize: '0.7rem', fontWeight: 700, transition: 'all 0.15s',
+                  padding: isMobile ? '6px 8px' : '4px 12px', color: 'rgba(180,180,200,0.8)', cursor: 'pointer',
+                  fontSize: isMobile ? '0.65rem' : '0.7rem', fontWeight: 700, transition: 'all 0.15s',
+                  minHeight: isMobile ? 36 : undefined,
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(80,80,100,0.3)'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.3)'; }}
@@ -3426,7 +3432,8 @@ export default function BattleScreen() {
                         background: disabled ? 'rgba(30,30,40,0.5)' : undefined,
                         backgroundColor: disabled ? 'rgba(30,30,40,0.5)' : 'rgba(60,45,25,0.6)',
                         border: `2px solid ${disabled ? '#3a3a4a' : '#8b7355'}`,
-                        borderRadius: 4, padding: '5px 10px', minWidth: 90,
+                        borderRadius: 4, padding: isMobile ? '6px 8px' : '5px 10px', minWidth: isMobile ? 70 : 90,
+                        minHeight: isMobile ? 36 : undefined,
                         color: disabled ? '#555' : '#e8dcc8',
                         cursor: disabled ? 'not-allowed' : 'pointer',
                         transition: 'all 0.2s', textAlign: 'center', opacity: disabled ? 0.5 : 1,
@@ -3444,8 +3451,8 @@ export default function BattleScreen() {
                         color: disabled ? '#666' : '#2a1a0a', border: '1px solid rgba(0,0,0,0.3)'
                       }}>{idx + 1}</div>
                       <div style={{ marginBottom: 0, filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.6))' }}><AbilityIcon ability={ability} size={28} /></div>
-                      <div style={{ fontWeight: 600, fontSize: '0.65rem', textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{ability.name}</div>
-                      <div style={{ fontSize: '0.5rem', color: '#a08b6d', marginTop: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: isMobile ? '0.6rem' : '0.65rem', textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{ability.name}</div>
+                      <div style={{ fontSize: isMobile ? '0.5rem' : '0.5rem', color: '#a08b6d', marginTop: 0 }}>
                         {ability.manaCost > 0 && <span style={{ color: '#6b9bd2' }}>{ability.manaCost}MP </span>}
                         {ability.staminaCost > 0 && <span style={{ color: '#d4a96a' }}>{ability.staminaCost}SP</span>}
                         {ability.manaGain > 0 && <span style={{ color: '#7bb8e8' }}>+{ability.manaGain}MP </span>}
@@ -3477,7 +3484,7 @@ export default function BattleScreen() {
           </div>
 
           <div style={{
-            flex: '0 0 140px', width: 140,
+            flex: isMobile ? '0 0 100px' : '0 0 140px', width: isMobile ? 100 : 140,
             padding: '6px 6px',
             display: 'flex', flexDirection: 'column', gap: 3,
             justifyContent: 'center',
@@ -3490,12 +3497,12 @@ export default function BattleScreen() {
               return (
                 <div key={unit.id} style={{ opacity: unit.alive ? 1 : 0.4 }}>
                   <div style={{
-                    fontSize: '0.5rem', fontWeight: 700,
+                    fontSize: isMobile ? '0.55rem' : '0.5rem', fontWeight: 700,
                     color: unit.id === currentUnitId ? 'var(--danger)' : '#fca5a5',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     marginBottom: 1, textAlign: 'right',
                   }}>{unit.name}</div>
-                  <MiniBar current={unit.health} max={unit.maxHealth} color={hpColor} height={5} width={128} />
+                  <MiniBar current={unit.health} max={unit.maxHealth} color={hpColor} height={5} width={isMobile ? 90 : 128} />
                   <div style={{ display: 'flex', gap: 2, marginTop: 1 }}>
                     <MiniBar current={unit.mana} max={unit.maxMana} color="#3b82f6" height={3} width={62} />
                     <MiniBar current={unit.stamina} max={unit.maxStamina} color="#f59e0b" height={3} width={62} />

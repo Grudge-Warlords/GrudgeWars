@@ -14,7 +14,7 @@ export default function AbilityIcon({ ability, size = 24, style = {} }) {
           width: size,
           height: size,
           borderRadius: 4,
-          objectFit: 'cover',
+          objectFit: 'contain',
           imageRendering: 'auto',
           ...style,
         }}

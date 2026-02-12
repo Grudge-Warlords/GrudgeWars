@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import useGameStore from '../stores/gameStore';
 import { setBgm } from '../utils/audioManager';
 import { EssentialIcon } from '../data/uiSprites';
+import useIsMobile from '../hooks/useIsMobile';
 
 export default function TitleScreen() {
   const setScreen = useGameStore(s => s.setScreen);
   const [fadeClass, setFadeClass] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setBgm('intro');
@@ -63,17 +65,19 @@ export default function TitleScreen() {
             The Abyss King Awaits
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: isMobile ? '100%' : 'auto' }}>
             <MenuButton
               label="DIVE IN"
               onClick={() => handleLogin('guest')}
               primary
+              isMobile={isMobile}
               icon={<EssentialIcon name="Gamepad" size={20} style={{ marginRight: 8 }} />}
             />
 
             <MenuButton
               label="CONNECT DISCORD"
               onClick={() => handleLogin('discord')}
+              isMobile={isMobile}
               icon={
                 <svg width="20" height="16" viewBox="0 0 71 55" fill="currentColor" style={{ marginRight: 8 }}>
                   <path d="M60.1 4.9A58.5 58.5 0 0045.4.2a.2.2 0 00-.2.1 40.7 40.7 0 00-1.8 3.7 54 54 0 00-16.2 0A26.4 26.4 0 0025.4.3a.2.2 0 00-.2-.1A58.4 58.4 0 0010.5 4.9a.2.2 0 00-.1.1C1.5 18.7-.9 32.2.3 45.5v.1a58.8 58.8 0 0017.7 9a.2.2 0 00.3-.1 42 42 0 003.6-5.9.2.2 0 00-.1-.3 38.8 38.8 0 01-5.5-2.6.2.2 0 01 0-.4c.4-.3.7-.6 1.1-.9a.2.2 0 01.2 0 42 42 0 0035.6 0 .2.2 0 01.2 0l1.1.9a.2.2 0 010 .4 36.4 36.4 0 01-5.5 2.6.2.2 0 00-.1.3 47.2 47.2 0 003.6 5.9.2.2 0 00.3.1A58.6 58.6 0 0070.3 45.6v-.1c1.4-15.1-2.4-28.2-10.1-39.8a.2.2 0 00-.1-.1zM23.7 37.3c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.4 3.2 6.3 7-2.8 7-6.3 7zm23.2 0c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.4 3.2 6.3 7-2.8 7-6.3 7z"/>
@@ -85,6 +89,7 @@ export default function TitleScreen() {
               label="GRUDGE STUDIO"
               onClick={() => window.open('https://grudgestudio.com', '_blank')}
               subtle
+              isMobile={isMobile}
               icon={<EssentialIcon name="Home" size={16} style={{ marginRight: 8 }} />}
             />
           </div>
@@ -107,7 +112,7 @@ export default function TitleScreen() {
     );
 }
 
-function MenuButton({ label, onClick, primary, subtle, icon }) {
+function MenuButton({ label, onClick, primary, subtle, icon, isMobile }) {
   const [hovered, setHovered] = useState(false);
 
   const baseStyle = {
@@ -126,7 +131,7 @@ function MenuButton({ label, onClick, primary, subtle, icon }) {
         ? '1px solid rgba(255,255,255,0.1)'
         : '1px solid rgba(255,255,255,0.15)',
     borderRadius: 8,
-    padding: primary ? '14px 50px' : '10px 40px',
+    padding: primary ? (isMobile ? '14px 20px' : '14px 50px') : (isMobile ? '10px 16px' : '10px 40px'),
     color: primary ? 'var(--accent)' : subtle ? 'var(--muted)' : '#ccc',
     fontSize: primary ? '1rem' : '0.85rem',
     fontWeight: 600,
@@ -134,7 +139,8 @@ function MenuButton({ label, onClick, primary, subtle, icon }) {
     fontFamily: "'Cinzel', serif",
     letterSpacing: primary ? 3 : 2,
     transition: 'all 0.3s',
-    width: 280,
+    width: isMobile ? '100%' : 280,
+    minHeight: primary ? 44 : 36,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

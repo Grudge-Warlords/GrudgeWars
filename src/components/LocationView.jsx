@@ -9,6 +9,7 @@ import { getQuestsForZone, checkQuestProgress } from '../data/quests';
 import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite } from '../data/spriteMap';
 import { InlineIcon, EssentialIcon } from '../data/uiSprites';
+import useIsMobile from '../hooks/useIsMobile';
 
 const SLOT_ICONS = {
   weapon: 'crossed_swords', offhand: 'shield', helmet: 'helm', armor: 'shield',
@@ -246,6 +247,7 @@ function QuestItem({ quest, zoneId, zoneStats, gameState, completed, onComplete 
 }
 
 export default function LocationView() {
+  const isMobile = useIsMobile();
   const {
     currentLocation, startBattle, startBossBattle, returnToWorld,
     bossesDefeated, level, heroRoster, activeHeroIds, zoneConquer,
@@ -289,17 +291,18 @@ export default function LocationView() {
 
       <div style={{
         position: 'relative', zIndex: 1,
-        display: 'flex', height: '100%', overflow: 'hidden',
+        display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: '100%', overflow: 'hidden',
       }}>
         <div style={{
-          flex: 1, overflowY: 'auto', padding: '14px 16px 14px 20px',
+          flex: 1, overflowY: 'auto', padding: isMobile ? '10px 8px' : '14px 16px 14px 20px',
           display: 'flex', flexDirection: 'column',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 10, marginBottom: 10, flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
             <button onClick={returnToWorld} style={{
               background: 'rgba(42,49,80,0.8)', border: '1px solid var(--border)',
-              borderRadius: 6, padding: '4px 10px', color: 'var(--text)',
+              borderRadius: 6, padding: isMobile ? '8px 12px' : '4px 10px', color: 'var(--text)',
               cursor: 'pointer', fontSize: '0.7rem', flexShrink: 0,
+              minHeight: isMobile ? 36 : 'auto',
             }}
             onMouseEnter={e => e.target.style.background = 'rgba(60,70,100,0.9)'}
             onMouseLeave={e => e.target.style.background = 'rgba(42,49,80,0.8)'}
@@ -308,12 +311,12 @@ export default function LocationView() {
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
-              <span style={{ fontSize: '1.4rem' }}>{loc.icon}</span>
+              <span style={{ fontSize: isMobile ? '1.1rem' : '1.4rem' }}>{loc.icon}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <h2 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '1.05rem', margin: 0, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <h2 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: isMobile ? '0.85rem' : '1.05rem', margin: 0, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {loc.name}
                 </h2>
-                <div style={{ fontSize: '0.6rem', color: 'var(--muted)', display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div style={{ fontSize: isMobile ? '0.55rem' : '0.6rem', color: 'var(--muted)', display: 'flex', gap: isMobile ? 4 : 8, alignItems: 'center', flexWrap: 'wrap' }}>
                   <span>Lv.{loc.levelRange[0]}-{loc.levelRange[1]}</span>
                   {bossDefeated && <span style={{ color: 'var(--gold)' }}>Boss Cleared</span>}
                   {conquer > 0 && <span style={{ color: conquer >= 100 ? 'var(--gold)' : clsColor, fontWeight: 600 }}>CP: {Math.floor(conquer)}%</span>}
@@ -321,14 +324,16 @@ export default function LocationView() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
+            <div style={{ display: 'flex', gap: 5, flexShrink: 0, ...(isMobile ? { width: '100%' } : {}) }}>
               <button onClick={() => startBattle(currentLocation)} style={{
                 background: 'linear-gradient(135deg, var(--accent), #10b981)',
-                border: 'none', borderRadius: 7, padding: '7px 14px',
+                border: 'none', borderRadius: 7, padding: isMobile ? '10px 14px' : '7px 14px',
                 color: '#0b1020', fontWeight: 700, fontSize: '0.75rem',
                 cursor: 'pointer', fontFamily: "'Cinzel', serif",
                 transition: 'all 0.2s',
                 display: 'flex', alignItems: 'center', gap: 6,
+                flex: isMobile ? 1 : 'none', justifyContent: 'center',
+                minHeight: isMobile ? 36 : 'auto',
               }}
               onMouseEnter={e => { e.target.style.transform = 'translateY(-1px)'; e.target.style.boxShadow = '0 4px 12px rgba(110,231,183,0.4)'; }}
               onMouseLeave={e => { e.target.style.transform = 'none'; e.target.style.boxShadow = 'none'; }}
@@ -338,11 +343,13 @@ export default function LocationView() {
               {loc.boss && !bossDefeated && (
                 <button onClick={() => startBossBattle(loc.boss)} style={{
                   background: 'linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.1))',
-                  border: '2px solid var(--danger)', borderRadius: 7, padding: '7px 14px',
+                  border: '2px solid var(--danger)', borderRadius: 7, padding: isMobile ? '10px 14px' : '7px 14px',
                   color: 'var(--danger)', fontWeight: 700, fontSize: '0.75rem',
                   cursor: 'pointer', fontFamily: "'Cinzel', serif",
                   transition: 'all 0.2s', animation: 'glow 2s infinite',
                   display: 'flex', alignItems: 'center', gap: 6,
+                  flex: isMobile ? 1 : 'none', justifyContent: 'center',
+                  minHeight: isMobile ? 36 : 'auto',
                 }}
                 onMouseEnter={e => e.target.style.transform = 'translateY(-1px)'}
                 onMouseLeave={e => e.target.style.transform = 'none'}
@@ -422,9 +429,11 @@ export default function LocationView() {
         </div>
 
         <div style={{
-          width: 240, flexShrink: 0, overflowY: 'auto',
-          padding: '14px 12px 14px 0',
-          borderLeft: '1px solid rgba(255,255,255,0.04)',
+          width: isMobile ? '100%' : 240, flexShrink: 0, overflowY: 'auto',
+          padding: isMobile ? '8px' : '14px 12px 14px 0',
+          borderLeft: isMobile ? 'none' : '1px solid rgba(255,255,255,0.04)',
+          borderTop: isMobile ? '1px solid rgba(255,255,255,0.04)' : 'none',
+          maxHeight: isMobile ? '40vh' : 'none',
         }}>
           <div style={{
             fontSize: '0.6rem', color: 'var(--gold)', fontWeight: 700,

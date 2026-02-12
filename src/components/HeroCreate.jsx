@@ -6,6 +6,7 @@ import { attributeDefinitions, STARTING_POINTS, calculateStats } from '../data/a
 import SpriteAnimation from './SpriteAnimation';
 import WorgeMorphPreview from './WorgeMorphPreview';
 import { getPlayerSprite } from '../data/spriteMap';
+import useIsMobile from '../hooks/useIsMobile';
 
 const ATTRIBUTES = Object.keys(attributeDefinitions);
 
@@ -22,6 +23,7 @@ const RACE_BG = {
 
 export default function HeroCreate() {
   const { addHeroToRoster, setScreen, level, heroRoster } = useGameStore();
+  const isMobile = useIsMobile();
 
   const [step, setStep] = useState(1);
   const [showCinematic, setShowCinematic] = useState(false);
@@ -188,7 +190,7 @@ export default function HeroCreate() {
         ))}
       </div>
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: isMobile ? 10 : 20 }}>
         <div style={{
           fontSize: '0.7rem', color: 'var(--muted)', textAlign: 'center', marginBottom: 16,
         }}>
@@ -228,7 +230,7 @@ export default function HeroCreate() {
         {step === 2 && (
           <div>
             <h2 className="font-cinzel" style={{ color: 'var(--text)', marginBottom: 16, textAlign: 'center' }}>Choose Breed</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: 12 }}>
               {Object.entries(raceDefinitions).map(([id, race]) => (
                 <div key={id} onClick={() => setSelectedRace(id)}
                   style={{
@@ -252,6 +254,7 @@ export default function HeroCreate() {
               <button onClick={() => setStep(1)} style={{
                 background: 'var(--border)', border: 'none', borderRadius: 10,
                 padding: '10px 20px', color: 'var(--text)', cursor: 'pointer',
+                minHeight: 36,
               }}>← Back</button>
               <button onClick={() => selectedRace && setStep(3)} disabled={!selectedRace}
                 style={{
@@ -259,6 +262,7 @@ export default function HeroCreate() {
                   border: 'none', borderRadius: 10, padding: '10px 30px',
                   color: selectedRace ? '#0b1020' : 'var(--muted)', fontWeight: 700,
                   cursor: selectedRace ? 'pointer' : 'not-allowed',
+                  minHeight: 36,
                 }}>
                 Next →
               </button>
@@ -269,7 +273,7 @@ export default function HeroCreate() {
         {step === 3 && (
           <div>
             <h2 className="font-cinzel" style={{ color: 'var(--text)', marginBottom: 16, textAlign: 'center' }}>Choose Class</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: 12 }}>
               {Object.entries(classDefinitions).map(([id, cls]) => (
                 <div key={id} onClick={() => setSelectedClass(id)}
                   style={{
@@ -308,6 +312,7 @@ export default function HeroCreate() {
               <button onClick={() => setStep(2)} style={{
                 background: 'var(--border)', border: 'none', borderRadius: 10,
                 padding: '10px 20px', color: 'var(--text)', cursor: 'pointer',
+                minHeight: 36,
               }}>← Back</button>
               <button onClick={() => selectedClass && setStep(4)} disabled={!selectedClass}
                 style={{
@@ -315,6 +320,7 @@ export default function HeroCreate() {
                   border: 'none', borderRadius: 10, padding: '10px 30px',
                   color: selectedClass ? '#0b1020' : 'var(--muted)', fontWeight: 700,
                   cursor: selectedClass ? 'pointer' : 'not-allowed',
+                  minHeight: 36,
                 }}>
                 Next →
               </button>
@@ -329,7 +335,7 @@ export default function HeroCreate() {
               Points Remaining: {remaining}/{totalAvailable}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
               <div>
                 {ATTRIBUTES.map(attr => {
                   const def = attributeDefinitions[attr];
@@ -347,7 +353,7 @@ export default function HeroCreate() {
                       </div>
                       <button onClick={() => decAttr(attr)} disabled={attrPoints[attr] <= 0}
                         style={{
-                          width: 24, height: 24, borderRadius: 4,
+                          width: isMobile ? 36 : 24, height: isMobile ? 36 : 24, borderRadius: 4,
                           background: attrPoints[attr] > 0 ? 'rgba(239,68,68,0.3)' : 'var(--border)',
                           border: 'none', color: 'var(--text)', cursor: attrPoints[attr] > 0 ? 'pointer' : 'not-allowed',
                           fontSize: '0.8rem', fontWeight: 700,
@@ -360,7 +366,7 @@ export default function HeroCreate() {
                       </div>
                       <button onClick={() => incAttr(attr)} disabled={remaining <= 0}
                         style={{
-                          width: 24, height: 24, borderRadius: 4,
+                          width: isMobile ? 36 : 24, height: isMobile ? 36 : 24, borderRadius: 4,
                           background: remaining > 0 ? 'rgba(110,231,183,0.3)' : 'var(--border)',
                           border: 'none', color: 'var(--text)', cursor: remaining > 0 ? 'pointer' : 'not-allowed',
                           fontSize: '0.8rem', fontWeight: 700,

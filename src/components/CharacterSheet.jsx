@@ -6,8 +6,10 @@ import { raceDefinitions } from '../data/races';
 import { InlineIcon } from '../data/uiSprites';
 import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite } from '../data/spriteMap';
+import useIsMobile from '../hooks/useIsMobile';
 
 export default function CharacterSheet() {
+  const isMobile = useIsMobile();
   const {
     setScreen, playerName, playerClass, playerRace, level, xp, xpToNext, gold,
     attributePoints, unspentPoints, allocatePoint, deallocatePoint,
@@ -62,7 +64,7 @@ export default function CharacterSheet() {
         <div style={{ width: 80 }} />
       </header>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? 10 : 20, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 12 : 20 }}>
         <div style={{ backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center', border: '1px solid var(--border)', borderRadius: 14, padding: 20 }}>
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
@@ -103,7 +105,7 @@ export default function CharacterSheet() {
             <h3 style={{ color: 'var(--accent)', fontSize: '1rem', marginBottom: 10, borderBottom: '1px solid var(--border)', paddingBottom: 6 }}>
               Combat Stats
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '4px 16px' }}>
               {combatStats.map(s => (
                 <div key={s.key} style={{
                   display: 'flex', justifyContent: 'space-between',
@@ -142,7 +144,7 @@ export default function CharacterSheet() {
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <button onClick={() => deallocatePoint(name)} disabled={attributePoints[name] <= 0} style={{
-                    width: 26, height: 26, borderRadius: '50%',
+                    width: isMobile ? 36 : 26, height: isMobile ? 36 : 26, borderRadius: '50%',
                     background: attributePoints[name] > 0 ? 'var(--danger)' : 'var(--border)',
                     border: 'none', color: 'white', fontWeight: 700, fontSize: '0.85rem',
                     cursor: attributePoints[name] > 0 ? 'pointer' : 'not-allowed'
@@ -154,7 +156,7 @@ export default function CharacterSheet() {
                     {attributePoints[name]}
                   </span>
                   <button onClick={() => allocatePoint(name)} disabled={unspentPoints <= 0} style={{
-                    width: 26, height: 26, borderRadius: '50%',
+                    width: isMobile ? 36 : 26, height: isMobile ? 36 : 26, borderRadius: '50%',
                     background: unspentPoints > 0 ? 'var(--success)' : 'var(--border)',
                     border: 'none', color: 'white', fontWeight: 700, fontSize: '0.85rem',
                     cursor: unspentPoints > 0 ? 'pointer' : 'not-allowed'

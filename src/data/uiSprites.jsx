@@ -505,7 +505,7 @@ export function EssentialIcon({ name, size = 16, style = {} }) {
       alt=""
       width={size}
       height={size}
-      style={{ imageRendering: 'pixelated', verticalAlign: 'middle', ...style }}
+      style={{ imageRendering: 'pixelated', verticalAlign: 'middle', objectFit: 'contain', ...style }}
     />
   );
 }

@@ -10,10 +10,12 @@ import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite } from '../data/spriteMap';
 import RadarChart from './RadarChart';
 import { setMusicMuted, setSfxMuted } from '../utils/audioManager';
+import useIsMobile from '../hooks/useIsMobile';
 
 const POPUP_BOTTOM = 'calc(180px + 10px)';
 
 function HarvestingPopup({ onClose }) {
+  const isMobile = useIsMobile();
   const {
     harvestNodes, activeHarvests, harvestResources,
     assignHarvest, recallHarvest, heroRoster, activeHeroIds, level
@@ -26,7 +28,7 @@ function HarvestingPopup({ onClose }) {
   const unlockedNodes = (harvestNodes || []).filter(n => level >= n.unlockLevel);
 
   return (
-    <div className="ui-popup" style={{ right: 10, width: 360 }}>
+    <div className="ui-popup" style={{ right: isMobile ? 4 : 10, width: isMobile ? 'calc(100vw - 16px)' : 360, maxWidth: isMobile ? 'calc(100vw - 16px)' : 'none' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h4 className="font-cinzel" style={{ color: '#c5a059', fontSize: '0.9rem', margin: 0 }}>
           <InlineIcon name="pickaxe" size={14} /> Harvest Sites
@@ -105,6 +107,7 @@ function HarvestingPopup({ onClose }) {
 }
 
 function GearPopup({ onClose }) {
+  const isMobile = useIsMobile();
   const { heroRoster, activeHeroIds, inventory } = useGameStore();
   const activeHeroes = heroRoster.filter(h => activeHeroIds.includes(h.id));
   const [selectedHero, setSelectedHero] = useState(activeHeroes[0]?.id || null);
@@ -113,7 +116,7 @@ function GearPopup({ onClose }) {
   const slotNames = ['weapon', 'helmet', 'armor', 'boots', 'ring', 'shield', 'accessory'];
 
   return (
-    <div className="ui-popup" style={{ right: 10, width: 380 }}>
+    <div className="ui-popup" style={{ right: isMobile ? 4 : 10, width: isMobile ? 'calc(100vw - 16px)' : 380, maxWidth: isMobile ? 'calc(100vw - 16px)' : 'none' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h4 className="font-cinzel" style={{ color: '#22d3ee', fontSize: '0.9rem', margin: 0 }}>
           <InlineIcon name="shield" size={14} /> Gear Overview
@@ -173,6 +176,7 @@ function GearPopup({ onClose }) {
 }
 
 function CharacterPopup({ onClose }) {
+  const isMobile = useIsMobile();
   const { heroRoster, activeHeroIds } = useGameStore();
   const [selectedHero, setSelectedHero] = useState(() => {
     const active = heroRoster.filter(h => activeHeroIds.includes(h.id));
@@ -207,7 +211,7 @@ function CharacterPopup({ onClose }) {
   ] : [];
 
   return (
-    <div className="ui-popup" style={{ right: 10, width: 420 }}>
+    <div className="ui-popup" style={{ right: isMobile ? 4 : 10, width: isMobile ? 'calc(100vw - 16px)' : 420, maxWidth: isMobile ? 'calc(100vw - 16px)' : 'none' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h4 className="font-cinzel" style={{ color: '#c084fc', fontSize: '0.9rem', margin: 0 }}>
           <InlineIcon name="chart" size={14} /> Character Power
@@ -248,9 +252,9 @@ function CharacterPopup({ onClose }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 8 : 16, alignItems: isMobile ? 'center' : 'flex-start' }}>
             <div style={{ flex: '0 0 auto' }}>
-              <RadarChart labels={attrLabels} values={radarValues} size={160} color="#a855f7" />
+              <RadarChart labels={attrLabels} values={radarValues} size={isMobile ? 120 : 160} color="#a855f7" />
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '0.5rem', color: '#888', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Attributes</div>
@@ -310,6 +314,7 @@ export default function GameUIOverlay({
   showWarParty,
   showGruda,
 }) {
+  const isMobile = useIsMobile();
   const {
     heroRoster, activeHeroIds, activeHarvests, level,
     unspentPoints, skillPoints,

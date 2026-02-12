@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import useGameStore from '../stores/gameStore';
 import { TIERS, WEAPON_TYPES, ARMOR_TYPES } from '../data/equipment';
 import { InlineIcon } from '../data/uiSprites';
+import useIsMobile from '../hooks/useIsMobile';
 
 export default function LootPopup() {
+  const isMobile = useIsMobile();
   const pendingLoot = useGameStore(s => s.pendingLoot);
   const clearPendingLoot = useGameStore(s => s.clearPendingLoot);
   const discardPendingLoot = useGameStore(s => s.discardPendingLoot);
@@ -30,8 +32,8 @@ export default function LootPopup() {
     }}>
       <div style={{
         background: 'linear-gradient(135deg, #141a2b, #1e293b)',
-        border: '2px solid var(--gold)', borderRadius: 16, padding: '25px 35px',
-        maxWidth: 450, width: '90%', animation: 'slideUp 0.3s ease',
+        border: '2px solid var(--gold)', borderRadius: isMobile ? 10 : 16, padding: isMobile ? '16px 12px' : '25px 35px',
+        maxWidth: isMobile ? '100%' : 450, width: isMobile ? '95%' : '90%', animation: 'slideUp 0.3s ease',
       }}>
         <h3 className="font-cinzel" style={{
           color: 'var(--gold)', fontSize: '1.3rem', textAlign: 'center', marginBottom: 15,
@@ -83,8 +85,9 @@ export default function LootPopup() {
             onClick={clearPendingLoot}
             style={{
               background: 'linear-gradient(135deg, #b8860b, #daa520)', color: '#000',
-              border: 'none', borderRadius: 8, padding: '10px 25px', fontSize: '0.9rem',
+              border: 'none', borderRadius: 8, padding: isMobile ? '12px 20px' : '10px 25px', fontSize: '0.9rem',
               fontFamily: "'Cinzel', serif", fontWeight: 'bold', cursor: 'pointer',
+              minHeight: 36,
             }}
           >
             Take All <span style={{ fontSize: '0.6rem', opacity: 0.6, marginLeft: 4 }}>[Space]</span>
@@ -94,7 +97,8 @@ export default function LootPopup() {
             style={{
               background: 'rgba(100,100,100,0.3)', color: 'var(--text-dim)',
               border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8,
-              padding: '10px 25px', fontSize: '0.9rem', cursor: 'pointer',
+              padding: isMobile ? '12px 20px' : '10px 25px', fontSize: '0.9rem', cursor: 'pointer',
+              minHeight: 36,
             }}
           >
             Discard

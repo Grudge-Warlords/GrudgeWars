@@ -13,6 +13,7 @@ import { UI_PANELS, UI_SLOTS, UI_ICONS, SLOT_ICON_MAP, SpriteIcon, getItemSprite
 import RadarChart from './RadarChart';
 import AbilityIcon from './AbilityIcon';
 import { useTooltip, showTooltip, hideTooltip, updateTooltipPosition } from './GameTooltip';
+import useIsMobile from '../hooks/useIsMobile';
 
 const ATTRIBUTES = Object.keys(attributeDefinitions);
 
@@ -109,7 +110,7 @@ function getCardScale(spriteData) {
   return Math.min(Math.max(base, 0.7), 2.2);
 }
 
-function HeroCard({ hero, isSelected, onClick, isActive }) {
+function HeroCard({ hero, isSelected, onClick, isActive, isMobile }) {
   const cls = classDefinitions[hero.classId];
   const race = hero.raceId ? raceDefinitions[hero.raceId] : null;
   const stats = getHeroStatsWithBonuses(hero);
@@ -133,7 +134,7 @@ function HeroCard({ hero, isSelected, onClick, isActive }) {
       border: `2px solid ${isSelected ? raceColor : 'rgba(255,255,255,0.08)'}`,
       borderRadius: 14, padding: 0, cursor: 'pointer',
       transition: 'all 0.3s', position: 'relative', overflow: 'hidden',
-      minWidth: 175,
+      minWidth: isMobile ? 140 : 175,
       boxShadow: isSelected ? `0 0 16px ${raceColor}30, 0 4px 16px rgba(0,0,0,0.4)` : '0 2px 8px rgba(0,0,0,0.3)',
     }}
     onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = raceColor + '60'; e.currentTarget.style.boxShadow = `0 0 12px ${raceColor}20, 0 4px 12px rgba(0,0,0,0.3)`; }}}
@@ -424,7 +425,7 @@ function LoadoutEditor({ hero, cls, selectingSlot, setSelectingSlot, setHeroLoad
               <div
                 onClick={() => !locked && setSelectingSlot(isSelected ? null : idx)}
                 style={{
-                  width: 160, flexShrink: 0,
+                  width: 140, flexShrink: 0,
                   display: 'flex', gap: 6, alignItems: 'center',
                   background: isSelected ? 'rgba(110,231,183,0.1)' : 'rgba(42,49,80,0.4)',
                   border: `2px solid ${isSelected ? 'var(--accent)' : locked ? 'rgba(100,100,120,0.3)' : 'var(--border)'}`,
@@ -520,7 +521,7 @@ function LoadoutEditor({ hero, cls, selectingSlot, setSelectingSlot, setHeroLoad
   );
 }
 
-function HeroDetailPanel({ hero, onClose }) {
+function HeroDetailPanel({ hero, onClose, isMobile }) {
   const { unlockHeroSkill, allocateHeroPoint, deallocateHeroPoint, activeHeroIds, setActiveHeroes, equipItem, unequipItem, inventory, setHeroLoadout } = useGameStore();
   const [tab, setTab] = useState('stats');
   const [selectingSlot, setSelectingSlot] = useState(null);
@@ -595,15 +596,16 @@ function HeroDetailPanel({ hero, onClose }) {
         backgroundImage: `linear-gradient(135deg, ${cls?.color || 'var(--accent)'}40, rgba(14,22,48,0.8)), url(${RACE_BG[hero.raceId] || RACE_BG.human})`,
         backgroundSize: 'cover', backgroundPosition: 'center',
         borderBottom: `2px solid ${cls?.color || 'var(--border)'}`,
-        padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10,
+        padding: isMobile ? '6px 8px' : '8px 12px', display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 10,
+        flexWrap: isMobile ? 'wrap' : 'nowrap',
       }}>
         <div style={{ filter: `drop-shadow(0 0 10px ${cls?.color || 'var(--accent)'}50)` }}>
-          <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={getCardScale(getPlayerSprite(hero.classId, hero.raceId)) * 0.9} speed={150} equipmentOverlays={buildEquipmentOverlays(hero, TIERS)} />
+          <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={getCardScale(getPlayerSprite(hero.classId, hero.raceId)) * (isMobile ? 0.7 : 0.9)} speed={150} equipmentOverlays={buildEquipmentOverlays(hero, TIERS)} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '1.1rem' }}>{hero.name}</span>
-            <span style={{ color: cls?.color, fontSize: '0.75rem', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: isMobile ? 4 : 8, flexWrap: 'wrap' }}>
+            <span className="font-cinzel" style={{ color: 'var(--gold)', fontSize: isMobile ? '0.85rem' : '1.1rem' }}>{hero.name}</span>
+            <span style={{ color: cls?.color, fontSize: isMobile ? '0.6rem' : '0.75rem', fontWeight: 600 }}>
               Lv.{hero.level} {race?.name || ''} {cls?.name || ''}
             </span>
           </div>
@@ -616,7 +618,8 @@ function HeroDetailPanel({ hero, onClose }) {
             <button onClick={toggleActive} style={{
               background: isActive ? 'rgba(110,231,183,0.2)' : 'rgba(42,49,80,0.5)',
               border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-              padding: '1px 8px', borderRadius: 4, fontSize: '0.65rem',
+              padding: isMobile ? '6px 10px' : '1px 8px', minHeight: isMobile ? 36 : 'auto',
+              borderRadius: 4, fontSize: '0.65rem',
               color: isActive ? 'var(--accent)' : 'var(--muted)',
               cursor: 'pointer', fontWeight: 600,
             }}>
@@ -625,7 +628,7 @@ function HeroDetailPanel({ hero, onClose }) {
           </div>
         </div>
         <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 10px',
+          display: isMobile ? 'none' : 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 10px',
           background: 'rgba(4,18,37,0.7)', borderRadius: 8, padding: '6px 10px',
           border: '1px solid rgba(110,231,183,0.15)', flexShrink: 0,
         }}>
@@ -652,15 +655,17 @@ function HeroDetailPanel({ hero, onClose }) {
 
       <div style={{
         display: 'flex', borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.2)',
+        overflowX: isMobile ? 'auto' : 'visible', flexShrink: 0,
       }}>
         {tabs.map(t => (
           <button key={t.id} onClick={() => { setTab(t.id); setSelectedItemId(null); }} style={{
-            flex: 1, padding: '6px 4px', border: 'none',
+            flex: isMobile ? '0 0 auto' : 1, padding: isMobile ? '8px 10px' : '6px 4px', border: 'none',
+            minHeight: isMobile ? 36 : 'auto',
             background: tab === t.id ? 'rgba(110,231,183,0.1)' : 'transparent',
             borderBottom: tab === t.id ? '2px solid var(--accent)' : '2px solid transparent',
             color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
-            cursor: 'pointer', fontSize: '0.7rem', fontWeight: 600,
-            transition: 'all 0.2s',
+            cursor: 'pointer', fontSize: isMobile ? '0.6rem' : '0.7rem', fontWeight: 600,
+            transition: 'all 0.2s', whiteSpace: 'nowrap',
           }}>
             <span style={{ marginRight: 3 }}><InlineIcon name={t.icon} size={12} /></span>{t.label}
             {t.id === 'attributes' && (hero.unspentPoints || 0) > 0 && (
@@ -718,7 +723,7 @@ function HeroDetailPanel({ hero, onClose }) {
               <MiniBar current={hero.currentStamina} max={stats.stamina} color="#f59e0b" height={6} label="SP" />
             </div>
 
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 12 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <h4 style={{ color: 'var(--accent)', fontSize: '0.8rem', marginBottom: 6, borderBottom: '1px solid var(--border)', paddingBottom: 3 }}>
                   Core Stats
@@ -747,7 +752,7 @@ function HeroDetailPanel({ hero, onClose }) {
               </div>
 
               <div style={{
-                width: 200, flexShrink: 0,
+                width: isMobile ? '100%' : 200, flexShrink: 0,
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
               }}>
                 <div style={{
@@ -921,7 +926,7 @@ function HeroDetailPanel({ hero, onClose }) {
 
           return (
             <div>
-              <div style={{ display: 'flex', gap: 10, marginBottom: 8, alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 10, marginBottom: 8, alignItems: 'flex-start' }}>
                 <div style={{
                   flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0,
                 }}>
@@ -1083,7 +1088,7 @@ function HeroDetailPanel({ hero, onClose }) {
                       const slots = Array.from({ length: totalSlots }, (_, i) => sorted[i] || null);
                       return (
                         <div style={{
-                          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 3,
+                          display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)', gap: 3,
                         }}>
                           {slots.map((item, i) => {
                             const r = item ? (TIERS[item.tier] || TIERS[1]) : null;
@@ -1156,7 +1161,7 @@ function HeroDetailPanel({ hero, onClose }) {
 
               <div style={sectionStyle}>
                 {sectionTitle('scroll', 'Warlord Profile')}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '4px 12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem' }}>
                     <span style={{ color: 'var(--muted)' }}>Class</span>
                     <span style={{ color: cls?.color || 'var(--accent)', fontWeight: 600 }}>{cls?.name || '?'}</span>
@@ -1190,7 +1195,7 @@ function HeroDetailPanel({ hero, onClose }) {
 
               <div style={sectionStyle}>
                 {sectionTitle('crossed_swords', 'Combat Record')}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, textAlign: 'center' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 4, textAlign: 'center' }}>
                   {[
                     { label: 'Victories', val: rec.wins, color: '#22c55e' },
                     { label: 'Defeats', val: rec.losses, color: '#ef4444' },
@@ -1210,7 +1215,7 @@ function HeroDetailPanel({ hero, onClose }) {
                 )}
               </div>
 
-              <div style={{ display: 'flex', gap: 6 }}>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 6 }}>
                 <div style={{ ...sectionStyle, flex: 1, marginBottom: 6 }}>
                   {sectionTitle('sword', `Gear (${equippedCount}/7)`)}
                   {equippedCount === 0 ? (
@@ -1298,7 +1303,7 @@ function HeroDetailPanel({ hero, onClose }) {
 
               <div style={sectionStyle}>
                 {sectionTitle('chart', 'Attribute Spread')}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '3px 6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)', gap: '3px 6px' }}>
                   {ATTRIBUTES.map(attr => {
                     const pts = (hero.attributePoints || {})[attr] || 0;
                     const def = attributeDefinitions[attr];
@@ -1769,6 +1774,7 @@ const TERRAIN_BG = {
 export default function AccountPage() {
   const { setScreen, heroRoster, activeHeroIds, maxHeroSlots, level, currentLocation } = useGameStore();
   const [selectedHeroId, setSelectedHeroId] = useState(heroRoster[0]?.id || null);
+  const isMobile = useIsMobile();
 
   const selectedHero = heroRoster.find(h => h.id === selectedHeroId);
   const canRecruit = heroRoster.length < maxHeroSlots;
@@ -1784,33 +1790,36 @@ export default function AccountPage() {
       <header style={{
         backgroundImage: `linear-gradient(135deg, rgba(14,22,48,0.7), rgba(20,26,43,0.6)), url(${bgImage})`,
         backgroundSize: 'cover', backgroundPosition: 'center',
-        borderBottom: '2px solid var(--border)', padding: '12px 20px',
+        borderBottom: '2px solid var(--border)', padding: isMobile ? '8px 12px' : '12px 20px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        flex: '0 0 auto',
+        flex: '0 0 auto', gap: isMobile ? 6 : 0,
       }}>
         <button onClick={() => setScreen('world')} style={{
           background: 'var(--border)', border: 'none', borderRadius: 8,
-          padding: '8px 16px', color: 'var(--text)', cursor: 'pointer', fontSize: '0.8rem',
+          padding: isMobile ? '8px 10px' : '8px 16px', minHeight: 36,
+          color: 'var(--text)', cursor: 'pointer', fontSize: isMobile ? '0.7rem' : '0.8rem',
         }}>← Back</button>
-        <h1 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '1.2rem' }}>
+        <h1 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: isMobile ? '0.9rem' : '1.2rem' }}>
           War Council
         </h1>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ color: 'var(--muted)', fontSize: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: isMobile ? 4 : 8, alignItems: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
+          <span style={{ color: 'var(--muted)', fontSize: isMobile ? '0.6rem' : '0.75rem' }}>
             Party: {activeHeroIds.length}/3
           </span>
-          <span style={{ color: 'var(--accent)', fontSize: '0.75rem' }}>
+          <span style={{ color: 'var(--accent)', fontSize: isMobile ? '0.6rem' : '0.75rem' }}>
             Roster: {heroRoster.length}/{maxHeroSlots}
           </span>
         </div>
       </header>
 
       <div style={{
-        flex: 1, display: 'flex', gap: 16, padding: 16, overflow: 'hidden', minHeight: 0,
+        flex: 1, display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 8 : 16, padding: isMobile ? 8 : 16, overflow: 'hidden', minHeight: 0,
       }}>
         <div style={{
-          flex: '0 0 auto', width: 220, display: 'flex', flexDirection: 'column', gap: 10,
-          overflow: 'auto', paddingRight: 4,
+          ...(isMobile
+            ? { flex: '0 0 auto', display: 'flex', flexDirection: 'row', gap: 8, overflowX: 'auto', paddingBottom: 4 }
+            : { flex: '0 0 auto', width: 220, display: 'flex', flexDirection: 'column', gap: 10, overflow: 'auto', paddingRight: 4 }
+          ),
         }}>
           {heroRoster.map(hero => (
             <HeroCard
@@ -1819,28 +1828,30 @@ export default function AccountPage() {
               isSelected={selectedHeroId === hero.id}
               isActive={activeHeroIds.includes(hero.id)}
               onClick={() => setSelectedHeroId(hero.id)}
+              isMobile={isMobile}
             />
           ))}
 
           {canRecruit && (
             <div onClick={() => setScreen('heroCreate')} style={{
               background: 'rgba(255,215,0,0.05)', border: '2px dashed var(--gold)',
-              borderRadius: 14, padding: 20, cursor: 'pointer', textAlign: 'center',
-              transition: 'all 0.2s', minHeight: 80,
+              borderRadius: 14, padding: isMobile ? 12 : 20, cursor: 'pointer', textAlign: 'center',
+              transition: 'all 0.2s', minHeight: isMobile ? 60 : 80,
+              minWidth: isMobile ? 120 : 'auto', flexShrink: 0,
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             }}
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,215,0,0.1)'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,215,0,0.05)'; }}
             >
-              <div style={{ fontSize: '1.5rem', color: 'var(--gold)', marginBottom: 4 }}>+</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--gold)', fontWeight: 600 }}>Recruit Hero</div>
+              <div style={{ fontSize: isMobile ? '1.2rem' : '1.5rem', color: 'var(--gold)', marginBottom: 4 }}>+</div>
+              <div style={{ fontSize: isMobile ? '0.65rem' : '0.75rem', color: 'var(--gold)', fontWeight: 600 }}>Recruit Hero</div>
             </div>
           )}
         </div>
 
-        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+        <div style={{ flex: 1, minWidth: 0, overflow: isMobile ? 'auto' : 'hidden' }}>
           {selectedHero ? (
-            <HeroDetailPanel hero={selectedHero} />
+            <HeroDetailPanel hero={selectedHero} isMobile={isMobile} />
           ) : (
             <div style={{
               height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',

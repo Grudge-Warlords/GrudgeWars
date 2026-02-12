@@ -4,6 +4,7 @@ import { InlineIcon, EssentialIcon } from '../data/uiSprites';
 import SpriteAnimation from './SpriteAnimation';
 import { getRaceClassSprite } from '../data/spriteMap';
 import { setBgm } from '../utils/audioManager';
+import useIsMobile from '../hooks/useIsMobile';
 
 export default function LobbyScreen() {
   const setScreen = useGameStore(s => s.setScreen);
@@ -14,6 +15,7 @@ export default function LobbyScreen() {
   const playerRace = useGameStore(s => s.playerRace);
   const playerClass = useGameStore(s => s.playerClass);
   const resetGame = useGameStore(s => s.resetGame);
+  const isMobile = useIsMobile();
 
   const [activeTab, setActiveTab] = useState('main');
   const [fadeIn, setFadeIn] = useState(false);
@@ -149,26 +151,25 @@ export default function LobbyScreen() {
       </div>
 
       <div style={{
-        display: 'flex', flex: 1, overflow: 'hidden',
+        display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1, overflow: 'hidden',
         position: 'relative', zIndex: 1,
       }}>
         <div style={{
-          width: 200,
-          background: 'rgba(0,0,0,0.4)',
-          borderRight: '1px solid rgba(110,231,183,0.08)',
-          display: 'flex', flexDirection: 'column',
-          padding: '16px 0',
+          ...(isMobile
+            ? { display: 'flex', flexDirection: 'row', overflowX: 'auto', padding: '6px 8px', gap: 4, borderBottom: '1px solid rgba(110,231,183,0.08)', background: 'rgba(0,0,0,0.4)', flexShrink: 0 }
+            : { width: 200, background: 'rgba(0,0,0,0.4)', borderRight: '1px solid rgba(110,231,183,0.08)', display: 'flex', flexDirection: 'column', padding: '16px 0' }
+          ),
         }}>
-          <NavItem essentialIcon="Gamepad" label="PLAY" active={activeTab === 'main'} onClick={() => setActiveTab('main')} />
-          <NavItem essentialIcon="Team" label="CHARACTERS" active={activeTab === 'characters'} onClick={() => setActiveTab('characters')} />
-          <NavItem essentialIcon="Briefcase" label="ACCOUNT" active={activeTab === 'account'} onClick={() => setActiveTab('account')} />
-          <NavItem essentialIcon="Cloud" label="DISCORD" active={activeTab === 'discord'} onClick={() => setActiveTab('discord')} />
-          <div style={{ flex: 1 }} />
-          <NavItem essentialIcon="Trophy" label="CREDITS" active={activeTab === 'credits'} onClick={() => setActiveTab('credits')} />
+          <NavItem essentialIcon="Gamepad" label="PLAY" active={activeTab === 'main'} onClick={() => setActiveTab('main')} isMobile={isMobile} />
+          <NavItem essentialIcon="Team" label="CHARACTERS" active={activeTab === 'characters'} onClick={() => setActiveTab('characters')} isMobile={isMobile} />
+          <NavItem essentialIcon="Briefcase" label="ACCOUNT" active={activeTab === 'account'} onClick={() => setActiveTab('account')} isMobile={isMobile} />
+          <NavItem essentialIcon="Cloud" label="DISCORD" active={activeTab === 'discord'} onClick={() => setActiveTab('discord')} isMobile={isMobile} />
+          {!isMobile && <div style={{ flex: 1 }} />}
+          <NavItem essentialIcon="Trophy" label="CREDITS" active={activeTab === 'credits'} onClick={() => setActiveTab('credits')} isMobile={isMobile} />
         </div>
 
         <div style={{
-          flex: 1, overflow: 'auto', padding: 24,
+          flex: 1, overflow: 'auto', padding: isMobile ? 12 : 24,
         }}>
           {activeTab === 'main' && (
             <MainTab
@@ -182,6 +183,7 @@ export default function LobbyScreen() {
               gold={gold}
               heroRoster={heroRoster}
               panelStyle={panelStyle}
+              isMobile={isMobile}
             />
           )}
           {activeTab === 'characters' && (
@@ -202,7 +204,7 @@ export default function LobbyScreen() {
   );
 }
 
-function NavItem({ essentialIcon, label, active, onClick }) {
+function NavItem({ essentialIcon, label, active, onClick, isMobile }) {
   const [hovered, setHovered] = useState(false);
   return (
     <button
@@ -210,74 +212,80 @@ function NavItem({ essentialIcon, label, active, onClick }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '10px 20px',
+        display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 10,
+        padding: isMobile ? '8px 12px' : '10px 20px',
+        minHeight: isMobile ? 36 : 'auto',
         background: active ? 'rgba(110,231,183,0.1)' : hovered ? 'rgba(255,255,255,0.03)' : 'transparent',
         border: 'none',
-        borderLeft: active ? '3px solid var(--accent)' : '3px solid transparent',
+        ...(isMobile
+          ? { borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent', borderRadius: 6 }
+          : { borderLeft: active ? '3px solid var(--accent)' : '3px solid transparent' }
+        ),
         color: active ? 'var(--accent)' : 'var(--muted)',
-        fontSize: '0.75rem',
+        fontSize: isMobile ? '0.6rem' : '0.75rem',
         fontFamily: "'Cinzel', serif",
-        letterSpacing: 2,
+        letterSpacing: isMobile ? 1 : 2,
         cursor: 'pointer',
         transition: 'all 0.2s',
-        width: '100%',
+        width: isMobile ? 'auto' : '100%',
         textAlign: 'left',
+        whiteSpace: 'nowrap',
+        flexShrink: 0,
       }}
     >
-      <EssentialIcon name={essentialIcon} size={16} />
+      <EssentialIcon name={essentialIcon} size={isMobile ? 14 : 16} />
       {label}
     </button>
   );
 }
 
-function MainTab({ hasExistingSave, onContinue, onNewGame, playerName, playerLevel, playerRace, playerClass, gold, heroRoster, panelStyle }) {
+function MainTab({ hasExistingSave, onContinue, onNewGame, playerName, playerLevel, playerRace, playerClass, gold, heroRoster, panelStyle, isMobile }) {
   return (
     <div style={{ maxWidth: 700 }}>
-      <h2 className="font-cinzel" style={{ color: 'var(--accent)', fontSize: '1.4rem', marginBottom: 20 }}>
+      <h2 className="font-cinzel" style={{ color: 'var(--accent)', fontSize: isMobile ? '1.1rem' : '1.4rem', marginBottom: isMobile ? 12 : 20 }}>
         War Room
       </h2>
 
       {hasExistingSave && (
-        <div style={{ ...panelStyle, marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ ...panelStyle, marginBottom: 20, padding: isMobile ? 14 : 24 }}>
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center', justifyContent: 'space-between', gap: isMobile ? 10 : 0 }}>
             <div>
               <div style={{ color: 'var(--muted)', fontSize: '0.7rem', letterSpacing: 2, marginBottom: 4 }}>
                 SAVED CAMPAIGN
               </div>
-              <div className="font-cinzel" style={{ color: '#fff', fontSize: '1.1rem' }}>
+              <div className="font-cinzel" style={{ color: '#fff', fontSize: isMobile ? '0.95rem' : '1.1rem' }}>
                 {playerName}
               </div>
-              <div style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: 4 }}>
+              <div style={{ color: 'var(--muted)', fontSize: isMobile ? '0.7rem' : '0.8rem', marginTop: 4 }}>
                 Level {playerLevel} {playerRace} {playerClass} &bull;{' '}
                 <InlineIcon name="gold" size={12} /> {gold} Pearls &bull;{' '}
                 <EssentialIcon name="Team" size={12} /> {heroRoster?.length || 0} Heroes
               </div>
             </div>
-            <LobbyButton label="CONTINUE" onClick={onContinue} primary icon="Play" />
+            <LobbyButton label="CONTINUE" onClick={onContinue} primary icon="Play" isMobile={isMobile} />
           </div>
         </div>
       )}
 
-      <div style={{ ...panelStyle }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ ...panelStyle, padding: isMobile ? 14 : 24 }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center', justifyContent: 'space-between', gap: isMobile ? 10 : 0 }}>
           <div>
-            <div className="font-cinzel" style={{ color: '#fff', fontSize: '1rem' }}>
+            <div className="font-cinzel" style={{ color: '#fff', fontSize: isMobile ? '0.9rem' : '1rem' }}>
               New Campaign
             </div>
-            <div style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: 4 }}>
+            <div style={{ color: 'var(--muted)', fontSize: isMobile ? '0.7rem' : '0.8rem', marginTop: 4 }}>
               Begin your journey through the realms. Choose your breed and class.
             </div>
           </div>
-          <LobbyButton label="NEW GAME" onClick={onNewGame} icon="Restart" />
+          <LobbyButton label="NEW GAME" onClick={onNewGame} icon="Restart" isMobile={isMobile} />
         </div>
       </div>
 
-      <div style={{ ...panelStyle, marginTop: 16 }}>
-        <div className="font-cinzel" style={{ color: 'var(--accent)', fontSize: '0.9rem', marginBottom: 12 }}>
+      <div style={{ ...panelStyle, marginTop: 16, padding: isMobile ? 14 : 24 }}>
+        <div className="font-cinzel" style={{ color: 'var(--accent)', fontSize: isMobile ? '0.8rem' : '0.9rem', marginBottom: 12 }}>
           Game Features
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
           {[
             { essentialIcon: 'Hammer', text: '32 Warlord Combinations' },
             { essentialIcon: 'Skull', text: 'Tactical Turn-Based Combat' },
@@ -687,7 +695,7 @@ function CreditEntry({ title, role }) {
   );
 }
 
-function LobbyButton({ label, onClick, primary, icon }) {
+function LobbyButton({ label, onClick, primary, icon, isMobile }) {
   const [hovered, setHovered] = useState(false);
   return (
     <button
@@ -700,9 +708,11 @@ function LobbyButton({ label, onClick, primary, icon }) {
           : hovered ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)',
         border: primary ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.15)',
         borderRadius: 8,
-        padding: '8px 24px',
+        padding: isMobile ? '10px 16px' : '8px 24px',
+        minHeight: isMobile ? 36 : 'auto',
+        width: isMobile ? '100%' : 'auto',
         color: primary ? 'var(--accent)' : '#ccc',
-        fontSize: '0.8rem',
+        fontSize: isMobile ? '0.75rem' : '0.8rem',
         fontWeight: 600,
         cursor: 'pointer',
         fontFamily: "'Cinzel', serif",

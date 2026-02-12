@@ -18,6 +18,7 @@ import { encodeGrudaShare, generateShareUrl, generateShareCode } from '../utils/
 import { MAP_LAYERS, svgOverlayProps, mapNodeStyle, mapCenterStyle, fullCoverStyle, nodeScale as calcNodeScale } from './mapConstants';
 import { InlineIcon, getIconSrc } from '../data/uiSprites';
 import { generateAllWanderAreas, generateAllRoadPaths, aStarPathfind, buildAStarAdjacency } from '../utils/mapPathfinding';
+import useIsMobile from '../hooks/useIsMobile';
 
 const bossMapSprites = {
   nature_elemental: { glow: 'rgba(0,255,180,0.5)', terrain: '/backgrounds/kelp_forest.png', shape: 'archway', effect: 'vines', color1: '#0f4', color2: '#084' },
@@ -620,6 +621,8 @@ export default function WorldMap() {
     enterScene,
   } = useGameStore();
 
+  const isMobile = useIsMobile();
+
   const enterLocation = useGameStore(s => s.enterLocation);
   const raceDef = playerRace ? raceDefinitions[playerRace] : null;
   const cls = classDefinitions[playerClass];
@@ -694,7 +697,7 @@ export default function WorldMap() {
     const start = cities[Math.floor(Math.random() * cities.length)];
     return { currentNode: start, targetNode: null, progress: 0, showShop: false };
   });
-  const [camZoom, setCamZoom] = useState(3);
+  const [camZoom, setCamZoom] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 640 ? 3.5 : 3);
   const [camPos, setCamPos] = useState({ x: 0, y: 0 });
   const [devUnlocked, setDevUnlocked] = useState({});
   const [devPositions, setDevPositions] = useState(() => {
@@ -1977,7 +1980,7 @@ export default function WorldMap() {
                 transition: 'transform 0.3s',
               })}
             >
-              <div style={{ position: 'relative', width: 42, height: 42 }}>
+              <div style={{ position: 'relative', width: isMobile ? 48 : 42, height: isMobile ? 48 : 42 }}>
                 {isUnlocked && portalLocations.includes(loc.id) && (
                   <>
                     <div style={{
@@ -2208,9 +2211,9 @@ export default function WorldMap() {
                 transition: isCityDragging ? 'none' : 'transform 0.3s',
               })}
             >
-              <div style={{ position: 'relative', width: 44, height: 44 }}>
+              <div style={{ position: 'relative', width: isMobile ? 52 : 44, height: isMobile ? 52 : 44 }}>
                 <div style={{
-                  width: 40, height: 40, margin: '2px',
+                  width: isMobile ? 48 : 40, height: isMobile ? 48 : 40, margin: '2px',
                   borderRadius: '50%',
                   overflow: 'hidden',
                   background: isCityUnlocked
@@ -2455,16 +2458,16 @@ export default function WorldMap() {
                   border: `1px solid ${borderClr}`,
                   borderRadius: 8, padding: '6px 10px',
                   boxShadow: `0 4px 16px rgba(0,0,0,0.7), 0 0 8px ${nodeBlocked ? 'rgba(255,60,60,0.15)' : 'rgba(34,211,238,0.1)'}`,
-                  minWidth: 130, maxWidth: 200,
+                  minWidth: isMobile ? 160 : 130, maxWidth: isMobile ? 260 : 200,
                   animation: 'tooltipSlideIn 0.15s ease-out',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 }}>
-                    <span className="font-cinzel" style={{ fontSize: '0.55rem', fontWeight: 700, color: nodeBlocked ? '#ff8888' : '#fff', lineHeight: 1 }}>{loc.name}</span>
+                    <span className="font-cinzel" style={{ fontSize: isMobile ? '0.65rem' : '0.55rem', fontWeight: 700, color: nodeBlocked ? '#ff8888' : '#fff', lineHeight: 1 }}>{loc.name}</span>
                     {isConquered && <span style={{ fontSize: '0.4rem', color: 'var(--gold)', fontWeight: 700 }}>CONQUERED</span>}
                     {isCleared && !isConquered && <span style={{ fontSize: '0.4rem', color: '#22c55e' }}>CLEARED</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                    <span style={{ fontSize: '0.42rem', color: levelOk ? 'var(--teal)' : '#ef4444', fontWeight: 600 }}>Lv.{loc.levelRange[0]}-{loc.levelRange[1]}</span>
+                    <span style={{ fontSize: isMobile ? '0.6rem' : '0.42rem', color: levelOk ? 'var(--teal)' : '#ef4444', fontWeight: 600 }}>Lv.{loc.levelRange[0]}-{loc.levelRange[1]}</span>
                     {loc.terrain && <span style={{ fontSize: '0.38rem', color: icon?.color || 'var(--muted)', opacity: 0.7 }}>{loc.terrain}</span>}
                   </div>
                   <div style={{
@@ -2665,7 +2668,8 @@ export default function WorldMap() {
             border: `1.5px solid ${locationIcons[selectedLoc.id]?.color || 'var(--accent)'}`,
             borderRadius: 10,
             padding: 0,
-            width: 190,
+            width: isMobile ? 'min(90vw, 360px)' : 190,
+            maxWidth: isMobile ? 'calc(100vw - 16px)' : undefined,
             maxHeight: '60vh', overflowY: 'auto',
             boxShadow: `0 4px 20px rgba(0,0,0,0.8), 0 0 12px ${locationIcons[selectedLoc.id]?.glow || 'rgba(110,231,183,0.2)'}`,
             ...popupPositionStyle(selectedLoc.id),
@@ -2829,7 +2833,8 @@ export default function WorldMap() {
             background: 'linear-gradient(135deg, rgba(10,8,30,0.97), rgba(20,15,45,0.97))',
             border: '2px solid rgba(167,139,250,0.6)',
             borderRadius: 16,
-            padding: 0, width: 300,
+            padding: 0, width: isMobile ? 'min(90vw, 360px)' : 300,
+            maxWidth: isMobile ? 'calc(100vw - 16px)' : undefined,
             boxShadow: '0 8px 40px rgba(0,0,0,0.9), 0 0 40px rgba(167,139,250,0.2)',
             animation: 'fadeIn 0.2s ease-out',
           }}>
@@ -2956,7 +2961,8 @@ export default function WorldMap() {
               border: '1.5px solid #4ade80',
               borderRadius: 10,
               padding: 0,
-              width: 200,
+              width: isMobile ? 'min(90vw, 360px)' : 200,
+              maxWidth: isMobile ? 'calc(100vw - 16px)' : undefined,
               maxHeight: '60vh', overflowY: 'auto',
               boxShadow: '0 4px 20px rgba(0,0,0,0.8), 0 0 12px rgba(74,222,128,0.3)',
               ...popupPositionStyle(city.id),
@@ -3431,7 +3437,7 @@ export default function WorldMap() {
             backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
             border: `2px solid ${selectedEvent.color}`,
             borderRadius: 14, padding: 0,
-            minWidth: 240, maxHeight: '60vh', overflowY: 'auto',
+            minWidth: isMobile ? undefined : 240, width: isMobile ? 'min(90vw, 360px)' : undefined, maxWidth: isMobile ? 'calc(100vw - 16px)' : undefined, maxHeight: '60vh', overflowY: 'auto',
             boxShadow: `0 8px 40px rgba(0,0,0,0.8), 0 0 20px ${selectedEvent.color}40`,
             ...(() => {
               const evtPos = locationPositions[selectedEvent.locationId];
@@ -3603,7 +3609,7 @@ export default function WorldMap() {
             position: 'absolute', top: 70, right: 12, zIndex: 10600, pointerEvents: 'auto',
             backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
             border: '1px solid rgba(110,231,183,0.2)',
-            borderRadius: 12, padding: 14, maxWidth: 380, width: 370,
+            borderRadius: 12, padding: 14, maxWidth: isMobile ? 'calc(100vw - 16px)' : 380, width: isMobile ? 'min(90vw, 360px)' : 370,
             boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
             animation: 'fadeIn 0.15s ease-out',
             maxHeight: 'calc(100vh - 160px)', overflowY: 'auto',
@@ -3806,7 +3812,7 @@ export default function WorldMap() {
             position: 'absolute', top: 70, right: 12, zIndex: 10600, pointerEvents: 'auto',
             backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
             border: '1px solid rgba(239,68,68,0.25)',
-            borderRadius: 12, padding: 14, maxWidth: 380, width: 360,
+            borderRadius: 12, padding: 14, maxWidth: isMobile ? 'calc(100vw - 16px)' : 380, width: isMobile ? 'min(90vw, 360px)' : 360,
             boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
             animation: 'fadeIn 0.15s ease-out',
           }}>
@@ -4596,18 +4602,18 @@ export default function WorldMap() {
       }}>
         <button onClick={() => { setCamZoom(z => { const nz = Math.min(5, z + 0.5); setCamPos(p => clampCam(p, nz)); return nz; }); }} style={{
           background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#ccc', cursor: 'pointer',
-          fontSize: '0.75rem', width: 24, height: 24, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: isMobile ? '1rem' : '0.75rem', width: isMobile ? 36 : 24, height: isMobile ? 36 : 24, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>+</button>
-        <span style={{ color: 'var(--gold)', fontSize: '0.45rem', fontWeight: 700, textAlign: 'center' }}>
+        <span style={{ color: 'var(--gold)', fontSize: isMobile ? '0.55rem' : '0.45rem', fontWeight: 700, textAlign: 'center' }}>
           {Math.round(camZoom * 100)}%
         </span>
         <button onClick={() => { setCamZoom(z => { const nz = Math.max(1, z - 0.5); setCamPos(p => clampCam(p, nz)); return nz; }); }} style={{
           background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#ccc', cursor: 'pointer',
-          fontSize: '0.75rem', width: 24, height: 24, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: isMobile ? '1rem' : '0.75rem', width: isMobile ? 36 : 24, height: isMobile ? 36 : 24, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>-</button>
         <button onClick={() => { setCamZoom(1); setCamPos({ x: 0, y: 0 }); }} style={{
           background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.25)', color: 'var(--gold)', cursor: 'pointer',
-          fontSize: '0.4rem', fontWeight: 700, width: 24, height: 18, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: isMobile ? '0.55rem' : '0.4rem', fontWeight: 700, width: isMobile ? 36 : 24, height: isMobile ? 28 : 18, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>FIT</button>
         <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.08)', margin: '1px 0' }} />
         <button onClick={() => setShowRoads(r => !r)} title={showRoads ? 'Hide Paths' : 'Show Paths'} style={{

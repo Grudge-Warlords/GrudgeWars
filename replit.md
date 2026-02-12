@@ -16,6 +16,19 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
+- **2026-02-12:** Mobile responsiveness + painterly spell icons
+  - Made game fully playable on phone dimensions (360px-480px+)
+  - Added 358 painterly spell icons (256x256 PNG) to `public/icons/spells/`
+  - Filled all 24+ null ability icon entries in `abilityIcons.js` with mapped painterly icons
+  - Fixed icon cutoff: AbilityIcon uses `objectFit: 'contain'` instead of `cover`
+  - Created `src/hooks/useIsMobile.js` with `useIsMobile()` and `useViewport()` hooks
+  - Added CSS responsive system with variables (--ui-scale, --btn-min, --font-base, etc.)
+  - 5 responsive breakpoints: 900px, 768px, 640px, 480px, max-height 500px
+  - Mobile-optimized 13 components: BattleScreen, WorldMap, MapBottomBar, GameUIOverlay, LobbyScreen, AccountPage, LocationView, CampScene, CharacterCreate, CharacterSheet, HeroCreate, TitleScreen, LootPopup
+  - Touch targets: minimum 36-44px on all interactive elements
+  - Responsive panel widths: `maxWidth: calc(100vw - 16px)` on mobile
+  - Stacking layouts on narrow screens, horizontal scrolling for tabs
+  - Updated viewport meta for mobile (no zoom, viewport-fit=cover)
 - **2026-02-12:** Gorgon Siren zone boss sprites
   - Extracted 3 Gorgon Siren sprite sets from craftpix pack (128x128 frames)
   - Gorgon_1 (purple/original), Gorgon_2 (red variant), Gorgon_3 (teal hue-shifted from Gorgon_1)
