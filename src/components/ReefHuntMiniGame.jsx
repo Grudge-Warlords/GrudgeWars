@@ -19,6 +19,16 @@ const PLAYER_SIZE = 40;
 const BG_TILE_W = 800;
 const BG_TILE_H = 600;
 
+const SURFACE_Y = 120;
+const AIR_GRAVITY = 0.18;
+const LEAP_VELOCITY = -6;
+const LEAP_COOLDOWN = 800;
+const MAX_AIR_TIME = 3;
+const SPLASH_PARTICLE_COUNT = 12;
+
+const PARALLAX_FAR = 0.2;
+const PARALLAX_MID = 0.5;
+
 const TILE_COLLISIONS = [
   { x: 0, y: 280, w: 250, h: 120 },
   { x: 560, y: 300, w: 240, h: 110 },
@@ -40,11 +50,28 @@ const COLLECTIBLES = [
   { type: 'starfish', resource: null, amount: 0, color: '#f472b6', emoji: '⭐', size: 18, energy: 15, weight: 5 },
 ];
 
+const AIR_COLLECTIBLES = [
+  { type: 'air_bubble', resource: null, amount: 0, color: '#7dd3fc', emoji: '💨', size: 18, energy: 20, weight: 40 },
+  { type: 'seagull_drop', resource: 'gold', amount: 3, color: '#fbbf24', emoji: '🪙', size: 14, energy: 0, weight: 30 },
+  { type: 'flying_fish', resource: null, amount: 0, color: '#38bdf8', emoji: '🐟', size: 16, energy: 0, weight: 20, scoreBonus: 100 },
+];
+
 const PREDATORS = [
   { type: 'shark', emoji: '🦈', size: 36, speed: 1.2, color: '#64748b', damage: 25, hp: 3 },
   { type: 'eel', emoji: '🐍', size: 28, speed: 1.5, color: '#7c3aed', damage: 15, hp: 2 },
   { type: 'jellyfish', emoji: '🪼', size: 24, speed: 0.6, color: '#c084fc', damage: 10, hp: 1 },
 ];
+
+const FAR_MOUNTAINS = [];
+(function generateMountains() {
+  let x = 0;
+  while (x < WORLD_W * 1.5) {
+    const w = 200 + Math.random() * 400;
+    const h = 150 + Math.random() * 250;
+    FAR_MOUNTAINS.push({ x, w, h, peak: x + w * (0.3 + Math.random() * 0.4) });
+    x += w * 0.6;
+  }
+})();
 
 function buildCollisionMap() {
   const rects = [];
@@ -144,7 +171,7 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       mouseScreenX: VIEWPORT_W / 2,
       mouseScreenY: VIEWPORT_H / 2,
       playerX: WORLD_W / 2,
-      playerY: WORLD_H / 3,
+      playerY: SURFACE_Y + 200,
       playerVx: 0,
       playerVy: 0,
       facingLeft: false,
@@ -158,11 +185,14 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       collected: { gold: 0, herbs: 0, wood: 0, ore: 0, crystals: 0 },
       totalCollected: 0,
       collectibles: [],
+      airCollectibles: [],
       predators: [],
       particles: [],
+      splashParticles: [],
       bubbles: [],
       lastSpawn: 0,
       lastPredatorSpawn: 0,
+      lastAirSpawn: 0,
       lastTime: 0,
       invulnUntil: 0,
       shakeUntil: 0,
@@ -173,13 +203,19 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       spriteFrame: 0,
       spriteTimer: 0,
       buffsEarned: [],
+      aboveWater: false,
+      wasAboveWater: false,
+      leapCooldownUntil: 0,
+      airTime: 0,
+      leapTrail: [],
+      keysDown: {},
     };
     gameRef.current = g;
 
     for (let i = 0; i < 60; i++) {
       g.bubbles.push({
         x: Math.random() * WORLD_W,
-        y: Math.random() * WORLD_H,
+        y: SURFACE_Y + Math.random() * (WORLD_H - SURFACE_Y),
         size: 2 + Math.random() * 4,
         vy: -0.3 - Math.random() * 0.5,
         vx: (Math.random() - 0.5) * 0.2,
@@ -190,6 +226,9 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
 
     for (let i = 0; i < 10; i++) {
       spawnItem(g);
+    }
+    for (let i = 0; i < 3; i++) {
+      spawnAirItem(g);
     }
 
     const canvas = canvasRef.current;
@@ -210,23 +249,29 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       const wy = sy + g.camY;
 
       let collected = false;
-      g.collectibles = g.collectibles.filter(c => {
+
+      const allItems = g.aboveWater ? g.airCollectibles : g.collectibles;
+      const key = g.aboveWater ? 'airCollectibles' : 'collectibles';
+
+      g[key] = allItems.filter(c => {
         if (dist(wx, wy, c.x, c.y) < COLLECT_RADIUS) {
           if (c.resource) {
             g.collected[c.resource] = (g.collected[c.resource] || 0) + c.amount;
           }
-          g.energy = Math.min(MAX_ENERGY, g.energy + c.energy);
+          g.energy = Math.min(MAX_ENERGY, g.energy + (c.energy || 0));
           g.totalCollected++;
           g.combo++;
           g.comboTimer = 2;
-          g.score += (10 + g.combo * 5);
-          addParticle(g, c.x, c.y, c.color, `+${c.amount} ${c.type}`);
+          const bonus = c.scoreBonus || (10 + g.combo * 5);
+          g.score += bonus;
+          addParticle(g, c.x, c.y, c.color, c.scoreBonus ? `+${c.scoreBonus} pts` : `+${c.amount} ${c.type}`);
           collected = true;
           try { playClick(); } catch(err) {}
           return false;
         }
         return true;
       });
+
       if (!collected) {
         g.combo = 0;
       }
@@ -261,9 +306,22 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       try { playClick(); } catch(err) {}
     };
 
+    const onKeyDown = (e) => {
+      g.keysDown[e.code] = true;
+      if (e.code === 'Space') {
+        e.preventDefault();
+      }
+    };
+
+    const onKeyUp = (e) => {
+      g.keysDown[e.code] = false;
+    };
+
     canvas.addEventListener('mousemove', onMouseMove);
     canvas.addEventListener('click', onClick);
     canvas.addEventListener('contextmenu', onRightClick);
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
 
     g.lastTime = performance.now();
 
@@ -288,37 +346,96 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
         return;
       }
 
+      g.wasAboveWater = g.aboveWater;
+      g.aboveWater = g.playerY < SURFACE_Y;
+
+      if (g.aboveWater && !g.wasAboveWater) {
+        createSplash(g, g.playerX, SURFACE_Y, true);
+        g.airTime = 0;
+      }
+      if (!g.aboveWater && g.wasAboveWater) {
+        createSplash(g, g.playerX, SURFACE_Y, false);
+      }
+
+      if (g.aboveWater) {
+        g.airTime += dt;
+      }
+
+      if (g.keysDown['Space'] && !g.aboveWater && g.playerY < SURFACE_Y + 100 && now > g.leapCooldownUntil) {
+        g.playerVy = LEAP_VELOCITY;
+        g.leapCooldownUntil = now + LEAP_COOLDOWN;
+        createSplash(g, g.playerX, SURFACE_Y, true);
+        addParticle(g, g.playerX, g.playerY, '#7dd3fc', 'LEAP!');
+        g.score += 10;
+      }
+
       const worldMouseX = g.mouseScreenX + g.camX;
       const worldMouseY = g.mouseScreenY + g.camY;
       const dx = worldMouseX - g.playerX;
       const dy = worldMouseY - g.playerY;
       const d = Math.sqrt(dx * dx + dy * dy);
-      if (d > 5) {
-        const accel = Math.min(d * 0.006, 3);
-        g.playerVx = lerp(g.playerVx, (dx / d) * accel, 0.08);
-        g.playerVy = lerp(g.playerVy, (dy / d) * accel, 0.08);
-        g.facingLeft = dx < 0;
+
+      if (g.aboveWater) {
+        if (d > 5) {
+          const accel = Math.min(d * 0.004, 2);
+          g.playerVx = lerp(g.playerVx, (dx / d) * accel, 0.06);
+          g.facingLeft = dx < 0;
+        } else {
+          g.playerVx *= 0.95;
+        }
+        g.playerVy += AIR_GRAVITY;
+
+        if (g.airTime > MAX_AIR_TIME) {
+          g.playerVy += 0.3;
+        }
       } else {
-        g.playerVx *= 0.92;
-        g.playerVy *= 0.92;
+        if (d > 5) {
+          const accel = Math.min(d * 0.006, 3);
+          g.playerVx = lerp(g.playerVx, (dx / d) * accel, 0.08);
+          g.playerVy = lerp(g.playerVy, (dy / d) * accel, 0.08);
+          g.facingLeft = dx < 0;
+        } else {
+          g.playerVx *= 0.92;
+          g.playerVy *= 0.92;
+        }
       }
+
+      if (g.aboveWater && Math.abs(g.playerVx) > 0.5) {
+        g.leapTrail.push({
+          x: g.playerX, y: g.playerY, life: 0.6,
+          size: 4 + Math.random() * 3,
+        });
+      }
+      g.leapTrail = g.leapTrail.filter(t => {
+        t.life -= dt * 2;
+        return t.life > 0;
+      });
 
       let newX = g.playerX + g.playerVx;
       let newY = g.playerY + g.playerVy;
-      const pushed = pushOutOfCollisions(newX - PLAYER_SIZE / 2, newY - PLAYER_SIZE / 2, PLAYER_SIZE, PLAYER_SIZE, collisions);
-      newX = pushed.x + PLAYER_SIZE / 2;
-      newY = pushed.y + PLAYER_SIZE / 2;
+
+      if (!g.aboveWater) {
+        const pushed = pushOutOfCollisions(newX - PLAYER_SIZE / 2, newY - PLAYER_SIZE / 2, PLAYER_SIZE, PLAYER_SIZE, collisions);
+        newX = pushed.x + PLAYER_SIZE / 2;
+        newY = pushed.y + PLAYER_SIZE / 2;
+      }
+
       g.playerX = clamp(newX, 20, WORLD_W - 20);
-      g.playerY = clamp(newY, 20, WORLD_H - 20);
+      g.playerY = clamp(newY, -80, WORLD_H - 20);
 
       const targetCamX = clamp(g.playerX - VIEWPORT_W / 2, 0, WORLD_W - VIEWPORT_W);
-      const targetCamY = clamp(g.playerY - VIEWPORT_H / 2, 0, WORLD_H - VIEWPORT_H);
+      const targetCamY = clamp(g.playerY - VIEWPORT_H / 2, -100, WORLD_H - VIEWPORT_H);
       g.camX = lerp(g.camX, targetCamX, 0.08);
       g.camY = lerp(g.camY, targetCamY, 0.08);
 
       if (now - g.lastSpawn > SPAWN_INTERVAL && g.collectibles.length < MAX_ITEMS) {
         spawnItem(g);
         g.lastSpawn = now;
+      }
+
+      if (now - g.lastAirSpawn > 4000 && g.airCollectibles.length < 8) {
+        spawnAirItem(g);
+        g.lastAirSpawn = now;
       }
 
       if (now - g.lastPredatorSpawn > PREDATOR_SPAWN_INTERVAL && g.predators.length < MAX_ENEMIES) {
@@ -341,7 +458,15 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
           }
         }
         c.x = clamp(c.x, 0, WORLD_W);
-        c.y = clamp(c.y, 0, WORLD_H);
+        c.y = clamp(c.y, SURFACE_Y, WORLD_H);
+      });
+
+      g.airCollectibles.forEach(c => {
+        c.wobble += 0.04;
+        c.x += c.vx + Math.sin(c.wobble) * 0.3;
+        c.y += c.vy;
+        c.y = clamp(c.y, -60, SURFACE_Y - 10);
+        c.x = clamp(c.x, 20, WORLD_W - 20);
       });
 
       g.predators.forEach(p => {
@@ -370,7 +495,7 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
         p.x = ep.x + 16;
         p.y = ep.y + 16;
         p.x = clamp(p.x, 20, WORLD_W - 20);
-        p.y = clamp(p.y, 20, WORLD_H - 20);
+        p.y = clamp(p.y, SURFACE_Y, WORLD_H - 20);
 
         if (pd < 30 && now > g.invulnUntil) {
           g.energy -= p.damage;
@@ -404,10 +529,18 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       });
       g.particles = g.particles.filter(p => p.life > 0);
 
+      g.splashParticles.forEach(sp => {
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.vy += 0.12;
+        sp.life -= dt * 2;
+      });
+      g.splashParticles = g.splashParticles.filter(sp => sp.life > 0);
+
       g.bubbles.forEach(b => {
         b.y += b.vy;
         b.x += Math.sin(b.y * 0.02) * 0.2 + b.vx;
-        if (b.y < -10) {
+        if (b.y < SURFACE_Y - 10) {
           b.y = WORLD_H + 10;
           b.x = Math.random() * WORLD_W;
         }
@@ -439,13 +572,15 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       canvas.removeEventListener('mousemove', onMouseMove);
       canvas.removeEventListener('click', onClick);
       canvas.removeEventListener('contextmenu', onRightClick);
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
     };
   }, [spriteData]);
 
   function spawnItem(g) {
     const template = weightedRandom(COLLECTIBLES);
     const x = Math.random() * (WORLD_W - 100) + 50;
-    const y = Math.random() * 200;
+    const y = SURFACE_Y + Math.random() * 200;
     g.collectibles.push({
       ...template,
       id: Date.now() + Math.random(),
@@ -457,10 +592,25 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
     });
   }
 
+  function spawnAirItem(g) {
+    const template = weightedRandom(AIR_COLLECTIBLES);
+    const x = Math.random() * (WORLD_W - 100) + 50;
+    const y = -20 + Math.random() * (SURFACE_Y - 20);
+    g.airCollectibles.push({
+      ...template,
+      id: Date.now() + Math.random(),
+      x, y,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.1,
+      wobble: Math.random() * Math.PI * 2,
+      alpha: 1,
+    });
+  }
+
   function spawnEnemy(g) {
     const template = PREDATORS[Math.floor(Math.random() * PREDATORS.length)];
     const x = Math.random() * WORLD_W;
-    const y = Math.random() * WORLD_H;
+    const y = SURFACE_Y + 50 + Math.random() * (WORLD_H - SURFACE_Y - 100);
     g.predators.push({
       ...template,
       id: Date.now() + Math.random(),
@@ -473,6 +623,20 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
     });
   }
 
+  function createSplash(g, x, y, goingUp) {
+    for (let i = 0; i < SPLASH_PARTICLE_COUNT; i++) {
+      g.splashParticles.push({
+        x: x + (Math.random() - 0.5) * 30,
+        y: y,
+        vx: (Math.random() - 0.5) * 4,
+        vy: goingUp ? -(2 + Math.random() * 3) : (1 + Math.random() * 2),
+        size: 3 + Math.random() * 5,
+        life: 0.8 + Math.random() * 0.4,
+        color: i % 3 === 0 ? '#ffffff' : '#7dd3fc',
+      });
+    }
+  }
+
   function addParticle(g, x, y, color, text) {
     g.particles.push({
       x, y, text, color,
@@ -481,6 +645,171 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       life: 1,
       id: Date.now() + Math.random(),
     });
+  }
+
+  function renderFarBackground(ctx, g, now) {
+    const farCamX = g.camX * PARALLAX_FAR;
+    const farCamY = g.camY * PARALLAX_FAR;
+
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, VIEWPORT_H);
+    skyGrad.addColorStop(0, '#0a3d62');
+    skyGrad.addColorStop(0.3, '#0c5a8a');
+    skyGrad.addColorStop(0.6, '#0e7490');
+    skyGrad.addColorStop(1, '#041225');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, VIEWPORT_W, VIEWPORT_H);
+
+    ctx.globalAlpha = 0.25;
+    for (const m of FAR_MOUNTAINS) {
+      const sx = m.x - farCamX;
+      const baseY = VIEWPORT_H * 0.6 - farCamY * 0.5;
+      if (sx + m.w < -100 || sx > VIEWPORT_W + 100) continue;
+
+      ctx.beginPath();
+      ctx.moveTo(sx, baseY);
+      ctx.quadraticCurveTo(
+        m.peak - farCamX, baseY - m.h,
+        sx + m.w, baseY
+      );
+      ctx.closePath();
+      ctx.fillStyle = '#0c4a6e';
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 0.12;
+    for (const m of FAR_MOUNTAINS) {
+      const sx = m.x * 1.3 - farCamX * 1.5;
+      const baseY = VIEWPORT_H * 0.55 - farCamY * 0.3;
+      if (sx + m.w < -100 || sx > VIEWPORT_W + 100) continue;
+
+      ctx.beginPath();
+      ctx.moveTo(sx, baseY);
+      ctx.quadraticCurveTo(
+        (m.peak * 1.3) - farCamX * 1.5, baseY - m.h * 0.7,
+        sx + m.w * 1.1, baseY
+      );
+      ctx.closePath();
+      ctx.fillStyle = '#164e63';
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function renderMidBackground(ctx, g, now, bgImg) {
+    if (!bgImg.complete || bgImg.naturalWidth <= 0) return;
+
+    const midCamX = g.camX * PARALLAX_MID;
+    const midCamY = g.camY * PARALLAX_MID;
+
+    ctx.globalAlpha = 0.35;
+    const tilesX = Math.ceil(WORLD_W / BG_TILE_W) + 1;
+    const tilesY = Math.ceil(WORLD_H / BG_TILE_H) + 1;
+    for (let ty = 0; ty < tilesY; ty++) {
+      for (let tx = 0; tx < tilesX; tx++) {
+        const drawX = tx * BG_TILE_W - midCamX;
+        const drawY = ty * BG_TILE_H - midCamY + 50;
+        if (drawX > VIEWPORT_W + 50 || drawY > VIEWPORT_H + 50 || drawX + BG_TILE_W < -50 || drawY + BG_TILE_H < -50) continue;
+        ctx.drawImage(bgImg, drawX, drawY, BG_TILE_W, BG_TILE_H);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function renderForegroundBg(ctx, g, bgImg) {
+    if (!bgImg.complete || bgImg.naturalWidth <= 0) return;
+    const tilesX = Math.ceil(WORLD_W / BG_TILE_W);
+    const tilesY = Math.ceil(WORLD_H / BG_TILE_H);
+    for (let ty = 0; ty < tilesY; ty++) {
+      for (let tx = 0; tx < tilesX; tx++) {
+        const drawX = tx * BG_TILE_W - g.camX;
+        const drawY = ty * BG_TILE_H - g.camY;
+        if (drawX > VIEWPORT_W || drawY > VIEWPORT_H || drawX + BG_TILE_W < 0 || drawY + BG_TILE_H < 0) continue;
+        ctx.drawImage(bgImg, drawX, drawY, BG_TILE_W, BG_TILE_H);
+      }
+    }
+  }
+
+  function renderSurface(ctx, g, now) {
+    const surfaceScreenY = SURFACE_Y - g.camY;
+
+    if (surfaceScreenY > -50 && surfaceScreenY < VIEWPORT_H + 50) {
+      ctx.save();
+
+      ctx.globalAlpha = 0.6;
+      ctx.strokeStyle = '#7dd3fc';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let x = 0; x <= VIEWPORT_W; x += 5) {
+        const worldX = x + g.camX;
+        const waveOffset = Math.sin(worldX * 0.008 + now * 0.001) * 6
+          + Math.sin(worldX * 0.015 + now * 0.0015) * 3;
+        const y = surfaceScreenY + waveOffset;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.globalAlpha = 0.3;
+      ctx.strokeStyle = '#bae6fd';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let x = 0; x <= VIEWPORT_W; x += 5) {
+        const worldX = x + g.camX;
+        const waveOffset = Math.sin(worldX * 0.01 + now * 0.0008 + 2) * 4
+          + Math.sin(worldX * 0.02 + now * 0.001) * 2;
+        const y = surfaceScreenY + waveOffset - 4;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    if (surfaceScreenY > 0) {
+      ctx.globalAlpha = 0.06;
+      const time = now * 0.001;
+      for (let i = 0; i < 5; i++) {
+        const lx = Math.sin(time * 0.15 + i * 1.2) * 200 + VIEWPORT_W * (0.2 + i * 0.15);
+        const lgr = ctx.createLinearGradient(lx - 40, 0, lx + 40, surfaceScreenY);
+        lgr.addColorStop(0, '#fffbe6');
+        lgr.addColorStop(1, 'transparent');
+        ctx.fillStyle = lgr;
+        ctx.fillRect(lx - 40, 0, 80, surfaceScreenY);
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function renderAboveWater(ctx, g, now) {
+    const surfaceScreenY = SURFACE_Y - g.camY;
+    if (surfaceScreenY <= 0) return;
+
+    ctx.save();
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, surfaceScreenY);
+    skyGrad.addColorStop(0, 'rgba(135,206,235,0.15)');
+    skyGrad.addColorStop(0.5, 'rgba(176,224,247,0.08)');
+    skyGrad.addColorStop(1, 'rgba(125,211,252,0.03)');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, VIEWPORT_W, surfaceScreenY);
+
+    const time = now * 0.001;
+    const cloudCamX = g.camX * 0.1;
+    ctx.globalAlpha = 0.08;
+    for (let i = 0; i < 6; i++) {
+      const cx = (i * 400 + time * 10) % (WORLD_W + 200) - 100 - cloudCamX;
+      const cy = 20 + i * 12 - g.camY * 0.05;
+      if (cx < -200 || cx > VIEWPORT_W + 200 || cy > surfaceScreenY) continue;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 80 + i * 10, 15 + i * 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(cx + 30, cy - 5, 50, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
   function render(ctx, g, now, bgImg, spriteImg, frameW, frameH, frameCount, collisions) {
@@ -492,54 +821,12 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
     }
 
-    if (bgImg.complete && bgImg.naturalWidth > 0) {
-      const tilesX = Math.ceil(WORLD_W / BG_TILE_W);
-      const tilesY = Math.ceil(WORLD_H / BG_TILE_H);
-      for (let ty = 0; ty < tilesY; ty++) {
-        for (let tx = 0; tx < tilesX; tx++) {
-          const drawX = tx * BG_TILE_W - g.camX;
-          const drawY = ty * BG_TILE_H - g.camY;
-          if (drawX > VIEWPORT_W || drawY > VIEWPORT_H || drawX + BG_TILE_W < 0 || drawY + BG_TILE_H < 0) continue;
-          ctx.drawImage(bgImg, drawX, drawY, BG_TILE_W, BG_TILE_H);
-        }
-      }
-    } else {
-      const grad = ctx.createLinearGradient(0, 0, 0, VIEWPORT_H);
-      grad.addColorStop(0, '#0c4a6e');
-      grad.addColorStop(0.4, '#0e3a5c');
-      grad.addColorStop(1, '#041225');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, VIEWPORT_W, VIEWPORT_H);
-    }
+    renderFarBackground(ctx, g, now);
+    renderMidBackground(ctx, g, now, bgImg);
+    renderForegroundBg(ctx, g, bgImg);
+    renderAboveWater(ctx, g, now);
 
-    const surfaceThreshold = WORLD_H / 3;
-    const surfaceScreenY = surfaceThreshold - g.camY;
-    if (surfaceScreenY > 0 && surfaceScreenY < VIEWPORT_H) {
-      const lgr = ctx.createLinearGradient(0, 0, 0, surfaceScreenY);
-      lgr.addColorStop(0, 'rgba(34,211,238,0.08)');
-      lgr.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = lgr;
-      ctx.fillRect(0, 0, VIEWPORT_W, surfaceScreenY);
-    }
-
-    if (g.camY < 100) {
-      const waveY = -g.camY;
-      ctx.globalAlpha = 0.15;
-      ctx.strokeStyle = '#22d3ee';
-      ctx.lineWidth = 2;
-      for (let i = 0; i < 3; i++) {
-        ctx.beginPath();
-        for (let x = 0; x <= VIEWPORT_W; x += 10) {
-          const y = Math.sin(x * 0.005 + now * 0.001 * 0.5 + i * 2) * 15 + waveY + 20 + i * 15;
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    const deepStart = surfaceThreshold;
+    const deepStart = WORLD_H / 3;
     const deepScreenY = deepStart - g.camY;
     if (deepScreenY < VIEWPORT_H) {
       const dg = ctx.createLinearGradient(0, Math.max(0, deepScreenY), 0, VIEWPORT_H);
@@ -548,18 +835,6 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       ctx.fillStyle = dg;
       ctx.fillRect(0, Math.max(0, deepScreenY), VIEWPORT_W, VIEWPORT_H - Math.max(0, deepScreenY));
     }
-
-    ctx.globalAlpha = 0.04;
-    const time = now * 0.001;
-    for (let i = 0; i < 4; i++) {
-      const lx = Math.sin(time * 0.2 + i * 1.5) * 300 + VIEWPORT_W / 2;
-      const lgr = ctx.createLinearGradient(lx - 60, 0, lx + 60, VIEWPORT_H * 0.6);
-      lgr.addColorStop(0, '#fffbe6');
-      lgr.addColorStop(1, 'transparent');
-      ctx.fillStyle = lgr;
-      ctx.fillRect(lx - 60, 0, 120, VIEWPORT_H * 0.6);
-    }
-    ctx.globalAlpha = 1;
 
     g.bubbles.forEach(b => {
       const sx = b.x - g.camX;
@@ -576,6 +851,23 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       ctx.fill();
     });
     ctx.globalAlpha = 1;
+
+    g.airCollectibles.forEach(c => {
+      const sx = c.x - g.camX;
+      const sy = c.y - g.camY;
+      if (sx < -30 || sx > VIEWPORT_W + 30 || sy < -30 || sy > VIEWPORT_H + 30) return;
+      ctx.save();
+      const bob = Math.sin(c.wobble) * 5;
+      ctx.globalAlpha = c.alpha * 0.9;
+      ctx.shadowColor = c.color;
+      ctx.shadowBlur = 10;
+      ctx.font = `${c.size + 4}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(c.emoji, sx, sy + bob);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    });
 
     g.collectibles.forEach(c => {
       const sx = c.x - g.camX;
@@ -597,6 +889,8 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       ctx.shadowBlur = 0;
       ctx.restore();
     });
+
+    renderSurface(ctx, g, now);
 
     g.predators.forEach(p => {
       const sx = p.x - g.camX;
@@ -635,6 +929,28 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
       ctx.restore();
     });
 
+    g.leapTrail.forEach(t => {
+      const sx = t.x - g.camX;
+      const sy = t.y - g.camY;
+      ctx.globalAlpha = t.life * 0.5;
+      ctx.fillStyle = '#7dd3fc';
+      ctx.beginPath();
+      ctx.arc(sx, sy, t.size * t.life, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
+    g.splashParticles.forEach(sp => {
+      const sx = sp.x - g.camX;
+      const sy = sp.y - g.camY;
+      ctx.globalAlpha = Math.max(0, sp.life) * 0.7;
+      ctx.fillStyle = sp.color;
+      ctx.beginPath();
+      ctx.arc(sx, sy, sp.size * sp.life, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
     const isInvuln = now < g.invulnUntil;
     ctx.save();
     if (isInvuln) {
@@ -645,6 +961,12 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
     const playerScreenY = g.playerY - g.camY;
 
     ctx.translate(playerScreenX, playerScreenY);
+
+    if (g.aboveWater) {
+      const leapAngle = clamp(g.playerVy * 0.08, -0.5, 0.5);
+      ctx.rotate(leapAngle * (g.facingLeft ? -1 : 1));
+    }
+
     if (g.attackSpinActive) {
       ctx.rotate(g.attackSpin);
     }
@@ -766,6 +1088,27 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
     const resText = `P:${res.gold} A:${res.herbs} C:${res.wood} S:${res.ore} X:${res.crystals}`;
     ctx.fillStyle = '#94a3b8';
     ctx.fillText(resText, 12, rY + 12);
+
+    if (g.playerY > SURFACE_Y - 100 && g.playerY < SURFACE_Y + 50) {
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fillRect(VIEWPORT_W / 2 - 60, VIEWPORT_H - 30, 120, 20);
+      ctx.font = '10px "Jost", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#7dd3fc';
+      ctx.fillText('SPACE to Leap!', VIEWPORT_W / 2, VIEWPORT_H - 17);
+    }
+
+    if (g.aboveWater && g.airTime > MAX_AIR_TIME - 1) {
+      const urgency = Math.sin(now * 0.01) > 0 ? 1 : 0.4;
+      ctx.globalAlpha = urgency;
+      ctx.fillStyle = 'rgba(239,68,68,0.3)';
+      ctx.fillRect(0, 0, VIEWPORT_W, 4);
+      ctx.globalAlpha = 1;
+      ctx.font = 'bold 12px "Jost", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ef4444';
+      ctx.fillText('Returning to water!', VIEWPORT_W / 2, VIEWPORT_H - 40);
+    }
   }
 
   return (
@@ -780,9 +1123,10 @@ export default function ReefHuntMiniGame({ onClose, onComplete }) {
             ref={canvasRef}
             width={VIEWPORT_W}
             height={VIEWPORT_H}
+            tabIndex={0}
             style={{
               maxWidth: '100%', maxHeight: '100%', display: 'block', cursor: 'none',
-              aspectRatio: `${VIEWPORT_W} / ${VIEWPORT_H}`,
+              aspectRatio: `${VIEWPORT_W} / ${VIEWPORT_H}`, outline: 'none',
             }}
           />
           <button onClick={onClose} style={{
