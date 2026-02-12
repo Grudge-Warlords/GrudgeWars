@@ -604,3 +604,13 @@ input[type="range"]::-moz-range-thumb {
   border: 2px solid rgba(255,255,255,0.3);
   box-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
+
+@keyframes shieldDroidIdle {
+  from { transform: translateX(0); }
+  to { transform: translateX(-90px); }
+}
+
+@keyframes shieldPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}

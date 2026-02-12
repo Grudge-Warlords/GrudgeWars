@@ -1022,6 +1022,18 @@ const tadpoleCharSprite = gifCharSprite('tadpole_char', 3);
 const wormCharSprite = gifCharSprite('worm_char', 3);
 const eggCharSprite = gifCharSprite('egg_char', 5);
 
+const shieldDroidSprite = {
+  folder: 'shield_droid', frameWidth: 90, frameHeight: 31,
+  idle: { src: '/sprites/shield_droid/idle.png', frames: 1 },
+  walk: { src: '/sprites/shield_droid/walk.png', frames: 6 },
+  attack1: { src: '/sprites/shield_droid/attack.png', frames: 14 },
+  hurt: { src: '/sprites/shield_droid/hit.png', frames: 7 },
+  death: { src: '/sprites/shield_droid/hit.png', frames: 7 },
+  shield_prep: { src: '/sprites/shield_droid/shield_prep.png', frames: 10 },
+  shield_pulse: { src: '/sprites/shield_droid/shield_pulse.png', frames: 6 },
+  shield_done: { src: '/sprites/shield_droid/shield_done.png', frames: 4 },
+};
+
 export const enemySpriteMap = {
   goblin: fishEnemySprite('fish_tan'),
   skeleton: eelSprite,
@@ -1063,6 +1075,7 @@ export const enemySpriteMap = {
   loreon_knight: { ...eelSprite, filter: 'hue-rotate(40deg) saturate(1.2)' },
   medieval_warrior: greenFishCharSprite,
   fantasy_warrior: { ...pufferfishBrownSprite, filter: 'hue-rotate(40deg) saturate(1.3)' },
+  shield_droid: shieldDroidSprite,
 };
 
 export function getClassBuffClass(classId, variant = 1) {

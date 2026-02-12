@@ -3,6 +3,18 @@ import { classDefinitions } from './classes.js';
 import { raceDefinitions } from './races.js';
 
 export const enemyTemplates = {
+  shield_droid: {
+    name: 'Shield Droid', icon: 'shield', color: '#64748b', portrait: '/sprites/shield_droid/idle.png',
+    baseHealth: 300, baseDamage: 25, baseDefense: 50, baseMana: 100,
+    xpReward: 80, goldReward: 40, speed: 8,
+    isBoss: false,
+    isBlocker: true,
+    abilities: [
+      { id: 'shock_pulse', name: 'Shock Pulse', icon: 'lightning', type: 'magical', damage: 1.2, description: 'Emits a crackling electric pulse' },
+      { id: 'shield_bash', name: 'Shield Bash', icon: 'shield', type: 'physical', damage: 1.4, cooldown: 3, description: 'Charges forward with energy shield for a devastating bash' },
+      { id: 'energy_barrier', name: 'Energy Barrier', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Activates a temporary energy barrier boosting defense', effect: { stat: 'defense', flat: 30, duration: 3 } },
+    ]
+  },
   goblin: {
     name: 'Reef Bandit', icon: 'sword', color: '#0ea5e9', portrait: '/images/enemies/puffer_scout.png',
     baseHealth: 80, baseDamage: 12, baseDefense: 5, baseMana: 20,
@@ -1079,6 +1091,65 @@ export const locations = [
       { raceId: 'purple_betta', classId: 'ranger', levelRange: [20, 20] },
     ],
   }
+];
+
+export const shieldBlockers = [
+  {
+    id: 'blocker_anemone',
+    locationId: 'mystic_grove',
+    name: 'Passage Guardian',
+    condition: { type: 'level', value: 3 },
+    message: 'Reach Level 3 to disable this Shield Droid',
+    scale: 2.5,
+  },
+  {
+    id: 'blocker_twilight',
+    locationId: 'twilight_coast',
+    name: 'Twilight Sentry',
+    condition: { type: 'boss', value: 'skeleton_knight' },
+    message: 'Defeat the Barnacle Knight in Biolume Caves to pass',
+    scale: 2.5,
+  },
+  {
+    id: 'blocker_ruins',
+    locationId: 'cursed_ruins',
+    name: 'Ruin Warden',
+    condition: { type: 'level', value: 8 },
+    message: 'Reach Level 8 to disable this Shield Droid',
+    scale: 2.5,
+  },
+  {
+    id: 'blocker_temple',
+    locationId: 'sunken_temple',
+    name: 'Temple Gatekeeper',
+    condition: { type: 'boss', value: 'dark_knight' },
+    message: 'Defeat the Angler Phantom in Shadow Reef to pass',
+    scale: 2.5,
+  },
+  {
+    id: 'blocker_volcano',
+    locationId: 'dragon_peaks',
+    name: 'Volcanic Sentinel',
+    condition: { type: 'level', value: 12 },
+    message: 'Reach Level 12 to disable this Shield Droid',
+    scale: 2.5,
+  },
+  {
+    id: 'blocker_necropolis',
+    locationId: 'necropolis',
+    name: 'Deep Guard',
+    condition: { type: 'boss', value: 'lich' },
+    message: 'Defeat the Kraken Lich in Abyssal Depths to pass',
+    scale: 2.5,
+  },
+  {
+    id: 'blocker_void',
+    locationId: 'void_threshold',
+    name: 'Final Blockade',
+    condition: { type: 'level', value: 17 },
+    message: 'Reach Level 17 to challenge the Abyss',
+    scale: 3.0,
+  },
 ];
 
 const ZONE_TERRAIN_MAP = {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import useGameStore, { getHeroStatsWithBonuses } from '../stores/gameStore';
-import { locations } from '../data/enemies';
+import { locations, shieldBlockers } from '../data/enemies';
 import { cities, cityPositions, cityConnections } from '../data/cities';
 import { missionTemplates, arenaTemplates } from '../data/missions';
 import { classDefinitions } from '../data/classes';
@@ -625,6 +625,24 @@ export default function WorldMap() {
   const cls = classDefinitions[playerClass];
   const unlockedLocs = getUnlockedLocations();
   const canCreateNewHero = heroRoster.length < maxHeroSlots;
+
+  const blockerMap = React.useMemo(() => {
+    const map = {};
+    for (const b of shieldBlockers) {
+      map[b.locationId] = b;
+    }
+    return map;
+  }, []);
+
+  const isBlockerActive = useCallback((locId) => {
+    const blocker = blockerMap[locId];
+    if (!blocker) return false;
+    const c = blocker.condition;
+    if (c.type === 'level') return level < c.value;
+    if (c.type === 'boss') return !bossesDefeated.includes(c.value);
+    if (c.type === 'node') return !locationsCleared.includes(c.value);
+    return false;
+  }, [blockerMap, level, bossesDefeated, locationsCleared]);
 
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
@@ -1299,6 +1317,7 @@ export default function WorldMap() {
       return;
     }
 
+    if (isBlockerActive(loc.id)) return;
     const isUnlocked = loc.unlocked || (loc.unlockLevel && level >= loc.unlockLevel) || devUnlocked[loc.id];
     if (!isUnlocked) return;
 
@@ -1907,7 +1926,9 @@ export default function WorldMap() {
         {locations.map((loc) => {
           const pos = getNodePos(loc.id);
           if (!pos) return null;
-          const isUnlocked = loc.unlocked || (loc.unlockLevel && level >= loc.unlockLevel) || devUnlocked[loc.id];
+          const blocked = isBlockerActive(loc.id);
+          const blocker = blockerMap[loc.id];
+          const isUnlocked = (loc.unlocked || (loc.unlockLevel && level >= loc.unlockLevel) || devUnlocked[loc.id]) && !blocked;
           const cleared = locationsCleared.includes(loc.id);
           const icon = locationIcons[loc.id];
           const isSelected = selectedLocation === loc.id;
@@ -1922,7 +1943,7 @@ export default function WorldMap() {
             <div key={loc.id}
               onClick={(e) => handleLocationClick(e, loc)}
               onContextMenu={(e) => handleNodeRightClick(e, loc)}
-              onMouseEnter={() => { if (!selectedLocation && !selectedCity && !selectedEvent) setHoveredNode({ type: 'location', id: loc.id, x: pos.x, y: pos.y }); }}
+              onMouseEnter={() => { if (!selectedLocation && !selectedCity && !selectedEvent) setHoveredNode({ type: 'location', id: loc.id, x: pos.x, y: pos.y, blocked, blockerMsg: blocker?.message }); }}
               onMouseLeave={() => setHoveredNode(null)}
               style={mapNodeStyle(pos, ns, isSelected ? MAP_LAYERS.SELECTED : MAP_LAYERS.NODES, {
                 cursor: isUnlocked ? 'pointer' : 'not-allowed',
@@ -2066,18 +2087,57 @@ export default function WorldMap() {
                   }} />
                 </div>
               )}
+              {blocked && (
+                <div style={{
+                  position: 'absolute', top: -22, left: '50%', transform: 'translateX(-50%)',
+                  width: 56, height: 56, pointerEvents: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <div style={{
+                    width: 30, height: 31,
+                    overflow: 'hidden',
+                    imageRendering: 'pixelated',
+                    transform: 'scale(1.8)',
+                  }}>
+                    <div style={{
+                      width: 90, height: 31,
+                      backgroundImage: 'url(/sprites/shield_droid/idle.png)',
+                      backgroundSize: '90px 31px',
+                      imageRendering: 'pixelated',
+                      animation: 'shieldDroidIdle 0.9s steps(3) infinite',
+                    }} />
+                  </div>
+                  <div style={{
+                    position: 'absolute', inset: -2,
+                    borderRadius: '50%',
+                    border: '2px solid rgba(255,60,60,0.5)',
+                    boxShadow: '0 0 12px rgba(255,60,60,0.3), inset 0 0 8px rgba(255,60,60,0.15)',
+                    animation: 'shieldPulse 2s ease-in-out infinite',
+                    pointerEvents: 'none',
+                  }} />
+                </div>
+              )}
               <div style={{
                 position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
                 marginTop: 4, whiteSpace: 'nowrap', textAlign: 'center',
               }}>
                 <div className="font-cinzel" style={{
                   fontSize: '0.65rem', fontWeight: 700,
-                  color: isUnlocked ? (isConquered ? 'var(--gold)' : cleared ? 'var(--gold)' : '#fff') : 'rgba(150,150,170,0.5)',
+                  color: blocked ? 'rgba(255,100,100,0.7)' : isUnlocked ? (isConquered ? 'var(--gold)' : cleared ? 'var(--gold)' : '#fff') : 'rgba(150,150,170,0.5)',
                   textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)',
                 }}>
-                  {loc.name}
+                  {blocked ? '🛡️ ' : ''}{loc.name}
                 </div>
-                {isUnlocked && (
+                {blocked && blocker && (
+                  <div style={{
+                    fontSize: '0.5rem', color: 'rgba(255,140,140,0.8)',
+                    textShadow: '0 1px 3px rgba(0,0,0,0.9)',
+                    maxWidth: 120,
+                  }}>
+                    {blocker.message}
+                  </div>
+                )}
+                {isUnlocked && !blocked && (
                   <div style={{
                     fontSize: '0.55rem', color: icon.color,
                     textShadow: '0 1px 3px rgba(0,0,0,0.9)',
@@ -2087,7 +2147,7 @@ export default function WorldMap() {
                     {cleared && ' ✓'}
                   </div>
                 )}
-                {!isUnlocked && loc.unlockLevel && (
+                {!isUnlocked && !blocked && loc.unlockLevel && (
                   <div style={{
                     fontSize: '0.5rem', color: 'rgba(150,150,170,0.4)',
                     textShadow: '0 1px 3px rgba(0,0,0,0.9)',
