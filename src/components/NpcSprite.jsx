@@ -13,6 +13,7 @@ export default function NpcSprite({ npcId, scale = 3, flip = false, name }) {
   const { src, frameWidth, frameHeight, frames } = npcData;
   const displayWidth = frameWidth * scale;
   const displayHeight = frameHeight * scale;
+  const isStatic = frames <= 1;
 
   useEffect(() => {
     const img = new Image();
@@ -28,9 +29,8 @@ export default function NpcSprite({ npcId, scale = 3, flip = false, name }) {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
-    const fps = 6;
 
-    const animate = () => {
+    const draw = () => {
       ctx.clearRect(0, 0, displayWidth, displayHeight);
       ctx.save();
       if (flip) {
@@ -45,16 +45,23 @@ export default function NpcSprite({ npcId, scale = 3, flip = false, name }) {
         displayWidth, displayHeight
       );
       ctx.restore();
-      frameRef.current = (frameRef.current + 1) % frames;
+      frameRef.current = (frameRef.current + 1) % Math.max(frames, 1);
     };
 
-    animate();
-    const interval = setInterval(animate, 1000 / fps);
-    return () => clearInterval(interval);
-  }, [loaded, displayWidth, displayHeight, frames, frameWidth, frameHeight, flip]);
+    draw();
+    if (!isStatic) {
+      const interval = setInterval(draw, 1000 / 6);
+      return () => clearInterval(interval);
+    }
+  }, [loaded, displayWidth, displayHeight, frames, frameWidth, frameHeight, flip, isStatic]);
+
+  const swimDelay = Math.random() * 3;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      animation: `npcSwim 3s ease-in-out ${swimDelay.toFixed(1)}s infinite`,
+    }}>
       <canvas
         ref={canvasRef}
         width={displayWidth}
