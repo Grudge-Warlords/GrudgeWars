@@ -341,7 +341,7 @@ export default function GameUIOverlay({
     { id: 'council', label: 'Council', icon: 'battle', action: () => setScreen('account') },
     { id: 'party', label: 'Party', icon: 'shield', action: () => onToggleWarParty(), badge: Object.keys(activeHarvests).length > 0 ? Object.keys(activeHarvests).length : null },
     { id: 'gruda', label: 'Gruda', icon: 'skull', action: () => onToggleGruda() },
-    { id: 'settings', label: 'Settings', icon: 'scroll', action: () => setScreen('account') },
+    { id: 'settings', label: 'Settings', icon: 'scroll', action: () => window.dispatchEvent(new Event('toggle-settings')) },
     { id: 'music', label: musicMuted ? 'Unmute' : 'Mute', icon: 'energy', action: () => {
       const newVal = !musicMuted;
       setMusicMutedState(newVal);

@@ -38,6 +38,12 @@ export default function SettingsMenu() {
     setConfirmReset(false);
   }, [screen]);
 
+  useEffect(() => {
+    const handler = () => setOpen(prev => !prev);
+    window.addEventListener('toggle-settings', handler);
+    return () => window.removeEventListener('toggle-settings', handler);
+  }, []);
+
   const handleMusicToggle = () => {
     const next = !musicOff;
     setMusicOff(next);
@@ -98,7 +104,7 @@ export default function SettingsMenu() {
       <button
         onClick={() => { setOpen(!open); setConfirmReset(false); }}
         style={{
-          position: 'fixed', top: 60, left: 16, zIndex: 10700,
+          position: 'fixed', top: 98, left: 16, zIndex: 10700,
           width: 34, height: 34, borderRadius: '50%',
           background: open ? 'rgba(110,231,183,0.2)' : 'rgba(14,22,48,0.7)',
           border: `1px solid ${open ? 'var(--accent)' : 'rgba(255,255,255,0.12)'}`,
@@ -115,7 +121,7 @@ export default function SettingsMenu() {
 
       {open && (
         <div ref={panelRef} style={{
-          position: 'fixed', top: 100, left: 16, zIndex: 10701,
+          position: 'fixed', top: 138, left: 16, zIndex: 10701,
           width: 280,
           backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
           border: '1px solid rgba(110,231,183,0.25)',

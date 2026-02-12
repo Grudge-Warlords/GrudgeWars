@@ -23,7 +23,6 @@ import SceneView from './components/SceneView';
 import IntroCinematic from './components/IntroCinematic';
 import DiscordAuth from './components/DiscordAuth';
 import { InlineIcon } from './data/uiSprites';
-import AdminGizmo from './components/AdminGizmo';
 import GameTooltipRenderer from './components/GameTooltip';
 
 function GameApp() {
@@ -144,7 +143,6 @@ function GameApp() {
       <div id="hud-overlay" style={{ position: 'absolute', inset: 0, zIndex: 10600, pointerEvents: 'none' }}>
         <GameTooltipRenderer />
         <SettingsMenu />
-        <AdminGizmo />
         {pendingLoot && pendingLoot.length > 0 && <LootPopup />}
         {gameMessage && (
           <div style={{
