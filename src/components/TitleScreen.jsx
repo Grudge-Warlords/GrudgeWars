@@ -3,11 +3,13 @@ import useGameStore from '../stores/gameStore';
 import { setBgm } from '../utils/audioManager';
 import { EssentialIcon } from '../data/uiSprites';
 import useIsMobile from '../hooks/useIsMobile';
+import { puterAuth, isPuterAvailable } from '../utils/puterService';
 
 export default function TitleScreen() {
   const setScreen = useGameStore(s => s.setScreen);
   const [fadeClass, setFadeClass] = useState(false);
   const isMobile = useIsMobile();
+  const [puterLoading, setPuterLoading] = useState(false);
 
   useEffect(() => {
     setBgm('intro');
@@ -23,6 +25,27 @@ export default function TitleScreen() {
     };
     localStorage.setItem('grudge-session', JSON.stringify(session));
     setScreen('intro');
+  };
+
+  const handlePuterLogin = async () => {
+    if (puterLoading) return;
+    setPuterLoading(true);
+    try {
+      await puterAuth.signIn();
+      const user = await puterAuth.getUser();
+      const session = {
+        type: 'puter',
+        username: user?.username || 'Puter User',
+        puterUser: user,
+        loginTime: Date.now(),
+      };
+      localStorage.setItem('grudge-session', JSON.stringify(session));
+      setScreen('intro');
+    } catch (err) {
+      console.error('Puter sign-in failed:', err);
+    } finally {
+      setPuterLoading(false);
+    }
   };
 
   return (
@@ -85,6 +108,15 @@ export default function TitleScreen() {
               }
             />
 
+            {isPuterAvailable() && (
+              <MenuButton
+                label={puterLoading ? 'SIGNING IN...' : 'SIGN IN WITH PUTER'}
+                onClick={handlePuterLogin}
+                isMobile={isMobile}
+                icon={<span style={{ marginRight: 8, fontSize: 18 }}>☁</span>}
+              />
+            )}
+
             <MenuButton
               label="GRUDGE STUDIO"
               onClick={() => window.open('https://grudgestudio.com', '_blank')}
@@ -107,6 +139,9 @@ export default function TitleScreen() {
           color: 'var(--muted)', fontSize: '0.65rem', opacity: 0.3,
         }}>
           &copy; 2026 Grudge Studio &bull; Betta Warlords
+          {isPuterAvailable() && (
+            <span> &bull; <a href="https://developer.puter.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--muted)', textDecoration: 'none', opacity: 0.7 }}>Powered by Puter</a></span>
+          )}
         </div>
       </div>
     );
