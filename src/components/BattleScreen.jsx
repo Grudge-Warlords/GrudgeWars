@@ -3057,10 +3057,10 @@ export default function BattleScreen() {
                           width: fishSize, height: fishSize, margin: '0 auto',
                           position: 'relative',
                         }}>
-                          <img src="/images/betta_red_plakat.png" alt="" style={{
+                          <img src="/images/betta_outline.png" alt="" style={{
                             width: '100%', height: '100%', objectFit: 'contain',
-                            opacity: 0.75, pointerEvents: 'none',
-                            filter: 'drop-shadow(0 0 6px rgba(220,50,50,0.2))',
+                            opacity: 0.45, pointerEvents: 'none',
+                            filter: 'drop-shadow(0 0 6px rgba(34,211,238,0.25))',
                           }} />
                           {Object.entries(fishSlots).map(([slot, pos]) => {
                             const item = eq[slot];

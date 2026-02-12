@@ -44,14 +44,14 @@ export default function FishEquipPanel({ equipment = {}, size = 220, onSlotClick
       flexShrink: 0,
     }}>
       <img
-        src="/images/betta_red_plakat.png"
+        src="/images/betta_outline.png"
         alt="Equipment"
         style={{
           width: '100%',
           height: '100%',
           objectFit: 'contain',
-          opacity: 0.85,
-          filter: 'drop-shadow(0 0 8px rgba(220,50,50,0.3))',
+          opacity: 0.45,
+          filter: 'drop-shadow(0 0 8px rgba(34,211,238,0.25))',
           pointerEvents: 'none',
         }}
       />
