@@ -319,12 +319,12 @@ export default function MapBottomBar({
   const hasUnspent = unspentPoints > 0 || skillPoints > 0 || heroRoster.some(h => (h.unspentPoints || 0) > 0 || (h.skillPoints || 0) > 0);
 
   const buttons = [
-    { id: 'camp', label: 'Camp', icon: 'camp', color: '#4ade80', action: () => enterScene('camp', 'world') },
-    { id: 'points', label: 'Points', icon: 'star', color: hasUnspent ? '#ef4444' : '#94a3b8', action: () => setScreen('account'), pulse: hasUnspent },
-    { id: 'council', label: 'Council', icon: 'battle', color: 'var(--gold)', action: () => setScreen('account') },
-    { id: 'party', label: 'Party', icon: 'shield', color: 'var(--accent)', action: () => onToggleWarParty(), badge: Object.keys(activeHarvests).length > 0 ? Object.keys(activeHarvests).length : null },
+    { id: 'camp', label: 'Camp', icon: 'camp', img: '/images/icons/btn-camp.png', color: '#4ade80', action: () => enterScene('camp', 'world') },
+    { id: 'points', label: 'Points', icon: 'star', img: '/images/icons/btn-points.png', color: hasUnspent ? '#ef4444' : '#94a3b8', action: () => setScreen('account'), pulse: hasUnspent },
+    { id: 'council', label: 'Council', icon: 'battle', img: '/images/icons/btn-council.png', color: 'var(--gold)', action: () => setScreen('account') },
+    { id: 'party', label: 'Party', icon: 'shield', img: '/images/icons/btn-party.png', color: 'var(--accent)', action: () => onToggleWarParty(), badge: Object.keys(activeHarvests).length > 0 ? Object.keys(activeHarvests).length : null },
     { id: 'gruda', label: 'Gruda', icon: 'skull', color: '#f87171', action: () => onToggleGruda() },
-    { id: 'settings', label: 'Settings', icon: 'scroll', color: '#94a3b8', action: () => setScreen('account') },
+    { id: 'settings', label: 'Settings', icon: 'scroll', img: '/images/icons/btn-settings.png', color: '#94a3b8', action: () => setScreen('account') },
     { id: 'music', label: musicMuted ? 'Unmute' : 'Mute', icon: 'energy', color: musicMuted ? '#ef4444' : '#6ee7b7', action: () => {
       const newVal = !musicMuted;
       setMusicMutedState(newVal);
@@ -449,7 +449,11 @@ export default function MapBottomBar({
                 onMouseMove={e => updateTooltipPosition(e)}
                 onMouseLeave={e => { hideTooltip(); e.currentTarget.style.background = 'rgba(0,0,0,0.35)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
               >
-                <InlineIcon name={btn.icon} size={18} />
+                {btn.img ? (
+                  <img src={btn.img} alt={btn.label} style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 4, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
+                ) : (
+                  <InlineIcon name={btn.icon} size={18} />
+                )}
                 <span style={{ fontSize: '0.45rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif" }}>{btn.label}</span>
                 {btn.badge && (
                   <span style={{
