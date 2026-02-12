@@ -2193,17 +2193,25 @@ export default function WorldMap() {
           const hitAnchorX = containerW / 2 + hitOffsetX;
           const hitAnchorY = visibleH / 2 + hitOffsetY;
           return (
-            <div style={{
-              position: 'absolute',
-              left: `${zonePos.x}%`,
-              top: `${zonePos.y}%`,
-              width: containerW,
-              height: containerH,
-              transform: `translate(-${hitAnchorX}px, -${hitAnchorY}px) scale(${heroScale})`,
-              zIndex: MAP_LAYERS.HERO,
-              transition: 'transform 0.3s',
-              pointerEvents: 'none',
-            }}>
+            <div
+              style={{
+                position: 'absolute',
+                left: `${zonePos.x}%`,
+                top: `${zonePos.y}%`,
+                width: containerW,
+                height: containerH,
+                transform: `translate(-${hitAnchorX}px, -${hitAnchorY}px) scale(${heroScale})`,
+                zIndex: MAP_LAYERS.HERO,
+                transition: 'transform 0.3s',
+                cursor: 'pointer',
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                const targetPos = isPathing ? heroPos : (getNodePos(currentZone) || locationPositions.verdant_plains);
+                const newCamPos = { x: -(targetPos.x - 50), y: -(targetPos.y - 50) };
+                setCamPos(clampCam(newCamPos, camZoom));
+              }}
+            >
               {activeHeroes.map((hero, idx) => {
                 const walk = heroWalking[hero.id];
                 const isWalking = walk?.moving;
