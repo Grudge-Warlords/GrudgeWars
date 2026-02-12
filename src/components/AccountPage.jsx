@@ -785,21 +785,18 @@ function HeroDetailPanel({ hero, onClose }) {
             </div>
           );
 
-          const FULL_SLOT_LABELS = { weapon: 'Weapon', offhand: 'Off-Hand', helmet: 'Helmet', armor: 'Chest', feet: 'Feet', ring: 'Ring', relic: 'Relic' };
+          const FULL_SLOT_LABELS = { weapon: 'Weapon', offhand: 'Off-Fin', helmet: 'Crown', armor: 'Gills', feet: 'Fins', ring: 'Scale', relic: 'Relic' };
 
-          const panelScale = 3.2;
-          const panelW = 67 * panelScale;
-          const panelH = 79 * panelScale;
-          const slotPx = 15 * panelScale;
-
-          const slotPositions = {
-            helmet:  { left: 24 * panelScale, top: 3 * panelScale },
-            weapon:  { left: 5 * panelScale, top: 22 * panelScale },
-            armor:   { left: 24 * panelScale, top: 22 * panelScale },
-            offhand: { left: 43 * panelScale, top: 22 * panelScale },
-            feet:    { left: 24 * panelScale, top: 41 * panelScale },
-            ring:    { left: 10 * panelScale, top: 59 * panelScale },
-            relic:   { left: 39 * panelScale, top: 59 * panelScale },
+          const fishPanelSize = 230;
+          const fishSlotSize = fishPanelSize * 0.16;
+          const fishSlotPositions = {
+            helmet:  { left: '72%', top: '24%' },
+            weapon:  { left: '82%', top: '48%' },
+            armor:   { left: '55%', top: '40%' },
+            offhand: { left: '48%', top: '16%' },
+            feet:    { left: '60%', top: '68%' },
+            ring:    { left: '38%', top: '52%' },
+            relic:   { left: '20%', top: '38%' },
           };
 
           return (
@@ -830,37 +827,53 @@ function HeroDetailPanel({ hero, onClose }) {
                     }}>EQUIPMENT</div>
 
                     <div style={{
-                      width: panelW, height: panelH,
-                      backgroundImage: `url(${UI_PANELS.equipPanelSmall})`,
-                      backgroundSize: `${panelW}px ${panelH}px`,
-                      imageRendering: 'pixelated',
+                      width: fishPanelSize, height: fishPanelSize,
                       position: 'relative',
-                      borderRadius: 4,
-                      overflow: 'hidden',
+                      borderRadius: 8,
                     }}>
-                      {Object.entries(slotPositions).map(([slot, pos]) => (
-                        <div key={slot} style={{
-                          position: 'absolute',
-                          left: pos.left, top: pos.top,
-                          width: slotPx, height: slotPx,
-                        }}>
-                          {renderEquipSlot(slot, slot === 'offhand' && is2H)}
-                        </div>
-                      ))}
+                      <img src="/images/betta_red_plakat.png" alt="" style={{
+                        width: '100%', height: '100%', objectFit: 'contain',
+                        opacity: 0.8, pointerEvents: 'none',
+                        filter: 'drop-shadow(0 0 8px rgba(220,50,50,0.25))',
+                      }} />
+                      {Object.entries(fishSlotPositions).map(([slot, pos]) => {
+                        const isLocked = slot === 'offhand' && is2H;
+                        const equipped = eq[slot];
+                        const tierDef = equipped ? TIERS[equipped.tier] || TIERS[1] : null;
+                        return (
+                          <div key={slot} style={{
+                            position: 'absolute',
+                            left: pos.left, top: pos.top,
+                            transform: 'translate(-50%, -50%)',
+                            width: fishSlotSize, height: fishSlotSize,
+                            borderRadius: '50%',
+                            background: isLocked ? 'rgba(60,60,60,0.7)' : equipped
+                              ? `radial-gradient(circle, ${tierDef.color}30 0%, rgba(0,0,0,0.5) 100%)`
+                              : 'rgba(10,15,30,0.65)',
+                            border: isLocked ? '2px solid #444' : equipped
+                              ? `2px solid ${tierDef.color}90`
+                              : '2px dashed rgba(100,140,180,0.35)',
+                            backdropFilter: 'blur(3px)',
+                            boxShadow: equipped ? `0 0 6px ${tierDef.color}30` : '0 0 4px rgba(0,0,0,0.5)',
+                          }}>
+                            {renderEquipSlot(slot, isLocked)}
+                          </div>
+                        );
+                      })}
                       {is2H && (
                         <div style={{
                           position: 'absolute', bottom: 6, left: 0, right: 0,
                           textAlign: 'center', fontSize: '0.45rem', color: '#f59e0b', fontWeight: 600,
                           textShadow: '0 1px 3px rgba(0,0,0,0.9)',
                         }}>
-                          2H — off-hand locked
+                          2H — off-fin locked
                         </div>
                       )}
                     </div>
 
                     <div style={{
                       marginTop: 8,
-                      width: panelW,
+                      width: fishPanelSize,
                       background: 'rgba(15,12,8,0.7)',
                       border: '1px solid rgba(139,115,85,0.3)',
                       borderRadius: 5,

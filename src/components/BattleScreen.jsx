@@ -2899,18 +2899,16 @@ export default function BattleScreen() {
                     }}>{equippedCount}</div>
                   )}
                   {hoveredGearUnitId === unit.id && hero && (() => {
-                    const ps = 2.0;
-                    const pW = 67 * ps;
-                    const pH = 79 * ps;
-                    const sPx = 15 * ps;
-                    const sPos = {
-                      helmet:  { left: 24 * ps, top: 3 * ps },
-                      weapon:  { left: 5 * ps, top: 22 * ps },
-                      armor:   { left: 24 * ps, top: 22 * ps },
-                      offhand: { left: 43 * ps, top: 22 * ps },
-                      feet:    { left: 24 * ps, top: 41 * ps },
-                      ring:    { left: 10 * ps, top: 59 * ps },
-                      relic:   { left: 39 * ps, top: 59 * ps },
+                    const fishSize = 160;
+                    const fishSlotSz = fishSize * 0.15;
+                    const fishSlots = {
+                      helmet:  { left: '72%', top: '24%' },
+                      weapon:  { left: '82%', top: '48%' },
+                      armor:   { left: '55%', top: '40%' },
+                      offhand: { left: '48%', top: '16%' },
+                      feet:    { left: '60%', top: '68%' },
+                      ring:    { left: '38%', top: '52%' },
+                      relic:   { left: '20%', top: '38%' },
                     };
                     return (
                       <div style={{
@@ -2922,7 +2920,7 @@ export default function BattleScreen() {
                         padding: '8px 10px 10px',
                         boxShadow: '0 4px 20px rgba(0,0,0,0.8), 0 0 12px rgba(139,115,85,0.2)',
                         pointerEvents: 'none',
-                        minWidth: pW + 20,
+                        minWidth: fishSize + 20,
                       }}>
                         <div style={{
                           textAlign: 'center', fontSize: '0.55rem', fontWeight: 700,
@@ -2930,34 +2928,42 @@ export default function BattleScreen() {
                           textTransform: 'uppercase', fontFamily: 'var(--font-heading)',
                         }}>{unit.name}</div>
                         <div style={{
-                          width: pW, height: pH, margin: '0 auto',
-                          backgroundImage: `url(${UI_PANELS.equipPanelSmall})`,
-                          backgroundSize: `${pW}px ${pH}px`,
-                          imageRendering: 'pixelated',
+                          width: fishSize, height: fishSize, margin: '0 auto',
                           position: 'relative',
                         }}>
-                          {Object.entries(sPos).map(([slot, pos]) => {
+                          <img src="/images/betta_red_plakat.png" alt="" style={{
+                            width: '100%', height: '100%', objectFit: 'contain',
+                            opacity: 0.75, pointerEvents: 'none',
+                            filter: 'drop-shadow(0 0 6px rgba(220,50,50,0.2))',
+                          }} />
+                          {Object.entries(fishSlots).map(([slot, pos]) => {
                             const item = eq[slot];
                             const itemSprite = item ? getItemSpriteIcon(item) : null;
                             const tDef = item ? (TIERS[item.tier] || TIERS[1]) : null;
                             return (
                               <div key={slot} style={{
                                 position: 'absolute', left: pos.left, top: pos.top,
-                                width: sPx, height: sPx,
+                                transform: 'translate(-50%, -50%)',
+                                width: fishSlotSz, height: fishSlotSz,
+                                borderRadius: '50%',
+                                background: item ? `radial-gradient(circle, ${tDef.color}30 0%, rgba(0,0,0,0.5) 100%)` : 'rgba(10,15,30,0.6)',
+                                border: item ? `2px solid ${tDef.color}80` : '1px dashed rgba(100,140,180,0.3)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                backdropFilter: 'blur(3px)',
+                                boxShadow: item ? `0 0 5px ${tDef.color}30` : 'none',
                               }}>
                                 {item ? (
                                   <>
                                     {itemSprite ? (
                                       <img src={itemSprite} alt={item.name} style={{
-                                        width: '75%', height: '75%', objectFit: 'contain',
+                                        width: '70%', height: '70%', objectFit: 'contain',
                                         imageRendering: 'pixelated',
                                         filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.9))',
                                       }} />
                                     ) : (
-                                      <InlineIcon name={item.icon} size={14} style={{ filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.9))' }} />
+                                      <InlineIcon name={item.icon} size={12} style={{ filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.9))' }} />
                                     )}
-                                    {tDef && <div style={{ position: 'absolute', bottom: 1, left: 2, right: 2, height: 2, background: tDef.color, borderRadius: 1, boxShadow: `0 0 4px ${tDef.color}` }} />}
+                                    {tDef && <div style={{ position: 'absolute', bottom: 0, left: '15%', right: '15%', height: 2, background: tDef.color, borderRadius: 1, boxShadow: `0 0 4px ${tDef.color}` }} />}
                                   </>
                                 ) : null}
                               </div>
