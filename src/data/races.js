@@ -65,6 +65,28 @@ export const raceDefinitions = {
     passive: '+3 Endurance, +2 Vitality, +1 Strength, +1 Dexterity, +1 Wisdom',
     trait: 'Royal Guard',
   },
+  orange_betta: {
+    id: 'orange_betta',
+    name: 'Ember Scale',
+    icon: '/images/races/orange_betta.png',
+    color: '#f97316',
+    description: 'Blazing swimmers from the thermal vents — fierce speed and burning strikes.',
+    lore: 'Ember Scales thrive in the superheated waters near volcanic fissures. Their scales shimmer like molten copper, and their lightning-fast dashes leave trails of heated water that scald anything in their wake.',
+    bonuses: { Strength: 2, Vitality: 0, Endurance: 1, Dexterity: 2, Agility: 3, Intellect: 0, Wisdom: 0, Tactics: 0 },
+    passive: '+3 Agility, +2 Strength, +2 Dexterity, +1 Endurance',
+    trait: 'Thermal Dash',
+  },
+  pink_betta: {
+    id: 'pink_betta',
+    name: 'Coral Dancer',
+    icon: '/images/races/pink_betta.png',
+    color: '#ec4899',
+    description: 'Graceful healers of the coral gardens — masters of restorative tides.',
+    lore: 'Coral Dancers are the most elegant bettas, gliding through pink coral fields with mesmerizing grace. Their bioluminescent fins pulse with healing energy, able to mend wounds and purify poisoned waters.',
+    bonuses: { Strength: 0, Vitality: 1, Endurance: 0, Dexterity: 1, Agility: 1, Intellect: 2, Wisdom: 3, Tactics: 0 },
+    passive: '+3 Wisdom, +2 Intellect, +1 Vitality, +1 Dexterity, +1 Agility',
+    trait: 'Healing Tide',
+  },
 };
 
 export const raceList = Object.values(raceDefinitions);

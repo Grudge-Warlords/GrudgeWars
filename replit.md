@@ -1,12 +1,12 @@
 # Betta Warlords
 
 ## Overview
-Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-based RPG built using React, Vite, and Zustand. It features multi-hero tactical battles with betta fish species, allowing players to create and manage a roster of heroes from 6 betta fish species and 4 classes, offering 24 unique Warlord combinations. The game is set in a vast underwater world with coral reefs, deep trenches, volcanic vents, and frozen depths.
+Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-based RPG built using React, Vite, and Zustand. It features multi-hero tactical battles with betta fish species, allowing players to create and manage a roster of heroes from 8 betta fish species and 4 classes, offering 32 unique Warlord combinations. The game is set in a vast underwater world with coral reefs, deep trenches, volcanic vents, and frozen depths.
 
 ## Theme
 - **Setting:** Underwater ocean world with betta fish characters
 - **Color Palette:** Teal (#22d3ee), Cyan (#06b6d4), Purple (#a855f7), Deep Blue (#041225)
-- **Races:** Blue Veil (blue_betta), Crimson Fang (red_betta), Mystic Fin (purple_betta), Ghost Tide (white_betta), Reef Striker (green_betta), Crown Tail (gold_betta)
+- **Races:** Blue Veil (blue_betta), Crimson Fang (red_betta), Mystic Fin (purple_betta), Ghost Tide (white_betta), Reef Striker (green_betta), Crown Tail (gold_betta), Ember Scale (orange_betta), Coral Dancer (pink_betta)
 - **Currency:** Pearls (formerly gold)
 - **Resources:** Coral (wood), Shells (ore), Algae (herbs), Crystals, Pearls
 - **Enemies:** Sea creatures (Puffer Scout, Barracuda, Ink Sorcerer, Sea Serpent, Kraken Lich, etc.)
@@ -16,6 +16,12 @@ Betta Warlords (formerly Grudge Warlords) is an underwater ocean adventure turn-
 - **Gods:** Poseidon (Lord of Tides), Charybdis (The Devourer), The Leviathan (Weaver of Currents)
 
 ## Recent Changes
+- **2026-02-12:** Expanded betta species from 6 to 8 with dedicated fish sprites
+  - Added Ember Scale (orange_betta) and Coral Dancer (pink_betta) races with full stats, lore, and portraits
+  - Split fish sprite sheet into per-color animation strips (48×48 frames, 3-frame animations)
+  - Updated spriteMap.js with fish sprite definitions for all 8 species
+  - Updated all UI text to reflect "8 Species / 32 Warlord Combinations"
+  - Fixed RACE_BG mappings and fallbacks across CharacterCreate and HeroCreate
 - **2026-02-11:** Complete re-theme from medieval fantasy to underwater betta fish ocean adventure
   - Generated 30+ AI ocean backgrounds and 20+ underwater map node images
   - Re-themed all 6 races to betta fish species with new portraits
@@ -39,7 +45,7 @@ The application is a React 19 frontend developed with Vite, with an Express back
 - **Map Bottom Bar (MapBottomBar.jsx):** Custom RPG bottom bar with Party Log, icon buttons, and War Party display.
 
 **Technical Implementations:**
-- **Character System:** 24 unique Warlord combinations across 6 betta species and 4 classes, with 8 attributes and 0-20 level progression.
+- **Character System:** 32 unique Warlord combinations across 8 betta species and 4 classes, with 8 attributes and 0-20 level progression.
 - **Battle System:** Multi-unit tactical combat with speed-based initiative, up to 3 active heroes against AI enemies.
 - **Sprite System:** SpriteAnimation component for pixel art animations with equipment overlays and special transformation effects.
 - **World Map:** RTS-style 2D underwater map with zoom/pan, 32 unlockable locations across 5 ocean terrain regions (Coral Reefs, Abyssal Depths, Volcanic Vents, Frozen Currents, Ancient Ruins).

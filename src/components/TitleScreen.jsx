@@ -93,7 +93,7 @@ export default function TitleScreen() {
             color: 'var(--muted)', fontSize: '0.7rem', marginTop: 40, opacity: 0.4,
             letterSpacing: 1,
           }}>
-            Ocean RPG &bull; 6 Species &bull; 4 Classes &bull; Deep Sea Adventure
+            Ocean RPG &bull; 8 Species &bull; 4 Classes &bull; Deep Sea Adventure
           </div>
         </div>
 

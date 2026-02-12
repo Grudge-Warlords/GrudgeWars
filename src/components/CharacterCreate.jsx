@@ -10,12 +10,14 @@ import { getPlayerSprite } from '../data/spriteMap';
 const stepLabels = ['Name', 'Race', 'Class', 'Attributes'];
 
 const RACE_BG = {
-  human: '/backgrounds/card_blue_betta.png',
-  elf: '/backgrounds/card_purple_betta.png',
-  dwarf: '/backgrounds/card_green_betta.png',
-  undead: '/backgrounds/card_white_betta.png',
-  orc: '/backgrounds/card_red_betta.png',
-  barbarian: '/backgrounds/card_gold_betta.png',
+  blue_betta: '/backgrounds/card_blue_betta.png',
+  purple_betta: '/backgrounds/card_purple_betta.png',
+  green_betta: '/backgrounds/card_green_betta.png',
+  white_betta: '/backgrounds/card_white_betta.png',
+  red_betta: '/backgrounds/card_red_betta.png',
+  gold_betta: '/backgrounds/card_gold_betta.png',
+  orange_betta: '/backgrounds/card_red_betta.png',
+  pink_betta: '/backgrounds/card_purple_betta.png',
 };
 
 export default function CharacterCreate() {
@@ -155,14 +157,14 @@ export default function CharacterCreate() {
               Choose Your Race
             </h2>
             <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.8rem', marginBottom: 20 }}>
-              6 Races &times; 4 Classes = 24 Warlord Combinations
+              8 Species &times; 4 Classes = 32 Warlord Combinations
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
               {raceList.map(race => {
                 const isSelected = selectedRace === race.id;
                 return (
                   <div key={race.id} onClick={() => setSelectedRace(race.id)} style={{
-                    backgroundImage: `linear-gradient(135deg, ${isSelected ? race.color + '35' : 'rgba(20,26,43,0.85)'}, rgba(11,16,32,0.88)), url(${RACE_BG[race.id] || RACE_BG.human})`,
+                    backgroundImage: `linear-gradient(135deg, ${isSelected ? race.color + '35' : 'rgba(20,26,43,0.85)'}, rgba(11,16,32,0.88)), url(${RACE_BG[race.id] || RACE_BG.blue_betta})`,
                     backgroundSize: 'cover', backgroundPosition: 'center',
                     border: `2px solid ${isSelected ? race.color : race.color + '30'}`,
                     borderRadius: 12, padding: 16, cursor: 'pointer',

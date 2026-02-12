@@ -240,7 +240,7 @@ function MainTab({ hasExistingSave, onContinue, onNewGame, playerName, playerLev
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           {[
-            { essentialIcon: 'Hammer', text: '24 Warlord Combinations' },
+            { essentialIcon: 'Hammer', text: '32 Warlord Combinations' },
             { essentialIcon: 'Skull', text: 'Tactical Turn-Based Combat' },
             { essentialIcon: 'Book', text: 'Deep Skill Trees' },
             { essentialIcon: 'ChestTreasure', text: 'Endgame Boss Fights' },

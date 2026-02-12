@@ -10,12 +10,14 @@ import { getPlayerSprite } from '../data/spriteMap';
 const ATTRIBUTES = Object.keys(attributeDefinitions);
 
 const RACE_BG = {
-  human: '/backgrounds/card_blue_betta.png',
-  elf: '/backgrounds/card_purple_betta.png',
-  dwarf: '/backgrounds/card_green_betta.png',
-  undead: '/backgrounds/card_white_betta.png',
-  orc: '/backgrounds/card_red_betta.png',
-  barbarian: '/backgrounds/card_gold_betta.png',
+  blue_betta: '/backgrounds/card_blue_betta.png',
+  purple_betta: '/backgrounds/card_purple_betta.png',
+  green_betta: '/backgrounds/card_green_betta.png',
+  white_betta: '/backgrounds/card_white_betta.png',
+  red_betta: '/backgrounds/card_red_betta.png',
+  gold_betta: '/backgrounds/card_gold_betta.png',
+  orange_betta: '/backgrounds/card_red_betta.png',
+  pink_betta: '/backgrounds/card_purple_betta.png',
 };
 
 export default function HeroCreate() {
@@ -230,7 +232,7 @@ export default function HeroCreate() {
               {Object.entries(raceDefinitions).map(([id, race]) => (
                 <div key={id} onClick={() => setSelectedRace(id)}
                   style={{
-                    backgroundImage: `linear-gradient(135deg, ${selectedRace === id ? (race.color || 'var(--accent)') + '35' : 'rgba(20,26,43,0.85)'}, rgba(11,16,32,0.88)), url(${RACE_BG[id] || RACE_BG.human})`,
+                    backgroundImage: `linear-gradient(135deg, ${selectedRace === id ? (race.color || 'var(--accent)') + '35' : 'rgba(20,26,43,0.85)'}, rgba(11,16,32,0.88)), url(${RACE_BG[id] || RACE_BG.blue_betta})`,
                     backgroundSize: 'cover', backgroundPosition: 'center',
                     border: `2px solid ${selectedRace === id ? (race.color || 'var(--accent)') : 'var(--border)'}`,
                     borderRadius: 12, padding: 16, cursor: 'pointer', transition: 'all 0.2s',
