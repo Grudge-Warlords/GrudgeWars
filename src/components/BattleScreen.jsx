@@ -2899,18 +2899,18 @@ export default function BattleScreen() {
                     }}>{equippedCount}</div>
                   )}
                   {hoveredGearUnitId === unit.id && hero && (() => {
-                    const ps = 1.6;
-                    const pW = 96 * ps;
-                    const pH = 128 * ps;
-                    const sPx = 20 * ps;
+                    const ps = 2.0;
+                    const pW = 67 * ps;
+                    const pH = 79 * ps;
+                    const sPx = 15 * ps;
                     const sPos = {
-                      helmet:  { left: 35 * ps, top: 8 * ps },
-                      weapon:  { left: 11 * ps, top: 32 * ps },
-                      armor:   { left: 35 * ps, top: 32 * ps },
-                      offhand: { left: 59 * ps, top: 32 * ps },
-                      feet:    { left: 35 * ps, top: 56 * ps },
-                      ring:    { left: 17 * ps, top: 85 * ps },
-                      relic:   { left: 52 * ps, top: 85 * ps },
+                      helmet:  { left: 24 * ps, top: 3 * ps },
+                      weapon:  { left: 5 * ps, top: 22 * ps },
+                      armor:   { left: 24 * ps, top: 22 * ps },
+                      offhand: { left: 43 * ps, top: 22 * ps },
+                      feet:    { left: 24 * ps, top: 41 * ps },
+                      ring:    { left: 10 * ps, top: 59 * ps },
+                      relic:   { left: 39 * ps, top: 59 * ps },
                     };
                     return (
                       <div style={{

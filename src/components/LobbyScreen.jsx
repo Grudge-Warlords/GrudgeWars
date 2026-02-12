@@ -49,9 +49,19 @@ export default function LobbyScreen() {
     }
   };
 
+  const [showFarewell, setShowFarewell] = useState(false);
+  const farewellTimer = React.useRef(null);
+
+  useEffect(() => {
+    return () => { if (farewellTimer.current) clearTimeout(farewellTimer.current); };
+  }, []);
+
   const handleLogout = () => {
-    localStorage.removeItem('grudge-session');
-    setScreen('title');
+    setShowFarewell(true);
+    farewellTimer.current = setTimeout(() => {
+      localStorage.removeItem('grudge-session');
+      setScreen('title');
+    }, 2500);
   };
 
   const panelStyle = {
@@ -77,6 +87,35 @@ export default function LobbyScreen() {
         zIndex: 0,
       }} />
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 0 }} />
+
+      {showFarewell && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 100,
+          backgroundImage: 'url(/backgrounds/main_menu_bg.png)',
+          backgroundSize: 'cover', backgroundPosition: 'center',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          animation: 'fadeIn 0.8s ease forwards',
+        }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,18,37,0.5)', pointerEvents: 'none' }} />
+          <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+            <div className="font-cinzel" style={{
+              fontSize: 'clamp(1.4rem, 4vw, 2.4rem)',
+              background: 'linear-gradient(135deg, #22d3ee, #06b6d4, #a855f7)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              marginBottom: 16,
+            }}>
+              Until Next Tide...
+            </div>
+            <div style={{
+              color: 'var(--accent)', fontSize: '0.85rem', opacity: 0.7,
+              letterSpacing: 2,
+            }}>
+              The depths await your return
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 24px',

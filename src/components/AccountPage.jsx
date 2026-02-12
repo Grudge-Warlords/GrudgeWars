@@ -787,19 +787,19 @@ function HeroDetailPanel({ hero, onClose }) {
 
           const FULL_SLOT_LABELS = { weapon: 'Weapon', offhand: 'Off-Hand', helmet: 'Helmet', armor: 'Chest', feet: 'Feet', ring: 'Ring', relic: 'Relic' };
 
-          const panelScale = 2.5;
-          const panelW = 96 * panelScale;
-          const panelH = 128 * panelScale;
-          const slotPx = 20 * panelScale;
+          const panelScale = 3.2;
+          const panelW = 67 * panelScale;
+          const panelH = 79 * panelScale;
+          const slotPx = 15 * panelScale;
 
           const slotPositions = {
-            helmet:  { left: 35 * panelScale, top: 8 * panelScale },
-            weapon:  { left: 11 * panelScale, top: 32 * panelScale },
-            armor:   { left: 35 * panelScale, top: 32 * panelScale },
-            offhand: { left: 59 * panelScale, top: 32 * panelScale },
-            feet:    { left: 35 * panelScale, top: 56 * panelScale },
-            ring:    { left: 17 * panelScale, top: 85 * panelScale },
-            relic:   { left: 52 * panelScale, top: 85 * panelScale },
+            helmet:  { left: 24 * panelScale, top: 3 * panelScale },
+            weapon:  { left: 5 * panelScale, top: 22 * panelScale },
+            armor:   { left: 24 * panelScale, top: 22 * panelScale },
+            offhand: { left: 43 * panelScale, top: 22 * panelScale },
+            feet:    { left: 24 * panelScale, top: 41 * panelScale },
+            ring:    { left: 10 * panelScale, top: 59 * panelScale },
+            relic:   { left: 39 * panelScale, top: 59 * panelScale },
           };
 
           return (
