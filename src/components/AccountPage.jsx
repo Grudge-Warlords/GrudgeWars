@@ -595,12 +595,12 @@ function HeroDetailPanel({ hero, onClose }) {
         backgroundImage: `linear-gradient(135deg, ${cls?.color || 'var(--accent)'}40, rgba(14,22,48,0.8)), url(${RACE_BG[hero.raceId] || RACE_BG.human})`,
         backgroundSize: 'cover', backgroundPosition: 'center',
         borderBottom: `2px solid ${cls?.color || 'var(--border)'}`,
-        padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 12,
+        padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10,
       }}>
         <div style={{ filter: `drop-shadow(0 0 10px ${cls?.color || 'var(--accent)'}50)` }}>
           <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={getCardScale(getPlayerSprite(hero.classId, hero.raceId)) * 0.9} speed={150} equipmentOverlays={buildEquipmentOverlays(hero, TIERS)} />
         </div>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '1.1rem' }}>{hero.name}</span>
             <span style={{ color: cls?.color, fontSize: '0.75rem', fontWeight: 600 }}>
@@ -623,6 +623,30 @@ function HeroDetailPanel({ hero, onClose }) {
               {isActive ? '✓ In Party' : '+ Add to Party'}
             </button>
           </div>
+        </div>
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 10px',
+          background: 'rgba(4,18,37,0.7)', borderRadius: 8, padding: '6px 10px',
+          border: '1px solid rgba(110,231,183,0.15)', flexShrink: 0,
+        }}>
+          {[
+            { label: 'HP', value: Math.floor(stats.health), color: '#22c55e', icon: '❤' },
+            { label: 'ATK', value: Math.floor(stats.physicalDamage), color: '#ef4444', icon: '⚔' },
+            { label: 'MP', value: Math.floor(stats.mana), color: '#3b82f6', icon: '💧' },
+            { label: 'DEF', value: Math.floor(stats.defense), color: '#6b7280', icon: '🛡' },
+            { label: 'SP', value: Math.floor(stats.stamina), color: '#f59e0b', icon: '⚡' },
+            { label: 'SPD', value: Math.floor(stats.speed || 0), color: '#22d3ee', icon: '💨' },
+            { label: 'CRIT', value: (stats.criticalChance || 0).toFixed(1) + '%', color: '#f97316', icon: '🎯' },
+            { label: 'MAG', value: Math.floor(stats.magicDamage), color: '#8b5cf6', icon: '✨' },
+          ].map(s => (
+            <div key={s.label} style={{
+              display: 'flex', alignItems: 'center', gap: 4, padding: '1px 0',
+            }}>
+              <span style={{ fontSize: '0.55rem', lineHeight: 1 }}>{s.icon}</span>
+              <span style={{ color: 'var(--muted)', fontSize: '0.6rem', width: 28 }}>{s.label}</span>
+              <span style={{ color: s.color, fontSize: '0.7rem', fontWeight: 700, fontFamily: 'monospace' }}>{s.value}</span>
+            </div>
+          ))}
         </div>
       </div>
 
