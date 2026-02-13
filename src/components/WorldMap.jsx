@@ -1266,7 +1266,7 @@ export default function WorldMap() {
           const sprite1 = getPlayerSprite(hero1.classId, hero1.raceId);
           setBubbleQueue(prev => [...prev.slice(-4), {
             id: `b_${Date.now()}_1`, speaker: hero1, text: line1,
-            colorHex: '#6ee7b7', spriteData: sprite1, autoExpire: 10000,
+            colorHex: '#6ee7b7', spriteData: sprite1, autoExpire: 10000, isAI: true,
           }]);
           setChatLog(prev => [...prev.slice(-49), { id: Date.now(), speaker: hero1.name, line: line1, color: 'var(--accent)' }]);
           lastDialogueTime.current = Date.now();
@@ -1284,7 +1284,7 @@ export default function WorldMap() {
                 const sprite2 = getPlayerSprite(hero2.classId, hero2.raceId);
                 setBubbleQueue(prev => [...prev.slice(-4), {
                   id: `b_${Date.now()}_ai`, speaker: hero2, text: line2,
-                  colorHex: '#c084fc', spriteData: sprite2, autoExpire: 10000,
+                  colorHex: '#c084fc', spriteData: sprite2, autoExpire: 10000, isAI: true,
                 }]);
                 setChatLog(prev => [...prev.slice(-49), { id: Date.now() + 1, speaker: hero2.name, line: line2, color: '#c084fc' }]);
               } catch {}
@@ -1305,21 +1305,11 @@ export default function WorldMap() {
       if (!dialogue) return;
       lastDialogueTime.current = Date.now();
 
-      const sprite1 = getPlayerSprite(dialogue.speaker1.classId, dialogue.speaker1.raceId);
-      setBubbleQueue(prev => [...prev.slice(-4), {
-        id: `b_${Date.now()}_1`, speaker: dialogue.speaker1, text: dialogue.line1,
-        colorHex: '#6ee7b7', spriteData: sprite1, autoExpire: 8000,
-      }]);
       setChatLog(prev => [...prev.slice(-49), { id: Date.now(), speaker: dialogue.speaker1.name, line: dialogue.line1, color: 'var(--accent)' }]);
 
       if (hero2) {
         setTimeout(() => {
           if (cancelled) return;
-          const sprite2 = getPlayerSprite(dialogue.speaker2.classId, dialogue.speaker2.raceId);
-          setBubbleQueue(prev => [...prev.slice(-4), {
-            id: `b_${Date.now()}_2`, speaker: dialogue.speaker2, text: dialogue.line2,
-            colorHex: '#fbbf24', spriteData: sprite2, autoExpire: 8000,
-          }]);
           setChatLog(prev => [...prev.slice(-49), { id: Date.now() + 1, speaker: dialogue.speaker2.name, line: dialogue.line2, color: 'var(--gold)' }]);
         }, 2500);
       }
