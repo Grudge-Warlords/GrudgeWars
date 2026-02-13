@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import useGameStore, { getHeroStatsWithBonuses } from '../stores/gameStore';
-import { locations, shieldBlockers } from '../data/enemies';
+import { locations, shieldBlockers, getZoneTerrain } from '../data/enemies';
+import { LOCATION_LORE, CARD_ART_CONFIG } from '../data/lore';
 import { cities, cityPositions, cityConnections } from '../data/cities';
 import { missionTemplates, arenaTemplates } from '../data/missions';
 import { classDefinitions } from '../data/classes';
@@ -2722,169 +2723,266 @@ export default function WorldMap() {
       </div>
 
         {selectedLoc && outerRef.current && createPortal(
-          <div ref={menuRef} style={{
-            position: 'absolute',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            zIndex: MAP_LAYERS.POPUPS,
-            backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
-            border: `1.5px solid ${locationIcons[selectedLoc.id]?.color || 'var(--accent)'}`,
-            borderRadius: 10,
-            padding: 0,
-            width: isMobile ? 'min(90vw, 360px)' : 190,
-            maxWidth: isMobile ? 'calc(100vw - 16px)' : undefined,
-            maxHeight: '60vh', overflowY: 'auto',
-            boxShadow: `0 4px 20px rgba(0,0,0,0.8), 0 0 12px ${locationIcons[selectedLoc.id]?.glow || 'rgba(110,231,183,0.2)'}`,
-            ...popupPositionStyle(selectedLoc.id),
-          }}>
-            <div style={{
-              padding: '8px 10px 6px',
-              borderBottom: '1px solid rgba(255,255,255,0.08)',
-              background: `linear-gradient(135deg, ${locationIcons[selectedLoc.id]?.glow || 'rgba(0,0,0,0.2)'}, transparent)`,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                <img src={locationIcons[selectedLoc.id]?.img} alt="" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: `1px solid ${locationIcons[selectedLoc.id]?.color || 'var(--accent)'}` }} />
-                <div>
-                  <div className="font-cinzel" style={{ color: '#fff', fontSize: '0.72rem', fontWeight: 700 }}>
-                    {selectedLoc.name}
+          (() => {
+            const locLore = LOCATION_LORE[selectedLoc.id] || {};
+            const terrain = getZoneTerrain(selectedLoc.id);
+            const cardImg = CARD_ART_CONFIG.getCardImage(selectedLoc.id, terrain);
+            const vesselColor = CARD_ART_CONFIG.vesselColors[locLore.vesselConnection] || '#22d3ee';
+            const vesselIcon = CARD_ART_CONFIG.vesselIcons[locLore.vesselConnection] || '?';
+            const vesselLabel = CARD_ART_CONFIG.vesselLabels[locLore.vesselConnection] || '';
+            const nodeIcon = locationIcons[selectedLoc.id];
+            const nodeColor = nodeIcon?.color || 'var(--accent)';
+            const nodeGlow = nodeIcon?.glow || 'rgba(110,231,183,0.2)';
+            const selConquer = (zoneConquer || {})[selectedLoc.id] || 0;
+            const isConquered = selConquer >= 100;
+
+            const menuItems = [];
+            let idx = 1;
+            menuItems.push({ key: idx++, props: {
+              iconSrc: '/sprites/ui/icons/icon_trident.png',
+              label: 'Hunt Monsters', sublabel: `Lv.${selectedLoc.levelRange[0]}-${selectedLoc.levelRange[1]}`,
+              color: 'var(--accent)', onClick: () => handleBattle(selectedLoc.id), compact: true,
+            }});
+            if (selectedLoc.boss && !bossDefeated) {
+              menuItems.push({ key: idx++, props: {
+                iconSrc: nodeIcon?.img,
+                label: 'Challenge Boss', sublabel: selectedLoc.boss.replace(/_/g, ' '),
+                color: '#ef4444', onClick: () => handleBoss(selectedLoc.id, selectedLoc.boss), glow: true, compact: true,
+              }});
+            }
+            menuItems.push({ key: idx++, props: {
+              iconSrc: '/sprites/ui/icons/icon_heart.png',
+              label: 'Rest', sublabel: `${level * 5}g`,
+              color: '#60a5fa', onClick: handleRest, compact: true,
+            }});
+            menuItems.push({ key: idx++, props: {
+              iconSrc: nodeIcon?.img,
+              label: 'Visit', sublabel: 'Explore',
+              color: '#c084fc', onClick: () => { enterLocation(selectedLoc.id); setSelectedLocation(null); }, compact: true,
+            }});
+            if (selectedLoc.levelRange && selectedLoc.levelRange[0] >= 8) {
+              menuItems.push({ key: idx++, props: {
+                iconSrc: '/sprites/ui/icons/icon_portal.png', label: 'Dungeon', sublabel: 'Multi-fight',
+                color: '#f97316', onClick: () => {
+                  setSelectedLocation(null);
+                  useGameStore.getState().startDungeon(selectedLoc.id);
+                }, compact: true,
+              }});
+            }
+            if (!selectedLoc.isCity) {
+              menuItems.push({ key: idx++, props: {
+                iconSrc: '/sprites/ui/icons/icon_nature.png', label: 'Field', sublabel: 'Roam terrain',
+                color: '#6ee7b3', onClick: () => {
+                  setSelectedLocation(null);
+                  enterScene('field', selectedLoc.id);
+                }, compact: true,
+              }});
+            }
+            if (isConquered) {
+              menuItems.push({ key: idx++, props: {
+                iconSrc: '/sprites/ui/icons/icon_pearl.png', label: 'Trade', sublabel: 'Buy/Sell',
+                color: '#fbbf24', onClick: () => setCitySubmenu('trade'), compact: true,
+              }});
+              menuItems.push({ key: idx++, props: {
+                iconSrc: '/sprites/ui/icons/icon_sea_scroll.png', label: 'Weapon', sublabel: 'Unlock rare',
+                color: '#f59e0b', onClick: () => {
+                  setGameMessage(`The masters of ${selectedLoc.name} have unlocked a legendary weapon path for you!`);
+                }, compact: true,
+              }});
+            }
+
+            return (
+              <div ref={menuRef} style={{
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: MAP_LAYERS.POPUPS,
+                width: isMobile ? 'min(92vw, 380px)' : 240,
+                maxWidth: isMobile ? 'calc(100vw - 12px)' : undefined,
+                maxHeight: '75vh', overflowY: 'auto',
+                borderRadius: 6,
+                border: `2px solid ${nodeColor}`,
+                boxShadow: `0 6px 32px rgba(0,0,0,0.9), 0 0 20px ${nodeGlow}, inset 0 0 40px rgba(0,0,0,0.3)`,
+                background: 'linear-gradient(170deg, rgba(12,10,30,0.97), rgba(8,6,22,0.98))',
+                ...popupPositionStyle(selectedLoc.id),
+              }}>
+                <div style={{
+                  position: 'relative',
+                  height: isMobile ? 130 : 110,
+                  overflow: 'hidden',
+                  borderRadius: '4px 4px 0 0',
+                }}>
+                  <img
+                    src={cardImg}
+                    alt=""
+                    style={{
+                      position: 'absolute', inset: 0,
+                      width: '100%', height: '100%',
+                      objectFit: 'cover',
+                      opacity: 0.35,
+                      filter: 'saturate(1.3) brightness(0.7)',
+                    }}
+                  />
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: `linear-gradient(180deg, transparent 20%, rgba(12,10,30,0.85) 80%, rgba(12,10,30,1) 100%), linear-gradient(135deg, ${nodeGlow}, transparent 60%)`,
+                  }} />
+
+                  <img
+                    src={nodeIcon?.img}
+                    alt=""
+                    style={{
+                      position: 'absolute',
+                      top: '50%', left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: isMobile ? 70 : 56,
+                      height: isMobile ? 70 : 56,
+                      objectFit: 'contain',
+                      opacity: 0.2,
+                      filter: 'blur(1px)',
+                    }}
+                  />
+
+                  <div style={{
+                    position: 'absolute', top: 6, left: 8,
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}>
+                    <span style={{
+                      fontSize: '0.5rem', padding: '1px 5px',
+                      background: `${vesselColor}25`,
+                      border: `1px solid ${vesselColor}55`,
+                      borderRadius: 3,
+                      color: vesselColor,
+                      fontFamily: "'Cinzel', serif", fontWeight: 700,
+                      letterSpacing: '0.05em',
+                    }}>
+                      {vesselIcon} {vesselLabel}
+                    </span>
                   </div>
-                  <div style={{ fontSize: '0.5rem', color: 'var(--muted)' }}>
-                    Lv.{selectedLoc.levelRange[0]}-{selectedLoc.levelRange[1]}
-                    {isCleared && <span style={{ color: 'var(--gold)', marginLeft: 4 }}>Cleared</span>}
+
+                  <div style={{
+                    position: 'absolute', top: 6, right: 8,
+                    display: 'flex', alignItems: 'center', gap: 3,
+                  }}>
+                    <span style={{
+                      fontSize: '0.55rem', padding: '1px 6px',
+                      background: 'rgba(0,0,0,0.6)',
+                      border: `1px solid ${nodeColor}55`,
+                      borderRadius: 3,
+                      color: nodeColor,
+                      fontWeight: 700,
+                    }}>
+                      Lv.{selectedLoc.levelRange[0]}-{selectedLoc.levelRange[1]}
+                    </span>
+                    {isCleared && (
+                      <span style={{
+                        fontSize: '0.5rem', padding: '1px 4px',
+                        background: 'rgba(251,191,36,0.15)',
+                        border: '1px solid rgba(251,191,36,0.4)',
+                        borderRadius: 3,
+                        color: 'var(--gold)', fontWeight: 700,
+                      }}>CLEARED</span>
+                    )}
+                  </div>
+
+                  <div style={{
+                    position: 'absolute', bottom: 8, left: 8, right: 8,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <img src={nodeIcon?.img} alt="" style={{
+                        width: 28, height: 28, borderRadius: 4,
+                        objectFit: 'cover',
+                        border: `1.5px solid ${nodeColor}`,
+                        boxShadow: `0 0 8px ${nodeGlow}`,
+                      }} />
+                      <div>
+                        <div className="font-cinzel" style={{
+                          color: '#fff', fontSize: '0.78rem', fontWeight: 700,
+                          textShadow: '0 1px 4px rgba(0,0,0,0.8)',
+                          lineHeight: 1.1,
+                        }}>
+                          {selectedLoc.name}
+                        </div>
+                        {locLore.loreTag && (
+                          <div style={{
+                            fontSize: '0.48rem', color: nodeColor,
+                            fontFamily: "'Cinzel', serif",
+                            textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+                            opacity: 0.9, marginTop: 1,
+                          }}>
+                            {locLore.loreTag}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div style={{ fontSize: '0.55rem', color: 'var(--muted)', lineHeight: 1.3 }}>
-                {selectedLoc.description?.length > 80 ? selectedLoc.description.slice(0, 80) + '...' : selectedLoc.description}
-              </div>
-              {(() => {
-                const selConquer = (zoneConquer || {})[selectedLoc.id] || 0;
-                if (selConquer <= 0) return null;
-                const xpMod = Math.floor(selConquer * 0.7);
-                const harvestMod = Math.floor((selConquer / 100) * 300);
-                return (
-                  <div style={{ marginTop: 8 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-                      <span style={{ fontSize: '0.5rem', color: 'var(--muted)' }}>Conquered</span>
-                      <span style={{ fontSize: '0.5rem', fontWeight: 700, color: selConquer >= 100 ? 'var(--gold)' : locationIcons[selectedLoc.id]?.color }}>{selConquer}%</span>
-                    </div>
-                  <div style={{ height: 4, background: 'rgba(0,0,0,0.4)', borderRadius: 2, overflow: 'visible', position: 'relative' }}>
+
+                {locLore.loreQuote && (
+                  <div style={{
+                    padding: '5px 10px',
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    background: 'linear-gradient(90deg, rgba(255,255,255,0.02), transparent)',
+                  }}>
                     <div style={{
-                      height: '100%', width: `${selConquer}%`, borderRadius: 3,
-                      background: selConquer >= 100
-                        ? 'linear-gradient(90deg, var(--gold), #ffed4a)'
-                        : `linear-gradient(90deg, ${locationIcons[selectedLoc.id]?.color}, ${locationIcons[selectedLoc.id]?.glow})`,
-                      transition: 'width 0.3s',
-                      boxShadow: selConquer >= 100 ? '0 0 8px rgba(255,215,0,0.5)' : 'none',
-                    }} />
-                    {selConquer >= 100 && (
-                      <div style={{
-                        position: 'absolute', right: -15, top: '50%', transform: 'translateY(-50%)',
-                        fontSize: '1rem', animation: 'pulse 1.5s infinite', zIndex: 10
-                      }}>✨</div>
-                    )}
-                  </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 3 }}>
-                      <span style={{ fontSize: '0.5rem', color: '#ef4444' }}>XP -{xpMod}%</span>
-                      <span style={{ fontSize: '0.5rem', color: '#22c55e' }}>Harvest +{harvestMod}%</span>
+                      fontSize: '0.5rem', color: 'rgba(200,200,220,0.6)',
+                      fontStyle: 'italic', lineHeight: 1.35,
+                      borderLeft: `2px solid ${vesselColor}40`,
+                      paddingLeft: 6,
+                    }}>
+                      {locLore.loreQuote}
                     </div>
                   </div>
-                );
-              })()}
-            </div>
+                )}
 
-            <div style={{ padding: '4px 6px' }}>
-              {(() => {
-                const menuItems = [];
-                let idx = 1;
-                const isConquered = ((zoneConquer || {})[selectedLoc.id] || 0) >= 100;
-
-                menuItems.push({ key: idx++, props: {
-                  iconSrc: '/sprites/ui/icons/icon_trident.png',
-                  label: 'Hunt Monsters', sublabel: `Lv.${selectedLoc.levelRange[0]}-${selectedLoc.levelRange[1]}`,
-                  color: 'var(--accent)', onClick: () => handleBattle(selectedLoc.id), compact: true,
-                }});
-
-                if (selectedLoc.boss && !bossDefeated) {
-                  menuItems.push({ key: idx++, props: {
-                    iconSrc: locationIcons[selectedLoc.id]?.img,
-                    label: 'Challenge Boss', sublabel: selectedLoc.boss.replace(/_/g, ' '),
-                    color: '#ef4444', onClick: () => handleBoss(selectedLoc.id, selectedLoc.boss), glow: true, compact: true,
-                  }});
-                }
-
-                menuItems.push({ key: idx++, props: {
-                  iconSrc: '/sprites/ui/icons/icon_heart.png',
-                  label: 'Rest', sublabel: `${level * 5}g`,
-                  color: '#60a5fa', onClick: handleRest, compact: true,
-                }});
-
-                menuItems.push({ key: idx++, props: {
-                  iconSrc: locationIcons[selectedLoc.id]?.img,
-                  label: 'Visit', sublabel: 'Explore',
-                  color: '#c084fc', onClick: () => { enterLocation(selectedLoc.id); setSelectedLocation(null); }, compact: true,
-                }});
-
-                if (selectedLoc.levelRange && selectedLoc.levelRange[0] >= 8) {
-                  menuItems.push({ key: idx++, props: {
-                    iconSrc: '/sprites/ui/icons/icon_portal.png', label: 'Dungeon', sublabel: 'Multi-fight',
-                    color: '#f97316', onClick: () => {
-                      setSelectedLocation(null);
-                      useGameStore.getState().startDungeon(selectedLoc.id);
-                    }, compact: true,
-                  }});
-                }
-
-                if (!selectedLoc.isCity) {
-                  menuItems.push({ key: idx++, props: {
-                    iconSrc: '/sprites/ui/icons/icon_nature.png', label: 'Field', sublabel: 'Roam terrain',
-                    color: '#6ee7b3', onClick: () => {
-                      setSelectedLocation(null);
-                      enterScene('field', selectedLoc.id);
-                    }, compact: true,
-                  }});
-                }
-
-                if (isConquered) {
-                  menuItems.push({ key: idx++, props: {
-                    iconSrc: '/sprites/ui/icons/icon_pearl.png', label: 'Trade', sublabel: 'Buy/Sell',
-                    color: '#fbbf24', onClick: () => setCitySubmenu('trade'), compact: true,
-                  }});
-                  menuItems.push({ key: idx++, props: {
-                    iconSrc: '/sprites/ui/icons/icon_sea_scroll.png', label: 'Weapon', sublabel: 'Unlock rare',
-                    color: '#f59e0b', onClick: () => {
-                      setGameMessage(`The masters of ${selectedLoc.name} have unlocked a legendary weapon path for you!`);
-                    }, compact: true,
-                  }});
-                }
-
-                return (
-                  <>
-                    {selectedLoc.boss && bossDefeated && (
+                {selConquer > 0 && (
+                  <div style={{ padding: '5px 10px 3px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                      <span style={{ fontSize: '0.48rem', color: 'var(--muted)' }}>Conquered</span>
+                      <span style={{ fontSize: '0.48rem', fontWeight: 700, color: isConquered ? 'var(--gold)' : nodeColor }}>{selConquer}%</span>
+                    </div>
+                    <div style={{ height: 3, background: 'rgba(0,0,0,0.5)', borderRadius: 2, overflow: 'hidden' }}>
                       <div style={{
-                        padding: '3px 6px', margin: '2px 0', borderRadius: 6,
-                        background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
-                        color: 'var(--success)', fontSize: '0.55rem', textAlign: 'center',
-                        fontFamily: "'Cinzel', serif", fontWeight: 600,
-                      }}>Boss Defeated</div>
-                    )}
-                    {menuItems.map(item => (
-                      <MenuButton key={item.key} {...item.props} hotkey={item.key} />
-                    ))}
-                  </>
-                );
-              })()}
-            </div>
+                        height: '100%', width: `${selConquer}%`, borderRadius: 2,
+                        background: isConquered
+                          ? 'linear-gradient(90deg, var(--gold), #ffed4a)'
+                          : `linear-gradient(90deg, ${nodeColor}, ${nodeGlow})`,
+                        transition: 'width 0.3s',
+                        boxShadow: isConquered ? '0 0 6px rgba(255,215,0,0.5)' : 'none',
+                      }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
+                      <span style={{ fontSize: '0.42rem', color: '#ef4444' }}>XP -{Math.floor(selConquer * 0.7)}%</span>
+                      <span style={{ fontSize: '0.42rem', color: '#22c55e' }}>Harvest +{Math.floor((selConquer / 100) * 300)}%</span>
+                    </div>
+                  </div>
+                )}
 
-            <div style={{
-              padding: '3px 8px 5px', borderTop: '1px solid rgba(255,255,255,0.05)',
-              textAlign: 'center',
-            }}>
-              <span style={{ fontSize: '0.4rem', color: 'rgba(150,150,170,0.3)', fontFamily: "'Cinzel', serif" }}>
-                1-{selectedLoc?.boss && !bossDefeated ? '4' : '3'} &bull; Esc
-              </span>
-            </div>
-          </div>,
+                <div style={{ padding: '4px 6px' }}>
+                  {selectedLoc.boss && bossDefeated && (
+                    <div style={{
+                      padding: '3px 6px', margin: '2px 0', borderRadius: 4,
+                      background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
+                      color: 'var(--success)', fontSize: '0.52rem', textAlign: 'center',
+                      fontFamily: "'Cinzel', serif", fontWeight: 600,
+                    }}>Boss Defeated</div>
+                  )}
+                  {menuItems.map(item => (
+                    <MenuButton key={item.key} {...item.props} hotkey={item.key} />
+                  ))}
+                </div>
+
+                <div style={{
+                  padding: '2px 8px 4px', borderTop: '1px solid rgba(255,255,255,0.04)',
+                  textAlign: 'center',
+                }}>
+                  <span style={{ fontSize: '0.38rem', color: 'rgba(150,150,170,0.25)', fontFamily: "'Cinzel', serif" }}>
+                    1-{menuItems.length} &bull; Esc
+                  </span>
+                </div>
+              </div>
+            );
+          })(),
           outerRef.current
         )}
 
