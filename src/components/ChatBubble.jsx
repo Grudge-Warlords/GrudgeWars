@@ -6,31 +6,33 @@ function FishWatermark({ spriteData, accent }) {
 
   const frameWidth = spriteData?.frameWidth || 48;
   const frameHeight = spriteData?.frameHeight || 48;
+  const sc = 4.5;
 
   return (
     <div style={{
       position: 'absolute',
-      right: -8,
-      bottom: -4,
-      width: 80,
-      height: 80,
-      opacity: 0.10,
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: frameWidth * sc,
+      height: frameHeight * sc,
+      opacity: 0.18,
       overflow: 'hidden',
       pointerEvents: 'none',
       zIndex: 0,
+      filter: `blur(1px) drop-shadow(0 0 12px ${accent})`,
     }}>
       <div style={{
-        width: frameWidth * 3.2,
-        height: frameHeight * 3.2,
+        width: frameWidth * sc,
+        height: frameHeight * sc,
         backgroundImage: `url(${idleAnim.src})`,
-        backgroundSize: `${frameWidth * (idleAnim.frames || 1) * 3.2}px ${frameHeight * 3.2}px`,
+        backgroundSize: `${frameWidth * (idleAnim.frames || 1) * sc}px ${frameHeight * sc}px`,
         backgroundPosition: '0px 0px',
         imageRendering: 'pixelated',
         position: 'absolute',
         left: '50%',
         top: '50%',
         transform: 'translate(-50%, -50%) scaleX(-1)',
-        filter: spriteData?.filter || `drop-shadow(0 0 6px ${accent})`,
       }} />
     </div>
   );
@@ -237,20 +239,23 @@ function FloatingBubble({ bubble, index, totalVisible, onDismiss, viewportW, vie
 
   const bubbleStyle = useMemo(() => ({
     position: 'relative',
-    background: `radial-gradient(ellipse at 30% 25%, rgba(20,40,70,0.93), rgba(8,16,35,0.95) 70%)`,
-    border: `2px solid ${accent}44`,
-    borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
-    padding: '14px 20px 16px 20px',
+    background: `radial-gradient(ellipse at 35% 20%, ${accent}18, rgba(15,30,55,0.55) 50%, rgba(8,16,35,0.5) 80%)`,
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: `1.5px solid ${accent}55`,
+    borderRadius: '50%',
+    padding: '22px 26px 24px 26px',
     overflow: 'hidden',
     boxShadow: `
-      0 0 20px ${accent}18,
-      inset 0 1px 0 ${accent}22,
-      inset 0 -2px 8px rgba(0,0,0,0.3),
-      0 4px 16px rgba(0,0,0,0.4)
+      0 0 30px ${accent}20,
+      inset 0 2px 0 rgba(255,255,255,0.12),
+      inset 0 -3px 10px rgba(0,0,0,0.15),
+      0 6px 24px rgba(0,0,0,0.3)
     `,
-    minWidth: 140,
+    minWidth: 150,
     maxWidth: 420,
     width: 'max-content',
+    aspectRatio: 'auto',
   }), [accent]);
 
   return (
@@ -281,17 +286,19 @@ function FloatingBubble({ bubble, index, totalVisible, onDismiss, viewportW, vie
           <div style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
             background: `
-              radial-gradient(circle at 20% 30%, ${accent}0d 0%, transparent 50%),
-              radial-gradient(circle at 80% 70%, ${accent}08 0%, transparent 40%)
+              radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.08) 0%, transparent 40%),
+              radial-gradient(circle at 70% 75%, ${accent}0a 0%, transparent 35%)
             `,
             pointerEvents: 'none',
             borderRadius: 'inherit',
           }} />
 
           <div style={{
-            position: 'absolute', top: 3, left: '15%', right: '15%', height: 1,
-            background: `linear-gradient(90deg, transparent, ${accent}33, transparent)`,
-            borderRadius: 1,
+            position: 'absolute', top: '8%', left: '20%', width: '45%', height: '25%',
+            background: `radial-gradient(ellipse, rgba(255,255,255,0.1) 0%, transparent 70%)`,
+            borderRadius: '50%',
+            pointerEvents: 'none',
+            transform: 'rotate(-8deg)',
           }} />
 
           <FishWatermark spriteData={bubble.spriteData} accent={accent} />
@@ -351,23 +358,23 @@ function FloatingBubble({ bubble, index, totalVisible, onDismiss, viewportW, vie
         </div>
 
         <svg
-          width="30" height="26" viewBox="0 0 30 26"
+          width="30" height="28" viewBox="0 0 30 28"
           style={{
             position: 'absolute',
             top: '100%',
             left: '50%',
             transform: 'translateX(-50%)',
-            marginTop: -2,
+            marginTop: -4,
             display: 'block',
             overflow: 'visible',
           }}
         >
-          <ellipse cx="15" cy="5" rx="6" ry="5"
-            fill="rgba(12,22,40,0.9)" stroke={accent + '33'} strokeWidth="1.2" />
-          <ellipse cx="15" cy="15" rx="3.5" ry="3"
-            fill="rgba(12,22,40,0.75)" stroke={accent + '22'} strokeWidth="0.8" />
-          <ellipse cx="15" cy="22" rx="2" ry="1.8"
-            fill="rgba(12,22,40,0.5)" stroke={accent + '18'} strokeWidth="0.6" />
+          <circle cx="15" cy="6" r="6"
+            fill={`rgba(15,30,55,0.45)`} stroke={accent + '40'} strokeWidth="1" />
+          <circle cx="16" cy="16" r="3.5"
+            fill={`rgba(15,30,55,0.35)`} stroke={accent + '30'} strokeWidth="0.8" />
+          <circle cx="17" cy="23" r="2.2"
+            fill={`rgba(15,30,55,0.25)`} stroke={accent + '20'} strokeWidth="0.6" />
         </svg>
       </div>
     </div>
