@@ -23,8 +23,9 @@ The application is a React 19 frontend developed with Vite, with an Express back
 - **Mini-games:** Includes a "Reef Hunt" canvas-based mini-game with collecting, predators, and resource harvesting, integrating directly into the game's economy.
 - **Audio System:** Web Audio API for synthesized combat sounds and adaptive background music.
 - **Economy:** Pearl gain from battles, and a harvest system for resources like coral, shells, algae, and crystals.
+- **AI Dialogue System:** Real AI-powered hero dialogue via Puter.js free AI. Each hero has unique personality (UUID/SHA identity), conversation history logged to Puter KV, player style tracking (battles, exploration, trades, healing, boss attempts). AI generates contextual dialogue based on game state, zone, triggers, and ally conversations. Fallback to template dialogue when AI unavailable. Service: `src/utils/aiDialogueService.js`.
 - **Discord Integration:** Backend server handles Discord login and webhook broadcasting for in-game events.
-- **Save System:** Uses `localStorage` for game state persistence.
+- **Save System:** Uses `localStorage` for game state persistence, with cloud save via Puter KV.
 
 ## External Dependencies
 - **React:** Frontend library.

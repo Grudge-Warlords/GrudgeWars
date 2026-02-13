@@ -9,6 +9,7 @@ import { generateLoot, getEquipmentStatBonuses, getStartingEquipment, EQUIPMENT_
 import { getDefaultLoadout, resolveLoadout, getAllAbilityMap } from '../utils/abilityLoadout';
 import { missionTemplates, arenaTemplates } from '../data/missions';
 import { puterKV, isPuterAvailable } from '../utils/puterService';
+import { savePlayerStyle } from '../utils/aiDialogueService';
 import { cities } from '../data/cities';
 import { getDefaultRow, getRowPositions, applyRowCombatModifiers, getAdjacentRows, getRowName, getAIRowPreference, isUnitRanged, PLAYER_ROWS, ENEMY_ROWS } from '../data/battleRows';
 
@@ -419,6 +420,22 @@ const useGameStore = create(persist((set, get) => ({
   currentScene: null,
   sceneReturnTo: null,
   dungeonProgress: null,
+  playerStyle: { battles: 0, explores: 0, trades: 0, heals: 0, bossAttempts: 0 },
+
+  trackPlayerAction: (actionType) => {
+    const style = { ...get().playerStyle };
+    switch (actionType) {
+      case 'battle': style.battles = (style.battles || 0) + 1; break;
+      case 'explore': style.explores = (style.explores || 0) + 1; break;
+      case 'trade': style.trades = (style.trades || 0) + 1; break;
+      case 'heal': style.heals = (style.heals || 0) + 1; break;
+      case 'boss': style.bossAttempts = (style.bossAttempts || 0) + 1; break;
+    }
+    set({ playerStyle: style });
+    if (isPuterAvailable()) {
+      savePlayerStyle(style).catch(() => {});
+    }
+  },
 
   setScreen: (screen) => set({ screen }),
 
@@ -749,6 +766,7 @@ const useGameStore = create(persist((set, get) => ({
     };
 
     set({ currentLocation: locationId, screen: 'location' });
+    get().trackPlayerAction('explore');
 
     // Auto-sync on location change
     syncWithPlatform();
@@ -758,6 +776,7 @@ const useGameStore = create(persist((set, get) => ({
     const state = get();
     const loc = locations.find(l => l.id === locationId);
     if (!loc) return;
+    state.trackPlayerAction(loc.boss ? 'boss' : 'battle');
 
     const primaryHero = state.heroRoster.find(h => h.id === 'player');
     if (primaryHero) {
@@ -2329,6 +2348,7 @@ const useGameStore = create(persist((set, get) => ({
 
   buyItem: (itemId) => {
     const state = get();
+    state.trackPlayerAction('trade');
     const item = state.shopInventory.find(i => i.id === itemId);
     if (!item) return;
     const price = getItemPrice(item);
@@ -2849,6 +2869,7 @@ const useGameStore = create(persist((set, get) => ({
       randomEvents: [],
       lastEventSpawn: Date.now(),
       trainingPhase: null,
+      playerStyle: { battles: 0, explores: 0, trades: 0, heals: 0, bossAttempts: 0 },
     });
   },
 }), {

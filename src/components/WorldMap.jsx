@@ -13,7 +13,8 @@ import { setBgm } from '../utils/audioManager';
 import { TIERS, UPGRADE_COSTS, EQUIPMENT_SLOTS, WEAPON_TYPES, ARMOR_TYPES, getItemPrice, getSellPrice } from '../data/equipment';
 import { generateDialogue } from '../data/dialogue';
 import ChatBubbleSystem from './ChatBubble';
-import { puterAI, isPuterAvailable } from '../utils/puterService';
+import { isPuterAvailable } from '../utils/puterService';
+import { generateAIDialogue, logGameEvent } from '../utils/aiDialogueService';
 import { generateRandomEvent, getRewardDescription } from '../data/randomEvents';
 import { encodeGrudaShare, generateShareUrl, generateShareCode } from '../utils/grudaShare';
 import { MAP_LAYERS, svgOverlayProps, mapNodeStyle, mapCenterStyle, fullCoverStyle, nodeScale as calcNodeScale } from './mapConstants';
@@ -1205,74 +1206,108 @@ export default function WorldMap() {
   useEffect(() => {
     const activeHeroes = heroRoster.filter(h => activeHeroIds.includes(h.id));
     if (activeHeroes.length < 2) return;
-    const spawnDialogue = () => {
-      const gameState = { gold, level, currentZone, zoneConquer, bossesDefeated, locationsCleared, victories, locations };
-      const dialogue = generateDialogue(activeHeroes, gameState);
-      if (dialogue) {
-        lastDialogueTime.current = Date.now();
+    let cancelled = false;
 
-        const sprite1 = getPlayerSprite(dialogue.speaker1.classId, dialogue.speaker1.raceId);
-        const bubble1 = {
-          id: `b_${Date.now()}_1`,
-          speaker: dialogue.speaker1,
-          text: dialogue.line1,
-          colorHex: '#6ee7b7',
-          spriteData: sprite1,
-          autoExpire: 8000,
-        };
-        setBubbleQueue(prev => [...prev.slice(-4), bubble1]);
+    const determineTrigger = () => {
+      const hero1 = activeHeroes[0];
+      const currentConquer = (zoneConquer || {})[currentZone] || 0;
+      const currentLoc = locations.find(l => l.id === currentZone);
+      const hasBoss = currentLoc?.boss && !bossesDefeated?.includes(currentLoc.boss);
+      const bossJustDefeated = currentLoc?.boss && bossesDefeated?.includes(currentLoc.boss);
+      const healthRatio = hero1.currentHealth / (hero1.maxHealth || 100);
 
-        setChatLog(prev => {
-          const entry = { id: Date.now(), speaker: dialogue.speaker1.name, line: dialogue.line1, color: 'var(--accent)' };
-          return [...prev.slice(-49), entry];
-        });
+      if (healthRatio < 0.4) return 'low_health';
+      if (gold > 500 && Math.random() > 0.5) return 'high_gold';
+      if (gold < 30) return 'low_gold';
+      if (hasBoss && Math.random() > 0.4) return 'boss_nearby';
+      if (bossJustDefeated && Math.random() > 0.5) return 'boss_defeated';
+      if (currentConquer > 70) return 'high_conquer';
+      if (currentConquer < 10 && Math.random() > 0.6) return 'new_zone';
+      return null;
+    };
 
-        const useAI = isPuterAvailable() && Math.random() < 0.25;
-        if (useAI) {
-          const hero2 = dialogue.speaker2;
-          const zoneName = locations.find(l => l.id === currentZone)?.name || 'the depths';
-          puterAI.npcDialogue(hero2.name, `You are a ${raceDefinitions[hero2.raceId]?.name || ''} ${classDefinitions[hero2.classId]?.name || ''} in ${zoneName}. Your ally ${dialogue.speaker1.name} just said: "${dialogue.line1}". Reply in character.`).then(aiText => {
-            if (aiText) {
+    const spawnDialogue = async () => {
+      if (cancelled) return;
+      const hero1 = activeHeroes[0];
+      const hero2 = activeHeroes[1 + Math.floor(Math.random() * (activeHeroes.length - 1))];
+      const zoneName = locations.find(l => l.id === currentZone)?.name || 'the depths';
+      const trigger = determineTrigger();
+
+      const aiAvailable = isPuterAvailable();
+
+      if (aiAvailable) {
+        try {
+          const line1 = await generateAIDialogue(hero1, 'idle_chat', { zoneName, trigger });
+          if (cancelled || !line1) return;
+
+          const sprite1 = getPlayerSprite(hero1.classId, hero1.raceId);
+          const bubble1 = {
+            id: `b_${Date.now()}_1`,
+            speaker: hero1,
+            text: line1,
+            colorHex: '#6ee7b7',
+            spriteData: sprite1,
+            autoExpire: 8000,
+          };
+          setBubbleQueue(prev => [...prev.slice(-4), bubble1]);
+          setChatLog(prev => [...prev.slice(-49), { id: Date.now(), speaker: hero1.name, line: line1, color: 'var(--accent)' }]);
+          lastDialogueTime.current = Date.now();
+
+          setTimeout(async () => {
+            if (cancelled) return;
+            try {
+              const line2 = await generateAIDialogue(hero2, 'idle_chat', { zoneName, trigger, allyName: hero1.name, allyLine: line1 });
+              if (cancelled || !line2) return;
+
               const sprite2 = getPlayerSprite(hero2.classId, hero2.raceId);
               const bubble2 = {
                 id: `b_${Date.now()}_ai`,
                 speaker: hero2,
-                text: aiText,
+                text: line2,
                 colorHex: '#c084fc',
                 spriteData: sprite2,
                 autoExpire: 10000,
               };
               setBubbleQueue(prev => [...prev.slice(-4), bubble2]);
-              setChatLog(prev => {
-                const entry = { id: Date.now() + 1, speaker: hero2.name, line: aiText, color: '#c084fc' };
-                return [...prev.slice(-49), entry];
-              });
-            }
-          }).catch(() => {});
-        } else {
-          setTimeout(() => {
-            const sprite2 = getPlayerSprite(dialogue.speaker2.classId, dialogue.speaker2.raceId);
-            const bubble2 = {
-              id: `b_${Date.now()}_2`,
-              speaker: dialogue.speaker2,
-              text: dialogue.line2,
-              colorHex: '#fbbf24',
-              spriteData: sprite2,
-              autoExpire: 8000,
-            };
-            setBubbleQueue(prev => [...prev.slice(-4), bubble2]);
-
-            setChatLog(prev => {
-              const entry = { id: Date.now() + 1, speaker: dialogue.speaker2.name, line: dialogue.line2, color: 'var(--gold)' };
-              return [...prev.slice(-49), entry];
-            });
+              setChatLog(prev => [...prev.slice(-49), { id: Date.now() + 1, speaker: hero2.name, line: line2, color: '#c084fc' }]);
+            } catch {}
           }, 2500);
+        } catch (err) {
+          console.warn('[AI Dialogue] Failed, using fallback:', err);
+          spawnFallbackDialogue(hero1, hero2, trigger);
         }
+      } else {
+        spawnFallbackDialogue(hero1, hero2, trigger);
       }
     };
+
+    const spawnFallbackDialogue = (hero1, hero2, trigger) => {
+      const gameState = { gold, level, currentZone, zoneConquer, bossesDefeated, locationsCleared, victories, locations };
+      const dialogue = generateDialogue(activeHeroes, gameState);
+      if (!dialogue) return;
+      lastDialogueTime.current = Date.now();
+
+      const sprite1 = getPlayerSprite(dialogue.speaker1.classId, dialogue.speaker1.raceId);
+      setBubbleQueue(prev => [...prev.slice(-4), {
+        id: `b_${Date.now()}_1`, speaker: dialogue.speaker1, text: dialogue.line1,
+        colorHex: '#6ee7b7', spriteData: sprite1, autoExpire: 8000,
+      }]);
+      setChatLog(prev => [...prev.slice(-49), { id: Date.now(), speaker: dialogue.speaker1.name, line: dialogue.line1, color: 'var(--accent)' }]);
+
+      setTimeout(() => {
+        if (cancelled) return;
+        const sprite2 = getPlayerSprite(dialogue.speaker2.classId, dialogue.speaker2.raceId);
+        setBubbleQueue(prev => [...prev.slice(-4), {
+          id: `b_${Date.now()}_2`, speaker: dialogue.speaker2, text: dialogue.line2,
+          colorHex: '#fbbf24', spriteData: sprite2, autoExpire: 8000,
+        }]);
+        setChatLog(prev => [...prev.slice(-49), { id: Date.now() + 1, speaker: dialogue.speaker2.name, line: dialogue.line2, color: 'var(--gold)' }]);
+      }, 2500);
+    };
+
     const initialDelay = setTimeout(spawnDialogue, 5000 + Math.random() * 3000);
-    const interval = setInterval(spawnDialogue, 12000 + Math.random() * 6000);
-    return () => { clearTimeout(initialDelay); clearInterval(interval); };
+    const interval = setInterval(spawnDialogue, 15000 + Math.random() * 8000);
+    return () => { cancelled = true; clearTimeout(initialDelay); clearInterval(interval); };
   }, [heroRoster, activeHeroIds, gold, level, currentZone, zoneConquer, bossesDefeated, locationsCleared, victories]);
 
   useEffect(() => {
