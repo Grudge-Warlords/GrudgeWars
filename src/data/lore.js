@@ -309,6 +309,13 @@ export const LOCATION_LORE = {
     cardArt: 'boss',
     vesselConnection: 'plankton',
   },
+  void_maw: {
+    loreName: 'The Void Maw',
+    loreQuote: '"It consumed the Light of Unity whole — and still it hungers. The silence of the Plankton is its roar."',
+    loreTag: 'Lair of the Consumer — Final Trial',
+    cardArt: 'boss',
+    vesselConnection: 'plankton',
+  },
 };
 
 export const CARD_ART_CONFIG = {

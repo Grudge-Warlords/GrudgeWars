@@ -1007,6 +1007,21 @@ const gorgonSiren1 = gorgonSirenSprite(1);
 const gorgonSiren2 = gorgonSirenSprite(2);
 const gorgonSiren3 = gorgonSirenSprite(3);
 
+const cacodaemonSprite = {
+  folder: 'bosses',
+  frameWidth: 64,
+  frameHeight: 64,
+  swimming: true,
+  isBoss: true,
+  idle: { src: '/sprites/bosses/cacodaemon_row0.png', frames: 6 },
+  walk: { src: '/sprites/bosses/cacodaemon_row0.png', frames: 6 },
+  attack1: { src: '/sprites/bosses/cacodaemon_row1.png', frames: 6 },
+  attack2: { src: '/sprites/bosses/cacodaemon_row3.png', frames: 8 },
+  hurt: { src: '/sprites/bosses/cacodaemon_row2.png', frames: 4 },
+  death: { src: '/sprites/bosses/cacodaemon_row2.png', frames: 4 },
+  special: { src: '/sprites/bosses/cacodaemon_row3.png', frames: 8 },
+};
+
 const anglerSprite = underwaterBossSprite('angler');
 const seahorseSprite = underwaterBossSprite('seahorse');
 const pufferbossSprite = underwaterBossSprite('pufferfish_boss', true);
@@ -1195,6 +1210,7 @@ export const enemySpriteMap = {
   god_odin: gorgonSiren1,
   god_madra: gorgonSiren2,
   god_omni: gorgonSiren3,
+  cacodaemon: cacodaemonSprite,
   loreon_knight: { ...eelSprite, filter: 'hue-rotate(40deg) saturate(1.2)' },
   medieval_warrior: greenFishCharSprite,
   fantasy_warrior: { ...pufferfishBrownSprite, filter: 'hue-rotate(40deg) saturate(1.3)' },

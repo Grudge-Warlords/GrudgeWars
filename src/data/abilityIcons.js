@@ -101,6 +101,16 @@ export const abilityIconMap = {
   lava_claw: '/sprites/effects/magma_burst.png',
   lava_shell: '/sprites/effects/volcano_mini.png',
   eruption_slam: '/sprites/effects/fire_pillar.png',
+
+  void_bite: '/sprites/effects/crystal_red.png',
+  plankton_drain: '/sprites/effects/tentacle_purple.png',
+  silence_of_unity: '/sprites/effects/magic_orb.png',
+  consumed_light: '/sprites/effects/fire_pillar.png',
+  abyssal_roar: '/sprites/effects/magma_burst.png',
+  devour_magic: '/sprites/effects/crystal_red.png',
+  extinction_wave: '/sprites/effects/volcano_mini.png',
+  void_corruption: '/sprites/effects/poison_cloud.png',
+  shatter_vessel: '/sprites/effects/rock_formation.png',
 };
 
 export function getAbilityIcon(abilityId) {
