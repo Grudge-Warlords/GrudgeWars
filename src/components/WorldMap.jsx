@@ -14,7 +14,8 @@ import { TIERS, UPGRADE_COSTS, EQUIPMENT_SLOTS, WEAPON_TYPES, ARMOR_TYPES, getIt
 import { generateDialogue } from '../data/dialogue';
 import ChatBubbleSystem from './ChatBubble';
 import { isPuterAvailable } from '../utils/puterService';
-import { generateAIDialogue, logGameEvent } from '../utils/aiDialogueService';
+import { generateAIDialogue, logGameEvent, canHeroSpeak } from '../utils/aiDialogueService';
+import { checkInventoryForBestItems, checkBestItemEquipped } from '../data/heroBestItems';
 import { generateRandomEvent, getRewardDescription } from '../data/randomEvents';
 import { encodeGrudaShare, generateShareUrl, generateShareCode } from '../utils/grudaShare';
 import { MAP_LAYERS, svgOverlayProps, mapNodeStyle, mapCenterStyle, fullCoverStyle, nodeScale as calcNodeScale } from './mapConstants';
@@ -1208,13 +1209,17 @@ export default function WorldMap() {
     if (activeHeroes.length < 2) return;
     let cancelled = false;
 
-    const determineTrigger = () => {
-      const hero1 = activeHeroes[0];
+    const inventory = useGameStore.getState().inventory || [];
+
+    const determineTrigger = (hero) => {
       const currentConquer = (zoneConquer || {})[currentZone] || 0;
       const currentLoc = locations.find(l => l.id === currentZone);
       const hasBoss = currentLoc?.boss && !bossesDefeated?.includes(currentLoc.boss);
       const bossJustDefeated = currentLoc?.boss && bossesDefeated?.includes(currentLoc.boss);
-      const healthRatio = hero1.currentHealth / (hero1.maxHealth || 100);
+      const healthRatio = hero.currentHealth / (hero.maxHealth || 100);
+
+      const bestInInventory = checkInventoryForBestItems(hero, inventory);
+      if (bestInInventory.length > 0 && Math.random() > 0.3) return 'want_item';
 
       if (healthRatio < 0.4) return 'low_health';
       if (gold > 500 && Math.random() > 0.5) return 'high_gold';
@@ -1223,55 +1228,68 @@ export default function WorldMap() {
       if (bossJustDefeated && Math.random() > 0.5) return 'boss_defeated';
       if (currentConquer > 70) return 'high_conquer';
       if (currentConquer < 10 && Math.random() > 0.6) return 'new_zone';
+      if (Math.random() < 0.25) return 'betta_fact';
       return null;
+    };
+
+    const pickSpeaker = () => {
+      const speakable = activeHeroes.filter(h => canHeroSpeak(h.id));
+      if (speakable.length === 0) return null;
+      return speakable[Math.floor(Math.random() * speakable.length)];
+    };
+
+    const pickRespondent = (excludeId) => {
+      const others = activeHeroes.filter(h => h.id !== excludeId && canHeroSpeak(h.id));
+      if (others.length === 0) {
+        const fallback = activeHeroes.filter(h => h.id !== excludeId);
+        return fallback.length > 0 ? fallback[Math.floor(Math.random() * fallback.length)] : null;
+      }
+      return others[Math.floor(Math.random() * others.length)];
     };
 
     const spawnDialogue = async () => {
       if (cancelled) return;
-      const hero1 = activeHeroes[0];
-      const hero2 = activeHeroes[1 + Math.floor(Math.random() * (activeHeroes.length - 1))];
+      const hero1 = pickSpeaker();
+      if (!hero1) return;
+      const hero2 = pickRespondent(hero1.id);
       const zoneName = locations.find(l => l.id === currentZone)?.name || 'the depths';
-      const trigger = determineTrigger();
+      const trigger = determineTrigger(hero1);
+      const shortMode = Math.random() < 0.4;
 
       const aiAvailable = isPuterAvailable();
 
       if (aiAvailable) {
         try {
-          const line1 = await generateAIDialogue(hero1, 'idle_chat', { zoneName, trigger });
+          const line1 = await generateAIDialogue(hero1, 'idle_chat', { zoneName, trigger, inventory, shortMode });
           if (cancelled || !line1) return;
 
           const sprite1 = getPlayerSprite(hero1.classId, hero1.raceId);
-          const bubble1 = {
-            id: `b_${Date.now()}_1`,
-            speaker: hero1,
-            text: line1,
-            colorHex: '#6ee7b7',
-            spriteData: sprite1,
-            autoExpire: 8000,
-          };
-          setBubbleQueue(prev => [...prev.slice(-4), bubble1]);
+          setBubbleQueue(prev => [...prev.slice(-4), {
+            id: `b_${Date.now()}_1`, speaker: hero1, text: line1,
+            colorHex: '#6ee7b7', spriteData: sprite1, autoExpire: 10000,
+          }]);
           setChatLog(prev => [...prev.slice(-49), { id: Date.now(), speaker: hero1.name, line: line1, color: 'var(--accent)' }]);
           lastDialogueTime.current = Date.now();
 
-          setTimeout(async () => {
-            if (cancelled) return;
-            try {
-              const line2 = await generateAIDialogue(hero2, 'idle_chat', { zoneName, trigger, allyName: hero1.name, allyLine: line1 });
-              if (cancelled || !line2) return;
+          if (hero2) {
+            setTimeout(async () => {
+              if (cancelled) return;
+              try {
+                const line2 = await generateAIDialogue(hero2, 'idle_chat', {
+                  zoneName, trigger, allyName: hero1.name, allyLine: line1,
+                  inventory, shortMode: Math.random() < 0.4, forceSpeech: true,
+                });
+                if (cancelled || !line2) return;
 
-              const sprite2 = getPlayerSprite(hero2.classId, hero2.raceId);
-              const bubble2 = {
-                id: `b_${Date.now()}_ai`,
-                speaker: hero2,
-                text: line2,
-                colorHex: '#c084fc',
-                spriteData: sprite2,
-                autoExpire: 10000,
-              };
-              setBubbleQueue(prev => [...prev.slice(-4), bubble2]);
-              setChatLog(prev => [...prev.slice(-49), { id: Date.now() + 1, speaker: hero2.name, line: line2, color: '#c084fc' }]);
-            } catch {}
-          }, 2500);
+                const sprite2 = getPlayerSprite(hero2.classId, hero2.raceId);
+                setBubbleQueue(prev => [...prev.slice(-4), {
+                  id: `b_${Date.now()}_ai`, speaker: hero2, text: line2,
+                  colorHex: '#c084fc', spriteData: sprite2, autoExpire: 10000,
+                }]);
+                setChatLog(prev => [...prev.slice(-49), { id: Date.now() + 1, speaker: hero2.name, line: line2, color: '#c084fc' }]);
+              } catch {}
+            }, 3000);
+          }
         } catch (err) {
           console.warn('[AI Dialogue] Failed, using fallback:', err);
           spawnFallbackDialogue(hero1, hero2, trigger);
@@ -1294,19 +1312,21 @@ export default function WorldMap() {
       }]);
       setChatLog(prev => [...prev.slice(-49), { id: Date.now(), speaker: dialogue.speaker1.name, line: dialogue.line1, color: 'var(--accent)' }]);
 
-      setTimeout(() => {
-        if (cancelled) return;
-        const sprite2 = getPlayerSprite(dialogue.speaker2.classId, dialogue.speaker2.raceId);
-        setBubbleQueue(prev => [...prev.slice(-4), {
-          id: `b_${Date.now()}_2`, speaker: dialogue.speaker2, text: dialogue.line2,
-          colorHex: '#fbbf24', spriteData: sprite2, autoExpire: 8000,
-        }]);
-        setChatLog(prev => [...prev.slice(-49), { id: Date.now() + 1, speaker: dialogue.speaker2.name, line: dialogue.line2, color: 'var(--gold)' }]);
-      }, 2500);
+      if (hero2) {
+        setTimeout(() => {
+          if (cancelled) return;
+          const sprite2 = getPlayerSprite(dialogue.speaker2.classId, dialogue.speaker2.raceId);
+          setBubbleQueue(prev => [...prev.slice(-4), {
+            id: `b_${Date.now()}_2`, speaker: dialogue.speaker2, text: dialogue.line2,
+            colorHex: '#fbbf24', spriteData: sprite2, autoExpire: 8000,
+          }]);
+          setChatLog(prev => [...prev.slice(-49), { id: Date.now() + 1, speaker: dialogue.speaker2.name, line: dialogue.line2, color: 'var(--gold)' }]);
+        }, 2500);
+      }
     };
 
-    const initialDelay = setTimeout(spawnDialogue, 5000 + Math.random() * 3000);
-    const interval = setInterval(spawnDialogue, 15000 + Math.random() * 8000);
+    const initialDelay = setTimeout(spawnDialogue, 8000 + Math.random() * 5000);
+    const interval = setInterval(spawnDialogue, 90000);
     return () => { cancelled = true; clearTimeout(initialDelay); clearInterval(interval); };
   }, [heroRoster, activeHeroIds, gold, level, currentZone, zoneConquer, bossesDefeated, locationsCleared, victories]);
 

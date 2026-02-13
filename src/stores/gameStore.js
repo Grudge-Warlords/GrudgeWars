@@ -10,6 +10,7 @@ import { getDefaultLoadout, resolveLoadout, getAllAbilityMap } from '../utils/ab
 import { missionTemplates, arenaTemplates } from '../data/missions';
 import { puterKV, isPuterAvailable } from '../utils/puterService';
 import { savePlayerStyle } from '../utils/aiDialogueService';
+import { getBestItemBonuses } from '../data/heroBestItems';
 import { cities } from '../data/cities';
 import { getDefaultRow, getRowPositions, applyRowCombatModifiers, getAdjacentRows, getRowName, getAIRowPreference, isUnitRanged, PLAYER_ROWS, ENEMY_ROWS } from '../data/battleRows';
 
@@ -51,6 +52,11 @@ function getHeroStatsWithBonuses(hero) {
       else stats[key] = val;
     });
   }
+  const bestBonuses = getBestItemBonuses(hero);
+  Object.entries(bestBonuses).forEach(([key, val]) => {
+    if (stats[key] !== undefined) stats[key] += val;
+    else stats[key] = val;
+  });
   return stats;
 }
 
