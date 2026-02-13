@@ -379,6 +379,145 @@ function LoopingEffectSprite({ sprite, displaySize = 40, filter, offsetY = -30, 
   );
 }
 
+function FullscreenBuffOverlay({ fx }) {
+  const [frame, setFrame] = React.useState(0);
+  const [phase, setPhase] = React.useState('in');
+  const sprite = fx.sprite;
+  const totalFrames = sprite.frames || 64;
+  const hasCustomLayout = sprite.cols !== undefined;
+  const cols = hasCustomLayout ? sprite.cols : Math.round(Math.sqrt(totalFrames));
+  const frameW = hasCustomLayout ? sprite.frameW : (sprite.size / cols);
+  const frameH = hasCustomLayout ? sprite.frameH : (sprite.size / cols);
+
+  React.useEffect(() => {
+    let f = 0;
+    const iv = setInterval(() => { f = (f + 1) % totalFrames; setFrame(f); }, 40);
+    return () => clearInterval(iv);
+  }, [totalFrames]);
+
+  React.useEffect(() => {
+    setPhase('in');
+    const t1 = setTimeout(() => setPhase('hold'), 300);
+    const t2 = setTimeout(() => setPhase('out'), 1600);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  const classColors = {
+    warrior: { bg: 'rgba(239,68,68,0.15)', glow: '#ef4444', arrow: '#ff6b6b' },
+    mage: { bg: 'rgba(139,92,246,0.15)', glow: '#8b5cf6', arrow: '#a78bfa' },
+    worge: { bg: 'rgba(217,119,6,0.15)', glow: '#d97706', arrow: '#fbbf24' },
+    ranger: { bg: 'rgba(34,197,94,0.15)', glow: '#22c55e', arrow: '#4ade80' },
+  };
+  const cc = classColors[fx.classId] || classColors.warrior;
+
+  const col = frame % cols;
+  const row = Math.floor(frame / cols);
+  const tileW = 160;
+  const scX = tileW / frameW;
+  const scY = tileW / frameH;
+
+  const overlayOpacity = phase === 'in' ? 0 : phase === 'out' ? 0 : 0.6;
+  const transition = phase === 'in' ? 'opacity 0.3s ease-out' : phase === 'out' ? 'opacity 0.4s ease-in' : 'none';
+
+  const arrowTargets = fx.casterTeam === 'player' ? fx.enemies : fx.targets;
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, zIndex: 200,
+      pointerEvents: 'none',
+      opacity: overlayOpacity,
+      transition,
+    }}>
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: cc.bg,
+        backdropFilter: 'blur(1px)',
+      }} />
+
+      <div style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', flexWrap: 'wrap',
+        justifyContent: 'center', alignItems: 'center',
+        gap: 0,
+        overflow: 'hidden',
+      }}>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} style={{
+            width: tileW, height: tileW, overflow: 'hidden',
+            opacity: 0.5 + (i % 3) * 0.1,
+            transform: `rotate(${(i * 30) % 360}deg)`,
+          }}>
+            <div style={{
+              width: tileW, height: tileW,
+              backgroundImage: `url(${sprite.src})`,
+              backgroundSize: hasCustomLayout
+                ? `${cols * frameW * scX}px ${(sprite.rows || Math.ceil(totalFrames / cols)) * frameH * scY}px`
+                : `${sprite.size * scX}px ${sprite.size * scY}px`,
+              backgroundPosition: `-${col * tileW}px -${row * tileW}px`,
+              backgroundRepeat: 'no-repeat',
+              imageRendering: 'pixelated',
+              filter: `drop-shadow(0 0 6px ${cc.glow})`,
+            }} />
+          </div>
+        ))}
+      </div>
+
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: `radial-gradient(ellipse at center, transparent 30%, ${cc.bg} 100%)`,
+      }} />
+
+      {arrowTargets.filter(t => t?.position).map((t, i) => {
+        const tx = t.position.x;
+        const ty = t.position.y || 50;
+        return (
+          <svg key={i} style={{
+            position: 'absolute', left: tx - 30, top: ty - 20,
+            width: 60, height: 60, zIndex: 210, pointerEvents: 'none',
+            filter: `drop-shadow(0 0 8px ${cc.glow})`,
+          }}>
+            <defs>
+              <marker id={`arrowHead-${fx.id}-${i}`} markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <polygon points="0 0, 8 3, 0 6" fill={cc.arrow} />
+              </marker>
+            </defs>
+            <line x1="5" y1="50" x2="30" y2="15"
+              stroke={cc.arrow} strokeWidth="3"
+              markerEnd={`url(#arrowHead-${fx.id}-${i})`}
+              opacity="0.9"
+            >
+              <animate attributeName="opacity" values="0.5;1;0.5" dur="0.6s" repeatCount="indefinite" />
+            </line>
+            <line x1="55" y1="50" x2="30" y2="15"
+              stroke={cc.arrow} strokeWidth="3"
+              markerEnd={`url(#arrowHead-${fx.id}-${i})`}
+              opacity="0.9"
+            >
+              <animate attributeName="opacity" values="0.5;1;0.5" dur="0.6s" begin="0.3s" repeatCount="indefinite" />
+            </line>
+          </svg>
+        );
+      })}
+
+      <div style={{
+        position: 'absolute', top: '8%', left: '50%',
+        transform: 'translateX(-50%)',
+        fontFamily: "'Cinzel', serif",
+        fontSize: '1.4rem',
+        fontWeight: 700,
+        color: cc.arrow,
+        textShadow: `0 0 12px ${cc.glow}, 0 2px 4px rgba(0,0,0,0.7)`,
+        letterSpacing: '0.15em',
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap',
+        zIndex: 220,
+      }}>
+        {fx.abilityName}
+      </div>
+    </div>
+  );
+}
+
 function DodgeFlashSprite({ x, y }) {
   const [frame, setFrame] = React.useState(0);
   const sprite = effectSprites.thunderProjectile;
@@ -1171,6 +1310,7 @@ export default function BattleScreen() {
   const [waterSplashFx, setWaterSplashFx] = useState([]);
   const [poisonGustFx, setPoisonGustFx] = useState([]);
   const [resurrectFx, setResurrectFx] = useState([]);
+  const [buffScreenFx, setBuffScreenFx] = useState(null);
   const [showItemsPanel, setShowItemsPanel] = useState(false);
   const [healTargetMode, setHealTargetMode] = useState(null);
   const [hoveredGearUnitId, setHoveredGearUnitId] = useState(null);
@@ -2029,6 +2169,20 @@ export default function BattleScreen() {
             if (hfxR6.followUp) spawnFollowUpEffects(hfxR6.followUp, attacker.position.x, bodyY(attacker), hfxR6.filter);
           }
         }
+
+        const buffClassId = attacker.classId || 'warrior';
+        const buffTargets = target ? [target] : [attacker];
+        const enemies = allUnits.filter(u => u.team !== attacker.team && u.alive);
+        setBuffScreenFx({
+          id: Date.now(),
+          classId: buffClassId,
+          sprite: hfxR6.sprite || effectSprites.protectionCircle,
+          targets: buffTargets,
+          enemies,
+          casterTeam: attacker.team,
+          abilityName: abilityName || 'Buff',
+        });
+        setTimeout(() => setBuffScreenFx(null), 2000);
       }
       setTimeout(() => setUnitAnims(prev => ({ ...prev, [attackerId]: 'idle' })), 600);
       setTimeout(() => advanceTurn(), 900);
@@ -2667,6 +2821,8 @@ export default function BattleScreen() {
         {resurrectFx.map(r => (
           <ResurrectEffect key={r.id} x={r.x} y={r.y} />
         ))}
+
+        {buffScreenFx && <FullscreenBuffOverlay key={buffScreenFx.id} fx={buffScreenFx} />}
 
         {floatingDmg.map(f => (
           <div key={f.id} style={{
