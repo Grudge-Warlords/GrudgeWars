@@ -654,6 +654,11 @@ input[type="range"]::-moz-range-thumb {
   to { transform: translateX(-90px); }
 }
 
+@keyframes shieldDroidShield {
+  from { transform: translateX(0); }
+  to { transform: translateX(-540px); }
+}
+
 @keyframes shieldPulse {
   0%, 100% { opacity: 0.5; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.08); }

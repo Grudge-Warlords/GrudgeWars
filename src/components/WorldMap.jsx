@@ -2153,23 +2153,16 @@ export default function WorldMap() {
                     overflow: 'hidden',
                     imageRendering: 'pixelated',
                     transform: 'scale(1.8)',
+                    filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))',
                   }}>
                     <div style={{
-                      width: 90, height: 31,
-                      backgroundImage: 'url(/sprites/shield_droid/idle.png)',
-                      backgroundSize: '90px 31px',
+                      width: 540, height: 31,
+                      backgroundImage: 'url(/sprites/shield_droid/shield_pulse.png)',
+                      backgroundSize: '540px 31px',
                       imageRendering: 'pixelated',
-                      animation: 'shieldDroidIdle 0.9s steps(3) infinite',
+                      animation: 'shieldDroidShield 2.4s steps(18) infinite',
                     }} />
                   </div>
-                  <div style={{
-                    position: 'absolute', inset: -2,
-                    borderRadius: '50%',
-                    border: '2px solid rgba(255,60,60,0.5)',
-                    boxShadow: '0 0 12px rgba(255,60,60,0.3), inset 0 0 8px rgba(255,60,60,0.15)',
-                    animation: 'shieldPulse 2s ease-in-out infinite',
-                    pointerEvents: 'none',
-                  }} />
                 </div>
               )}
               <div style={{
