@@ -810,7 +810,8 @@ const useGameStore = create(persist((set, get) => ({
     const zonePresets = getZoneEnemyPresets(locationId);
     for (let i = 0; i < enemyCount; i++) {
       let enemy = null;
-      if (zonePresets && zonePresets.presets && zonePresets.presets.length > 0) {
+      const useBettaPreset = zonePresets && zonePresets.presets && zonePresets.presets.length > 0 && Math.random() < 0.3;
+      if (useBettaPreset) {
         const preset = zonePresets.presets[Math.floor(Math.random() * zonePresets.presets.length)];
         const [minLv, maxLv] = preset.levelRange;
         const enemyLevel = minLv + Math.floor(Math.random() * (maxLv - minLv + 1));
