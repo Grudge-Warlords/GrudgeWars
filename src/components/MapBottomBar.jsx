@@ -493,43 +493,48 @@ export default function MapBottomBar({
               alignItems: 'center',
               paddingTop: '3%',
             }}>
-              {buttons.map(btn => (
-                <button key={btn.id} onClick={btn.action} style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  gap: 1,
-                  transition: 'all 0.15s',
-                  position: 'relative',
-                  animation: btn.pulse ? 'glow 2s infinite' : 'none',
-                  aspectRatio: '1 / 1',
-                  width: '100%',
-                  minWidth: isMobile ? 36 : undefined,
-                  minHeight: isMobile ? 36 : undefined,
-                }}
-                  onMouseEnter={e => { showTooltip(btn.label, e); e.currentTarget.style.filter = 'brightness(1.4)'; }}
-                  onMouseMove={e => updateTooltipPosition(e)}
-                  onMouseLeave={e => { hideTooltip(); e.currentTarget.style.filter = 'none'; }}
-                >
-                  {btn.img ? (
-                    <img src={btn.img} alt={btn.label} style={{ width: '70%', height: '70%', objectFit: 'contain', borderRadius: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
-                  ) : btn.iconSrc ? (
-                    <img src={btn.iconSrc} alt={btn.label} style={{ width: '60%', height: '60%', objectFit: 'contain', imageRendering: 'pixelated', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
-                  ) : (
-                    <InlineIcon name={btn.icon} size={20} />
-                  )}
-                  <span style={{ fontSize: isMobile ? '0.55rem' : '0.4rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif", lineHeight: 1 }}>{btn.label}</span>
-                  {btn.badge && (
-                    <span style={{
-                      position: 'absolute', top: -2, right: -2,
-                      background: 'var(--gold)', color: '#000', fontSize: '0.4rem',
-                      fontWeight: 800, borderRadius: '50%', width: 14, height: 14,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>{btn.badge}</span>
-                  )}
-                </button>
+              {buttons.map((btn, idx) => (
+                <div key={btn.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <button onClick={btn.action} style={{
+                    background: 'rgba(0,0,0,0.6)',
+                    border: '2px solid rgba(197,160,89,0.4)',
+                    padding: 0,
+                    cursor: 'pointer',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    gap: 0,
+                    transition: 'all 0.15s',
+                    position: 'relative',
+                    animation: btn.pulse ? 'glow 2s infinite' : 'none',
+                    aspectRatio: '1 / 1',
+                    width: '100%',
+                    minWidth: isMobile ? 36 : undefined,
+                    minHeight: isMobile ? 36 : undefined,
+                    boxShadow: 'inset 0 0 5px rgba(0,0,0,0.8)',
+                    borderRadius: '5px',
+                  }}
+                    onMouseEnter={e => { showTooltip(btn.label, e); e.currentTarget.style.borderColor = '#c5a059'; e.currentTarget.style.transform = 'scale(1.08)'; }}
+                    onMouseMove={e => updateTooltipPosition(e)}
+                    onMouseLeave={e => { hideTooltip(); e.currentTarget.style.borderColor = 'rgba(197,160,89,0.4)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                  >
+                    {btn.img ? (
+                      <img src={btn.img} alt={btn.label} style={{ width: '65%', height: '65%', objectFit: 'contain', borderRadius: 2, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
+                    ) : btn.iconSrc ? (
+                      <img src={btn.iconSrc} alt={btn.label} style={{ width: '60%', height: '60%', objectFit: 'contain', imageRendering: 'pixelated', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
+                    ) : (
+                      <InlineIcon name={btn.icon} size={20} />
+                    )}
+                    <span style={{ position: 'absolute', top: 1, left: 3, fontSize: '0.4rem', color: 'rgba(200,200,200,0.5)', fontWeight: 600, fontFamily: "'Cinzel', serif" }}>{idx + 1}</span>
+                    {btn.badge && (
+                      <span style={{
+                        position: 'absolute', top: -2, right: -2,
+                        background: 'var(--gold)', color: '#000', fontSize: '0.4rem',
+                        fontWeight: 800, borderRadius: '50%', width: 14, height: 14,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>{btn.badge}</span>
+                    )}
+                  </button>
+                  <span style={{ fontSize: isMobile ? '0.55rem' : '0.4rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif", lineHeight: 1, textAlign: 'center' }}>{btn.label}</span>
+                </div>
               ))}
             </div>
           </div>
