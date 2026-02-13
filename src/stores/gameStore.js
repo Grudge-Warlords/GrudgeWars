@@ -12,7 +12,7 @@ import { puterKV, isPuterAvailable } from '../utils/puterService';
 import { savePlayerStyle } from '../utils/aiDialogueService';
 import { getBestItemBonuses } from '../data/heroBestItems';
 import { cities } from '../data/cities';
-import { getDefaultRow, getRowPositions, applyRowCombatModifiers, getAdjacentRows, getRowName, getAIRowPreference, isUnitRanged, PLAYER_ROWS, ENEMY_ROWS } from '../data/battleRows';
+import { getDefaultRow, getRowPositions, applyRowCombatModifiers, getAdjacentRows, getRowName, getAIRowPreference, isUnitRanged, PLAYER_ROWS, ENEMY_ROWS, checkGuardianIntercept, getRowSpeedModifier } from '../data/battleRows';
 
 function floorTo2(n) { return Math.floor(n * 100) / 100; }
 
@@ -393,6 +393,7 @@ const useGameStore = create(persist((set, get) => ({
   bossesDefeated: [],
   heroRoster: [],
   activeHeroIds: [],
+  heroTacticalRows: {},
   heroCreationPending: false,
   maxHeroSlots: 1,
   locationsCleared: [],
@@ -629,6 +630,11 @@ const useGameStore = create(persist((set, get) => ({
     set({ activeHeroIds: heroIds.slice(0, 3) });
   },
 
+  setHeroTacticalRow: (heroId, row) => {
+    const state = get();
+    set({ heroTacticalRows: { ...state.heroTacticalRows, [heroId]: row } });
+  },
+
   getAvailableHeroSlots: () => {
     const state = get();
     return state.maxHeroSlots - state.heroRoster.length;
@@ -798,7 +804,11 @@ const useGameStore = create(persist((set, get) => ({
       const hero = state.heroRoster.find(h => h.id === heroId);
       if (hero) {
         const unit = createHeroBattleUnit(hero);
-        if (unit) playerTeam.push(unit);
+        if (unit) {
+          const tacticalRow = state.heroTacticalRows[heroId];
+          if (tacticalRow) unit.row = tacticalRow;
+          playerTeam.push(unit);
+        }
       }
     }
 
@@ -829,7 +839,7 @@ const useGameStore = create(persist((set, get) => ({
     assignRowsAndPositions(playerTeam, enemyUnits);
 
     const turnOrder = [...allUnits]
-      .sort((a, b) => b.speed - a.speed)
+      .sort((a, b) => (b.speed * (1 + getRowSpeedModifier(b))) - (a.speed * (1 + getRowSpeedModifier(a))))
       .map(u => u.id);
 
     const mainUnit = playerTeam.find(u => u.id === 'player') || playerTeam[0];
@@ -903,7 +913,11 @@ const useGameStore = create(persist((set, get) => ({
       const hero = state.heroRoster.find(h => h.id === heroId);
       if (hero) {
         const unit = createHeroBattleUnit(hero);
-        if (unit) playerTeam.push(unit);
+        if (unit) {
+          const tacticalRow = state.heroTacticalRows[heroId];
+          if (tacticalRow) unit.row = tacticalRow;
+          playerTeam.push(unit);
+        }
       }
     }
 
@@ -953,7 +967,7 @@ const useGameStore = create(persist((set, get) => ({
 
     assignRowsAndPositions(playerTeam, enemyUnits);
 
-    const turnOrder = [...allUnits].sort((a, b) => b.speed - a.speed).map(u => u.id);
+    const turnOrder = [...allUnits].sort((a, b) => (b.speed * (1 + getRowSpeedModifier(b))) - (a.speed * (1 + getRowSpeedModifier(a)))).map(u => u.id);
 
     const mainUnit = playerTeam.find(u => u.id === 'player') || playerTeam[0];
 
@@ -1013,7 +1027,11 @@ const useGameStore = create(persist((set, get) => ({
       const hero = state.heroRoster.find(h => h.id === heroId);
       if (hero) {
         const unit = createHeroBattleUnit(hero);
-        if (unit) playerTeam.push(unit);
+        if (unit) {
+          const tacticalRow = state.heroTacticalRows[heroId];
+          if (tacticalRow) unit.row = tacticalRow;
+          playerTeam.push(unit);
+        }
       }
     }
     if (playerTeam.length === 0) return;
@@ -1024,7 +1042,7 @@ const useGameStore = create(persist((set, get) => ({
     const allUnits = [...playerTeam, ...enemyUnits];
     assignRowsAndPositions(playerTeam, enemyUnits);
 
-    const turnOrder = [...allUnits].sort((a, b) => b.speed - a.speed).map(u => u.id);
+    const turnOrder = [...allUnits].sort((a, b) => (b.speed * (1 + getRowSpeedModifier(b))) - (a.speed * (1 + getRowSpeedModifier(a)))).map(u => u.id);
     const mainUnit = playerTeam.find(u => u.id === 'player') || playerTeam[0];
 
     set({
@@ -1068,7 +1086,7 @@ const useGameStore = create(persist((set, get) => ({
     const allUnits = [...playerUnits, ...enemyUnits];
     assignRowsAndPositions(playerUnits, enemyUnits);
 
-    const turnOrder = [...allUnits].sort((a, b) => b.speed - a.speed).map(u => u.id);
+    const turnOrder = [...allUnits].sort((a, b) => (b.speed * (1 + getRowSpeedModifier(b))) - (a.speed * (1 + getRowSpeedModifier(a)))).map(u => u.id);
 
     set({
       activeMission: { ...state.activeMission, currentRound: nextRoundIdx },
@@ -1103,7 +1121,11 @@ const useGameStore = create(persist((set, get) => ({
       const hero = state.heroRoster.find(h => h.id === heroId);
       if (hero) {
         const unit = createHeroBattleUnit(hero);
-        if (unit) playerTeam.push(unit);
+        if (unit) {
+          const tacticalRow = state.heroTacticalRows[heroId];
+          if (tacticalRow) unit.row = tacticalRow;
+          playerTeam.push(unit);
+        }
       }
     }
     if (playerTeam.length === 0) return;
@@ -1113,7 +1135,7 @@ const useGameStore = create(persist((set, get) => ({
     const allUnits = [...playerTeam, ...enemyUnits];
     assignRowsAndPositions(playerTeam, enemyUnits);
 
-    const turnOrder = [...allUnits].sort((a, b) => b.speed - a.speed).map(u => u.id);
+    const turnOrder = [...allUnits].sort((a, b) => (b.speed * (1 + getRowSpeedModifier(b))) - (a.speed * (1 + getRowSpeedModifier(a)))).map(u => u.id);
     const mainUnit = playerTeam.find(u => u.id === 'player') || playerTeam[0];
 
     set({
@@ -1286,7 +1308,7 @@ const useGameStore = create(persist((set, get) => ({
     if (!unit || !unit.alive) return;
 
     const adjacent = getAdjacentRows(unit);
-    const rows = ['protection', 'battle', 'back'];
+    const rows = ['front', 'battle', 'support', 'back'];
     const currentIdx = rows.indexOf(unit.row);
     let targetRow = null;
 
@@ -1387,6 +1409,29 @@ const useGameStore = create(persist((set, get) => ({
       }
       const actualTarget = units.find(u => u.id === targetId);
       if (!actualTarget) return;
+
+      if (attacker.team === 'enemy' && actualTarget.team === 'player' && ability.type === 'physical') {
+        const playerUnits = units.filter(u => u.team === 'player' && u.alive);
+        const guardian = checkGuardianIntercept(actualTarget, playerUnits, attacker);
+        if (guardian) {
+          const counterResult = calculateAttackDamage(guardian, attacker, guardian.abilities?.[0] || ability);
+          attacker.health = Math.max(0, attacker.health - counterResult.totalDmg);
+          log.push(`[GUARDIAN] ${guardian.name} intercepts ${attacker.name}'s attack on ${actualTarget.name}!`);
+          log.push(`[COUNTER] ${guardian.name} strikes back for ${counterResult.totalDmg} damage!`);
+          if (attacker.health <= 0) {
+            attacker.alive = false;
+            log.push(`${attacker.name} has been slain by the Guardian!`);
+          }
+          actionResult = { ...actionResult, guardianIntercept: true, guardianId: guardian.id, counterDmg: counterResult.totalDmg };
+          set({
+            battleUnits: units,
+            battleLog: log.slice(-12),
+            battleState: { ...bs, phase: 'animating' },
+            lastAction: actionResult,
+          });
+          return;
+        }
+      }
 
       const result = calculateAttackDamage(attacker, actualTarget, ability);
       actionResult = { ...actionResult, ...result };
@@ -2637,7 +2682,7 @@ const useGameStore = create(persist((set, get) => ({
     const allUnits = [...playerTeam, ...enemyUnits];
     assignRowsAndPositions(playerTeam, enemyUnits);
 
-    const turnOrder = [...allUnits].sort((a, b) => b.speed - a.speed).map(u => u.id);
+    const turnOrder = [...allUnits].sort((a, b) => (b.speed * (1 + getRowSpeedModifier(b))) - (a.speed * (1 + getRowSpeedModifier(a)))).map(u => u.id);
     const mainUnit = playerTeam.find(u => u.id === 'player') || playerTeam[0];
 
     set({

@@ -3313,7 +3313,7 @@ export default function BattleScreen() {
                 const currentRow = currentUnit.row || 'battle';
                 const rowCfg = PLAYER_ROWS[currentRow];
                 const adjacent = getAdjacentRows(currentUnit);
-                const rows = ['protection', 'battle', 'back'];
+                const rows = ['front', 'battle', 'support', 'back'];
                 const currentIdx = rows.indexOf(currentRow);
                 const canForward = currentIdx > 0 && adjacent.includes(rows[currentIdx - 1]);
                 const canBack = currentIdx < rows.length - 1 && adjacent.includes(rows[currentIdx + 1]);
@@ -3328,21 +3328,21 @@ export default function BattleScreen() {
                     justifyContent: 'center',
                   }}>
                     <button
-                      disabled={!canForward}
-                      onClick={() => canForward && moveRow('forward')}
+                      disabled={!canBack}
+                      onClick={() => canBack && moveRow('back')}
                       style={{
                         width: 32, height: 32, borderRadius: 4,
-                        background: canForward ? 'rgba(59,130,246,0.3)' : 'rgba(40,40,50,0.3)',
-                        border: `2px solid ${canForward ? '#3b82f6' : '#333'}`,
-                        color: canForward ? '#93c5fd' : '#555',
-                        cursor: canForward ? 'pointer' : 'not-allowed',
+                        background: canBack ? 'rgba(245,158,11,0.3)' : 'rgba(40,40,50,0.3)',
+                        border: `2px solid ${canBack ? '#f59e0b' : '#333'}`,
+                        color: canBack ? '#fcd34d' : '#555',
+                        cursor: canBack ? 'pointer' : 'not-allowed',
                         fontSize: '1rem', fontWeight: 900, display: 'flex',
                         alignItems: 'center', justifyContent: 'center',
-                        transition: 'all 0.15s', opacity: canForward ? 1 : 0.4,
+                        transition: 'all 0.15s', opacity: canBack ? 1 : 0.4,
                       }}
-                      onMouseEnter={e => { if (forwardRow) showTooltip(`Move to ${forwardRow.name}`, e); if (canForward) e.currentTarget.style.background = 'rgba(59,130,246,0.5)'; }}
+                      onMouseEnter={e => { if (backRow) showTooltip(`Retreat to ${backRow.name}`, e); if (canBack) e.currentTarget.style.background = 'rgba(245,158,11,0.5)'; }}
                       onMouseMove={e => updateTooltipPosition(e)}
-                      onMouseLeave={e => { hideTooltip(); if (canForward) e.currentTarget.style.background = 'rgba(59,130,246,0.3)'; }}
+                      onMouseLeave={e => { hideTooltip(); if (canBack) e.currentTarget.style.background = 'rgba(245,158,11,0.3)'; }}
                     >{'\u25C0'}</button>
                     <div style={{
                       background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(212,169,106,0.3)',
@@ -3357,37 +3357,46 @@ export default function BattleScreen() {
                       {modEntries.length > 0 ? (
                         <div style={{ fontSize: '0.45rem', color: '#a08b6d', marginTop: 1, lineHeight: 1.3 }}>
                           {modEntries.map(([key, val]) => {
-                            const isPositive = key.includes('Bonus') || key.includes('Chance') || (key.includes('Mult') && val > 1);
-                            const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).replace('Mult', '').replace('Penalty', '');
-                            const display = typeof val === 'number' && val < 1 ? `${Math.round(val * 100)}%` : typeof val === 'number' && val > 1 ? `${Math.round(val * 100)}%` : `+${val}`;
+                            const labelMap = {
+                              damageBonus: 'Dmg', damageTakenBonus: 'Dmg Taken', healingBonus: 'Healing',
+                              critChanceBonus: 'Crit', dodgeBonus: 'Dodge', blockBonus: 'Block',
+                              dodgePenalty: 'Dodge', blockPenalty: 'Block', speedBonus: 'Speed',
+                              accuracyBonus: 'Accuracy',
+                            };
+                            const label = labelMap[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+                            const isPenalty = key.includes('Penalty') || key === 'damageTakenBonus';
+                            const isNegDmg = key === 'damageBonus' && val < 0;
+                            const isGood = !isPenalty && !isNegDmg;
+                            const pct = Math.abs(typeof val === 'number' && Math.abs(val) < 1 ? Math.round(val * 100) : val);
+                            const sign = isGood ? '+' : '-';
                             return (
                               <span key={key} style={{
-                                color: isPositive ? '#4ade80' : '#f87171',
+                                color: isGood ? '#4ade80' : '#f87171',
                                 marginRight: 4,
-                              }}>{isPositive ? '+' : ''}{display} {label}</span>
+                              }}>{sign}{pct}% {label}</span>
                             );
                           })}
                         </div>
                       ) : (
-                        <div style={{ fontSize: '0.45rem', color: '#6b7280', marginTop: 1 }}>No modifiers</div>
+                        <div style={{ fontSize: '0.45rem', color: '#6b7280', marginTop: 1 }}>Balanced</div>
                       )}
                     </div>
                     <button
-                      disabled={!canBack}
-                      onClick={() => canBack && moveRow('back')}
+                      disabled={!canForward}
+                      onClick={() => canForward && moveRow('forward')}
                       style={{
                         width: 32, height: 32, borderRadius: 4,
-                        background: canBack ? 'rgba(245,158,11,0.3)' : 'rgba(40,40,50,0.3)',
-                        border: `2px solid ${canBack ? '#f59e0b' : '#333'}`,
-                        color: canBack ? '#fcd34d' : '#555',
-                        cursor: canBack ? 'pointer' : 'not-allowed',
+                        background: canForward ? 'rgba(59,130,246,0.3)' : 'rgba(40,40,50,0.3)',
+                        border: `2px solid ${canForward ? '#3b82f6' : '#333'}`,
+                        color: canForward ? '#93c5fd' : '#555',
+                        cursor: canForward ? 'pointer' : 'not-allowed',
                         fontSize: '1rem', fontWeight: 900, display: 'flex',
                         alignItems: 'center', justifyContent: 'center',
-                        transition: 'all 0.15s', opacity: canBack ? 1 : 0.4,
+                        transition: 'all 0.15s', opacity: canForward ? 1 : 0.4,
                       }}
-                      onMouseEnter={e => { if (backRow) showTooltip(`Move to ${backRow.name}`, e); if (canBack) e.currentTarget.style.background = 'rgba(245,158,11,0.5)'; }}
+                      onMouseEnter={e => { if (forwardRow) showTooltip(`Advance to ${forwardRow.name}`, e); if (canForward) e.currentTarget.style.background = 'rgba(59,130,246,0.5)'; }}
                       onMouseMove={e => updateTooltipPosition(e)}
-                      onMouseLeave={e => { hideTooltip(); if (canBack) e.currentTarget.style.background = 'rgba(245,158,11,0.3)'; }}
+                      onMouseLeave={e => { hideTooltip(); if (canForward) e.currentTarget.style.background = 'rgba(59,130,246,0.3)'; }}
                     >{'\u25B6'}</button>
                   </div>
                 );

@@ -11,6 +11,7 @@ import { getPlayerSprite } from '../data/spriteMap';
 import RadarChart from './RadarChart';
 import { setMusicMuted, setSfxMuted } from '../utils/audioManager';
 import useIsMobile from '../hooks/useIsMobile';
+import { PLAYER_ROWS, getDefaultRow } from '../data/battleRows';
 
 const BAR_HEIGHT = '26.2%';
 const POPUP_BOTTOM_OFFSET = 'calc(26.2% + 8px)';
@@ -320,6 +321,205 @@ function CharacterPopup({ onClose, isMobile }) {
   );
 }
 
+const ROW_ICONS = { front: '🛡️', battle: '⚔️', support: '⚡', back: '🏹' };
+const ROW_COLORS = { front: '#ef4444', battle: '#f59e0b', support: '#6ee7b7', back: '#60a5fa' };
+
+function TacticalRowPanel({ onClose, isMobile }) {
+  const { heroRoster, activeHeroIds, heroTacticalRows, setHeroTacticalRow } = useGameStore();
+  const [dragHeroId, setDragHeroId] = useState(null);
+  const [selectedHeroId, setSelectedHeroId] = useState(null);
+
+  const activeHeroes = heroRoster.filter(h => activeHeroIds.includes(h.id) || h.id === 'player');
+  const rows = Object.entries(PLAYER_ROWS);
+
+  const getHeroRow = (heroId) => {
+    if (heroTacticalRows[heroId]) return heroTacticalRows[heroId];
+    const hero = heroRoster.find(h => h.id === heroId);
+    if (!hero) return 'battle';
+    const cls = classDefinitions[hero.classId];
+    if (!cls) return 'battle';
+    return getDefaultRow({ classId: hero.classId, team: 'player', weaponType: hero.equipment?.weapon?.weaponType || null });
+  };
+
+  const handleDrop = (rowId) => {
+    if (dragHeroId) {
+      setHeroTacticalRow(dragHeroId, rowId);
+      setDragHeroId(null);
+    }
+  };
+
+  const handleRowTap = (rowId) => {
+    if (selectedHeroId) {
+      setHeroTacticalRow(selectedHeroId, rowId);
+      setSelectedHeroId(null);
+    }
+  };
+
+  const handleHeroTap = (heroId) => {
+    setSelectedHeroId(prev => prev === heroId ? null : heroId);
+  };
+
+  return (
+    <div style={{
+      position: 'absolute', bottom: POPUP_BOTTOM_OFFSET, right: isMobile ? 4 : 10, zIndex: 10600,
+      backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+      border: '1px solid rgba(251,191,36,0.3)',
+      borderRadius: 12, padding: isMobile ? 10 : 16, width: isMobile ? 'calc(100vw - 16px)' : 380, maxHeight: 420, overflowY: 'auto',
+      boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
+      animation: 'fadeIn 0.15s ease-out',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <h4 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '0.9rem', margin: 0 }}>
+          ⚔️ Tactical Positions
+        </h4>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '1.1rem' }}>×</button>
+      </div>
+      <div style={{ fontSize: '0.6rem', color: 'rgba(148,163,184,0.7)', marginBottom: 12, lineHeight: 1.4 }}>
+        {isMobile ? 'Tap a hero to select, then tap a row to assign.' : 'Drag heroes to assign starting battle rows.'} These positions apply when entering combat.
+      </div>
+      {selectedHeroId && (
+        <div style={{
+          background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.3)',
+          borderRadius: 6, padding: '4px 10px', marginBottom: 8,
+          fontSize: '0.55rem', color: 'var(--gold)', textAlign: 'center',
+        }}>
+          Hero selected — tap a row to assign position
+        </div>
+      )}
+
+      {rows.map(([rowId, rowData]) => {
+        const heroesInRow = activeHeroes.filter(h => getHeroRow(h.id) === rowId);
+        return (
+          <div
+            key={rowId}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => handleDrop(rowId)}
+            onClick={() => handleRowTap(rowId)}
+            style={{
+              marginBottom: 8,
+              background: (dragHeroId || selectedHeroId) ? 'rgba(255,215,0,0.05)' : 'rgba(0,0,0,0.3)',
+              border: `1px solid ${(dragHeroId || selectedHeroId) ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,0.08)'}`,
+              borderRadius: 8,
+              padding: isMobile ? '8px 8px' : '8px 12px',
+              transition: 'all 0.15s',
+              minHeight: 50,
+              cursor: selectedHeroId ? 'pointer' : 'default',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+              <span style={{ fontSize: '0.85rem' }}>{ROW_ICONS[rowId]}</span>
+              <span className="font-cinzel" style={{ fontSize: '0.65rem', fontWeight: 700, color: ROW_COLORS[rowId] }}>
+                {rowData.name}
+              </span>
+              {selectedHeroId && <span style={{ fontSize: '0.5rem', color: 'var(--gold)', marginLeft: 'auto', fontWeight: 600 }}>Tap to place</span>}
+              {!selectedHeroId && <span style={{ fontSize: '0.5rem', color: 'rgba(148,163,184,0.5)', marginLeft: 'auto' }}>
+                {rowData.description.split('.').slice(1).join('.').trim()}
+              </span>}
+            </div>
+
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', minHeight: 36 }}>
+              {heroesInRow.length === 0 && (
+                <div style={{
+                  width: '100%', height: 36,
+                  border: `1px dashed ${selectedHeroId ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,0.1)'}`,
+                  borderRadius: 6,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '0.5rem', color: selectedHeroId ? 'var(--gold)' : 'rgba(148,163,184,0.3)', fontStyle: 'italic',
+                }}>
+                  {selectedHeroId ? 'Tap to assign here' : (isMobile ? 'Tap hero, then tap row' : 'Drag hero here')}
+                </div>
+              )}
+              {heroesInRow.map(hero => {
+                const heroCls = classDefinitions[hero.classId];
+                const isSelected = selectedHeroId === hero.id;
+                return (
+                  <div
+                    key={hero.id}
+                    draggable={!isMobile}
+                    onDragStart={() => setDragHeroId(hero.id)}
+                    onDragEnd={() => setDragHeroId(null)}
+                    onClick={(e) => { e.stopPropagation(); handleHeroTap(hero.id); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      background: isSelected ? 'rgba(255,215,0,0.15)' : 'rgba(0,0,0,0.5)',
+                      border: `1px solid ${(isSelected || dragHeroId === hero.id) ? 'var(--gold)' : 'rgba(197,160,89,0.25)'}`,
+                      borderRadius: 6, padding: '4px 10px 4px 4px',
+                      cursor: isMobile ? 'pointer' : 'grab',
+                      transition: 'all 0.15s',
+                      opacity: dragHeroId === hero.id ? 0.5 : 1,
+                      boxShadow: isSelected ? '0 0 8px rgba(255,215,0,0.3)' : 'none',
+                    }}
+                  >
+                    <div style={{ width: 28, height: 28, overflow: 'visible', flexShrink: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                      <SpriteAnimation spriteData={getPlayerSprite(hero.classId, hero.raceId)} animation="idle" scale={0.32} speed={180} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.6rem', fontWeight: 700, color: '#fff' }}>{hero.name}</div>
+                      <div style={{ fontSize: '0.45rem', color: 'var(--muted)' }}>Lv.{hero.level} {heroCls?.name}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {heroesInRow.length === 0 && !dragHeroId && (
+              <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                {activeHeroes.map(hero => (
+                  <button
+                    key={hero.id}
+                    onClick={() => setHeroTacticalRow(hero.id, rowId)}
+                    style={{
+                      background: 'rgba(255,215,0,0.08)',
+                      border: '1px solid rgba(255,215,0,0.15)',
+                      borderRadius: 4, padding: '2px 6px',
+                      color: 'var(--gold)', fontSize: '0.45rem',
+                      cursor: 'pointer', fontFamily: "'Cinzel', serif",
+                    }}
+                  >
+                    + {hero.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+        <button
+          onClick={() => {
+            activeHeroes.forEach(hero => {
+              const defaultRow = getDefaultRow({ classId: hero.classId, team: 'player', weaponType: hero.equipment?.weapon?.weaponType || null });
+              setHeroTacticalRow(hero.id, defaultRow);
+            });
+          }}
+          style={{
+            flex: 1, background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 6, padding: '6px 0',
+            color: 'var(--muted)', fontSize: '0.55rem',
+            cursor: 'pointer', fontFamily: "'Cinzel', serif", fontWeight: 600,
+          }}
+        >
+          Reset Defaults
+        </button>
+        <button
+          onClick={onClose}
+          style={{
+            flex: 1, background: 'rgba(255,215,0,0.12)',
+            border: '1px solid rgba(255,215,0,0.3)',
+            borderRadius: 6, padding: '6px 0',
+            color: 'var(--gold)', fontSize: '0.55rem',
+            cursor: 'pointer', fontFamily: "'Cinzel', serif", fontWeight: 700,
+          }}
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function MapBottomBar({
   chatLog,
   chatInput,
@@ -344,11 +544,13 @@ export default function MapBottomBar({
   const [showHarvesting, setShowHarvesting] = useState(false);
   const [showGear, setShowGear] = useState(false);
   const [showCharacter, setShowCharacter] = useState(false);
+  const [showTactical, setShowTactical] = useState(false);
 
   const closeAllPopups = () => {
     setShowHarvesting(false);
     setShowGear(false);
     setShowCharacter(false);
+    setShowTactical(false);
   };
 
   const togglePopup = (which) => {
@@ -356,6 +558,7 @@ export default function MapBottomBar({
     if (which === 'harvest' && !showHarvesting) setShowHarvesting(true);
     else if (which === 'gear' && !showGear) setShowGear(true);
     else if (which === 'character' && !showCharacter) setShowCharacter(true);
+    else if (which === 'tactical' && !showTactical) setShowTactical(true);
   };
 
   const hasUnspent = unspentPoints > 0 || skillPoints > 0 || heroRoster.some(h => (h.unspentPoints || 0) > 0 || (h.skillPoints || 0) > 0);
@@ -380,6 +583,7 @@ export default function MapBottomBar({
     { id: 'harvest', iconSrc: '/sprites/ui/icons/icon_pickaxe.png', color: 'var(--gold)', label: 'Harvest', active: showHarvesting },
     { id: 'gear', iconSrc: '/sprites/ui/icons/icon_shield_blue.png', color: 'var(--accent)', label: 'Gear', active: showGear },
     { id: 'character', iconSrc: '/sprites/ui/icons/icon_chart.png', color: '#a855f7', label: 'Power', active: showCharacter },
+    { id: 'tactical', icon: 'crossed_swords', color: '#ef4444', label: 'Tactical', active: showTactical },
   ];
 
   const sendChat = () => {
@@ -403,6 +607,7 @@ export default function MapBottomBar({
       {showHarvesting && <div style={{ pointerEvents: 'auto' }}><HarvestingPopup onClose={() => setShowHarvesting(false)} isMobile={isMobile} /></div>}
       {showGear && <div style={{ pointerEvents: 'auto' }}><GearPopup onClose={() => setShowGear(false)} isMobile={isMobile} /></div>}
       {showCharacter && <div style={{ pointerEvents: 'auto' }}><CharacterPopup onClose={() => setShowCharacter(false)} isMobile={isMobile} /></div>}
+      {showTactical && <div style={{ pointerEvents: 'auto' }}><TacticalRowPanel onClose={() => setShowTactical(false)} isMobile={isMobile} /></div>}
 
       <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0, height: BAR_HEIGHT,
