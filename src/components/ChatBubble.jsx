@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-function FishPortrait({ spriteData, size = 68 }) {
+function FishPortrait({ spriteData, size = 44 }) {
   const idleAnim = spriteData?.idle;
   if (!idleAnim) return null;
 
@@ -22,7 +22,7 @@ function FishPortrait({ spriteData, size = 68 }) {
         imageRendering: 'pixelated',
         position: 'absolute',
         left: '50%',
-        top: '35%',
+        top: '50%',
         transform: 'translate(-50%, -50%)',
         filter: spriteData?.filter || 'none',
       }} />
@@ -30,26 +30,25 @@ function FishPortrait({ spriteData, size = 68 }) {
   );
 }
 
-function BubbleTail() {
+function BubbleTail({ color }) {
   return (
     <svg
-      width="24"
-      height="40"
-      viewBox="0 0 24 40"
+      width="20"
+      height="32"
+      viewBox="0 0 20 32"
       style={{
         position: 'absolute',
         top: '100%',
         left: '50%',
         transform: 'translateX(-50%)',
-        marginTop: -2,
+        marginTop: -1,
         display: 'block',
         overflow: 'visible',
       }}
     >
-      <circle cx="12" cy="8" r="4" fill="#fffef5" stroke="#111" strokeWidth="2" />
-      <circle cx="12" cy="20" r="3" fill="#fffef5" stroke="#111" strokeWidth="1.8" />
-      <circle cx="12" cy="30" r="2" fill="#fffef5" stroke="#111" strokeWidth="1.5" />
-      <circle cx="12" cy="37" r="1.2" fill="#fffef5" stroke="#111" strokeWidth="1.2" />
+      <circle cx="10" cy="6" r="4" fill={color || '#0d1b2e'} fillOpacity="0.85" stroke="rgba(100,220,255,0.3)" strokeWidth="1" />
+      <circle cx="10" cy="16" r="2.8" fill={color || '#0d1b2e'} fillOpacity="0.7" stroke="rgba(100,220,255,0.2)" strokeWidth="0.8" />
+      <circle cx="10" cy="24" r="1.8" fill={color || '#0d1b2e'} fillOpacity="0.5" stroke="rgba(100,220,255,0.15)" strokeWidth="0.6" />
     </svg>
   );
 }
@@ -101,6 +100,7 @@ function FloatingBubble({ bubble, index, totalVisible, onDismiss }) {
   }, [bubble.autoExpire, handleDismiss]);
 
   const opacity = exiting ? 0 : (visible ? 1 : 0);
+  const accent = bubble.colorHex || '#40c9ff';
 
   return (
     <div
@@ -110,63 +110,97 @@ function FloatingBubble({ bubble, index, totalVisible, onDismiss }) {
         opacity,
         pointerEvents: opacity > 0.3 ? 'auto' : 'none',
         cursor: 'pointer',
-        marginBottom: 10,
-        maxWidth: 380,
-        minWidth: 240,
-        width: 'auto',
+        marginBottom: 8,
+        maxWidth: 480,
+        minWidth: 180,
+        width: 'max-content',
         willChange: 'transform',
       }}
       onClick={(e) => { e.stopPropagation(); handleDismiss(); }}
     >
       <div style={{
         position: 'relative',
-        filter: 'drop-shadow(2px 4px 2px rgba(0,0,0,0.5))',
+        filter: `drop-shadow(0 2px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 12px ${accent}22)`,
       }}>
         <div style={{
-          background: '#fffef5',
-          border: '3px solid #111',
-          borderRadius: 24,
-          padding: '12px 16px 12px 12px',
+          background: `linear-gradient(135deg, rgba(10,20,45,0.92) 0%, rgba(15,30,60,0.88) 50%, rgba(10,20,45,0.92) 100%)`,
+          backdropFilter: 'blur(8px)',
+          border: `1.5px solid ${accent}55`,
+          borderRadius: 18,
+          padding: '10px 18px 12px 18px',
           position: 'relative',
+          overflow: 'hidden',
         }}>
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 12,
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            background: `radial-gradient(ellipse at 30% 20%, ${accent}12 0%, transparent 60%)`,
+            pointerEvents: 'none',
+          }} />
+
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 6,
+            position: 'relative',
+            zIndex: 1,
           }}>
             <div style={{
-              width: 68, height: 68, borderRadius: '50%',
-              border: `3px solid ${bubble.colorHex}`,
-              overflow: 'hidden', flexShrink: 0,
-              background: 'radial-gradient(ellipse at center, #1a2a4a 0%, #0a1428 100%)',
-              boxShadow: `inset 0 0 10px rgba(0,0,0,0.7), 0 0 10px ${bubble.colorHex}55`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              width: '100%',
+              justifyContent: 'center',
             }}>
-              {bubble.spriteData && <FishPortrait spriteData={bubble.spriteData} size={68} />}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
-                fontFamily: "'Cinzel', serif", fontWeight: 700,
-                fontSize: '0.85rem', color: bubble.colorHex || '#1a1a2e',
-                letterSpacing: '0.03em',
+                width: 36, height: 36, borderRadius: '50%',
+                border: `2px solid ${accent}88`,
+                overflow: 'hidden', flexShrink: 0,
+                background: `radial-gradient(ellipse at center, #1a2a4a 0%, #0a1020 100%)`,
+                boxShadow: `0 0 8px ${accent}33, inset 0 0 6px rgba(0,0,0,0.6)`,
+              }}>
+                {bubble.spriteData && <FishPortrait spriteData={bubble.spriteData} size={36} />}
+              </div>
+
+              <div style={{
+                fontFamily: "'Cinzel', serif",
+                fontWeight: 700,
+                fontSize: '0.72rem',
+                color: accent,
+                letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                marginBottom: 4,
+                textShadow: `0 0 8px ${accent}44`,
                 lineHeight: 1.2,
               }}>
                 {bubble.speaker?.name}
               </div>
-              <div style={{
-                fontSize: '0.95rem',
-                color: '#222',
-                lineHeight: 1.5,
-                fontWeight: 500,
-                fontFamily: "'Jost', sans-serif",
-                wordBreak: 'break-word',
-              }}>
-                {bubble.text?.replace(`${bubble.speaker?.name}: `, '')}
-              </div>
+            </div>
+
+            <div style={{
+              width: '80%',
+              height: 1,
+              background: `linear-gradient(90deg, transparent, ${accent}33, transparent)`,
+              margin: '0 auto',
+            }} />
+
+            <div style={{
+              fontSize: '0.88rem',
+              color: '#d4e8f0',
+              lineHeight: 1.55,
+              fontWeight: 400,
+              fontFamily: "'Jost', sans-serif",
+              wordBreak: 'break-word',
+              textAlign: 'center',
+              letterSpacing: '0.01em',
+              padding: '0 4px',
+              textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+            }}>
+              {bubble.text?.replace(`${bubble.speaker?.name}: `, '')}
             </div>
           </div>
         </div>
 
-        <BubbleTail />
+        <BubbleTail color={`rgba(10,20,45,0.85)`} />
       </div>
     </div>
   );
@@ -192,7 +226,7 @@ export default function ChatBubbleSystem({ bubbleQueue, onDismiss, camZoom = 3, 
       pointerEvents: 'none',
       zIndex: 9500,
       paddingBottom: 30,
-      minWidth: 240,
+      minWidth: 180,
     }}>
       {bubbleQueue.map((bubble, i) => (
         <FloatingBubble
