@@ -86,6 +86,21 @@ export const abilityIconMap = {
   tsunami: '/icons/spells/rip-water-1.png',
   whirlpool: '/icons/spells/wind-grasp-sky-1.png',
   coral_barrage: '/icons/spells/needles-royal-1.png',
+
+  jelly_sting: '/sprites/effects/tentacle_purple.png',
+  jelly_shock: '/sprites/effects/lightning_bolt.png',
+  frost_shard: '/sprites/effects/ice_spike.png',
+  freeze_touch: '/sprites/effects/ice_formation.png',
+  ice_shield: '/sprites/effects/shield_barrier.png',
+  claw_pinch: '/sprites/effects/crystal_red.png',
+  shell_retreat: '/sprites/effects/shell_pink.png',
+  crab_crush: '/sprites/effects/rock_formation.png',
+  cryo_sting: '/sprites/effects/frost_cloud.png',
+  ice_cloud: '/sprites/effects/ice_formation.png',
+  cryo_flash: '/sprites/effects/magic_orb.png',
+  lava_claw: '/sprites/effects/magma_burst.png',
+  lava_shell: '/sprites/effects/volcano_mini.png',
+  eruption_slam: '/sprites/effects/fire_pillar.png',
 };
 
 export function getAbilityIcon(abilityId) {

@@ -13,6 +13,7 @@ import AbilityIcon from './AbilityIcon';
 import { showTooltip, hideTooltip, updateTooltipPosition } from './GameTooltip';
 import useIsMobile from '../hooks/useIsMobile';
 import { useBattleNarration } from '../hooks/usePuterAI';
+import StatusEffectIcons from './StatusEffectIcons';
 import BubbleEmitter from './BubbleEmitter';
 
 const locationBackgrounds = {
@@ -2659,6 +2660,12 @@ export default function BattleScreen() {
                     filter="drop-shadow(0 0 4px #38bdf8) drop-shadow(0 0 8px #06b6d4)"
                   />
                   {adminMode && <div style={{ position: 'absolute', top: adminOverrides.buff.offsetY - 8, left: '50%', transform: 'translateX(-50%)', fontSize: '0.4rem', color: '#38bdf8', background: 'rgba(0,0,0,0.8)', padding: '1px 3px', borderRadius: 2, pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 50 }}>BUFF y:{adminOverrides.buff.offsetY} s:{adminOverrides.buff.size}</div>}
+                </div>
+              )}
+
+              {unit.alive && ((unit.dots || []).length > 0 || (unit.buffs || []).length > 0 || unit.stunned) && (
+                <div style={{ position: 'absolute', top: 0, left: 0, width: spriteSize, height: spriteSize, pointerEvents: 'none' }}>
+                  <StatusEffectIcons unit={unit} size={isMobile ? 10 : 12} maxIcons={4} />
                 </div>
               )}
 
