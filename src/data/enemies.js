@@ -469,6 +469,55 @@ export const enemyTemplates = {
       { id: 'crumble_curse', name: 'Erosion Curse', icon: 'skull', type: 'magical', damage: 0.8, cooldown: 4, description: 'Curses a hero with saltwater decay, eroding armor', effect: { type: 'dot', damage: 0.10, duration: 4 } },
     ]
   },
+  jellyfish_swarm: {
+    name: 'Stinging Swarm', icon: 'nature', color: '#e879f9', portrait: '/images/enemies/jellyfish_eye.png',
+    baseHealth: 60, baseDamage: 14, baseDefense: 3, baseMana: 50,
+    xpReward: 12, goldReward: 6, speed: 20,
+    abilities: [
+      { id: 'jelly_sting', name: 'Venom Sting', icon: 'nature', type: 'physical', damage: 0.9, description: 'Stinging tendrils lash out' },
+      { id: 'jelly_shock', name: 'Bio-shock', icon: 'lightning', type: 'magical', damage: 1.4, cooldown: 3, description: 'Releases a burst of bioluminescent electricity', effect: { type: 'stun', duration: 1 } },
+    ]
+  },
+  ice_elemental: {
+    name: 'Frost Wisp', icon: 'ice', color: '#7dd3fc', portrait: '/images/enemies/water_elemental.png',
+    baseHealth: 130, baseDamage: 20, baseDefense: 12, baseMana: 80,
+    xpReward: 25, goldReward: 14, speed: 13,
+    abilities: [
+      { id: 'frost_shard', name: 'Ice Shard', icon: 'ice', type: 'magical', damage: 1.1, description: 'Hurls a shard of deep-sea ice' },
+      { id: 'freeze_touch', name: 'Freezing Touch', icon: 'ice', type: 'magical', damage: 1.6, cooldown: 3, description: 'Flash-freezes on contact', effect: { type: 'dot', damage: 0.10, duration: 3 } },
+      { id: 'ice_shield', name: 'Frost Shell', icon: 'shield', type: 'buff', damage: 0, cooldown: 4, description: 'Encases in protective ice', effect: { stat: 'defense', flat: 18, duration: 2 } },
+    ]
+  },
+  crab_warrior: {
+    name: 'Reef Crab', icon: 'shield', color: '#a16207', portrait: '/images/enemies/armored_crab.png',
+    baseHealth: 110, baseDamage: 16, baseDefense: 18, baseMana: 0,
+    xpReward: 16, goldReward: 9, speed: 9,
+    abilities: [
+      { id: 'claw_pinch', name: 'Claw Pinch', icon: 'sword', type: 'physical', damage: 1.0, description: 'Snaps with hardened claws' },
+      { id: 'shell_retreat', name: 'Shell Retreat', icon: 'shield', type: 'buff', damage: 0, cooldown: 4, description: 'Retreats into shell for protection', effect: { stat: 'defense', flat: 22, duration: 2 } },
+      { id: 'crab_crush', name: 'Crusher Claw', icon: 'sword', type: 'physical', damage: 1.6, cooldown: 3, description: 'A devastating claw crush' },
+    ]
+  },
+  frost_jellyfish: {
+    name: 'Arctic Jellyfish', icon: 'ice', color: '#a5f3fc', portrait: '/images/enemies/jellyfish_eye.png',
+    baseHealth: 140, baseDamage: 22, baseDefense: 8, baseMana: 100,
+    xpReward: 28, goldReward: 16, speed: 16,
+    abilities: [
+      { id: 'cryo_sting', name: 'Cryo-Sting', icon: 'ice', type: 'magical', damage: 1.2, description: 'A freezing venom sting' },
+      { id: 'ice_cloud', name: 'Frost Cloud', icon: 'ice', type: 'magical', damage: 1.8, cooldown: 3, description: 'Releases a cloud of sub-zero water', effect: { type: 'dot', damage: 0.12, duration: 3 } },
+      { id: 'cryo_flash', name: 'Flash Freeze', icon: 'ice', type: 'magical', damage: 0.8, cooldown: 4, description: 'Instantly freezes a hero in place', effect: { type: 'stun', duration: 1 } },
+    ]
+  },
+  lava_crab: {
+    name: 'Magma Crab', icon: 'fire', color: '#dc2626', portrait: '/images/enemies/armored_crab.png',
+    baseHealth: 180, baseDamage: 24, baseDefense: 24, baseMana: 40,
+    xpReward: 36, goldReward: 22, speed: 7,
+    abilities: [
+      { id: 'lava_claw', name: 'Molten Claw', icon: 'fire', type: 'physical', damage: 1.2, description: 'Claws heated by volcanic vents' },
+      { id: 'lava_shell', name: 'Magma Shell', icon: 'shield', type: 'buff', damage: 0, cooldown: 4, description: 'Hardens shell with cooling lava', effect: { stat: 'defense', flat: 28, duration: 3 } },
+      { id: 'eruption_slam', name: 'Eruption Slam', icon: 'fire', type: 'physical', damage: 2.0, cooldown: 4, description: 'Slams the ground causing a mini-eruption', effect: { type: 'dot', damage: 0.12, duration: 2 } },
+    ]
+  },
 };
 
 export const locations = [
@@ -477,7 +526,7 @@ export const locations = [
     name: 'Coral Shallows',
     description: 'Sunlit waters dance over vibrant coral beds where the first fragment of the shattered Coral Crown was found. Reef bandits and mantis shrimp prowl the shallows, emboldened by the fading light of the old world.',
     levelRange: [1, 3],
-    enemies: ['goblin', 'wolf', 'mushroom', 'imp', 'shadow_bat'],
+    enemies: ['goblin', 'wolf', 'mushroom', 'imp', 'shadow_bat', 'jellyfish_swarm', 'crab_warrior'],
     bgGradient: 'linear-gradient(135deg, #064e3b 0%, #0d9488 50%, #0891b2 100%)',
     icon: 'nature',
     unlocked: true,
@@ -495,7 +544,7 @@ export const locations = [
     name: 'Kelp Forest',
     description: 'Towering kelp canopies sway in the currents, casting shifting shadows where predators lie in wait. Whispers among the fronds speak of a Crown fragment hidden deep within the tangled growth.',
     levelRange: [3, 5],
-    enemies: ['wolf', 'goblin', 'skeleton', 'mushroom', 'flying_eye', 'shadow_bat', 'imp'],
+    enemies: ['wolf', 'goblin', 'skeleton', 'mushroom', 'flying_eye', 'shadow_bat', 'imp', 'jellyfish_swarm', 'crab_warrior'],
     bgGradient: 'linear-gradient(135deg, #042f2e 0%, #134e4a 50%, #0f766e 100%)',
     icon: 'nature',
     unlocked: true,
@@ -665,7 +714,7 @@ export const locations = [
     name: 'Thermal Vent',
     description: 'Superheated water erupts from the ocean floor in blinding geysers of mineral-rich fury. The Trench Warlord commands this volcanic stronghold, forging weapons in the scalding vents for the Abyss King\'s armies.',
     levelRange: [9, 12],
-    enemies: ['orc', 'skeleton', 'dark_mage', 'crow_knight', 'dark_knight', 'shadow_warrior'],
+    enemies: ['orc', 'skeleton', 'dark_mage', 'crow_knight', 'dark_knight', 'shadow_warrior', 'lava_crab'],
     bgGradient: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #431407 100%)',
     icon: 'shield',
     unlocked: false,
@@ -684,7 +733,7 @@ export const locations = [
     name: 'Frozen Depths',
     description: 'Arctic currents have frozen these waters into a silent kingdom of ice, where a mighty Frost Serpent coils in the darkness below. The cold here is ancient, predating even the Coral Crown.',
     levelRange: [10, 13],
-    enemies: ['orc', 'skeleton', 'dark_mage', 'shadow_bat', 'water_priestess_mage'],
+    enemies: ['orc', 'skeleton', 'dark_mage', 'shadow_bat', 'water_priestess_mage', 'ice_elemental', 'frost_jellyfish'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #7dd3fc 50%, #bae6fd 100%)',
     icon: 'ice',
     unlocked: false,
@@ -760,7 +809,7 @@ export const locations = [
     name: 'Volcanic Hearth',
     description: 'Rivers of magma snake beneath the ocean floor, turning the water into a boiling cauldron of fire and steam. Sea drakes are drawn to the volcanic heat, nesting in the molten crevasses.',
     levelRange: [12, 14],
-    enemies: ['dragon_whelp', 'orc', 'dark_mage'],
+    enemies: ['dragon_whelp', 'orc', 'dark_mage', 'lava_crab'],
     bgGradient: 'linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #7f1d1d 100%)',
     icon: 'fire',
     unlocked: false,

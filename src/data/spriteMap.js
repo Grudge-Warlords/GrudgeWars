@@ -1121,6 +1121,42 @@ const toasterBotSprite = {
   death: { src: '/sprites/toaster_bot/death.png', frames: 5 },
 };
 
+const jellyfishNewSprite = {
+  folder: 'enemies/jellyfish', frameWidth: 32, frameHeight: 32, swimming: true,
+  idle: { src: '/sprites/enemies/jellyfish/idle.png', frames: 7 },
+  walk: { src: '/sprites/enemies/jellyfish/walk.png', frames: 7 },
+  attack1: { src: '/sprites/enemies/jellyfish/attack1.png', frames: 7 },
+  hurt: { src: '/sprites/enemies/jellyfish/hurt.png', frames: 7 },
+  death: { src: '/sprites/enemies/jellyfish/death.png', frames: 7 },
+};
+
+const iceElementalSprite = {
+  folder: 'enemies/ice_elemental', frameWidth: 32, frameHeight: 32, swimming: true,
+  idle: { src: '/sprites/enemies/ice_elemental/idle.png', frames: 6 },
+  walk: { src: '/sprites/enemies/ice_elemental/walk.png', frames: 6 },
+  attack1: { src: '/sprites/enemies/ice_elemental/attack1.png', frames: 6 },
+  hurt: { src: '/sprites/enemies/ice_elemental/hurt.png', frames: 3 },
+  death: { src: '/sprites/enemies/ice_elemental/death.png', frames: 6 },
+};
+
+const mimicChestSprite = {
+  folder: 'enemies/mimic_chest', frameWidth: 32, frameHeight: 32,
+  idle: { src: '/sprites/enemies/mimic_chest/idle.png', frames: 4 },
+  walk: { src: '/sprites/enemies/mimic_chest/walk.png', frames: 6 },
+  attack1: { src: '/sprites/enemies/mimic_chest/attack1.png', frames: 5 },
+  hurt: { src: '/sprites/enemies/mimic_chest/hurt.png', frames: 3 },
+  death: { src: '/sprites/enemies/mimic_chest/death.png', frames: 5 },
+};
+
+const crabEnemySprite = {
+  folder: 'enemies/crab', frameWidth: 32, frameHeight: 32,
+  idle: { src: '/sprites/enemies/crab/idle.png', frames: 4 },
+  walk: { src: '/sprites/enemies/crab/walk.png', frames: 4 },
+  attack1: { src: '/sprites/enemies/crab/attack1.png', frames: 4 },
+  hurt: { src: '/sprites/enemies/crab/hurt.png', frames: 2 },
+  death: { src: '/sprites/enemies/crab/death.png', frames: 4 },
+};
+
 export const enemySpriteMap = {
   goblin: fishEnemySprite('fish_tan'),
   skeleton: eelSprite,
@@ -1131,14 +1167,14 @@ export const enemySpriteMap = {
   water_priestess_mage: pinkFishCharSprite,
   orc: octopusRedSprite,
   dragon_whelp: seahorseSprite,
-  flying_eye: starfishCharSprite,
+  flying_eye: jellyfishNewSprite,
   mushroom: pufferfishBrownSprite,
   skeleton_knight: turtleGreenSprite,
   shadow_bat: { ...eelSprite, filter: 'hue-rotate(200deg) saturate(1.3) brightness(0.8)' },
   imp: tadpoleCharSprite,
-  mimic: { ...pufferfishBrownSprite, filter: 'hue-rotate(30deg) saturate(1.2)' },
+  mimic: mimicChestSprite,
   crow_knight: fishEnemySprite('fish_blue'),
-  stone_guardian: shockSweeperSprite,
+  stone_guardian: crabEnemySprite,
   forest_guardian: spiritBoxerSprite,
   elite_orc: { ...octopusRedSprite, filter: 'hue-rotate(350deg) saturate(1.4)' },
   lich: { ...jellyfishPurpleSprite, filter: 'hue-rotate(180deg) saturate(1.5) brightness(1.2)' },
@@ -1155,7 +1191,7 @@ export const enemySpriteMap = {
   void_sentinel: { ...octopusRedSprite, filter: 'hue-rotate(200deg) saturate(1.5) brightness(1.1)' },
   abyssal_demon: { ...anglerSprite, filter: 'hue-rotate(350deg) saturate(1.6) brightness(1.0)' },
   eldritch_horror: { ...jellyfishPurpleSprite, filter: 'hue-rotate(120deg) saturate(1.3) brightness(0.8)' },
-  frost_titan: { ...turtleGreenSprite, filter: 'hue-rotate(170deg) saturate(1.2) brightness(1.4)' },
+  frost_titan: { ...iceElementalSprite, filter: 'brightness(1.3) saturate(1.2)' },
   god_odin: gorgonSiren1,
   god_madra: gorgonSiren2,
   god_omni: gorgonSiren3,
@@ -1169,6 +1205,12 @@ export const enemySpriteMap = {
   barrel_bomber: barrelBomberDefault,
   barrel_bomb: barrelBombBlack,
   barrel_trap: barrelTrapGreen,
+  jellyfish_swarm: { ...jellyfishNewSprite, filter: 'hue-rotate(30deg) saturate(1.3)' },
+  ice_elemental: iceElementalSprite,
+  crab_warrior: crabEnemySprite,
+  mimic_chest: mimicChestSprite,
+  frost_jellyfish: { ...jellyfishNewSprite, filter: 'hue-rotate(180deg) saturate(1.2) brightness(1.3)' },
+  lava_crab: { ...crabEnemySprite, filter: 'hue-rotate(350deg) saturate(1.5) brightness(1.1)' },
 };
 
 export function getClassBuffClass(classId, variant = 1) {
