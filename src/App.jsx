@@ -27,40 +27,188 @@ import CraftingPage from './components/CraftingPage';
 import { InlineIcon } from './data/uiSprites';
 import GameTooltipRenderer from './components/GameTooltip';
 
+function IntroVideoScreen({ onFinish }) {
+  const videoRef = useRef(null);
+  const mountedRef = useRef(true);
+  const timersRef = useRef([]);
+  const [assetsReady, setAssetsReady] = useState(false);
+  const [videoEnded, setVideoEnded] = useState(false);
+  const [fadingOut, setFadingOut] = useState(false);
+  const [skipVisible, setSkipVisible] = useState(false);
+  const [needsTap, setNeedsTap] = useState(false);
+  const [progress, setProgress] = useState({ loaded: 0, total: 1 });
+
+  const safeTimeout = (fn, ms) => {
+    const id = setTimeout(() => { if (mountedRef.current) fn(); }, ms);
+    timersRef.current.push(id);
+    return id;
+  };
+
+  useEffect(() => {
+    mountedRef.current = true;
+    const loadAssets = isReady()
+      ? (() => { setProgress({ loaded: 1, total: 1 }); return Promise.resolve(); })()
+      : startPreload((loaded, total) => {
+          if (mountedRef.current) setProgress({ loaded, total });
+        });
+
+    loadAssets.then(() => {
+      if (!mountedRef.current) return;
+      setAssetsReady(true);
+      safeTimeout(() => setSkipVisible(true), 300);
+    });
+
+    const vid = videoRef.current;
+    if (vid) {
+      const playPromise = vid.play();
+      if (playPromise && playPromise.catch) {
+        playPromise.catch(() => {
+          if (mountedRef.current) setNeedsTap(true);
+        });
+      }
+    }
+
+    return () => {
+      mountedRef.current = false;
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+    };
+  }, []);
+
+  useEffect(() => {
+    if (videoEnded && assetsReady && mountedRef.current) {
+      doFinish();
+    }
+  }, [videoEnded, assetsReady]);
+
+  const doFinish = () => {
+    if (fadingOut || !mountedRef.current) return;
+    setFadingOut(true);
+    safeTimeout(() => onFinish(), 600);
+  };
+
+  const handleTapToPlay = () => {
+    setNeedsTap(false);
+    const vid = videoRef.current;
+    if (vid) vid.play().catch(() => {});
+  };
+
+  const pct = progress.total > 0 ? Math.round((progress.loaded / progress.total) * 100) : 0;
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 99999,
+      background: '#000',
+      opacity: fadingOut ? 0 : 1,
+      transition: 'opacity 0.5s ease-out',
+    }}>
+      <video
+        ref={videoRef}
+        src="/videos/intro_cinematic.mp4"
+        muted
+        playsInline
+        onEnded={() => { if (mountedRef.current) setVideoEnded(true); }}
+        onError={() => { if (mountedRef.current) setVideoEnded(true); }}
+        style={{
+          position: 'absolute', top: 0, left: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover',
+        }}
+      />
+
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.6) 100%)',
+        pointerEvents: 'none',
+      }} />
+
+      {needsTap && (
+        <div
+          onClick={handleTapToPlay}
+          style={{
+            position: 'absolute', inset: 0, zIndex: 4,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <div style={{
+            background: 'rgba(0,0,0,0.6)', borderRadius: '50%',
+            width: 80, height: 80,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: '2px solid rgba(34,211,238,0.5)',
+            animation: 'fadeIn 0.5s ease',
+          }}>
+            <span style={{ color: '#22d3ee', fontSize: 32, marginLeft: 4 }}>▶</span>
+          </div>
+        </div>
+      )}
+
+      {!assetsReady && (
+        <div style={{
+          position: 'absolute', bottom: 'max(60px, env(safe-area-inset-bottom, 20px))',
+          left: '50%', transform: 'translateX(-50%)',
+          textAlign: 'center', zIndex: 2,
+        }}>
+          <div style={{
+            width: 200, height: 4, background: 'rgba(255,255,255,0.15)',
+            borderRadius: 2, overflow: 'hidden', margin: '0 auto 8px',
+          }}>
+            <div style={{
+              width: `${pct}%`, height: '100%',
+              background: 'linear-gradient(90deg, #22d3ee, #06b6d4)',
+              borderRadius: 2, transition: 'width 0.3s ease',
+            }} />
+          </div>
+          <div style={{
+            color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem',
+            letterSpacing: 2, fontFamily: "'Jost', sans-serif",
+          }}>
+            Loading {pct}%
+          </div>
+        </div>
+      )}
+
+      {assetsReady && skipVisible && (
+        <button
+          onClick={doFinish}
+          style={{
+            position: 'absolute',
+            bottom: 'max(30px, env(safe-area-inset-bottom, 20px))',
+            right: 'clamp(16px, 5vw, 40px)',
+            zIndex: 3,
+            background: 'rgba(0,0,0,0.5)',
+            border: '1px solid rgba(34,211,238,0.5)',
+            borderRadius: 8,
+            padding: '12px 28px',
+            color: '#22d3ee',
+            fontSize: 'clamp(0.8rem, 2.5vw, 0.95rem)',
+            fontFamily: "'Cinzel', serif",
+            fontWeight: 600,
+            letterSpacing: 3,
+            cursor: 'pointer',
+            backdropFilter: 'blur(8px)',
+            animation: 'fadeIn 0.5s ease',
+            minHeight: 44,
+            minWidth: 44,
+          }}
+        >
+          SKIP ▸
+        </button>
+      )}
+    </div>
+  );
+}
+
 function GameApp() {
   const screen = useGameStore(s => s.screen);
   const gameMessage = useGameStore(s => s.gameMessage);
   const clearMessage = useGameStore(s => s.clearMessage);
   const pendingLoot = useGameStore(s => s.pendingLoot);
 
-  const [splashDone, setSplashDone] = useState(false);
-  const [splashFading, setSplashFading] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [progress, setProgress] = useState({ loaded: 0, total: 1 });
+  const [introVideoDone, setIntroVideoDone] = useState(false);
   const prevScreenRef = useRef(screen);
   const [transitioning, setTransitioning] = useState(false);
   const [transitionPhase, setTransitionPhase] = useState('none');
-
-  useEffect(() => {
-    const fadeTimer = setTimeout(() => setSplashFading(true), 1600);
-    const doneTimer = setTimeout(() => setSplashDone(true), 2000);
-    return () => { clearTimeout(fadeTimer); clearTimeout(doneTimer); };
-  }, []);
-
-  useEffect(() => {
-    if (!splashDone) return;
-    const minTime = new Promise(r => setTimeout(r, 3000));
-
-    const loadAssets = isReady()
-      ? (() => { setProgress({ loaded: 1, total: 1 }); return Promise.resolve(); })()
-      : startPreload((loaded, total) => {
-          setProgress({ loaded, total });
-        });
-
-    Promise.all([minTime, loadAssets]).then(() => {
-      setReady(true);
-    });
-  }, [splashDone]);
 
   useEffect(() => {
     const prev = prevScreenRef.current;
@@ -92,36 +240,8 @@ function GameApp() {
     }
   }, [screen]);
 
-  if (!splashDone) {
-    return (
-      <div style={{
-        position: 'fixed', inset: 0, zIndex: 99999,
-        background: '#000',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        opacity: splashFading ? 0 : 1,
-        transition: 'opacity 0.4s ease-out',
-      }}>
-        <img
-          src="/images/splash_logo.png"
-          alt="Betta Warlords"
-          style={{
-            maxWidth: '100%', maxHeight: '100%',
-            width: '100%', height: '100%',
-            objectFit: 'contain',
-          }}
-        />
-      </div>
-    );
-  }
-
-  if (!ready) {
-    return (
-      <LoadingScreen
-        progress={progress.loaded}
-        total={progress.total}
-        message="Diving into the Deep..."
-      />
-    );
+  if (!introVideoDone) {
+    return <IntroVideoScreen onFinish={() => setIntroVideoDone(true)} />;
   }
 
   const screensWithOwnBackground = ['world', 'battle', 'location', 'scene', 'intro'];
