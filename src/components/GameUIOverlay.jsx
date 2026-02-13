@@ -313,6 +313,7 @@ export default function GameUIOverlay({
   onToggleGruda,
   showWarParty,
   showGruda,
+  onPlayerChat,
 }) {
   const isMobile = useIsMobile();
   const {
@@ -364,12 +365,12 @@ export default function GameUIOverlay({
 
   const sendChat = () => {
     if (!chatInput?.trim()) return;
-    const leader = heroRoster.find(h => activeHeroIds.includes(h.id));
-    const name = leader?.name || 'You';
+    const msg = chatInput.trim();
     setChatLog(prev => [...prev.slice(-49), {
-      id: Date.now(), speaker: name, line: chatInput.trim(), color: '#a78bfa',
+      id: Date.now(), speaker: 'You', line: msg, color: '#60a5fa',
     }]);
     setChatInput('');
+    if (onPlayerChat) onPlayerChat(msg);
   };
 
   const activeParty = heroRoster.filter(h => h.id === 'player' || activeHeroIds.includes(h.id));

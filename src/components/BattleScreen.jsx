@@ -13,6 +13,7 @@ import AbilityIcon from './AbilityIcon';
 import { showTooltip, hideTooltip, updateTooltipPosition } from './GameTooltip';
 import useIsMobile from '../hooks/useIsMobile';
 import { useBattleNarration } from '../hooks/usePuterAI';
+import BubbleEmitter from './BubbleEmitter';
 
 const locationBackgrounds = {
   coral_shallows: '/backgrounds/ocean_battle_new.png',
@@ -1310,6 +1311,7 @@ export default function BattleScreen() {
   const [waterSplashFx, setWaterSplashFx] = useState([]);
   const [poisonGustFx, setPoisonGustFx] = useState([]);
   const [resurrectFx, setResurrectFx] = useState([]);
+  const [bigImpactFx, setBigImpactFx] = useState([]);
   const [buffScreenFx, setBuffScreenFx] = useState(null);
   const [showItemsPanel, setShowItemsPanel] = useState(false);
   const [healTargetMode, setHealTargetMode] = useState(null);
@@ -1519,6 +1521,19 @@ export default function BattleScreen() {
     setTimeout(() => setSlashImpactFx(prev => prev.filter(s => s.id !== id)), 500);
   }, []);
 
+  const spawnBigImpact = useCallback((x, y, type) => {
+    if (x == null || y == null) return;
+    const id = Date.now() + Math.random();
+    const impactSprite = type === 'crit' ? effectSprites.critSlash 
+      : type === 'fire' ? effectSprites.fireExplosion 
+      : type === 'ice' ? effectSprites.frozenIce
+      : type === 'holy' ? effectSprites.holyImpact
+      : type === 'arcane' ? effectSprites.arcaneslash
+      : effectSprites.hitBurst;
+    setBigImpactFx(prev => [...prev, { id, x, y, sprite: impactSprite }]);
+    setTimeout(() => setBigImpactFx(prev => prev.filter(s => s.id !== id)), 1200);
+  }, []);
+
   const spawnFollowUpEffects = useCallback((followUp, x, y, filterOverride) => {
     if (!followUp || !Array.isArray(followUp)) return;
     followUp.forEach(fu => {
@@ -1634,7 +1649,7 @@ export default function BattleScreen() {
               setTimeout(() => setHitEffects(prev => prev.filter(e => e.id !== hid)), 800);
               if (hfxR.followUp) spawnFollowUpEffects(hfxR.followUp, target.position.x, bodyY(target), hfxR.filter);
             }
-            if (isCrit) { playCrit(); spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId)); } else { playHurt(); spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId)); }
+            if (isCrit) { playCrit(); spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId)); setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); } else { playHurt(); spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId)); if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); }
             spawnWeaponContact(target.position.x, bodyY(target), 1);
           } else {
             playDodge();
@@ -1712,6 +1727,7 @@ export default function BattleScreen() {
             if (isCrit) {
               playCrit();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
+              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
               if (target.position) {
                 const critId = Date.now() + Math.random();
                 setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('spell') }]);
@@ -1720,6 +1736,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
+              if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
             }
           } else {
             playDodge();
@@ -1760,6 +1777,7 @@ export default function BattleScreen() {
             if (isCrit) {
               playCrit();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
+              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
               if (target.position) {
                 const critId = Date.now() + Math.random();
                 setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('spell') }]);
@@ -1768,6 +1786,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
+              if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
             }
           } else {
             playDodge();
@@ -1811,6 +1830,7 @@ export default function BattleScreen() {
             if (isCrit) {
               playCrit();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
+              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
               if (target.position) {
                 const critId = Date.now() + Math.random();
                 setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('spell') }]);
@@ -1819,6 +1839,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
+              if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
             }
           } else {
             playDodge();
@@ -1859,6 +1880,7 @@ export default function BattleScreen() {
             if (isCrit) {
               playCrit();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
+              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
               if (target.position) {
                 const critId = Date.now() + Math.random();
                 setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('spell') }]);
@@ -1867,6 +1889,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
+              if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
             }
           } else {
             playDodge();
@@ -1920,6 +1943,7 @@ export default function BattleScreen() {
                 if (isCrit) {
                   playCrit();
                   spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
+                  setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
                   if (target.position) {
                     const critType = abilityType === 'magical' ? 'spell' : 'melee';
                     const critId = Date.now() + Math.random();
@@ -1929,6 +1953,7 @@ export default function BattleScreen() {
                 } else {
                   playHurt();
                   spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
+                  if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
                 }
               } else {
                 playDodge();
@@ -1982,6 +2007,7 @@ export default function BattleScreen() {
               if (isCrit) {
                 playCrit();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
+                setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
                 if (target.position) {
                   const critId = Date.now() + Math.random();
                   setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('melee') }]);
@@ -1990,6 +2016,7 @@ export default function BattleScreen() {
               } else {
                 playHurt();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
+                if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
               }
               if (target.position) spawnWeaponContact(target.position.x, bodyY(target), 2);
             } else {
@@ -2041,6 +2068,7 @@ export default function BattleScreen() {
               if (isCrit) {
                 playCrit();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
+                setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
                 if (target.position) {
                   const critType = abilityType === 'magical' ? 'spell' : 'melee';
                   const critId = Date.now() + Math.random();
@@ -2050,6 +2078,7 @@ export default function BattleScreen() {
               } else {
                 playHurt();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
+                if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
               }
               if (target.position) spawnWeaponContact(target.position.x, bodyY(target), combo.length);
             } else {
@@ -2083,6 +2112,7 @@ export default function BattleScreen() {
               if (isCrit) {
                 playCrit();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
+                setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
                 if (target.position) {
                   const critType = abilityType === 'magical' ? 'spell' : 'melee';
                   const critId = Date.now() + Math.random();
@@ -2092,6 +2122,7 @@ export default function BattleScreen() {
               } else {
                 playHurt();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
+                if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
               }
               if (target.position) spawnWeaponContact(target.position.x, bodyY(target), 1);
             } else {
@@ -2167,6 +2198,15 @@ export default function BattleScreen() {
             setHitEffects(prev => [...prev, { id: hid, x: attacker.position.x, y: bodyY(attacker), sprite: hfxR6.sprite, filter: hfxR6.filter }]);
             setTimeout(() => setHitEffects(prev => prev.filter(e => e.id !== hid)), (hfxR6.sprite.frames || 16) * 35 + 100);
             if (hfxR6.followUp) spawnFollowUpEffects(hfxR6.followUp, attacker.position.x, bodyY(attacker), hfxR6.filter);
+          }
+          if (attacker.bearForm || attacker.demonBlade || attacker.eliteForm) {
+            const castId = Date.now() + Math.random();
+            setCastingFx(prev => [...prev, { id: castId, x: attacker.position.x, y: bodyY(attacker) }]);
+            setTimeout(() => setCastingFx(prev => prev.filter(c => c.id !== castId)), 1200);
+            addParticle('cast', attacker.position.x, bodyY(attacker), '#c084fc');
+            addParticle('cast', attacker.position.x, bodyY(attacker), '#f59e0b');
+            addParticle('hit', attacker.position.x, bodyY(attacker), '#fff');
+            setTimeout(() => spawnBigImpact(attacker.position.x, bodyY(attacker), 'arcane'), 300);
           }
         }
 
@@ -2341,6 +2381,11 @@ export default function BattleScreen() {
                 {currentUnit.isPlayerControlled ? `${currentUnit.name}'s TURN` : `${currentUnit.name}'s turn`}
               </div>
             )}
+            {currentUnit && currentUnit.row && !isVictory && !isDefeat && (
+              <div style={{ fontSize: '0.65rem', color: '#60a5fa', textAlign: 'center', padding: '2px 6px', background: 'rgba(96,165,250,0.1)', borderRadius: 4 }}>
+                Row: {currentUnit.row.charAt(0).toUpperCase() + currentUnit.row.slice(1)}
+              </div>
+            )}
             {isMissionRoundComplete && (
               <button onClick={() => {
                 useGameStore.getState().advanceMissionRound();
@@ -2387,6 +2432,7 @@ export default function BattleScreen() {
         flex: 1, position: 'relative', zIndex: 1, minHeight: 0, overflow: 'hidden',
       }}>
         <AmbientParticles />
+        <BubbleEmitter />
 
         {battleUnits.map((unit, idx) => {
           if (!unit.position) return null;
@@ -2405,7 +2451,9 @@ export default function BattleScreen() {
           const isBearForm = unit.classId === 'worge' && unit.bearForm;
           const isBossUnit = unit.team === 'enemy' && unit.isBoss;
           const bossScaleVal = isBossUnit ? (unit.bossScale || 1.6) : 1;
-          const spriteScale = (targetDisplaySize / baseFrameSize) * (isBearForm ? 1.25 : 1) * bossScaleVal;
+          const isTransformed = isBearForm || unit.demonBlade || unit.eliteForm;
+          const transformScale = isBearForm ? 1.5 : (unit.demonBlade ? 1.4 : (unit.eliteForm ? 1.35 : 1));
+          const spriteScale = (targetDisplaySize / baseFrameSize) * transformScale * bossScaleVal;
 
           const spriteSize = Math.round(baseFrameSize * spriteScale);
           const footCrop = 0.82;
@@ -2780,6 +2828,10 @@ export default function BattleScreen() {
 
         {slashImpactFx.map(s => (
           <StackedSlashImpact key={s.id} x={s.x} y={s.y} level={s.level} color={s.color} />
+        ))}
+
+        {bigImpactFx.map(fx => (
+          <GrowingEffectSprite key={fx.id} x={fx.x} y={fx.y} sprite={fx.sprite} startScale={0.6} endScale={2.0} />
         ))}
 
         {dodgeFlashes.map(d => (
@@ -3436,6 +3488,46 @@ export default function BattleScreen() {
                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(80,80,100,0.3)'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.3)'; }}
                 >Skip</button>
+                <button
+                  onClick={() => moveRow('forward')}
+                  disabled={phase !== 'player_turn' || !currentUnit?.alive}
+                  style={{
+                    background: 'rgba(20,40,80,0.85)',
+                    border: '1px solid rgba(100,180,255,0.3)',
+                    borderRadius: 6,
+                    color: '#93c5fd',
+                    padding: '4px 8px',
+                    fontSize: isMobile ? '0.6rem' : '0.7rem',
+                    cursor: 'pointer',
+                    opacity: phase !== 'player_turn' ? 0.4 : 1,
+                    fontWeight: 700,
+                    transition: 'all 0.15s',
+                    minHeight: isMobile ? 36 : undefined,
+                  }}
+                  title="Move forward one row"
+                >
+                  ▲ Fwd
+                </button>
+                <button
+                  onClick={() => moveRow('back')}
+                  disabled={phase !== 'player_turn' || !currentUnit?.alive}
+                  style={{
+                    background: 'rgba(20,40,80,0.85)',
+                    border: '1px solid rgba(100,180,255,0.3)',
+                    borderRadius: 6,
+                    color: '#93c5fd',
+                    padding: '4px 8px',
+                    fontSize: isMobile ? '0.6rem' : '0.7rem',
+                    cursor: 'pointer',
+                    opacity: phase !== 'player_turn' ? 0.4 : 1,
+                    fontWeight: 700,
+                    transition: 'all 0.15s',
+                    minHeight: isMobile ? 36 : undefined,
+                  }}
+                  title="Move back one row"
+                >
+                  ▼ Back
+                </button>
                 {(() => {
                   const consumables = inventory.filter(i => i.slot === 'consumable');
                   if (consumables.length === 0) return null;

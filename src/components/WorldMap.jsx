@@ -15,7 +15,7 @@ import { TIERS, UPGRADE_COSTS, EQUIPMENT_SLOTS, WEAPON_TYPES, ARMOR_TYPES, getIt
 import { generateDialogue } from '../data/dialogue';
 import ChatBubbleSystem from './ChatBubble';
 import { isPuterAvailable } from '../utils/puterService';
-import { generateAIDialogue, logGameEvent, canHeroSpeak } from '../utils/aiDialogueService';
+import { generateAIDialogue, generatePlayerChatResponse, logGameEvent, canHeroSpeak } from '../utils/aiDialogueService';
 import { checkInventoryForBestItems, checkBestItemEquipped } from '../data/heroBestItems';
 import { generateRandomEvent, getRewardDescription } from '../data/randomEvents';
 import { encodeGrudaShare, generateShareUrl, generateShareCode } from '../utils/grudaShare';
@@ -23,6 +23,7 @@ import { MAP_LAYERS, svgOverlayProps, mapNodeStyle, mapCenterStyle, fullCoverSty
 import { InlineIcon, getIconSrc } from '../data/uiSprites';
 import { generateAllWanderAreas, generateAllRoadPaths, aStarPathfind, buildAStarAdjacency } from '../utils/mapPathfinding';
 import useIsMobile from '../hooks/useIsMobile';
+import ChapterTracker from './ChapterTracker';
 
 const bossMapSprites = {
   nature_elemental: { glow: 'rgba(0,255,180,0.5)', terrain: '/backgrounds/kelp_forest.png', shape: 'archway', effect: 'vines', color1: '#0f4', color2: '#084' },
@@ -623,6 +624,7 @@ export default function WorldMap() {
     shopInventory, inventory, buyItem, sellItem, refreshShop,
     randomEvents, addRandomEvent, cleanExpiredEvents, startEventBattle, lastEventSpawn,
     enterScene,
+    visitZone, completeChapter, completedChapters, visitedZones, battleStats,
   } = useGameStore();
 
   const isMobile = useIsMobile();
@@ -1035,6 +1037,7 @@ export default function WorldMap() {
         const dest = movePath[movePath.length - 1];
         setCurrentZone(dest);
         setHeroStandingZone(dest);
+        visitZone(dest);
         setIsPathing(false);
         setIsMoving(false);
         setMovePath(null);
@@ -1175,6 +1178,31 @@ export default function WorldMap() {
       chatLogRef.current.scrollTop = chatLogRef.current.scrollHeight;
     }
   }, [chatLog]);
+
+  const handlePlayerChat = useCallback(async (message) => {
+    const party = heroRoster.filter(h => activeHeroIds.includes(h.id));
+    if (party.length === 0) return;
+    const respondent = party[Math.floor(Math.random() * party.length)];
+    const zoneName = locations.find(l => l.id === currentZone)?.name || 'the depths';
+    try {
+      const response = await generatePlayerChatResponse(respondent, message, zoneName, inventory);
+      if (response) {
+        const cls = classDefinitions[respondent.classId];
+        setChatLog(prev => [...prev.slice(-49), {
+          id: Date.now(), speaker: respondent.name, line: response, color: cls?.color || '#c5a059',
+        }]);
+        setBubbleQueue(prev => [...prev, {
+          id: Date.now() + Math.random(),
+          text: response,
+          heroId: respondent.id,
+          isAI: true,
+          duration: 6000,
+        }]);
+      }
+    } catch (err) {
+      console.warn('[Player Chat] AI response failed:', err);
+    }
+  }, [heroRoster, activeHeroIds, currentZone, inventory, locations]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -4094,7 +4122,10 @@ export default function WorldMap() {
           onToggleGruda={() => { setShowGruda(!showGruda); setShowWarParty(false); setGrudaCopied(null); }}
           showWarParty={showWarParty}
           showGruda={showGruda}
+          onPlayerChat={handlePlayerChat}
         />
+
+        <ChapterTracker />
 
         <style>{`
           @keyframes eventPulse {

@@ -123,6 +123,21 @@ function createHeroBattleUnit(hero) {
     guaranteedCrit: false,
     grudge: 0,
   };
+  const passiveProcs = [];
+  const heroSkills = hero.unlockedSkills || {};
+  const tree = skillTrees[hero.classId];
+  if (tree) {
+    tree.tiers.forEach(tier => {
+      tier.skills.forEach(skill => {
+        if (skill.passive && skill.procEffect && (heroSkills[skill.id] || 0) > 0) {
+          const points = heroSkills[skill.id];
+          const chance = (skill.bonuses?.procChance || 10) * points;
+          passiveProcs.push({ ...skill.procEffect, chance, source: skill.name });
+        }
+      });
+    });
+  }
+  unit.passiveProcs = passiveProcs;
   unit.row = getDefaultRow(unit);
   return unit;
 }
@@ -211,6 +226,56 @@ function calculateAttackDamage(attacker, defender, ability) {
   let result = { totalDmg, isCrit, blocked, evaded: false, drained };
   result = applyRowCombatModifiers(attacker, defender, ability, result);
   return result;
+}
+
+function applyEffectToTarget(target, effect, sourceName, log) {
+  if (!target.alive || !effect) return;
+  const etype = effect.type;
+  if (etype === 'bleed' || etype === 'burn' || etype === 'poison' || etype === 'dot') {
+    target.dots.push({ damage: effect.damage, duration: effect.duration, source: sourceName });
+    const label = etype === 'dot' ? 'bleeding' : (etype === 'burn' ? 'burning' : (etype === 'poison' ? 'poisoned' : 'bleeding'));
+    log.push(`${target.name} is ${label} from ${sourceName}!`);
+  } else if (etype === 'stun') {
+    target.stunned = true;
+    log.push(`[STUN] ${target.name} is stunned by ${sourceName}!`);
+  } else if (etype === 'sleep') {
+    target.stunned = true;
+    target.buffs.push({ type: 'sleep', duration: effect.duration, source: sourceName });
+    log.push(`[SLEEP] ${target.name} falls asleep from ${sourceName}!`);
+  } else if (etype === 'confuse') {
+    target.buffs.push({ type: 'confuse', duration: effect.duration, source: sourceName });
+    log.push(`[CONFUSE] ${target.name} is confused by ${sourceName}!`);
+  } else if (etype === 'lower_defense') {
+    target.buffs.push({ stat: 'defense', multiplier: 1 - (effect.percent || 0.2), duration: effect.duration, source: sourceName });
+    log.push(`[DEBUFF] ${target.name}'s defense is lowered by ${sourceName}!`);
+  } else if (etype === 'lower_attack') {
+    target.buffs.push({ stat: 'damage', multiplier: 1 - (effect.percent || 0.2), duration: effect.duration, source: sourceName });
+    log.push(`[DEBUFF] ${target.name}'s attack is lowered by ${sourceName}!`);
+  }
+}
+
+function applyPassiveProcs(attacker, target, result, log, ability) {
+  if (!attacker.passiveProcs || !target.alive || result.evaded || result.absorbed || result.totalDmg <= 0) return;
+  for (const proc of attacker.passiveProcs) {
+    if (proc.onCrit && !result.isCrit) continue;
+    if (Math.random() * 100 < proc.chance) {
+      if (proc.type === 'extra_attack') {
+        const bonusDmg = Math.floor(result.totalDmg * (proc.damage || 0.5));
+        target.health = Math.max(0, target.health - bonusDmg);
+        log.push(`[PROC] ${proc.source} triggers! ${attacker.name} deals ${bonusDmg} bonus damage!`);
+        if (target.health <= 0) { target.alive = false; log.push(`${target.name} has been slain!`); }
+      } else if (proc.type === 'random_debuff' && proc.options) {
+        const pick = proc.options[Math.floor(Math.random() * proc.options.length)];
+        applyEffectToTarget(target, { type: pick, damage: 0.10, duration: 2, percent: 0.15 }, proc.source, log);
+      } else if (proc.type === 'multi_dot' && proc.effects) {
+        for (const eff of proc.effects) {
+          applyEffectToTarget(target, { type: eff, damage: 0.08, duration: 3, percent: 0.10 }, proc.source, log);
+        }
+      } else {
+        applyEffectToTarget(target, proc, proc.source, log);
+      }
+    }
+  }
 }
 
 function chooseAIAction(unit, allUnits) {
@@ -391,6 +456,9 @@ const useGameStore = create(persist((set, get) => ({
   victories: 0,
   losses: 0,
   bossesDefeated: [],
+  completedChapters: [],
+  visitedZones: [],
+  battleStats: { totalWins: 0, totalLosses: 0 },
   heroRoster: [],
   activeHeroIds: [],
   heroTacticalRows: {},
@@ -420,6 +488,7 @@ const useGameStore = create(persist((set, get) => ({
   lastEventSpawn: Date.now(),
   eventBonusRewards: null,
   trainingPhase: null,
+  trainingComplete: false,
   activeMission: null,
   completedMissions: [],
   arenaLastRotation: 0,
@@ -1433,7 +1502,22 @@ const useGameStore = create(persist((set, get) => ({
         }
       }
 
+      let savedDefense = null;
+      if (ability.armorPiercing) {
+        savedDefense = actualTarget.defense;
+        actualTarget.defense = 0;
+      }
+
       const result = calculateAttackDamage(attacker, actualTarget, ability);
+
+      if (savedDefense !== null) {
+        actualTarget.defense = savedDefense;
+      }
+
+      if (ability.executeDamage && ability.executeThreshold && actualTarget.health / actualTarget.maxHealth < ability.executeThreshold) {
+        result.totalDmg = Math.floor(result.totalDmg * ability.executeDamage);
+      }
+
       actionResult = { ...actionResult, ...result };
 
       if (result.absorbed) {
@@ -1464,16 +1548,18 @@ const useGameStore = create(persist((set, get) => ({
         log.push(`${actualTarget.name} has been slain!`);
       }
 
-      if (ability.effect?.type === 'stun' && actualTarget.alive) {
-        actualTarget.stunned = true;
-        log.push(`[STUN] ${actualTarget.name} is stunned!`);
-      }
-      if (ability.effect?.type === 'dot' && actualTarget.alive) {
-        actualTarget.dots.push({ damage: ability.effect.damage, duration: ability.effect.duration, source: ability.name });
-        log.push(`${actualTarget.name} is bleeding!`);
+      if (ability.effect && actualTarget.alive && !result.evaded && !result.absorbed) {
+        applyEffectToTarget(actualTarget, ability.effect, ability.name, log);
       }
       if (ability.effect?.stat && ability.effect?.multiplier && ability.effect.multiplier < 1 && actualTarget.alive) {
         actualTarget.buffs.push({ ...ability.effect, source: ability.name });
+      }
+      if (ability.secondaryEffect && actualTarget.alive && !result.evaded && !result.absorbed) {
+        applyEffectToTarget(actualTarget, ability.secondaryEffect, ability.name, log);
+      }
+
+      if (!result.evaded && !result.absorbed) {
+        applyPassiveProcs(attacker, actualTarget, result, log, ability);
       }
 
       if (result.drained > 0) {
@@ -1498,6 +1584,12 @@ const useGameStore = create(persist((set, get) => ({
       actionResult.targetId = healTarget.id;
       actionResult.healAmt = healAmt;
       log.push(`${attacker.name} heals ${healTarget.name} for ${healAmt}!`);
+      if (ability.cleanse) {
+        healTarget.dots = [];
+        healTarget.buffs = healTarget.buffs.filter(b => b.stat === 'defense' && b.flat > 0 || b.stat === 'evasion' || b.stat === 'damage' && b.multiplier > 1);
+        healTarget.stunned = false;
+        log.push(`[CLEANSE] ${healTarget.name}'s ailments are purified!`);
+      }
 
     } else if (ability.type === 'heal_over_time') {
       attacker.dots.push({ heal: true, healPercent: ability.healPercent, duration: ability.duration, source: ability.name });
@@ -1565,9 +1657,29 @@ const useGameStore = create(persist((set, get) => ({
         log.push(`${attacker.name} transforms into a Demon Swordsman!`);
       } else if (ability.effect) {
         attacker.buffs.push({ ...ability.effect, source: ability.name });
+        if (ability.defenseBoost) {
+          attacker.buffs.push({ ...ability.defenseBoost, source: ability.name });
+        }
         actionResult.targetId = currentUnitId;
         log.push(`${attacker.name} uses ${ability.name}!`);
       }
+    } else if (ability.type === 'debuff') {
+      const target = units.find(u => u.id === targetId);
+      if (!target || !target.alive) {
+        const fallback = units.find(u => u.team !== attacker.team && u.alive && u.health > 0);
+        if (!fallback) return;
+        targetId = fallback.id;
+        actionResult.targetId = targetId;
+      }
+      const debuffTarget = units.find(u => u.id === targetId);
+      if (!debuffTarget) return;
+      if (ability.effect) {
+        applyEffectToTarget(debuffTarget, ability.effect, ability.name, log);
+      }
+      if (ability.secondaryEffect) {
+        applyEffectToTarget(debuffTarget, ability.secondaryEffect, ability.name, log);
+      }
+      actionResult.targetId = debuffTarget.id;
     }
 
     if (attacker.id === 'player') {
@@ -2109,6 +2221,7 @@ const useGameStore = create(persist((set, get) => ({
       unspentPoints: newUnspent,
       skillPoints: newSkillPoints,
       victories: newVictories,
+      battleStats: { ...state.battleStats, totalWins: (state.battleStats?.totalWins || 0) + 1 },
       bossesDefeated,
       locationsCleared,
       zoneConquer,
@@ -2822,10 +2935,12 @@ const useGameStore = create(persist((set, get) => ({
     set({
       screen: 'world',
       trainingPhase: null,
+      trainingComplete: true,
       playerHealth: Math.floor(stats.health),
       playerMana: Math.floor(stats.mana),
       playerStamina: Math.floor(stats.stamina),
       gameMessage: 'Your War Party is formed! The world awaits, Warlord.',
+      visitedZones: [...new Set([...(state.visitedZones || []), 'verdant_plains'])],
     });
   },
 
@@ -2857,6 +2972,20 @@ const useGameStore = create(persist((set, get) => ({
     } catch (err) {
       console.error('[Puter] Cloud load failed:', err);
       return false;
+    }
+  },
+
+  visitZone: (zoneId) => {
+    const state = get();
+    if (!state.visitedZones.includes(zoneId)) {
+      set({ visitedZones: [...state.visitedZones, zoneId] });
+    }
+  },
+
+  completeChapter: (chapterId) => {
+    const state = get();
+    if (!state.completedChapters.includes(chapterId)) {
+      set({ completedChapters: [...state.completedChapters, chapterId] });
     }
   },
 
@@ -2903,6 +3032,9 @@ const useGameStore = create(persist((set, get) => ({
       victories: 0,
       losses: 0,
       bossesDefeated: [],
+      completedChapters: [],
+      visitedZones: [],
+      battleStats: { totalWins: 0, totalLosses: 0 },
       heroRoster: [],
       activeHeroIds: [],
       heroCreationPending: false,
@@ -3035,7 +3167,14 @@ const useGameStore = create(persist((set, get) => ({
     randomEvents: state.randomEvents,
     lastEventSpawn: state.lastEventSpawn,
     trainingPhase: state.trainingPhase,
+    trainingComplete: state.trainingComplete,
+    completedChapters: state.completedChapters,
+    visitedZones: state.visitedZones,
+    battleStats: state.battleStats,
+    heroTacticalRows: state.heroTacticalRows,
     dungeonProgress: state.dungeonProgress,
+    playerStyle: state.playerStyle,
+    completedMissions: state.completedMissions,
   }),
 }));
 

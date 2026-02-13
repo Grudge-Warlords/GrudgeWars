@@ -365,6 +365,11 @@ export async function generateAIDialogue(hero, contextType, contextData = {}) {
         userPrompt = contextData.prompt || `Respond as an NPC in the underwater kingdom.`;
         break;
       }
+      case 'player_chat': {
+        const { playerMessage, zoneName } = contextData;
+        userPrompt = `Your commander (the player) says to you: "${playerMessage}". You are in ${zoneName || 'the depths'}. Respond in character. Keep it natural and brief (1-2 sentences). React to what they said.`;
+        break;
+      }
       default:
         userPrompt = 'Say something in character about your underwater adventures.';
     }
@@ -415,6 +420,15 @@ export async function generateAILore(hero, zoneName, zoneDescription) {
 export async function generateAINpcDialogue(hero, npcName, context) {
   return generateAIDialogue(hero, 'npc_dialogue', {
     prompt: `You are speaking with ${npcName}. Context: ${context}. Respond as ${npcName} would.`,
+  });
+}
+
+export async function generatePlayerChatResponse(hero, playerMessage, zoneName, inventory) {
+  return generateAIDialogue(hero, 'player_chat', {
+    playerMessage,
+    zoneName,
+    inventory,
+    forceSpeech: true,
   });
 }
 
