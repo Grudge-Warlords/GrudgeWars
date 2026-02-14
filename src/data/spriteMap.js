@@ -1119,12 +1119,12 @@ const shieldDroidSprite = {
   folder: 'shield_droid', frameWidth: 90, frameHeight: 31,
   idle: { src: '/sprites/shield_droid/idle.png', frames: 1 },
   walk: { src: '/sprites/shield_droid/walk.png', frames: 6 },
-  attack1: { src: '/sprites/shield_droid/attack.png', frames: 14 },
-  hurt: { src: '/sprites/shield_droid/hit.png', frames: 7 },
-  death: { src: '/sprites/shield_droid/hit.png', frames: 7 },
+  attack1: { src: '/sprites/shield_droid/shock_attack.png', frames: 14 },
+  hurt: { src: '/sprites/shield_droid/hit_death.png', frames: 7 },
+  death: { src: '/sprites/shield_droid/hit_death.png', frames: 7 },
   shield_prep: { src: '/sprites/shield_droid/shield_prep.png', frames: 10 },
   shield_pulse: { src: '/sprites/shield_droid/shield_pulse.png', frames: 6 },
-  shield_done: { src: '/sprites/shield_droid/shield_done.png', frames: 4 },
+  shield_finished: { src: '/sprites/shield_droid/shield_finished.png', frames: 4 },
 };
 
 const toasterBotSprite = {

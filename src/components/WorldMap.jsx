@@ -8,6 +8,7 @@ import { missionTemplates, arenaTemplates } from '../data/missions';
 import { classDefinitions } from '../data/classes';
 import { raceDefinitions } from '../data/races';
 import SpriteAnimation, { buildEquipmentOverlays } from './SpriteAnimation';
+import ShieldBlockerSprite from './ShieldBlockerSprite';
 import { getPlayerSprite, getEnemySprite, merchantSprite } from '../data/spriteMap';
 import GameUIOverlay from './GameUIOverlay';
 import { setBgm } from '../utils/audioManager';
@@ -2169,6 +2170,12 @@ export default function WorldMap() {
                     </div>
                   );
                 })()}
+                {blocker && (
+                  <ShieldBlockerSprite
+                    active={blocked}
+                    size={isMobile ? 56 : 50}
+                  />
+                )}
                 {isUnlocked && conquer > 0 && (
                   <div style={{
                     position: 'absolute', bottom: -4, left: 4, right: 4,
