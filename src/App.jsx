@@ -24,6 +24,7 @@ import IntroCinematic from './components/IntroCinematic';
 import DiscordAuth from './components/DiscordAuth';
 import ArenaPage from './components/ArenaPage';
 import CraftingPage from './components/CraftingPage';
+import BackgroundsPage from './components/BackgroundsPage';
 import { InlineIcon } from './data/uiSprites';
 import GameTooltipRenderer from './components/GameTooltip';
 
@@ -330,6 +331,7 @@ export default function App() {
   if (path === '/discordauth') return <DiscordAuth />;
   if (path === '/arena') return <ArenaPage />;
   if (path === '/crafting') return <CraftingPage />;
+  if (path === '/backgrounds') return <BackgroundsPage />;
 
   return <GameApp />;
 }
