@@ -30,6 +30,20 @@ The application is a React 19 frontend developed with Vite, with an Express back
 - **Discord Integration:** Backend server handles Discord login and webhook broadcasting for in-game events.
 - **Save System:** Uses `localStorage` for game state persistence, with cloud save via Puter KV.
 
+## Grudge Studios
+Betta Warlords is the first and flagship title of **Grudge Studios**. The game is made FOR the Betta community and runs on Grudge Studios infrastructure.
+- **Auth:** Uses Grudge Studios login systems (Discord OAuth + Puter.js authentication)
+- **GBuX:** Universal currency across all Grudge Studios titles and AI tools, earned through gameplay
+- **Free AI:** Grudge Studios provides free AI via Puter.js for hero dialogue, battle narration, lore generation, NPC personalities
+- **cNFT Breeding:** Compressed NFT system for on-chain Warlord assets (8 breeds x 4 classes = 32 base types)
+- **Exclusive Gateway:** Betta Warlords is the ONLY entry point to early-stage GBuX, cNFT breeding, and Grudge Studios systems
+- **Grudge Logo:** `public/images/grudge_logo.png` — pirate skull with gold horned frame, gold/orange scheme
+- **Promotional Website:** `public/game-index.html` — standalone landing page with PWA install, Web2/Web3 positioning, cNFT/GBuX/Grudge sections
+- **PWA:** `public/manifest.json` + `public/sw.js` for installable app experience across all platforms
+
+## Agent Skills
+Comprehensive project knowledge is stored in `.agents/skills/betta-warlords-project/SKILL.md`. This covers architecture, game systems, lore, breeds, classes, Grudge Studios relationship, and all technical patterns.
+
 ## External Dependencies
 - **React:** Frontend library.
 - **Vite:** Development server and build tool.
@@ -38,3 +52,4 @@ The application is a React 19 frontend developed with Vite, with an Express back
 - **discord.js:** Discord API client library.
 - **Google Fonts:** For Cinzel and Jost fonts.
 - **Web Audio API:** For in-game audio.
+- **Puter.js:** Free AI, cloud saves (KV), and authentication.
