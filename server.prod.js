@@ -12,7 +12,7 @@ app.use(express.json());
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const BETA_CHANNEL_ID = '1381760000946470987';
-const PORT = 5000;
+const PORT = parseInt(process.env.PORT || '3001', 10);
 
 const pendingStates = new Map();
 
