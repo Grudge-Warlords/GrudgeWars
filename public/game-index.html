@@ -1,1146 +1,1101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Betta Warlords — Game Index</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --deep:#041225;--panel:rgba(4,18,37,0.92);--border:rgba(34,211,238,0.18);
-  --gold:#fbbf24;--teal:#22d3ee;--cyan:#06b6d4;--purple:#a855f7;
-  --text:#e2e8f0;--muted:#94a3b8;--accent:#6ee7b7;
-}
-html{scroll-behavior:smooth}
-body{background:var(--deep);color:var(--text);font-family:'Jost',sans-serif;overflow-x:hidden;min-height:100vh}
-h1,h2,h3,h4,.cinzel{font-family:'Cinzel',serif}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Betta Warlords — The Sunken Kingdom of Abyssia | Grudge Studios</title>
+  <meta name="description" content="Dive into the Sunken Kingdom of Abyssia. 32 unique Warlord combinations, cNFT breeding, tactical RPG combat, and the gateway to GBuX & Grudge Studios Free AI." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-.hero-banner{position:relative;height:100vh;min-height:600px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
-.hero-banner::before{content:'';position:absolute;inset:0;background:url('/backgrounds/main_menu_bg.png') center/cover;filter:brightness(0.35)}
-.hero-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,var(--deep) 100%)}
-.hero-content{position:relative;z-index:2;max-width:800px;padding:0 20px}
-.hero-content img{width:160px;margin-bottom:24px;filter:drop-shadow(0 0 40px rgba(34,211,238,0.5))}
-.hero-content h1{font-size:clamp(2.5rem,6vw,4.5rem);color:var(--teal);text-shadow:0 0 60px rgba(34,211,238,0.5);letter-spacing:0.08em;margin-bottom:12px}
-.hero-content .subtitle{font-size:clamp(1rem,2.5vw,1.4rem);color:var(--gold);letter-spacing:0.15em;font-weight:300}
-.hero-content .tagline{font-size:clamp(0.85rem,2vw,1.1rem);color:var(--muted);margin-top:16px;line-height:1.6;max-width:600px;margin-inline:auto}
+    :root {
+      --deep-ocean: #050a18;
+      --abyss: #0a1128;
+      --midnight: #0e1630;
+      --teal: #06b6d4;
+      --cyan: #22d3ee;
+      --purple: #a855f7;
+      --gold: #f59e0b;
+      --red: #ef4444;
+      --green: #22c55e;
+      --pink: #ec4899;
+      --orange: #f97316;
+      --slate: #94a3b8;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+    }
 
-nav.toc{position:sticky;top:0;z-index:100;background:rgba(4,18,37,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 0;overflow-x:auto}
-nav.toc ul{display:flex;gap:4px;justify-content:center;list-style:none;padding:0 16px;flex-wrap:nowrap;min-width:max-content;margin:0 auto}
-nav.toc a{color:var(--muted);text-decoration:none;font-size:0.75rem;padding:6px 14px;border-radius:20px;border:1px solid transparent;transition:all 0.2s;white-space:nowrap;font-weight:500;letter-spacing:0.04em}
-nav.toc a:hover{color:var(--teal);border-color:var(--border);background:rgba(34,211,238,0.06)}
+    html { scroll-behavior: smooth; }
 
-section{max-width:1200px;margin:0 auto;padding:60px 20px}
-section h2{font-size:clamp(1.6rem,4vw,2.4rem);color:var(--teal);text-align:center;margin-bottom:8px;letter-spacing:0.06em}
-section .section-sub{text-align:center;color:var(--muted);font-size:0.95rem;margin-bottom:40px;max-width:700px;margin-inline:auto;line-height:1.6}
-.divider{width:80px;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent);margin:12px auto 24px}
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--deep-ocean);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
 
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s}
-.card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(34,211,238,0.12)}
-.card-img{height:180px;background-size:cover;background-position:center;position:relative}
-.card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,var(--panel) 100%)}
-.card-body{padding:16px}
-.card-body h3{color:var(--gold);font-size:1.1rem;margin-bottom:6px}
-.card-body p{color:var(--muted);font-size:0.82rem;line-height:1.5}
+    h1, h2, h3, h4, h5 { font-family: 'Cinzel', serif; }
 
-.breed-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
-.breed-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
-.breed-header{display:flex;align-items:center;gap:16px;padding:20px 20px 0}
-.breed-portrait{width:80px;height:80px;border-radius:50%;border:3px solid;object-fit:cover;flex-shrink:0}
-.breed-header h3{font-size:1.15rem;margin-bottom:2px}
-.breed-header .trait{font-size:0.72rem;padding:3px 10px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);display:inline-block;margin-top:4px}
-.breed-body{padding:16px 20px 20px;flex:1}
-.breed-body .desc{color:var(--muted);font-size:0.82rem;line-height:1.55;margin-bottom:10px;font-style:italic}
-.breed-body .lore{color:var(--text);font-size:0.8rem;line-height:1.6;margin-bottom:12px}
-.breed-stats{display:flex;flex-wrap:wrap;gap:4px}
-.breed-stats span{font-size:0.65rem;padding:2px 8px;border-radius:8px;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.15);color:var(--teal);font-weight:600}
+    .section { padding: 80px 20px; max-width: 1200px; margin: 0 auto; }
+    @media (max-width: 768px) { .section { padding: 50px 16px; } }
 
-.class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
-.class-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;overflow:hidden}
-.class-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:16px 16px 0 0}
-.class-card h3{font-size:1.2rem;margin-bottom:6px}
-.class-card .class-desc{color:var(--muted);font-size:0.82rem;line-height:1.5;margin-bottom:12px}
-.class-card .class-lore{color:var(--text);font-size:0.8rem;line-height:1.55;margin-bottom:14px;font-style:italic}
-.ability-list{display:flex;flex-direction:column;gap:6px}
-.ability{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:6px 10px}
-.ability img{width:20px;height:20px;flex-shrink:0}
-.ability .ab-name{color:var(--gold);font-size:0.75rem;font-weight:600}
-.ability .ab-desc{color:var(--muted);font-size:0.68rem}
-.ability .ab-type{font-size:0.6rem;padding:1px 6px;border-radius:6px;margin-left:auto;flex-shrink:0;font-weight:600}
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-.enemy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-.enemy-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start}
-.enemy-card img{width:56px;height:56px;border-radius:10px;border:2px solid var(--border);object-fit:cover;flex-shrink:0}
-.enemy-info h4{font-size:0.9rem;margin-bottom:3px}
-.enemy-info .enemy-stats{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
-.enemy-info .enemy-stats span{font-size:0.6rem;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--muted)}
-.enemy-abilities{font-size:0.7rem;color:var(--muted);line-height:1.4}
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      margin-bottom: 48px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-.boss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:24px}
-.boss-card{background:var(--panel);border-radius:16px;overflow:hidden;border:1px solid}
-.boss-card.god{border-color:rgba(168,85,247,0.4);box-shadow:0 0 30px rgba(168,85,247,0.1)}
-.boss-card.normal-boss{border-color:rgba(251,191,36,0.3)}
-.boss-banner{height:140px;background-size:cover;background-position:center top;position:relative}
-.boss-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,var(--panel) 100%)}
-.boss-banner .boss-portrait{position:absolute;bottom:-30px;left:20px;width:72px;height:72px;border-radius:50%;border:3px solid;object-fit:cover;z-index:2;background:var(--deep)}
-.boss-body{padding:44px 20px 20px}
-.boss-body h3{font-size:1.2rem;margin-bottom:4px}
-.boss-body .boss-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
-.boss-body .boss-stats-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.boss-body .boss-stats-row span{font-size:0.65rem;padding:2px 8px;border-radius:8px;font-weight:600}
-.boss-body .boss-abilities{margin-top:10px}
-.boss-body .boss-abilities h4{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
-.boss-ability-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.boss-ab{font-size:0.68rem;padding:4px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:6px}
-.boss-ab .ab-n{color:var(--gold);font-weight:600}
-.boss-ab .ab-d{color:var(--muted);font-size:0.62rem}
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      padding: 40px 20px;
+    }
 
-.zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
-.zone-card{border-radius:14px;overflow:hidden;border:1px solid var(--border);position:relative}
-.zone-bg{height:100px;position:relative}
-.zone-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,var(--panel) 100%)}
-.zone-body{padding:14px 16px 16px;background:var(--panel)}
-.zone-body h4{font-size:0.95rem;color:var(--gold);margin-bottom:2px}
-.zone-body .zone-level{font-size:0.68rem;color:var(--teal);margin-bottom:6px;font-weight:600}
-.zone-body p{font-size:0.78rem;color:var(--muted);line-height:1.5}
-.zone-body .zone-boss-tag{display:inline-block;font-size:0.62rem;padding:2px 8px;border-radius:8px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:#f87171;margin-top:8px;font-weight:600}
-.zone-body .zone-god-tag{background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.25);color:#c084fc}
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(6,182,212,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(168,85,247,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 90%, rgba(239,68,68,0.08) 0%, transparent 40%),
+        linear-gradient(180deg, var(--deep-ocean) 0%, var(--abyss) 50%, var(--midnight) 100%);
+    }
 
-.city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
-.city-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative}
-.city-banner{height:120px;background-size:cover;background-position:center;position:relative}
-.city-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,var(--panel) 100%)}
-.city-body{padding:16px 20px 20px}
-.city-body h3{margin-bottom:4px}
-.city-body .city-desc{color:var(--muted);font-size:0.82rem;line-height:1.5;margin-bottom:10px}
-.city-body .city-services{display:flex;flex-wrap:wrap;gap:4px}
-.city-body .city-services span{font-size:0.62rem;padding:2px 8px;border-radius:8px;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.15);color:var(--teal);text-transform:capitalize}
+    .hero-content { position: relative; z-index: 2; }
 
-.building-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
-.building-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s}
-.building-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(34,211,238,0.1)}
-.building-img{height:140px;background-size:cover;background-position:center;position:relative}
-.building-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,var(--panel) 100%)}
-.building-body{padding:10px 14px 14px}
-.building-body h4{color:var(--gold);font-size:0.88rem;margin-bottom:2px}
-.building-body p{color:var(--muted);font-size:0.72rem;line-height:1.4}
+    .hero-logo {
+      width: min(500px, 85vw);
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 40px rgba(6,182,212,0.4));
+      animation: logoFloat 4s ease-in-out infinite;
+    }
 
-.attr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.attr-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:row;gap:14px;align-items:center;transition:transform 0.2s}
-.attr-card:hover{transform:translateY(-3px)}
-.attr-card img{width:56px;height:56px;border-radius:12px;border:2px solid var(--border);object-fit:cover;flex-shrink:0}
-.attr-info h4{font-size:0.9rem;margin-bottom:2px}
-.attr-info .attr-abbr{font-size:0.65rem;padding:1px 6px;border-radius:6px;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.15);color:var(--teal);font-weight:600;display:inline-block;margin-bottom:4px}
-.attr-info p{color:var(--muted);font-size:0.75rem;line-height:1.4}
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
 
-.lore-section{position:relative}
-.lore-section .lore-bg{position:absolute;inset:0;background:url('/backgrounds/abyssal_depths.png') center/cover;opacity:0.08;pointer-events:none}
-.lore-block{position:relative;z-index:1;max-width:800px;margin:0 auto}
-.lore-block p{font-size:0.95rem;line-height:1.8;color:var(--text);margin-bottom:20px;text-indent:2em}
-.lore-block p:first-child::first-letter{font-size:3rem;font-family:'Cinzel',serif;color:var(--gold);float:left;margin-right:8px;line-height:1;margin-top:4px}
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #22d3ee 0%, #a855f7 40%, #ef4444 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
 
-.genetics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
-.genetics-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px}
-.genetics-card h4{color:var(--teal);font-size:0.95rem;margin-bottom:8px}
-.genetics-card p{color:var(--muted);font-size:0.82rem;line-height:1.6}
-.genetics-card .gene-tag{display:inline-block;font-size:0.6rem;padding:2px 8px;border-radius:8px;margin-bottom:8px;font-weight:600}
+    .hero-tagline {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      max-width: 650px;
+    }
 
-.combo-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:12px;overflow:hidden;font-size:0.78rem}
-.combo-table th{background:rgba(34,211,238,0.1);color:var(--teal);padding:10px 14px;text-align:left;font-family:'Cinzel',serif;font-weight:600;font-size:0.72rem;letter-spacing:0.04em}
-.combo-table td{padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-.combo-table tr:hover td{background:rgba(34,211,238,0.03)}
+    .hero-badges {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
 
-.footer{text-align:center;padding:60px 20px;border-top:1px solid var(--border);margin-top:40px}
-.footer p{color:var(--muted);font-size:0.8rem}
-.footer img{width:60px;margin-bottom:12px;opacity:0.6}
+    .badge {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
 
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.float-anim{animation:float 4s ease-in-out infinite}
+    .badge-teal { border-color: var(--teal); color: var(--teal); background: rgba(6,182,212,0.1); }
+    .badge-purple { border-color: var(--purple); color: var(--purple); background: rgba(168,85,247,0.1); }
+    .badge-gold { border-color: var(--gold); color: var(--gold); background: rgba(245,158,11,0.1); }
+    .badge-red { border-color: var(--red); color: var(--red); background: rgba(239,68,68,0.1); }
 
-@media(max-width:768px){
-  .breed-grid,.class-grid,.boss-grid,.city-grid,.genetics-grid{grid-template-columns:1fr}
-  .card-grid,.enemy-grid,.zone-grid,.building-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-  .attr-grid{grid-template-columns:repeat(2,1fr)}
-  .boss-ability-grid{grid-template-columns:1fr}
-  nav.toc ul{justify-content:flex-start}
-}
-</style>
+    .cta-row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--teal), var(--purple));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(6,182,212,0.4);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(6,182,212,0.6); }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      color: var(--cyan);
+      border: 1px solid rgba(6,182,212,0.4);
+    }
+    .btn-secondary:hover { background: rgba(6,182,212,0.15); transform: translateY(-2px); }
+
+    .btn-gbux {
+      background: linear-gradient(135deg, var(--gold), var(--orange));
+      color: #000;
+      box-shadow: 0 4px 20px rgba(245,158,11,0.4);
+    }
+    .btn-gbux:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,158,11,0.6); }
+
+    .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(34,211,238,0.3);
+      animation: drift linear infinite;
+    }
+
+    @keyframes drift {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    .vessels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+
+    .vessel-card {
+      background: rgba(14,22,48,0.8);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .vessel-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .vessel-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .vessel-betta::before { background: linear-gradient(90deg, var(--red), var(--orange)); }
+    .vessel-gorgon::before { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+    .vessel-plankton::before { background: linear-gradient(90deg, var(--cyan), var(--teal)); }
+    .vessel-icon { font-size: 3rem; margin-bottom: 12px; }
+    .vessel-card h3 { font-size: 1.2rem; margin-bottom: 8px; }
+    .vessel-betta h3 { color: var(--red); }
+    .vessel-gorgon h3 { color: var(--purple); }
+    .vessel-plankton h3 { color: var(--cyan); }
+
+    .vessel-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .vessel-betta .vessel-status { background: rgba(239,68,68,0.15); color: var(--red); }
+    .vessel-gorgon .vessel-status { background: rgba(168,85,247,0.15); color: var(--purple); }
+    .vessel-plankton .vessel-status { background: rgba(34,211,238,0.15); color: var(--cyan); }
+
+    .breeds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+
+    .breed-card {
+      background: rgba(14,22,48,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: all 0.3s;
+    }
+    .breed-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+    .breed-img {
+      width: 64px; height: 64px;
+      border-radius: 12px;
+      image-rendering: pixelated;
+      flex-shrink: 0;
+      border: 2px solid;
+    }
+    .breed-info h4 { font-size: 1rem; margin-bottom: 4px; }
+    .breed-info .breed-trait { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .breed-info p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.4; }
+
+    .classes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+
+    .class-card {
+      background: rgba(14,22,48,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .class-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+
+    .class-icon-wrap {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 1.6rem;
+    }
+    .class-card h4 { font-size: 1.1rem; margin-bottom: 8px; }
+    .class-card p { font-size: 0.85rem; color: var(--text-dim); }
+
+    .locations-scroll { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+
+    .location-card {
+      background: rgba(14,22,48,0.6);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .location-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.15); }
+    .location-art { width: 100%; height: 120px; object-fit: cover; image-rendering: pixelated; }
+    .location-body { padding: 14px; }
+    .location-body h5 { font-size: 0.9rem; margin-bottom: 4px; }
+    .location-body .lore-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+    .location-body .lore-quote { font-size: 0.78rem; font-style: italic; color: var(--text-dim); line-height: 1.4; }
+    .vessel-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
+    .enemies-gallery { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+
+    .enemy-thumb {
+      width: 80px; height: 80px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(14,22,48,0.5);
+      padding: 6px;
+      image-rendering: pixelated;
+      object-fit: contain;
+      transition: all 0.3s;
+    }
+    .enemy-thumb:hover { transform: scale(1.15); border-color: var(--teal); box-shadow: 0 0 16px rgba(6,182,212,0.3); }
+
+    .bosses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+
+    .boss-card {
+      background: rgba(14,22,48,0.8);
+      border-radius: 16px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .boss-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .boss-card:nth-child(1)::before { background: var(--teal); }
+    .boss-card:nth-child(2)::before { background: var(--purple); }
+    .boss-card:nth-child(3)::before { background: var(--red); }
+    .boss-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+    .boss-card h4 { font-size: 1.1rem; margin-bottom: 4px; }
+    .boss-card .boss-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .boss-card p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px; }
+
+    .boss-card .boss-lore {
+      font-style: italic;
+      font-size: 0.8rem;
+      padding: 10px 14px;
+      border-left: 3px solid;
+      background: rgba(0,0,0,0.2);
+      border-radius: 0 8px 8px 0;
+    }
+    .boss-card:nth-child(1) .boss-lore { border-color: var(--teal); color: var(--teal); }
+    .boss-card:nth-child(2) .boss-lore { border-color: var(--purple); color: var(--purple); }
+    .boss-card:nth-child(3) .boss-lore { border-color: var(--red); color: var(--red); }
+
+    .feature-banner { position: relative; padding: 80px 20px; overflow: hidden; }
+    .feature-banner::before { content: ''; position: absolute; inset: 0; }
+    .banner-cnft::before { background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(6,182,212,0.08)); }
+    .banner-grudge::before { background: linear-gradient(135deg, rgba(239,68,68,0.08), rgba(245,158,11,0.08)); }
+    .banner-gbux::before { background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(34,211,238,0.06)); }
+    .banner-inner { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; }
+    .banner-split { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    @media (max-width: 768px) { .banner-split { grid-template-columns: 1fr; } }
+    .banner-visual { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .banner-visual img { width: 100%; border-radius: 8px; image-rendering: pixelated; border: 1px solid rgba(255,255,255,0.08); }
+    .banner-text h2 { font-size: clamp(1.4rem, 3.5vw, 2.2rem); margin-bottom: 16px; }
+    .banner-text p { color: var(--text-dim); font-size: clamp(0.9rem, 1.5vw, 1.05rem); margin-bottom: 16px; line-height: 1.7; }
+
+    .feature-list { list-style: none; margin-bottom: 24px; }
+    .feature-list li { padding: 8px 0; font-size: 0.95rem; display: flex; gap: 10px; align-items: flex-start; }
+    .feature-list li::before { content: '>'; font-family: 'Cinzel', serif; font-weight: 700; flex-shrink: 0; }
+    .cnft-list li::before { color: var(--purple); }
+    .grudge-list li::before { color: var(--red); }
+    .gbux-list li::before { color: var(--gold); }
+
+    .sprite-showcase { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+
+    .sprite-frame {
+      width: 100px; height: 100px;
+      background: rgba(14,22,48,0.6);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      transition: all 0.3s;
+    }
+    .sprite-frame:hover { border-color: var(--cyan); transform: scale(1.1); box-shadow: 0 0 20px rgba(6,182,212,0.2); }
+    .sprite-frame img { max-width: 100%; max-height: 100%; image-rendering: pixelated; }
+
+    .cards-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    .card-frame {
+      width: 140px;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .card-frame:hover { transform: translateY(-6px) scale(1.05); box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+    .card-frame img { width: 100%; display: block; image-rendering: pixelated; }
+
+    .prologue-box {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(14,22,48,0.6);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .prologue-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--red), var(--purple), var(--cyan)); }
+    .prologue-box p { font-size: clamp(0.9rem, 1.5vw, 1.05rem); line-height: 1.8; color: var(--text-dim); margin-bottom: 16px; }
+    .prologue-box p:first-of-type::first-letter { font-family: 'Cinzel', serif; font-size: 3rem; float: left; margin-right: 8px; line-height: 1; color: var(--cyan); }
+
+    .buildings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+
+    .building-tile {
+      background: rgba(14,22,48,0.5);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .building-tile:hover { border-color: var(--teal); transform: translateY(-2px); }
+    .building-tile img { width: 64px; height: 64px; image-rendering: pixelated; margin-bottom: 6px; }
+    .building-tile span { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); }
+
+    .footer {
+      text-align: center;
+      padding: 60px 20px 40px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-logo { width: 120px; margin-bottom: 16px; filter: drop-shadow(0 0 12px rgba(6,182,212,0.3)); }
+    .footer p { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 8px; }
+    .footer-links { display: flex; gap: 24px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+    .footer-links a { color: var(--teal); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--cyan); }
+
+    .divider { height: 1px; max-width: 600px; margin: 0 auto; background: linear-gradient(90deg, transparent, rgba(6,182,212,0.3), transparent); }
+
+    .topnav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(5,10,24,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+    .topnav img { height: 32px; filter: drop-shadow(0 0 6px rgba(6,182,212,0.3)); }
+    .nav-links { display: flex; gap: 20px; list-style: none; }
+    .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--cyan); }
+    @media (max-width: 640px) { .nav-links { display: none; } }
+
+    .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.6s, transform 0.6s; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    @keyframes glowPulse {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(6,182,212,0.3)); }
+      50% { filter: drop-shadow(0 0 20px rgba(6,182,212,0.6)); }
+    }
+
+    .exclusive-strip {
+      background: linear-gradient(90deg, var(--gold), var(--orange), var(--gold));
+      color: #000;
+      text-align: center;
+      padding: 12px 20px;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: clamp(0.75rem, 2vw, 1rem);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .ecosystem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 32px; }
+
+    .eco-card {
+      background: rgba(14,22,48,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 24px 20px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .eco-card:hover { transform: translateY(-3px); border-color: rgba(245,158,11,0.3); }
+    .eco-icon { width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .eco-card h4 { font-size: 0.95rem; margin-bottom: 8px; color: var(--gold); }
+    .eco-card p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+  </style>
 </head>
+
 <body>
 
-<div class="hero-banner">
-  <div class="hero-content">
-    <img src="/images/logo.png" alt="Betta Warlords" class="float-anim">
-    <h1 class="cinzel">BETTA WARLORDS</h1>
-    <div class="subtitle cinzel">THE SUNKEN KINGDOM OF ABYSSIA</div>
-    <div class="tagline">A tactical underwater RPG featuring 8 betta fish breeds, 4 combat classes, and 32 unique Warlord combinations. Explore 32 ocean zones, battle 30+ sea creatures, challenge 3 ancient gods, and reclaim the shattered Coral Crown.</div>
-  </div>
-</div>
+<div class="particles" id="particles"></div>
 
-<nav class="toc">
-  <ul>
+<nav class="topnav">
+  <img src="/images/logo.png" alt="Betta Warlords" />
+  <ul class="nav-links">
     <li><a href="#lore">Lore</a></li>
     <li><a href="#breeds">Breeds</a></li>
-    <li><a href="#genetics">Genetics</a></li>
-    <li><a href="#classes">Classes</a></li>
-    <li><a href="#attributes">Attributes</a></li>
-    <li><a href="#combos">Combinations</a></li>
-    <li><a href="#enemies">Enemies</a></li>
-    <li><a href="#bosses">Bosses</a></li>
-    <li><a href="#gods">Gods</a></li>
-    <li><a href="#zones">Zones</a></li>
-    <li><a href="#cities">Cities</a></li>
-    <li><a href="#buildings">Buildings</a></li>
-    <li><a href="#resources">Resources</a></li>
+    <li><a href="#world">World</a></li>
+    <li><a href="#cnft">cNFT</a></li>
+    <li><a href="#grudge">Grudge</a></li>
+    <li><a href="#gbux">GBuX</a></li>
   </ul>
 </nav>
 
-<!-- ===== LORE ===== -->
-<section id="lore" class="lore-section" style="padding-top:80px">
-  <div class="lore-bg"></div>
-  <h2 class="cinzel">The Legend of Abyssia</h2>
-  <div class="divider"></div>
-  <div class="lore-block">
-    <p>Before the tides turned dark, the Sunken Kingdom of Abyssia thrived beneath the endless ocean. Eight great betta lineages ruled in harmony, their power bound to the Coral Crown &mdash; an ancient relic forged from living reef and infused with the ocean's primordial magic. The Crown maintained balance across all currents, from the sunlit shallows to the crushing depths of the hadal trenches.</p>
-    <p>But the Abyss King, once a noble guardian of the deep, gazed too long into the void beyond the ocean floor. The darkness whispered promises of power beyond the Crown's constraints. In a catastrophic act of betrayal, he shattered the Coral Crown into seven fragments and scattered them across the ocean, plunging Abyssia into chaos. The great currents failed, corruption seeped from the deepest trenches, and the ancient enemy creatures &mdash; long held at bay by the Crown's power &mdash; rose to claim the fractured kingdom.</p>
-    <p>Now, from every reef and every trench, betta warriors of every lineage answer the call. Halfmoons with their perfect symmetry, fierce Plakat brawlers, mystical Doubletails, ghostly Cambodians, mighty Giants, royal Crowntails, armored Dragonscales, and graceful Butterflies &mdash; all must set aside their differences and forge unlikely alliances. Schools of heroes must venture into corrupted waters, battle the Abyss King's forces, recover the Crown fragments, and restore the light to the dying ocean.</p>
-    <p>But the gods themselves have taken notice. Poseidon, Lord of Tides, tests the worthiest champions. Charybdis, The Devourer, hungers for the souls of heroes. And the Leviathan, Weaver of Currents, manipulates the tides of fate itself. Only those who prove themselves against all three divine powers can hope to reassemble the Coral Crown and face the Abyss King on his throne of devoured light.</p>
-    <p>The ocean remembers. The Crown calls. Will you answer?</p>
-  </div>
-</section>
+<div class="exclusive-strip" style="margin-top: 56px;">
+  Early Access to GBuX & Grudge Studios AI — Play Betta Warlords First
+</div>
 
-<!-- ===== BREEDS ===== -->
-<section id="breeds">
-  <h2 class="cinzel">The Eight Breeds</h2>
-  <div class="divider"></div>
-  <p class="section-sub">Eight distinct betta lineages, each carrying unique genetic traits recognized by the International Betta Congress (IBC). Choose your breed wisely &mdash; each brings different strengths to the battlefield.</p>
-
-  <div class="breed-grid">
-
-    <div class="breed-card">
-      <div class="breed-header">
-        <img src="/images/races/blue_betta.png" alt="Halfmoon" class="breed-portrait" style="border-color:#22d3ee">
-        <div>
-          <h3 class="cinzel" style="color:#22d3ee">Halfmoon</h3>
-          <div style="color:var(--muted);font-size:0.75rem">Balanced Perfection</div>
-          <span class="trait" style="color:#22d3ee;border-color:rgba(34,211,238,0.3)">Trait: Tidal Flow</span>
-        </div>
-      </div>
-      <div class="breed-body">
-        <p class="desc">Balanced perfection &mdash; a 180&deg; caudal spread with full ray branching and flawless symmetry.</p>
-        <p class="lore">Halfmoons are the ideal show-standard betta, prized for their perfect 180-degree tail spread and balanced finnage. In the arenas of Abyssia, their symmetrical form translates to well-rounded combat ability &mdash; no fault in any attribute, no weakness to exploit.</p>
-        <div class="breed-stats">
-          <span>+1 All Stats</span>
-        </div>
-      </div>
+<section class="hero">
+  <div class="hero-content">
+    <img src="/images/splash_logo.png" alt="Betta Warlords Logo" class="hero-logo" />
+    <h1>BETTA WARLORDS</h1>
+    <p class="hero-tagline">The Sunken Kingdom of Abyssia awaits. 8 Betta breeds. 4 classes. 32 unique Warlords. Tactical RPG combat in a vast underwater world — and your gateway to cNFT breeding, GBuX rewards, and Grudge Studios Free AI.</p>
+    <div class="hero-badges">
+      <span class="badge badge-teal">Turn-Based RPG</span>
+      <span class="badge badge-purple">cNFT Breeding</span>
+      <span class="badge badge-gold">GBuX Rewards</span>
+      <span class="badge badge-red">Grudge Gameplay</span>
     </div>
-
-    <div class="breed-card">
-      <div class="breed-header">
-        <img src="/images/races/red_betta.png" alt="Plakat" class="breed-portrait" style="border-color:#ef4444">
-        <div>
-          <h3 class="cinzel" style="color:#ef4444">Plakat</h3>
-          <div style="color:var(--muted);font-size:0.75rem">Short-Finned Brawler</div>
-          <span class="trait" style="color:#ef4444;border-color:rgba(239,68,68,0.3)">Trait: Blood Frenzy</span>
-        </div>
-      </div>
-      <div class="breed-body">
-        <p class="desc">Short-finned brawlers &mdash; compact, aggressive, and bred for battle since the old fighting lines.</p>
-        <p class="lore">Plakats descend from the original fighting bloodlines &mdash; short, muscular fins built for speed and power. In IBC terms, their compact form avoids the fin-drag faults of longer breeds, channeling raw aggression into devastating strikes.</p>
-        <div class="breed-stats">
-          <span>+4 STR</span><span>+2 VIT</span><span>+2 END</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="breed-card">
-      <div class="breed-header">
-        <img src="/images/races/purple_betta.png" alt="Doubletail" class="breed-portrait" style="border-color:#a855f7">
-        <div>
-          <h3 class="cinzel" style="color:#a855f7">Doubletail</h3>
-          <div style="color:var(--muted);font-size:0.75rem">Twin-Lobed Mystic</div>
-          <span class="trait" style="color:#a855f7;border-color:rgba(168,85,247,0.3)">Trait: Arcane Depths</span>
-        </div>
-      </div>
-      <div class="breed-body">
-        <p class="desc">Twin-lobed and mystical &mdash; a rare recessive breed channeling arcane currents through split caudal fins.</p>
-        <p class="lore">Doubletails carry the rare homozygous recessive gene that splits their caudal fin into two equal lobes. In Abyssia, this genetic rarity manifests as deep attunement to ocean magic &mdash; their twin fins act as dual conduits for arcane energy.</p>
-        <div class="breed-stats">
-          <span>+3 INT</span><span>+2 DEX</span><span>+2 AGI</span><span>+1 WIS</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="breed-card">
-      <div class="breed-header">
-        <img src="/images/races/white_betta.png" alt="Cambodian" class="breed-portrait" style="border-color:#94a3b8">
-        <div>
-          <h3 class="cinzel" style="color:#94a3b8">Cambodian</h3>
-          <div style="color:var(--muted);font-size:0.75rem">Pale Phantom</div>
-          <span class="trait" style="color:#94a3b8;border-color:rgba(148,163,184,0.3)">Trait: Phantom Scales</span>
-        </div>
-      </div>
-      <div class="breed-body">
-        <p class="desc">Pale and spectral &mdash; reduced pigment bettas from the frozen depths, nearly impossible to kill.</p>
-        <p class="lore">Cambodians carry the recessive reduced-pigment gene, giving them translucent, ghostly bodies. IBC judges note their clear body coloration as one of the rarest stable phenotypes &mdash; in combat, this translucency makes them extraordinarily difficult to target.</p>
-        <div class="breed-stats">
-          <span>+3 VIT</span><span>+2 END</span><span>+2 WIS</span><span>+1 STR</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="breed-card">
-      <div class="breed-header">
-        <img src="/images/races/green_betta.png" alt="Giant" class="breed-portrait" style="border-color:#22c55e">
-        <div>
-          <h3 class="cinzel" style="color:#22c55e">Giant</h3>
-          <div style="color:var(--muted);font-size:0.75rem">Oversized Predator</div>
-          <span class="trait" style="color:#22c55e;border-color:rgba(34,197,94,0.3)">Trait: Reef Fury</span>
-        </div>
-      </div>
-      <div class="breed-body">
-        <p class="desc">Oversized reef predators &mdash; the enlarged chr8 locus lineage with devastating raw power.</p>
-        <p class="lore">Giants carry the rare enlarged body gene from chromosome 8, making them significantly larger than standard bettas. In IBC shows, maintaining perfect finnage at giant size is nearly impossible &mdash; but in battle, their sheer mass overwhelms any opponent.</p>
-        <div class="breed-stats">
-          <span>+3 STR</span><span>+2 AGI</span><span>+1 VIT</span><span>+1 END</span><span>+1 TAC</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="breed-card">
-      <div class="breed-header">
-        <img src="/images/races/gold_betta.png" alt="Crowntail" class="breed-portrait" style="border-color:#f59e0b">
-        <div>
-          <h3 class="cinzel" style="color:#f59e0b">Crowntail</h3>
-          <div style="color:var(--muted);font-size:0.75rem">Royal Defender</div>
-          <span class="trait" style="color:#f59e0b;border-color:rgba(245,158,11,0.3)">Trait: Royal Guard</span>
-        </div>
-      </div>
-      <div class="breed-body">
-        <p class="desc">Royal defenders &mdash; extended ray tips form a crown of spines, armoring them in living gold.</p>
-        <p class="lore">Crowntails display the dramatic extended-ray phenotype, where fin rays extend well beyond the webbing to form a crown-like silhouette. IBC standards demand even ray extension with no crossed tips &mdash; in Abyssia, these spined fins serve as both shield and symbol of royal lineage.</p>
-        <div class="breed-stats">
-          <span>+3 END</span><span>+2 VIT</span><span>+1 STR</span><span>+1 DEX</span><span>+1 WIS</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="breed-card">
-      <div class="breed-header">
-        <img src="/images/races/orange_betta.png" alt="Dragonscale" class="breed-portrait" style="border-color:#f97316">
-        <div>
-          <h3 class="cinzel" style="color:#f97316">Dragonscale</h3>
-          <div style="color:var(--muted);font-size:0.75rem">Armored Speedster</div>
-          <span class="trait" style="color:#f97316;border-color:rgba(249,115,22,0.3)">Trait: Thermal Dash</span>
-        </div>
-      </div>
-      <div class="breed-body">
-        <p class="desc">Armored speedsters &mdash; thick metallic iridescent scales over a blazing orange body.</p>
-        <p class="lore">Dragonscales exhibit the highly coveted thick iridescent overlay that covers their body like armor plating. IBC judges score them on full coverage without gaps. In combat, their metallic armor deflects glancing blows while their compact build enables lightning dashes.</p>
-        <div class="breed-stats">
-          <span>+3 AGI</span><span>+2 STR</span><span>+2 DEX</span><span>+1 END</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="breed-card">
-      <div class="breed-header">
-        <img src="/images/races/pink_betta.png" alt="Butterfly" class="breed-portrait" style="border-color:#ec4899">
-        <div>
-          <h3 class="cinzel" style="color:#ec4899">Butterfly</h3>
-          <div style="color:var(--muted);font-size:0.75rem">Graceful Healer</div>
-          <span class="trait" style="color:#ec4899;border-color:rgba(236,72,153,0.3)">Trait: Healing Tide</span>
-        </div>
-      </div>
-      <div class="breed-body">
-        <p class="desc">Graceful healers &mdash; distinctive banded fin patterns that pulse with restorative energy.</p>
-        <p class="lore">Butterflies display the striking bi-color band pattern across their fins, with sharp divisions between colors that IBC judges scrutinize for clean edges. In Abyssia, these banded fins pulse with healing bioluminescence &mdash; the sharper the color bands, the more potent the restorative magic.</p>
-        <div class="breed-stats">
-          <span>+3 WIS</span><span>+2 INT</span><span>+1 VIT</span><span>+1 DEX</span><span>+1 AGI</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ===== GENETICS ===== -->
-<section id="genetics">
-  <h2 class="cinzel">Betta Genetics &amp; IBC Standards</h2>
-  <div class="divider"></div>
-  <p class="section-sub">Each breed carries unique genetic traits recognized by the International Betta Congress. Understanding these genetics is key to building the perfect Warlord team.</p>
-
-  <div class="genetics-grid">
-    <div class="genetics-card">
-      <span class="gene-tag" style="background:rgba(34,211,238,0.12);border:1px solid rgba(34,211,238,0.3);color:#22d3ee">Dominant Trait</span>
-      <h4 class="cinzel">The 180&deg; Spread Gene</h4>
-      <p>The Halfmoon's perfect 180-degree caudal spread is a polygenic trait requiring multiple alleles for full expression. IBC judges use a protractor to measure &mdash; anything less than 180&deg; is considered a fault. In Abyssia, this genetic perfection translates to balanced combat stats with no exploitable weakness.</p>
-    </div>
-    <div class="genetics-card">
-      <span class="gene-tag" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444">Fighting Line</span>
-      <h4 class="cinzel">Short-Fin Phenotype</h4>
-      <p>Plakats preserve the ancestral short-fin morphology of wild <em>Betta splendens</em>. While show bettas were selectively bred for flowing fins, Plakats maintain the compact, powerful build of the original fighting lines. Their reduced fin area means less drag and faster strikes &mdash; pure combat efficiency.</p>
-    </div>
-    <div class="genetics-card">
-      <span class="gene-tag" style="background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);color:#a855f7">Recessive Gene</span>
-      <h4 class="cinzel">Homozygous Double Caudal</h4>
-      <p>The Doubletail phenotype requires two copies of the recessive <em>dt</em> allele (homozygous <em>dt/dt</em>). This splits the caudal peduncle, producing twin tail lobes and an exceptionally wide dorsal fin. Heterozygous carriers (<em>dt/+</em>) show no visible split but can produce Doubletail offspring.</p>
-    </div>
-    <div class="genetics-card">
-      <span class="gene-tag" style="background:rgba(148,163,184,0.12);border:1px solid rgba(148,163,184,0.3);color:#94a3b8">Recessive Pigment</span>
-      <h4 class="cinzel">Reduced Pigmentation</h4>
-      <p>Cambodians carry the recessive <em>c</em> allele that suppresses body pigmentation while allowing fin color to remain. This creates their distinctive pale, translucent body that seems to glow in deep water. The clear flesh layer is one of the most difficult stable phenotypes to breed and maintain across generations.</p>
-    </div>
-    <div class="genetics-card">
-      <span class="gene-tag" style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:#22c55e">Chromosome 8</span>
-      <h4 class="cinzel">Giant Growth Factor</h4>
-      <p>The Giant betta's enlarged body size traces to a growth factor gene on chromosome 8. Unlike other breeds that max out around 6cm, Giants can reach 10cm or more. This requires careful selective breeding &mdash; maintaining both size AND proper finnage proportions. In IBC competition, Giant class bettas are judged separately.</p>
-    </div>
-    <div class="genetics-card">
-      <span class="gene-tag" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#f59e0b">Ray Extension</span>
-      <h4 class="cinzel">Extended Ray Phenotype</h4>
-      <p>Crowntails express a gene that causes fin rays to grow 33% or more beyond the webbing, creating the distinctive crown-like appearance. IBC standards require at least 33% ray extension with no crossed or curled tips. The "webbing reduction" creates natural defensive spines in combat.</p>
-    </div>
-    <div class="genetics-card">
-      <span class="gene-tag" style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.3);color:#f97316">Iridescent Layer</span>
-      <h4 class="cinzel">Metallic Scale Overlay</h4>
-      <p>Dragonscales develop a thick layer of iridescent guanine crystals over their scales, creating a metallic, armor-like appearance. IBC judges score for "full mask" coverage &mdash; any gaps in the metallic overlay are considered faults. Over generations, this armor can cause diamond eye (scale overgrowth), a known tradeoff in breeding.</p>
-    </div>
-    <div class="genetics-card">
-      <span class="gene-tag" style="background:rgba(236,72,153,0.12);border:1px solid rgba(236,72,153,0.3);color:#ec4899">Color Banding</span>
-      <h4 class="cinzel">Bi-Color Band Pattern</h4>
-      <p>Butterflies express a unique color distribution gene that creates distinct bands of color across their fins, typically with a clear outer band and a colored inner band. IBC standards demand sharp, clean transitions between color zones &mdash; blurred or uneven bands are marked as faults. The banding pattern is believed to interact with bioluminescent proteins.</p>
+    <div class="cta-row">
+      <a href="/" class="btn btn-primary">Dive In — Play Now</a>
+      <a href="#cnft" class="btn btn-secondary">cNFT Breeding</a>
+      <a href="#gbux" class="btn btn-gbux">Earn GBuX</a>
     </div>
   </div>
 </section>
 
-<!-- ===== CLASSES ===== -->
-<section id="classes">
-  <h2 class="cinzel">Combat Classes</h2>
-  <div class="divider"></div>
-  <p class="section-sub">Four distinct combat specializations determine how your Warlord fights. Pair wisely with your breed for maximum synergy.</p>
+<section class="section" id="lore">
+  <h2 class="section-title fade-in">The Silence of the Plankton</h2>
+  <p class="section-subtitle fade-in">Three Vessels of Magic once sustained all life beneath the waves. Then the Light of Unity went silent...</p>
+  <div class="prologue-box fade-in">
+    <p>In the age before memory, when the ocean was young and currents still sang, three vessels of magic sustained all life beneath the waves. The Betta — fierce, beautiful, and proud — carried the Fire of Will, the spark that drives all creatures to fight, to love, to endure. The Gorgons — ancient serpents of coral and stone — held the Weight of Law, the force that keeps the deep in order and the tides in rhythm. And the Plankton — countless, invisible, everywhere — bore the Light of Unity, the quiet magic that binds every living thing to every other.</p>
+    <p>For eons, the three magics held the ocean in balance. The Betta Warlords built the kingdom of Abyssia atop the Coral Crown, a living reef throne that channeled all three magics into harmony.</p>
+    <p>Then the Plankton Magic went silent. No warning, no cataclysm, no final cry. One day the water simply... dimmed. The Coral Crown shattered. The Gorgon Sirens, driven mad by the severed connection, turned hostile. The Betta Warlords, the last vessels of conscious magic, found themselves alone in a darkening ocean.</p>
+    <p style="color: var(--cyan); font-weight: 500;">Now you must gather your Warlords, restore the Coral Crown, face the maddened Gorgons, and discover why the Plankton Magic fell silent — before the Abyss devours everything.</p>
+  </div>
+</section>
 
-  <div class="class-grid">
-    <div class="class-card" style="border-color:rgba(239,68,68,0.2)">
-      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#ef4444;border-radius:16px 16px 0 0"></div>
-      <h3 class="cinzel" style="color:#ef4444">
-        <img src="/icons/spells/slash-red-1.png" style="width:20px;height:20px;vertical-align:middle;margin-right:6px" alt="">Warrior
-      </h3>
-      <p class="class-desc">A fearless frontline fighter specializing in raw power and defense.</p>
-      <p class="class-lore">"Forged in the fury of the First Tide War, Warriors are the backbone of any school. Their strength and endurance are unmatched in the deep ocean trenches."</p>
-      <div class="ability-list">
-        <div class="ability"><img src="/icons/spells/slash-red-1.png" alt=""><div><div class="ab-name">Slash</div><div class="ab-desc">A steady strike that restores resources</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/icons/spells/explosion-red-1.png" alt=""><div><div class="ab-name">Power Strike</div><div class="ab-desc">Devastating blow dealing 2x damage</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/icons/spells/beam-gold-1.png" alt=""><div><div class="ab-name">War Cry</div><div class="ab-desc">Boost damage by 30% for 3 turns</div></div><span class="ab-type" style="background:rgba(251,191,36,0.12);color:#fbbf24">Buff</span></div>
-        <div class="ability"><img src="/icons/spells/rock-blue-1.png" alt=""><div><div class="ab-name">Shield Bash</div><div class="ab-desc">Stun the enemy for 1 turn</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/icons/spells/slash-crimson-1.png" alt=""><div><div class="ab-name">Cleave</div><div class="ab-desc">Deep slash causing bleed for 3 turns</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/icons/spells/beam-eerie-1.png" alt=""><div><div class="ab-name">Demon Blade</div><div class="ab-desc">Transform for +40% dmg, +15 def for 3 turns</div></div><span class="ab-type" style="background:rgba(168,85,247,0.12);color:#a855f7">Ultimate</span></div>
+<section class="section">
+  <h2 class="section-title fade-in">The Three Vessels of Magic</h2>
+  <p class="section-subtitle fade-in">The ocean's power flows through three ancient channels — Fire, Law, and Unity</p>
+  <div class="vessels-grid">
+    <div class="vessel-card vessel-betta fade-in">
+      <div class="vessel-icon">&#128293;</div>
+      <h3>The Betta — Fire of Will</h3>
+      <p style="font-size:0.85rem; color:var(--text-dim);">The Betta fish carry the oldest conscious magic in the ocean. Each of the eight breeds channels a different aspect of Will — from the Halfmoon's protective resolve to the Crowntail's fierce ambition. When a Betta Warlord fights, they burn with the accumulated determination of every ancestor who refused to yield.</p>
+      <span class="vessel-status">Active — You are the last hope</span>
+    </div>
+    <div class="vessel-card vessel-gorgon fade-in">
+      <div class="vessel-icon">&#128013;</div>
+      <h3>The Gorgons — Weight of Law</h3>
+      <p style="font-size:0.85rem; color:var(--text-dim);">Three Gorgon Sirens once maintained the natural order of the deep: Scylla, Medusa, and Charybdis. Their petrifying gaze was justice — turning only those who threatened the balance to stone. But when the Plankton Magic severed their connection, the Gorgons lost their ability to distinguish friend from foe.</p>
+      <span class="vessel-status">Corrupted — Must be defeated or restored</span>
+    </div>
+    <div class="vessel-card vessel-plankton fade-in">
+      <div class="vessel-icon">&#10024;</div>
+      <h3>The Plankton — Light of Unity</h3>
+      <p style="font-size:0.85rem; color:var(--text-dim);">The most mysterious and powerful of the three magics. Plankton are everywhere — a living network of bioluminescent light that let every creature feel the heartbeat of every other. When their magic went silent, the ocean itself went blind and deaf. Why they withdrew is the central mystery.</p>
+      <span class="vessel-status">Silent — The great mystery</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="section" id="breeds">
+  <h2 class="section-title fade-in">8 Betta Breeds</h2>
+  <p class="section-subtitle fade-in">Inspired by real IBC show standards. Each breed channels a unique aspect of the Fire of Will.</p>
+  <div class="breeds-grid">
+    <div class="breed-card fade-in">
+      <img src="/images/races/blue_betta.png" alt="Halfmoon" class="breed-img" style="border-color: #22d3ee;" />
+      <div class="breed-info">
+        <h4 style="color: #22d3ee;">Halfmoon</h4>
+        <div class="breed-trait" style="color: #22d3ee;">Tidal Flow — +1 All Stats</div>
+        <p>Balanced perfection — a 180-degree caudal spread with full ray branching and flawless symmetry.</p>
       </div>
     </div>
-
-    <div class="class-card" style="border-color:rgba(139,92,246,0.2)">
-      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#8b5cf6;border-radius:16px 16px 0 0"></div>
-      <h3 class="cinzel" style="color:#8b5cf6">
-        <img src="/icons/spells/beam-blue-1.png" style="width:20px;height:20px;vertical-align:middle;margin-right:6px" alt="">Mage Priest
-      </h3>
-      <p class="class-desc">Master of arcane magic and divine healing arts.</p>
-      <p class="class-lore">"Drawing power from the ancient ocean currents and forgotten sea gods, Mage Priests wield destructive tidal magic alongside sacred healing &mdash; a balance few can master in the crushing depths."</p>
-      <div class="ability-list">
-        <div class="ability"><img src="/icons/spells/beam-blue-1.png" alt=""><div><div class="ab-name">Arcane Bolt</div><div class="ab-desc">Focused arcane pulse that restores resources</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
-        <div class="ability"><img src="/icons/spells/explosion-red-2.png" alt=""><div><div class="ab-name">Fireball</div><div class="ab-desc">Massive damage + burn over time</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
-        <div class="ability"><img src="/icons/spells/vines-jade-1.png" alt=""><div><div class="ab-name">Divine Heal</div><div class="ab-desc">Restore 30% of max HP</div></div><span class="ab-type" style="background:rgba(34,197,94,0.12);color:#22c55e">Heal</span></div>
-        <div class="ability"><img src="/icons/spells/ice-blue-1.png" alt=""><div><div class="ab-name">Ice Storm</div><div class="ab-desc">Freezes enemy, reducing their damage</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
+    <div class="breed-card fade-in">
+      <img src="/images/races/red_betta.png" alt="Plakat" class="breed-img" style="border-color: #ef4444;" />
+      <div class="breed-info">
+        <h4 style="color: #ef4444;">Plakat</h4>
+        <div class="breed-trait" style="color: #ef4444;">Blood Frenzy — +4 STR, +2 VIT</div>
+        <p>Short-finned brawlers from the original fighting bloodlines — compact, aggressive, bred for battle.</p>
       </div>
     </div>
-
-    <div class="class-card" style="border-color:rgba(217,119,6,0.2)">
-      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#d97706;border-radius:16px 16px 0 0"></div>
-      <h3 class="cinzel" style="color:#d97706">
-        <img src="/icons/spells/rock-orange-1.png" alt="" style="width:20px;height:20px;vertical-align:middle;margin-right:6px">Worge
-      </h3>
-      <p class="class-desc">A shapeshifter who wields current and reef magic, then transforms into a devastating deep-sea predator.</p>
-      <p class="class-lore">"Worges swim between worlds &mdash; channelers of storm and coral in their natural form, unstoppable leviathans in beast form. The ocean's fury made flesh."</p>
-      <div class="ability-list">
-        <div class="ability"><img src="/icons/spells/rock-orange-1.png" alt=""><div><div class="ab-name">Mace Strike</div><div class="ab-desc">Current-charged blow that restores resources</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/icons/spells/lightning-gold-1.png" alt=""><div><div class="ab-name">Lightning Lash</div><div class="ab-desc">Call down lightning + burn</div></div><span class="ab-type" style="background:rgba(139,92,246,0.12);color:#8b5cf6">Magic</span></div>
-        <div class="ability"><img src="/icons/spells/vines-jade-2.png" alt=""><div><div class="ab-name">Nature's Grasp</div><div class="ab-desc">Heal over time for 3 turns</div></div><span class="ab-type" style="background:rgba(34,197,94,0.12);color:#22c55e">Heal</span></div>
-        <div class="ability"><img src="/icons/spells/beam-eerie-2.png" alt=""><div><div class="ab-name">Bear Form</div><div class="ab-desc">Transform: +25% dmg, +10 def, new abilities</div></div><span class="ab-type" style="background:rgba(168,85,247,0.12);color:#a855f7">Ultimate</span></div>
+    <div class="breed-card fade-in">
+      <img src="/images/races/purple_betta.png" alt="Doubletail" class="breed-img" style="border-color: #a855f7;" />
+      <div class="breed-info">
+        <h4 style="color: #a855f7;">Doubletail</h4>
+        <div class="breed-trait" style="color: #a855f7;">Arcane Depths — +3 INT, +2 DEX</div>
+        <p>Twin-lobed and mystical — a rare recessive breed channeling arcane currents through split caudal fins.</p>
       </div>
     </div>
-
-    <div class="class-card" style="border-color:rgba(34,197,94,0.2)">
-      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#22c55e;border-radius:16px 16px 0 0"></div>
-      <h3 class="cinzel" style="color:#22c55e">
-        <img src="/icons/spells/air-burst-air-1.png" alt="" style="width:20px;height:20px;vertical-align:middle;margin-right:6px">Ranger
-      </h3>
-      <p class="class-desc">A deadly marksman with precise long-range attacks.</p>
-      <p class="class-lore">"Silent and patient, Rangers strike from the murky depths with lethal precision. Their harpoons find gaps in even the thickest shell armor."</p>
-      <div class="ability-list">
-        <div class="ability"><img src="/icons/spells/air-burst-air-1.png" alt=""><div><div class="ab-name">Quick Shot</div><div class="ab-desc">Swift harpoon that restores resources</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/icons/spells/beam-crimson-1.png" alt=""><div><div class="ab-name">Aimed Shot</div><div class="ab-desc">Carefully aimed shot, always crits</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/icons/spells/explosion-acid-1.png" alt=""><div><div class="ab-name">Poison Arrow</div><div class="ab-desc">Poisons for damage over time</div></div><span class="ab-type" style="background:rgba(239,68,68,0.12);color:#ef4444">Physical</span></div>
-        <div class="ability"><img src="/icons/spells/wind-grasp-air-1.png" alt=""><div><div class="ab-name">Evasive Roll</div><div class="ab-desc">+50% evasion for 2 turns</div></div><span class="ab-type" style="background:rgba(251,191,36,0.12);color:#fbbf24">Buff</span></div>
-        <div class="ability"><img src="/icons/spells/beam-gold-2.png" alt=""><div><div class="ab-name">Focus</div><div class="ab-desc">Passive crit stacking, active guaranteed crit</div></div><span class="ab-type" style="background:rgba(168,85,247,0.12);color:#a855f7">Ultimate</span></div>
+    <div class="breed-card fade-in">
+      <img src="/images/races/white_betta.png" alt="Cambodian" class="breed-img" style="border-color: #94a3b8;" />
+      <div class="breed-info">
+        <h4 style="color: #94a3b8;">Cambodian</h4>
+        <div class="breed-trait" style="color: #94a3b8;">Phantom Scales — +3 VIT, +2 END</div>
+        <p>Pale and spectral — reduced pigment bettas from the frozen depths, nearly impossible to kill.</p>
+      </div>
+    </div>
+    <div class="breed-card fade-in">
+      <img src="/images/races/green_betta.png" alt="Giant" class="breed-img" style="border-color: #22c55e;" />
+      <div class="breed-info">
+        <h4 style="color: #22c55e;">Giant</h4>
+        <div class="breed-trait" style="color: #22c55e;">Reef Fury — +3 STR, +2 AGI</div>
+        <p>Oversized reef predators — the enlarged chr8 locus lineage with devastating raw power.</p>
+      </div>
+    </div>
+    <div class="breed-card fade-in">
+      <img src="/images/races/gold_betta.png" alt="Crowntail" class="breed-img" style="border-color: #f59e0b;" />
+      <div class="breed-info">
+        <h4 style="color: #f59e0b;">Crowntail</h4>
+        <div class="breed-trait" style="color: #f59e0b;">Royal Guard — +3 END, +2 VIT</div>
+        <p>Royal defenders — extended ray tips form a crown of spines, armoring them in living gold.</p>
+      </div>
+    </div>
+    <div class="breed-card fade-in">
+      <img src="/images/races/orange_betta.png" alt="Dragonscale" class="breed-img" style="border-color: #f97316;" />
+      <div class="breed-info">
+        <h4 style="color: #f97316;">Dragonscale</h4>
+        <div class="breed-trait" style="color: #f97316;">Thermal Dash — +3 AGI, +2 STR</div>
+        <p>Armored speedsters — thick metallic iridescent scales over a blazing orange body.</p>
+      </div>
+    </div>
+    <div class="breed-card fade-in">
+      <img src="/images/races/pink_betta.png" alt="Butterfly" class="breed-img" style="border-color: #ec4899;" />
+      <div class="breed-info">
+        <h4 style="color: #ec4899;">Butterfly</h4>
+        <div class="breed-trait" style="color: #ec4899;">Healing Tide — +3 WIS, +2 INT</div>
+        <p>Graceful healers — distinctive banded fin patterns that pulse with restorative energy.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== ATTRIBUTES ===== -->
-<section id="attributes">
-  <h2 class="cinzel">Hero Attributes</h2>
-  <div class="divider"></div>
-  <p class="section-sub">Eight core attributes define every Warlord's combat capabilities. Each breed and class modifies these stats differently.</p>
+<div class="divider"></div>
 
-  <div class="attr-grid">
-    <div class="attr-card">
-      <img src="/images/attributes/strength.png" alt="Strength">
-      <div class="attr-info">
-        <h4 class="cinzel" style="color:#ef4444">Strength</h4>
-        <span class="attr-abbr">STR</span>
-        <p>Physical power and melee damage. Determines how hard your strikes hit.</p>
+<section class="section">
+  <h2 class="section-title fade-in">4 Warlord Classes</h2>
+  <p class="section-subtitle fade-in">8 breeds x 4 classes = 32 unique Warlord combinations, each with deep skill trees</p>
+  <div class="classes-grid">
+    <div class="class-card fade-in">
+      <div class="class-icon-wrap" style="background: rgba(239,68,68,0.15);">&#9876;&#65039;</div>
+      <h4 style="color: var(--red);">Warrior</h4>
+      <p>Frontline fighter from the crushing depths. Specializes in raw power, deep-sea defense, and the devastating Leviathan Form transformation.</p>
+    </div>
+    <div class="class-card fade-in">
+      <div class="class-icon-wrap" style="background: rgba(139,92,246,0.15);">&#128302;</div>
+      <h4 style="color: #8b5cf6;">Mage Priest</h4>
+      <p>Master of tidal magic and coral healing arts. Wields Hydrothermal Blasts, Frozen Currents, and the sacred Bubble Shield barrier.</p>
+    </div>
+    <div class="class-card fade-in">
+      <div class="class-icon-wrap" style="background: rgba(217,119,6,0.15);">&#128058;</div>
+      <h4 style="color: #d97706;">Worge</h4>
+      <p>Shapeshifter who transforms into a devastating ocean predator. Shark Form unleashes Savage Bite, Torpedo Rush, and Predator's Roar.</p>
+    </div>
+    <div class="class-card fade-in">
+      <div class="class-icon-wrap" style="background: rgba(34,197,94,0.15);">&#127993;</div>
+      <h4 style="color: var(--green);">Ranger</h4>
+      <p>Silent hunter from the kelp canopy. Precision strikes with Coral Spine Barrage, Depth Charge traps, and deadly Venom Shot.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="section">
+  <h2 class="section-title fade-in">The Gorgon Sirens</h2>
+  <p class="section-subtitle fade-in">Three corrupted guardians stand between you and the truth of the Silence</p>
+  <div class="bosses-grid">
+    <div class="boss-card fade-in">
+      <h4 style="color: var(--teal);">Scylla, Siren of the Shallows</h4>
+      <div class="boss-title" style="color: var(--teal);">Guardian of the Sunlit Waters — Level 9</div>
+      <p>Once the gentlest of the three, Scylla watched over the coral reefs where young sea creatures took their first breaths. Now maddened, her six serpentine heads strike with the speed of a riptide.</p>
+      <div class="boss-lore">"Scylla's petrification was always temporary — she would release her victims after they learned respect for the reef. This mercy is now gone."</div>
+    </div>
+    <div class="boss-card fade-in">
+      <h4 style="color: var(--purple);">Medusa, Siren of the Mid-Waters</h4>
+      <div class="boss-title" style="color: var(--purple);">Keeper of the Twilight Depths — Level 17</div>
+      <p>Medusa maintained the delicate border between light and darkness. Her coral-snake hair could sense disturbances from miles away. With the Plankton Magic gone, she lashes out at shadows.</p>
+      <div class="boss-lore">"Legend says Medusa wept when the Plankton Magic fell silent, and her tears became the first abyssal pearls — worth a fortune but cursed with sorrow."</div>
+    </div>
+    <div class="boss-card fade-in">
+      <h4 style="color: var(--red);">Charybdis, Siren of the Abyss</h4>
+      <div class="boss-title" style="color: var(--red);">The Devourer of the Deep — Level 20</div>
+      <p>The most fearsome of the three. She could create whirlpools that swallowed armies, and her gaze didn't just petrify — it unmade, dissolving matter back into raw ocean.</p>
+      <div class="boss-lore">"Charybdis is the only being who was present at the moment the Plankton Magic went silent. What she saw in that instant drove her to the edge of madness."</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="section" id="world">
+  <h2 class="section-title fade-in">The World of Abyssia</h2>
+  <p class="section-subtitle fade-in">32 explorable locations across 5 ocean terrain regions, each with unique lore tied to the Three Vessels</p>
+  <div class="locations-scroll fade-in">
+    <div class="location-card">
+      <img src="/images/cards/card_v1_green.png" alt="Coral Shallows" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--red);"></span>Coral Shallows</h5>
+        <span class="lore-tag" style="color: var(--red);">Birthplace of the Warlords</span>
+        <p class="lore-quote">"Where the first Betta drew breath, the Crown's light still lingers."</p>
       </div>
     </div>
-    <div class="attr-card">
-      <img src="/images/attributes/vitality.png" alt="Vitality">
-      <div class="attr-info">
-        <h4 class="cinzel" style="color:#22c55e">Vitality</h4>
-        <span class="attr-abbr">VIT</span>
-        <p>Max HP and survivability. More vitality means more hits you can take.</p>
+    <div class="location-card">
+      <img src="/images/cards/card_v2_green.png" alt="Kelp Forest" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--cyan);"></span>Kelp Forest</h5>
+        <span class="lore-tag" style="color: var(--cyan);">The Whispering Canopy</span>
+        <p class="lore-quote">"The kelp remembers when the Plankton sang through every frond."</p>
       </div>
     </div>
-    <div class="attr-card">
-      <img src="/images/attributes/endurance.png" alt="Endurance">
-      <div class="attr-info">
-        <h4 class="cinzel" style="color:#f59e0b">Endurance</h4>
-        <span class="attr-abbr">END</span>
-        <p>Defense and damage reduction. Reduces incoming physical and magical damage.</p>
+    <div class="location-card">
+      <img src="/images/cards/card_v1_green.png" alt="Anemone Garden" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--cyan);"></span>Anemone Garden</h5>
+        <span class="lore-tag" style="color: var(--cyan);">Garden of the First Spells</span>
+        <p class="lore-quote">"Ancient magic pulses here — older than the Crown itself."</p>
       </div>
     </div>
-    <div class="attr-card">
-      <img src="/images/attributes/intellect.png" alt="Intellect">
-      <div class="attr-info">
-        <h4 class="cinzel" style="color:#8b5cf6">Intellect</h4>
-        <span class="attr-abbr">INT</span>
-        <p>Magic damage and spell power. Amplifies arcane and elemental abilities.</p>
+    <div class="location-card">
+      <img src="/images/cards/card_v2_blue.png" alt="Biolume Caves" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--cyan);"></span>Biolume Caves</h5>
+        <span class="lore-tag" style="color: var(--cyan);">Echoes of the Lost Light</span>
+        <p class="lore-quote">"Even in silence, the caves glow with the memory of unity."</p>
       </div>
     </div>
-    <div class="attr-card">
-      <img src="/images/attributes/wisdom.png" alt="Wisdom">
-      <div class="attr-info">
-        <h4 class="cinzel" style="color:#ec4899">Wisdom</h4>
-        <span class="attr-abbr">WIS</span>
-        <p>Healing power and magic defense. Boosts restorative abilities and arcane resistance.</p>
+    <div class="location-card">
+      <img src="/images/cards/card_v3_blue.png" alt="Sargasso Maze" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--purple);"></span>Sargasso Maze</h5>
+        <span class="lore-tag" style="color: var(--purple);">Labyrinth of the Fallen</span>
+        <p class="lore-quote">"The drowned drift here, caught between the living and the void."</p>
       </div>
     </div>
-    <div class="attr-card">
-      <img src="/images/attributes/dexterity.png" alt="Dexterity">
-      <div class="attr-info">
-        <h4 class="cinzel" style="color:#f97316">Dexterity</h4>
-        <span class="attr-abbr">DEX</span>
-        <p>Critical hit chance. Higher dexterity means more devastating critical strikes.</p>
+    <div class="location-card">
+      <img src="/images/cards/card_v3_red.png" alt="Sunken Citadel" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--red);"></span>Sunken Citadel</h5>
+        <span class="lore-tag" style="color: var(--red);">Ruins of the Old Kingdom</span>
+        <p class="lore-quote">"Once the jewel of Abyssia, now a tomb for forgotten kings."</p>
       </div>
     </div>
-    <div class="attr-card">
-      <img src="/images/attributes/agility.png" alt="Agility">
-      <div class="attr-info">
-        <h4 class="cinzel" style="color:#06b6d4">Agility</h4>
-        <span class="attr-abbr">AGI</span>
-        <p>Speed and evasion. Determines turn order and chance to dodge attacks.</p>
+    <div class="location-card">
+      <img src="/images/cards/card_v1_blue.png" alt="Shipwreck Hollow" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--purple);"></span>Shipwreck Hollow</h5>
+        <span class="lore-tag" style="color: var(--purple);">Lair of the First Siren</span>
+        <p class="lore-quote">"Scylla's shadow falls across these timbers. The first Gorgon awaits."</p>
       </div>
     </div>
-    <div class="attr-card">
-      <img src="/images/attributes/tactics.png" alt="Tactics">
-      <div class="attr-info">
-        <h4 class="cinzel" style="color:#22d3ee">Tactics</h4>
-        <span class="attr-abbr">TAC</span>
-        <p>Turn order and combo efficiency. Enables better tactical decisions in battle.</p>
+    <div class="location-card">
+      <img src="/images/cards/card_v2_blue.png" alt="Crystal Grotto" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--red);"></span>Crystal Grotto</h5>
+        <span class="lore-tag" style="color: var(--red);">The Singing Crystals</span>
+        <p class="lore-quote">"The crystals hum with Crown resonance — a fragment is near."</p>
+      </div>
+    </div>
+    <div class="location-card">
+      <img src="/images/cards/card_v3_red.png" alt="Thermal Vent" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--red);"></span>Thermal Vent</h5>
+        <span class="lore-tag" style="color: var(--red);">The Burning Forge</span>
+        <p class="lore-quote">"In scalding fury, the Warlord forges instruments of destruction."</p>
+      </div>
+    </div>
+    <div class="location-card">
+      <img src="/images/cards/card_v1_red.png" alt="Shadow Citadel" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--purple);"></span>Shadow Citadel</h5>
+        <span class="lore-tag" style="color: var(--purple);">Fortress of the Second Siren</span>
+        <p class="lore-quote">"Medusa's tears became abyssal pearls. Her rage became this fortress."</p>
+      </div>
+    </div>
+    <div class="location-card">
+      <img src="/images/cards/card_v1_red.png" alt="The Devourer's Maw" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--purple);"></span>The Devourer's Maw</h5>
+        <span class="lore-tag" style="color: var(--purple);">Lair of the Third Siren</span>
+        <p class="lore-quote">"Charybdis saw the moment the Plankton Magic died. It broke her."</p>
+      </div>
+    </div>
+    <div class="location-card">
+      <img src="/images/cards/card_v2_blue.png" alt="Hadal Trench" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--cyan);"></span>Hadal Trench</h5>
+        <span class="lore-tag" style="color: var(--cyan);">Where the Light Hides</span>
+        <p class="lore-quote">"In the deepest dark, Plankton still glow. They spell a single word."</p>
+      </div>
+    </div>
+    <div class="location-card">
+      <img src="/images/cards/card_v1_red.png" alt="The Void Maw" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--cyan);"></span>The Void Maw</h5>
+        <span class="lore-tag" style="color: var(--cyan);">Lair of the Consumer — Final Trial</span>
+        <p class="lore-quote">"It consumed the Light of Unity whole — and still it hungers."</p>
+      </div>
+    </div>
+    <div class="location-card">
+      <img src="/images/cards/card_v1_blue.png" alt="Abyss Throne" class="location-art" />
+      <div class="location-body">
+        <h5><span class="vessel-dot" style="background: var(--purple);"></span>The Abyss Throne</h5>
+        <span class="lore-tag" style="color: var(--purple);">Seat of the Abyss King</span>
+        <p class="lore-quote">"In crushing darkness, the King sits upon a throne of devoured light."</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== COMBINATIONS ===== -->
-<section id="combos">
-  <h2 class="cinzel">32 Warlord Combinations</h2>
-  <div class="divider"></div>
-  <p class="section-sub">Every breed can be paired with every class, creating 32 unique Warlord combinations. Here are the recommended synergies.</p>
+<div class="divider"></div>
 
-  <div style="overflow-x:auto">
-  <table class="combo-table">
-    <thead>
-      <tr><th>Breed</th><th>Best Class</th><th>Synergy</th><th>Playstyle</th></tr>
-    </thead>
-    <tbody>
-      <tr><td style="color:#22d3ee">Halfmoon</td><td>Any</td><td style="color:var(--gold)">Universal</td><td>+1 all stats means any class works &mdash; the ultimate flex pick</td></tr>
-      <tr><td style="color:#ef4444">Plakat</td><td>Warrior</td><td style="color:var(--gold)">S-Tier</td><td>STR+VIT bonuses stack perfectly with Warrior's frontline kit</td></tr>
-      <tr><td style="color:#a855f7">Doubletail</td><td>Mage Priest</td><td style="color:var(--gold)">S-Tier</td><td>INT+WIS bonuses amplify both damage spells and healing</td></tr>
-      <tr><td style="color:#94a3b8">Cambodian</td><td>Mage Priest</td><td style="color:#22d3ee">A-Tier</td><td>High VIT + WIS = tanky caster who outlasts enemies</td></tr>
-      <tr><td style="color:#22c55e">Giant</td><td>Warrior</td><td style="color:var(--gold)">S-Tier</td><td>Massive STR + Reef Fury stun = devastating first strikes</td></tr>
-      <tr><td style="color:#22c55e">Giant</td><td>Worge</td><td style="color:#22d3ee">A-Tier</td><td>STR+AGI bonuses make Beast Form terrifying</td></tr>
-      <tr><td style="color:#f59e0b">Crowntail</td><td>Warrior</td><td style="color:#22d3ee">A-Tier</td><td>END+VIT bonuses create an unkillable tank with Royal Guard thorns</td></tr>
-      <tr><td style="color:#f97316">Dragonscale</td><td>Ranger</td><td style="color:var(--gold)">S-Tier</td><td>AGI+DEX bonuses boost crit and evasion for deadly precision</td></tr>
-      <tr><td style="color:#f97316">Dragonscale</td><td>Worge</td><td style="color:#22d3ee">A-Tier</td><td>Thermal Dash + Nature's Grasp = hit-and-run specialist</td></tr>
-      <tr><td style="color:#ec4899">Butterfly</td><td>Mage Priest</td><td style="color:var(--gold)">S-Tier</td><td>WIS+INT bonuses make the ultimate healer/damage hybrid</td></tr>
-      <tr><td style="color:#ec4899">Butterfly</td><td>Ranger</td><td style="color:#22d3ee">A-Tier</td><td>Healing Tide + Focus = sustained damage with self-sustain</td></tr>
-      <tr><td style="color:#ef4444">Plakat</td><td>Worge</td><td style="color:#22d3ee">A-Tier</td><td>Blood Frenzy + Bear Form = berserker monster at low health</td></tr>
-    </tbody>
-  </table>
+<section class="section">
+  <h2 class="section-title fade-in">Creatures of the Deep</h2>
+  <p class="section-subtitle fade-in">Over 30 unique enemy types inhabit the waters of Abyssia</p>
+  <div class="enemies-gallery fade-in">
+    <img src="/images/enemies/armored_crab.png" alt="Armored Crab" class="enemy-thumb" title="Armored Crab" />
+    <img src="/images/enemies/barracuda.png" alt="Barracuda" class="enemy-thumb" title="Barracuda" />
+    <img src="/images/enemies/barnacle_warrior.png" alt="Barnacle Warrior" class="enemy-thumb" title="Barnacle Warrior" />
+    <img src="/images/enemies/jellyfish_eye.png" alt="Jellyfish" class="enemy-thumb" title="Jellyfish" />
+    <img src="/images/enemies/kelp_giant.png" alt="Kelp Giant" class="enemy-thumb" title="Kelp Giant" />
+    <img src="/images/enemies/lobster_warlord.png" alt="Lobster Warlord" class="enemy-thumb" title="Lobster Warlord" />
+    <img src="/images/enemies/mantis_shrimp.png" alt="Mantis Shrimp" class="enemy-thumb" title="Mantis Shrimp" />
+    <img src="/images/enemies/sea_serpent.png" alt="Sea Serpent" class="enemy-thumb" title="Sea Serpent" />
+    <img src="/images/enemies/shadow_eel.png" alt="Shadow Eel" class="enemy-thumb" title="Shadow Eel" />
+    <img src="/images/enemies/shadow_manta.png" alt="Shadow Manta" class="enemy-thumb" title="Shadow Manta" />
+    <img src="/images/enemies/swordfish_knight.png" alt="Swordfish Knight" class="enemy-thumb" title="Swordfish Knight" />
+    <img src="/images/enemies/ink_sorcerer.png" alt="Ink Sorcerer" class="enemy-thumb" title="Ink Sorcerer" />
+    <img src="/images/enemies/puffer_scout.png" alt="Puffer Scout" class="enemy-thumb" title="Puffer Scout" />
+    <img src="/images/enemies/water_elemental.png" alt="Water Elemental" class="enemy-thumb" title="Water Elemental" />
+    <img src="/images/enemies/frost_titan.png" alt="Frost Titan" class="enemy-thumb" title="Frost Titan" />
+    <img src="/images/enemies/frost_wyrm.png" alt="Frost Wyrm" class="enemy-thumb" title="Frost Wyrm" />
+    <img src="/images/enemies/kraken_lich.png" alt="Kraken Lich" class="enemy-thumb" title="Kraken Lich" />
+    <img src="/images/enemies/leviathan.png" alt="Leviathan" class="enemy-thumb" title="Leviathan" />
+    <img src="/images/enemies/nature_elemental.png" alt="Nature Elemental" class="enemy-thumb" title="Nature Elemental" />
+    <img src="/images/enemies/ocean_mimic.png" alt="Ocean Mimic" class="enemy-thumb" title="Ocean Mimic" />
+    <img src="/images/enemies/poseidon.png" alt="Poseidon" class="enemy-thumb" title="Poseidon" />
+    <img src="/images/enemies/stone_guardian.png" alt="Stone Guardian" class="enemy-thumb" title="Stone Guardian" />
+    <img src="/images/enemies/void_sentinel.png" alt="Void Sentinel" class="enemy-thumb" title="Void Sentinel" />
+    <img src="/images/enemies/water_priestess.png" alt="Water Priestess" class="enemy-thumb" title="Water Priestess" />
+    <img src="/images/enemies/abyss_king.png" alt="Abyss King" class="enemy-thumb" title="Abyss King" />
+    <img src="/images/enemies/demon_lord.png" alt="Demon Lord" class="enemy-thumb" title="Demon Lord" />
+    <img src="/images/enemies/grand_shaman.png" alt="Grand Shaman" class="enemy-thumb" title="Grand Shaman" />
+    <img src="/images/enemies/charybdis.png" alt="Charybdis" class="enemy-thumb" title="Charybdis" />
+    <img src="/images/enemies/sea_devil.png" alt="Sea Devil" class="enemy-thumb" title="Sea Devil" />
+    <img src="/images/enemies/sea_mushroom.png" alt="Sea Mushroom" class="enemy-thumb" title="Sea Mushroom" />
   </div>
 </section>
 
-<!-- ===== ENEMIES ===== -->
-<section id="enemies">
-  <h2 class="cinzel">Sea Creatures</h2>
-  <div class="divider"></div>
-  <p class="section-sub">The corrupted waters of Abyssia teem with hostile creatures, from lowly reef bandits to fearsome abyssal knights.</p>
+<div class="divider"></div>
 
-  <div class="enemy-grid">
-    <div class="enemy-card"><img src="/images/enemies/puffer_scout.png" alt="Reef Bandit"><div class="enemy-info"><h4 style="color:#0ea5e9">Reef Bandit</h4><div class="enemy-stats"><span>80 HP</span><span>12 DMG</span><span>5 DEF</span><span>Spd 14</span></div><div class="enemy-abilities">Spine Jab, Ambush Sting</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/barnacle_warrior.png" alt="Barnacle Warrior"><div class="enemy-info"><h4 style="color:#94a3b8">Barnacle Warrior</h4><div class="enemy-stats"><span>120 HP</span><span>18 DMG</span><span>15 DEF</span><span>Spd 10</span></div><div class="enemy-abilities">Shell Slam, Shell Guard</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/barracuda.png" alt="Mantis Shrimp"><div class="enemy-info"><h4 style="color:#64748b">Mantis Shrimp</h4><div class="enemy-stats"><span>100 HP</span><span>22 DMG</span><span>8 DEF</span><span>Spd 18</span></div><div class="enemy-abilities">Razor Bite, Predator Surge</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/ink_sorcerer.png" alt="Ink Sorcerer"><div class="enemy-info"><h4 style="color:#4c1d95">Ink Sorcerer</h4><div class="enemy-stats"><span>90 HP</span><span>25 DMG</span><span>6 DEF</span><span>Spd 12</span></div><div class="enemy-abilities">Ink Bolt, Ink Cloud, Leech Current</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/armored_crab.png" alt="Abyssal Knight"><div class="enemy-info"><h4 style="color:#1e3a5f">Abyssal Knight</h4><div class="enemy-stats"><span>160 HP</span><span>26 DMG</span><span>22 DEF</span><span>Spd 10</span></div><div class="enemy-abilities">Claw Crush, Carapace Wall, Shell Breaker</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/shadow_eel.png" alt="Shadow Eel"><div class="enemy-info"><h4 style="color:#0f172a">Shadow Eel</h4><div class="enemy-stats"><span>140 HP</span><span>30 DMG</span><span>16 DEF</span><span>Spd 14</span></div><div class="enemy-abilities">Electric Strike, Voltage Surge, Eel Lunge</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/water_priestess.png" alt="Coral Priestess"><div class="enemy-info"><h4 style="color:#0891b2">Coral Priestess</h4><div class="enemy-stats"><span>110 HP</span><span>32 MDMG</span><span>12 DEF</span><span>Spd 12</span></div><div class="enemy-abilities">Tidal Strike, Healing Tide, Frozen Prison</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/mantis_shrimp.png" alt="Hammerhead Brute"><div class="enemy-info"><h4 style="color:#dc2626">Hammerhead Brute</h4><div class="enemy-stats"><span>180 HP</span><span>28 DMG</span><span>20 DEF</span><span>Spd 8</span></div><div class="enemy-abilities">Hammer Strike, Cavitation Rage, Seafloor Shatter</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/sea_serpent.png" alt="Sea Drake"><div class="enemy-info"><h4 style="color:#0d9488">Sea Drake</h4><div class="enemy-stats"><span>150 HP</span><span>30 DMG</span><span>18 DEF</span><span>Spd 15</span></div><div class="enemy-abilities">Fang Snap, Toxic Spray, Tail Lash</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/jellyfish_eye.png" alt="Lantern Jellyfish"><div class="enemy-info"><h4 style="color:#c084fc">Lantern Jellyfish</h4><div class="enemy-stats"><span>70 HP</span><span>16 DMG</span><span>4 DEF</span><span>Spd 19</span></div><div class="enemy-abilities">Sting Beam, Tentacle Dive</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/sea_mushroom.png" alt="Toxic Urchin"><div class="enemy-info"><h4 style="color:#a855f7">Toxic Urchin</h4><div class="enemy-stats"><span>90 HP</span><span>10 DMG</span><span>8 DEF</span><span>Spd 8</span></div><div class="enemy-abilities">Spine Slap, Toxic Spine (Poison DOT)</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/shadow_manta.png" alt="Manta Ray"><div class="enemy-info"><h4 style="color:#4c1d95">Manta Ray</h4><div class="enemy-stats"><span>55 HP</span><span>14 DMG</span><span>3 DEF</span><span>Spd 22</span></div><div class="enemy-abilities">Coil Slash, Echolocation Pulse, Venom Drain</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/sea_devil.png" alt="Electric Eel"><div class="enemy-info"><h4 style="color:#0891b2">Electric Eel</h4><div class="enemy-stats"><span>65 HP</span><span>11 DMG</span><span>4 DEF</span><span>Spd 17</span></div><div class="enemy-abilities">Spine Scratch, Toxin Bolt, Puff Frenzy</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/ocean_mimic.png" alt="Hermit Mimic"><div class="enemy-info"><h4 style="color:#0e7490">Hermit Mimic</h4><div class="enemy-stats"><span>200 HP</span><span>26 DMG</span><span>22 DEF</span><span>Spd 7</span></div><div class="enemy-abilities">Shell Snap, Siphon Lash (Stun), Pearl Snatch</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/swordfish_knight.png" alt="Barracuda Knight"><div class="enemy-info"><h4 style="color:#1e3a5f">Barracuda Knight</h4><div class="enemy-stats"><span>170 HP</span><span>24 DMG</span><span>16 DEF</span><span>Spd 16</span></div><div class="enemy-abilities">Bill Strike, Depth Charge, School Swarm</div></div></div>
-    <div class="enemy-card"><img src="/images/enemies/stone_guardian.png" alt="Stone Crab"><div class="enemy-info"><h4 style="color:#f472b6">Stone Crab</h4><div class="enemy-stats"><span>250 HP</span><span>20 DMG</span><span>30 DEF</span><span>Spd 6</span></div><div class="enemy-abilities">Coral Fist, Hypnotic Gaze (Stun), Reef Slam</div></div></div>
+<section class="section">
+  <h2 class="section-title fade-in">Kingdom Structures</h2>
+  <p class="section-subtitle fade-in">Build, upgrade, and manage your underwater stronghold</p>
+  <div class="buildings-grid fade-in">
+    <div class="building-tile"><img src="/images/buildings/campfire.png" alt="Camp" /><span>Camp</span></div>
+    <div class="building-tile"><img src="/images/buildings/weapons_shop.png" alt="Weapons" /><span>Weapons</span></div>
+    <div class="building-tile"><img src="/images/buildings/armor_shop.png" alt="Armor" /><span>Armor</span></div>
+    <div class="building-tile"><img src="/images/buildings/potions_shop.png" alt="Potions" /><span>Potions</span></div>
+    <div class="building-tile"><img src="/images/buildings/relics_shop.png" alt="Relics" /><span>Relics</span></div>
+    <div class="building-tile"><img src="/images/buildings/healing_shrine.png" alt="Shrine" /><span>Shrine</span></div>
+    <div class="building-tile"><img src="/images/buildings/crystal_cave.png" alt="Crystal Cave" /><span>Crystal Cave</span></div>
+    <div class="building-tile"><img src="/images/buildings/crystal_grotto.png" alt="Grotto" /><span>Grotto</span></div>
+    <div class="building-tile"><img src="/images/buildings/pearl_beds.png" alt="Pearl Beds" /><span>Pearl Beds</span></div>
+    <div class="building-tile"><img src="/images/buildings/coral_grove.png" alt="Coral Grove" /><span>Coral Grove</span></div>
+    <div class="building-tile"><img src="/images/buildings/algae_garden.png" alt="Algae" /><span>Algae</span></div>
+    <div class="building-tile"><img src="/images/buildings/ore_vein.png" alt="Ore Vein" /><span>Ore Vein</span></div>
+    <div class="building-tile"><img src="/images/buildings/shell_deposit.png" alt="Shells" /><span>Shells</span></div>
+    <div class="building-tile"><img src="/images/buildings/boss_lair.png" alt="Boss Lair" /><span>Boss Lair</span></div>
+    <div class="building-tile"><img src="/images/buildings/dungeon_gate.png" alt="Dungeon" /><span>Dungeon</span></div>
+    <div class="building-tile"><img src="/images/buildings/treasure_chest.png" alt="Treasure" /><span>Treasure</span></div>
   </div>
 </section>
 
-<!-- ===== BOSSES ===== -->
-<section id="bosses">
-  <h2 class="cinzel">Boss Encounters</h2>
-  <div class="divider"></div>
-  <p class="section-sub">Powerful guardians and commanders who must be defeated to unlock new territories and recover Crown fragments.</p>
+<div class="divider"></div>
 
-  <div class="boss-grid">
-    <div class="boss-card normal-boss">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#059669,#0d9488)">
-        <img src="/images/enemies/grand_shaman.png" alt="Reef Shaman" class="boss-portrait" style="border-color:#059669">
-      </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#059669">Reef Shaman</h3>
-        <div class="boss-title" style="color:#059669">Guardian of Shipwreck Hollow</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">500 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">32 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">18 DEF</span>
-          <span style="background:rgba(34,211,238,0.12);color:#22d3ee">55 XP &bull; 80 Pearls</span>
-        </div>
-        <div class="boss-abilities"><h4>Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Coral Bolt</span><div class="ab-d">Concentrated reef energy</div></div>
-            <div class="boss-ab"><span class="ab-n">Healing Current</span><div class="ab-d">Restores 18% HP</div></div>
-            <div class="boss-ab"><span class="ab-n">Urchin Burst</span><div class="ab-d">Sea urchin spines + DOT</div></div>
-            <div class="boss-ab"><span class="ab-n">Kelp Snare</span><div class="ab-d">Stuns for 1 turn</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
+<section class="section">
+  <h2 class="section-title fade-in">TCG-Style Location Cards</h2>
+  <p class="section-subtitle fade-in">Each world location is presented as a collectible card with vessel-aligned art</p>
+  <div class="cards-row fade-in">
+    <div class="card-frame"><img src="/images/cards/card_v1_blue.png" alt="Mission Blue" /></div>
+    <div class="card-frame"><img src="/images/cards/card_v1_green.png" alt="Mission Green" /></div>
+    <div class="card-frame"><img src="/images/cards/card_v1_red.png" alt="Mission Red" /></div>
+    <div class="card-frame"><img src="/images/cards/card_v2_blue.png" alt="Exploration Blue" /></div>
+    <div class="card-frame"><img src="/images/cards/card_v2_green.png" alt="Exploration Green" /></div>
+    <div class="card-frame"><img src="/images/cards/card_v2_red.png" alt="Exploration Red" /></div>
+    <div class="card-frame"><img src="/images/cards/card_v3_blue.png" alt="Combat Blue" /></div>
+    <div class="card-frame"><img src="/images/cards/card_v3_green.png" alt="Combat Green" /></div>
+    <div class="card-frame"><img src="/images/cards/card_v3_red.png" alt="Combat Red" /></div>
+  </div>
+  <div class="cards-row fade-in" style="margin-top: 16px;">
+    <div class="card-frame"><img src="/images/cards/card_back_blue.png" alt="Card Back Blue" /></div>
+    <div class="card-frame"><img src="/images/cards/card_back_green.png" alt="Card Back Green" /></div>
+    <div class="card-frame"><img src="/images/cards/card_back_red.png" alt="Card Back Red" /></div>
+    <div class="card-frame"><img src="/images/cards/illustration1.png" alt="Illustration 1" /></div>
+    <div class="card-frame"><img src="/images/cards/illustration2.png" alt="Illustration 2" /></div>
+  </div>
+</section>
 
-    <div class="boss-card normal-boss">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#991b1b,#7c2d12)">
-        <img src="/images/enemies/lobster_warlord.png" alt="Trench Warlord" class="boss-portrait" style="border-color:#991b1b">
-      </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#ef4444">Trench Warlord</h3>
-        <div class="boss-title" style="color:#ef4444">Commander of Thermal Vent</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">650 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">38 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">28 DEF</span>
-          <span style="background:rgba(34,211,238,0.12);color:#22d3ee">95 XP &bull; 65 Pearls</span>
-        </div>
-        <div class="boss-abilities"><h4>Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Trench Cleave</span><div class="ab-d">Massive cleaving strike</div></div>
-            <div class="boss-ab"><span class="ab-n">Battle Roar</span><div class="ab-d">+60% damage for 3 turns</div></div>
-            <div class="boss-ab"><span class="ab-n">Depth Crusher</span><div class="ab-d">Devastating pressure smash</div></div>
-            <div class="boss-ab"><span class="ab-n">Blood Current</span><div class="ab-d">Frenzied drain strikes</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="divider"></div>
 
-    <div class="boss-card normal-boss">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#22d3ee,#0c4a6e)">
-        <img src="/images/enemies/frost_wyrm.png" alt="Frost Serpent" class="boss-portrait" style="border-color:#22d3ee">
-      </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#22d3ee">Frost Serpent</h3>
-        <div class="boss-title" style="color:#22d3ee">Terror of the Frozen Depths</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">750 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">42 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">30 DEF</span>
-          <span style="background:rgba(34,211,238,0.12);color:#22d3ee">110 XP &bull; 80 Pearls</span>
-        </div>
-        <div class="boss-abilities"><h4>Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Ice Fang</span><div class="ab-d">Freezing arctic bite</div></div>
-            <div class="boss-ab"><span class="ab-n">Frost Jet</span><div class="ab-d">Devastating ice breath + DOT</div></div>
-            <div class="boss-ab"><span class="ab-n">Glacial Slam</span><div class="ab-d">Ice spike eruption</div></div>
-            <div class="boss-ab"><span class="ab-n">Deep Freeze</span><div class="ab-d">Stuns for 1 turn</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
+<section class="section">
+  <h2 class="section-title fade-in">8 Core Attributes</h2>
+  <p class="section-subtitle fade-in">Every Warlord is defined by 8 attributes that shape their combat role and progression</p>
+  <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;" class="fade-in">
+    <div class="building-tile" style="width: 100px;"><img src="/images/attributes/strength.png" alt="Strength" /><span>Strength</span></div>
+    <div class="building-tile" style="width: 100px;"><img src="/images/attributes/vitality.png" alt="Vitality" /><span>Vitality</span></div>
+    <div class="building-tile" style="width: 100px;"><img src="/images/attributes/endurance.png" alt="Endurance" /><span>Endurance</span></div>
+    <div class="building-tile" style="width: 100px;"><img src="/images/attributes/dexterity.png" alt="Dexterity" /><span>Dexterity</span></div>
+    <div class="building-tile" style="width: 100px;"><img src="/images/attributes/agility.png" alt="Agility" /><span>Agility</span></div>
+    <div class="building-tile" style="width: 100px;"><img src="/images/attributes/intellect.png" alt="Intellect" /><span>Intellect</span></div>
+    <div class="building-tile" style="width: 100px;"><img src="/images/attributes/wisdom.png" alt="Wisdom" /><span>Wisdom</span></div>
+    <div class="building-tile" style="width: 100px;"><img src="/images/attributes/tactics.png" alt="Tactics" /><span>Tactics</span></div>
+  </div>
+</section>
 
-    <div class="boss-card normal-boss">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#581c87,#1e1b4b)">
-        <img src="/images/enemies/shadow_manta.png" alt="Shadow Shark" class="boss-portrait" style="border-color:#581c87">
-      </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#c084fc">Shadow Shark</h3>
-        <div class="boss-title" style="color:#c084fc">Lurker of the Abyss</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">800 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">45 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">25 DEF</span>
-          <span style="background:rgba(34,211,238,0.12);color:#22d3ee">130 XP &bull; 90 Pearls</span>
-        </div>
-        <div class="boss-abilities"><h4>Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Shadow Fin</span><div class="ab-d">Razor shadow strike</div></div>
-            <div class="boss-ab"><span class="ab-n">Dark Current</span><div class="ab-d">Dark energy + DOT</div></div>
-            <div class="boss-ab"><span class="ab-n">Murk Veil</span><div class="ab-d">+35 DEF for 3 turns</div></div>
-            <div class="boss-ab"><span class="ab-n">Life Siphon</span><div class="ab-d">Drains life force</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="divider"></div>
 
-    <div class="boss-card normal-boss">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#312e81,#020617)">
-        <img src="/images/enemies/kraken_lich.png" alt="Kraken Lich" class="boss-portrait" style="border-color:#312e81">
+<section class="feature-banner banner-cnft" id="cnft">
+  <div class="banner-inner">
+    <div class="banner-split">
+      <div class="banner-text">
+        <h2 style="background: linear-gradient(135deg, var(--purple), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">cNFT Breeding</h2>
+        <p>Your Betta Warlords aren't just game characters — they're compressed NFTs on-chain. Breed your 8 unique betta species across 4 classes to create rare genetic combinations. Each cNFT carries its breed traits, class abilities, skill tree progress, and battle history permanently on-chain.</p>
+        <p>The 32 base Warlord combinations are just the beginning. Breeding unlocks hybrid traits, rare color morphs, and legendary genetic mutations that can't be obtained any other way.</p>
+        <ul class="feature-list cnft-list">
+          <li>8 betta breeds x 4 classes = 32 base cNFT types with unique on-chain genetics</li>
+          <li>Breed combinations unlock hybrid traits and rare mutations</li>
+          <li>Battle history, skill trees, and equipment are permanently recorded</li>
+          <li>Trade, sell, or breed your Warlords on the marketplace</li>
+          <li>Legendary morphs only obtainable through multi-generational breeding</li>
+        </ul>
+        <a href="/" class="btn btn-primary">Start Breeding</a>
       </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#818cf8">Kraken Lich</h3>
-        <div class="boss-title" style="color:#818cf8">Master of the Shadow Citadel</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">700 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">40 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">22 DEF</span>
-          <span style="background:rgba(34,211,238,0.12);color:#22d3ee">120 XP &bull; 90 Pearls</span>
-        </div>
-        <div class="boss-abilities"><h4>Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Abyssal Bolt</span><div class="ab-d">Necromantic deep-sea energy</div></div>
-            <div class="boss-ab"><span class="ab-n">Depth Coil</span><div class="ab-d">Tentacle blast + drain</div></div>
-            <div class="boss-ab"><span class="ab-n">Raise Drowned</span><div class="ab-d">+60% damage for 3 turns</div></div>
-            <div class="boss-ab"><span class="ab-n">Ink Nova</span><div class="ab-d">Massive abyssal ink wave</div></div>
-            <div class="boss-ab"><span class="ab-n">Curse of the Deep</span><div class="ab-d">Crushing pressure DOT</div></div>
-            <div class="boss-ab"><span class="ab-n">Coral Armor</span><div class="ab-d">Ancient coral +40 DEF</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="boss-card normal-boss">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#ea580c,#431407)">
-        <img src="/images/enemies/demon_lord.png" alt="Leviathan" class="boss-portrait" style="border-color:#ea580c">
-      </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#f97316">Leviathan</h3>
-        <div class="boss-title" style="color:#f97316">Guardian of the Abyssal Gate</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">900 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">52 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">35 DEF</span>
-          <span style="background:rgba(34,211,238,0.12);color:#22d3ee">160 XP &bull; 120 Pearls</span>
-        </div>
-        <div class="boss-abilities"><h4>Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Magma Jet</span><div class="ab-d">Superheated volcanic water</div></div>
-            <div class="boss-ab"><span class="ab-n">Leviathan Bite</span><div class="ab-d">3x damage crushing jaws</div></div>
-            <div class="boss-ab"><span class="ab-n">Thermal Surge</span><div class="ab-d">Hydrothermal DOT</div></div>
-            <div class="boss-ab"><span class="ab-n">Tidal Slam</span><div class="ab-d">3.5x volcanic fury</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="boss-card normal-boss">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#0c4a6e,#000)">
-        <img src="/images/enemies/abyss_king.png" alt="The Abyss King" class="boss-portrait" style="border-color:#0c4a6e">
-      </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#38bdf8">The Abyss King</h3>
-        <div class="boss-title" style="color:#38bdf8">Final Boss &mdash; The Shatterer of the Crown</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">1200 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">60 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">48 DEF</span>
-          <span style="background:rgba(34,211,238,0.12);color:#22d3ee">300 XP &bull; 200 Pearls</span>
-        </div>
-        <div class="boss-abilities"><h4>Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Trench Slash</span><div class="ab-d">Slash through crushing depths</div></div>
-            <div class="boss-ab"><span class="ab-n">Tidal Annihilation</span><div class="ab-d">3.5x oceanic destruction</div></div>
-            <div class="boss-ab"><span class="ab-n">Rift Tide</span><div class="ab-d">4.5x tears the ocean floor</div></div>
-            <div class="boss-ab"><span class="ab-n">Frozen Current</span><div class="ab-d">Stuns for 2 turns</div></div>
-            <div class="boss-ab"><span class="ab-n">Depth Pulse</span><div class="ab-d">Pressure waves + DOT</div></div>
-            <div class="boss-ab"><span class="ab-n">Abyss Enrage</span><div class="ab-d">2x damage for 3 turns</div></div>
-          </div>
-        </div>
+      <div class="banner-visual">
+        <img src="/images/races/blue_betta.png" alt="Halfmoon" />
+        <img src="/images/races/red_betta.png" alt="Plakat" />
+        <img src="/images/races/purple_betta.png" alt="Doubletail" />
+        <img src="/images/races/gold_betta.png" alt="Crowntail" />
+        <img src="/images/races/green_betta.png" alt="Giant" />
+        <img src="/images/races/orange_betta.png" alt="Dragonscale" />
+        <img src="/images/races/pink_betta.png" alt="Butterfly" />
+        <img src="/images/races/white_betta.png" alt="Cambodian" />
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== GODS ===== -->
-<section id="gods" style="position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:url('/backgrounds/abyss_throne_battle.png') center/cover;opacity:0.06;pointer-events:none"></div>
-  <div style="position:relative;z-index:1">
-  <h2 class="cinzel" style="color:#c084fc">The Three Gods</h2>
-  <div class="divider" style="background:linear-gradient(90deg,transparent,#a855f7,transparent)"></div>
-  <p class="section-sub">Ancient divine beings who test the worthiest champions. Defeat all three to prove yourself worthy of restoring the Coral Crown.</p>
-
-  <div class="boss-grid">
-    <div class="boss-card god">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#0284c7,#0c4a6e)">
-        <img src="/images/enemies/poseidon.png" alt="Poseidon" class="boss-portrait" style="border-color:#0284c7">
+<section class="feature-banner banner-grudge" id="grudge">
+  <div class="banner-inner">
+    <div class="banner-split" style="direction: rtl;">
+      <div class="banner-text" style="direction: ltr;">
+        <h2 style="background: linear-gradient(135deg, var(--red), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Grudge Gameplay</h2>
+        <p>Betta Warlords is built on the Grudge engine — a tactical combat system where every battle has consequences, every defeat creates a grudge, and rivals remember. Your Warlords carry their feuds across battles, growing stronger through vengeance and earning exclusive rewards.</p>
+        <p><strong style="color: var(--red);">Betta Warlords is the ONLY way to access the early stages of Grudge Studios systems.</strong> Playing this game is your gateway into the broader Grudge ecosystem before it opens to the public.</p>
+        <ul class="feature-list grudge-list">
+          <li>Persistent rival system — enemies grow stronger when they defeat you</li>
+          <li>Grudge mechanics fuel revenge bonuses and unique skill unlocks</li>
+          <li>4-row tactical positioning with Guardian passive intercepts</li>
+          <li>Multi-unit party combat with speed-based initiative</li>
+          <li>Exclusive early access to Grudge Studios game engine and tools</li>
+          <li>The first title in the Grudge Studios catalog — be a founding player</li>
+        </ul>
+        <a href="/" class="btn btn-primary" style="background: linear-gradient(135deg, var(--red), var(--orange));">Enter the Arena</a>
       </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#38bdf8">Poseidon, Lord of Tides</h3>
-        <div class="boss-title" style="color:#0284c7">CRUSADE FACTION &mdash; Temple of Tides</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">1800 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">75 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">55 DEF</span>
-          <span style="background:rgba(168,85,247,0.12);color:#c084fc">500 XP &bull; 400 Pearls</span>
-        </div>
-        <p style="color:var(--muted);font-size:0.78rem;line-height:1.5;margin-bottom:10px;font-style:italic">"A grand temple of pearl and gold where Poseidon holds dominion over the ocean's currents. Only true Crusade champions may challenge divine authority."</p>
-        <div class="boss-abilities"><h4>Divine Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Trident Strike</span><div class="ab-d">Divine trident of the seas</div></div>
-            <div class="boss-ab"><span class="ab-n">Storm Surge</span><div class="ab-d">Lightning through ocean depths</div></div>
-            <div class="boss-ab"><span class="ab-n">Nereid Storm</span><div class="ab-d">Storm of divine sea warriors</div></div>
-            <div class="boss-ab"><span class="ab-n">Deluge</span><div class="ab-d">5x &mdash; The great flood</div></div>
-            <div class="boss-ab"><span class="ab-n">Whirlpool Trap</span><div class="ab-d">Swirling vortex stun</div></div>
-            <div class="boss-ab"><span class="ab-n">Ocean Omniscience</span><div class="ab-d">2.2x damage boost</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="boss-card god">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#be123c,#450a0a)">
-        <img src="/images/enemies/charybdis.png" alt="Charybdis" class="boss-portrait" style="border-color:#be123c">
-      </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#fb7185">Charybdis, The Devourer</h3>
-        <div class="boss-title" style="color:#be123c">LEGION FACTION &mdash; The Devourer's Maw</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">2000 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">82 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">45 DEF</span>
-          <span style="background:rgba(168,85,247,0.12);color:#c084fc">500 XP &bull; 400 Pearls</span>
-        </div>
-        <p style="color:var(--muted);font-size:0.78rem;line-height:1.5;margin-bottom:10px;font-style:italic">"A churning whirlpool of blood and shadow where Charybdis feasts on the souls of the fallen. Only those who conquered the Legion's mightiest may survive the descent."</p>
-        <div class="boss-abilities"><h4>Divine Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Maw Rend</span><div class="ab-d">Crushing mandible tears</div></div>
-            <div class="boss-ab"><span class="ab-n">Soul Devour</span><div class="ab-d">Essence consumed + drain</div></div>
-            <div class="boss-ab"><span class="ab-n">Feeding Frenzy</span><div class="ab-d">2.5x damage for 3 turns</div></div>
-            <div class="boss-ab"><span class="ab-n">Cataclysm</span><div class="ab-d">5.5x &mdash; Total annihilation</div></div>
-            <div class="boss-ab"><span class="ab-n">Toxic Tide</span><div class="ab-d">Poisonous current DOT</div></div>
-            <div class="boss-ab"><span class="ab-n">Devouring Feast</span><div class="ab-d">Heals 18% from prey</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="boss-card god">
-      <div class="boss-banner" style="background:linear-gradient(135deg,#7c3aed,#2e1065)">
-        <img src="/images/enemies/leviathan.png" alt="The Leviathan" class="boss-portrait" style="border-color:#7c3aed">
-      </div>
-      <div class="boss-body">
-        <h3 class="cinzel" style="color:#c084fc">The Leviathan, Weaver of Currents</h3>
-        <div class="boss-title" style="color:#7c3aed">FABLED FACTION &mdash; Leviathan Sanctum</div>
-        <div class="boss-stats-row">
-          <span style="background:rgba(34,197,94,0.12);color:#22c55e">1600 HP</span>
-          <span style="background:rgba(239,68,68,0.12);color:#ef4444">70 DMG</span>
-          <span style="background:rgba(251,191,36,0.12);color:#fbbf24">60 DEF</span>
-          <span style="background:rgba(168,85,247,0.12);color:#c084fc">500 XP &bull; 400 Pearls</span>
-        </div>
-        <p style="color:var(--muted);font-size:0.78rem;line-height:1.5;margin-bottom:10px;font-style:italic">"The infinite abyss where The Leviathan weaves the very fabric of the ocean's currents. Only the Fabled dare challenge the one who shapes reality itself."</p>
-        <div class="boss-abilities"><h4>Divine Abilities</h4>
-          <div class="boss-ability-grid">
-            <div class="boss-ab"><span class="ab-n">Current Blast</span><div class="ab-d">Pure ocean arcane energy</div></div>
-            <div class="boss-ab"><span class="ab-n">Current Weave</span><div class="ab-d">Rewrites the tides</div></div>
-            <div class="boss-ab"><span class="ab-n">Biolume Rain</span><div class="ab-d">4.8x bioluminescent rain</div></div>
-            <div class="boss-ab"><span class="ab-n">Genesis Tide</span><div class="ab-d">5.5x &mdash; Remakes the ocean</div></div>
-            <div class="boss-ab"><span class="ab-n">Pressure Crush</span><div class="ab-d">Abyssal mind pressure + DOT</div></div>
-            <div class="boss-ab"><span class="ab-n">Current Warp</span><div class="ab-d">Warps currents to stun</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
-</section>
-
-<!-- ===== ZONES ===== -->
-<section id="zones">
-  <h2 class="cinzel">Ocean Zones</h2>
-  <div class="divider"></div>
-  <p class="section-sub">32 explorable underwater zones spanning sunlit shallows to the crushing depths of the hadal trenches. Each zone hides enemies, resources, and fragments of the shattered Coral Crown.</p>
-
-  <div class="zone-grid">
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/coral_shallows.png') center/cover"></div><div class="zone-body"><h4>Coral Shallows</h4><div class="zone-level">Level 1-3 &bull; Starting Zone</div><p>Sunlit waters dance over vibrant coral beds where the first fragment of the shattered Coral Crown was found.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/kelp_forest.png') center/cover"></div><div class="zone-body"><h4>Kelp Forest</h4><div class="zone-level">Level 3-5</div><p>Towering kelp canopies sway in the currents, casting shifting shadows where predators lie in wait.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/biolume_caves.png') center/cover"></div><div class="zone-body"><h4>Biolume Caves</h4><div class="zone-level">Level 3-5</div><p>Twisting caverns aglow with bioluminescent life, where hermit mimics disguise among the glowing walls.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/anemone_garden.png') center/cover"></div><div class="zone-body"><h4>Anemone Garden</h4><div class="zone-level">Level 4-6</div><p>Giant sea anemones pulse with ancient magic, their tendrils weaving spells older than the Coral Crown.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/sargasso_maze.png') center/cover"></div><div class="zone-body"><h4>Sargasso Maze</h4><div class="zone-level">Level 5-7</div><p>A suffocating labyrinth of sargassum where the drowned drift among rotting fronds.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/shadow_citadel.png') center/cover"></div><div class="zone-body"><h4>Sunken Citadel</h4><div class="zone-level">Level 6-9</div><p>The drowned fortress of an ancient betta kingdom, guarding secrets of the shattered Crown.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/tide_stream.png') center/cover"></div><div class="zone-body"><h4>Tide Stream</h4><div class="zone-level">Level 6-8</div><p>A powerful underwater current that sweeps through narrow reef passages, carrying debris and unwary travelers.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/crystal_grotto.png') center/cover"></div><div class="zone-body"><h4>Crystal Grotto</h4><div class="zone-level">Level 7-9</div><p>Glittering caverns of living crystal hum with the resonance of the Coral Crown.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/sunken_wreck.png') center/cover"></div><div class="zone-body"><h4>Shipwreck Hollow</h4><div class="zone-level">Level 7-9</div><p>A shattered hull serving as fortress for the Reef Shaman.</p><span class="zone-boss-tag">BOSS: Reef Shaman</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/iron_peaks.png') center/cover"></div><div class="zone-body"><h4>Coral Fortress</h4><div class="zone-level">Level 8-11</div><p>A massive fortification of hardened coral &mdash; the Abyss King's first stronghold.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/thermal_vent.png') center/cover"></div><div class="zone-body"><h4>Thermal Vent</h4><div class="zone-level">Level 9-12</div><p>Superheated water erupts in blinding geysers of mineral-rich fury.</p><span class="zone-boss-tag">BOSS: Trench Warlord</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/frozen_depths.png') center/cover"></div><div class="zone-body"><h4>Frozen Depths</h4><div class="zone-level">Level 10-13</div><p>Arctic currents have frozen these waters into a silent kingdom of ice.</p><span class="zone-boss-tag">BOSS: Frost Serpent</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/sandy_wastes.png') center/cover"></div><div class="zone-body"><h4>Sandy Wastes</h4><div class="zone-level">Level 10-13</div><p>Vast stretches of barren seafloor where sandstorms rage and buried ruins hide ancient dangers.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/dragon_peaks.png') center/cover"></div><div class="zone-body"><h4>Leviathan's Wake</h4><div class="zone-level">Level 11-14</div><p>Volcanic peaks scarred by the passage of ancient leviathans.</p><span class="zone-boss-tag">BOSS: Storm Elemental</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/windswept_ridge.png') center/cover"></div><div class="zone-body"><h4>Riptide Shelf</h4><div class="zone-level">Level 11-14</div><p>A treacherous underwater cliff face battered by powerful riptides that tear at unwary swimmers.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/blood_canyon.png') center/cover"></div><div class="zone-body"><h4>Volcanic Hearth</h4><div class="zone-level">Level 12-14</div><p>Rivers of magma snake beneath the ocean floor, turning water into a boiling cauldron.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/mushroom_forest.png') center/cover"></div><div class="zone-body"><h4>Mushroom Forest</h4><div class="zone-level">Level 12-15</div><p>Towering fungal growths twist upward, their caps glowing with corrupted bioluminescence.</p><span class="zone-boss-tag">BOSS: Corrupted Reef Keeper</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/obsidian_wastes.png') center/cover"></div><div class="zone-body"><h4>Obsidian Flats</h4><div class="zone-level">Level 13-15</div><p>A vast plane of volcanic glass stretching into darkness, its razor edges slicing through the current.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/ruins_of_ashenmoor.png') center/cover"></div><div class="zone-body"><h4>Ruins of the Deep</h4><div class="zone-level">Level 13-16</div><p>The crumbling remains of an ancient underwater civilization, haunted by spectral guardians.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/blight_hollow.png') center/cover"></div><div class="zone-body"><h4>Blight Hollow</h4><div class="zone-level">Level 14-16</div><p>A corrupted depression in the seafloor where toxic sludge pools and mutated creatures thrive.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/shadow_citadel.png') center/cover"></div><div class="zone-body"><h4>Shadow Citadel</h4><div class="zone-level">Level 14-17</div><p>A fortress of living shadow where the Kraken Lich commands legions of the drowned dead.</p><span class="zone-boss-tag">BOSS: Kraken Lich</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/stormspire_peak.png') center/cover"></div><div class="zone-body"><h4>Maelstrom Peak</h4><div class="zone-level">Level 14-17</div><p>A towering underwater spire surrounded by perpetual whirlpools and crackling energy storms.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/demon_gate.png') center/cover"></div><div class="zone-body"><h4>Abyssal Gate</h4><div class="zone-level">Level 15-18</div><p>A massive cavern where the barrier between the ocean and the Abyss grows thin.</p><span class="zone-boss-tag">BOSS: Leviathan</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/abyssal_depths.png') center/cover"></div><div class="zone-body"><h4>Hadal Trench</h4><div class="zone-level">Level 16-18</div><p>Lightless depths where the crushing pressure warps reality itself.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/infernal_forge.png') center/cover"></div><div class="zone-body"><h4>Magma Forge</h4><div class="zone-level">Level 16-18</div><p>An ancient volcanic forge where the ocean's heat is harnessed to create weapons of terrible power.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/dreadmaw_canyon.png') center/cover"></div><div class="zone-body"><h4>Dreadmaw Rift</h4><div class="zone-level">Level 17-19</div><p>A jagged tear in the ocean floor where the Abyss King's corruption seeps into the world.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/void_threshold.png') center/cover"></div><div class="zone-body"><h4>Void Threshold</h4><div class="zone-level">Level 17-19</div><p>The boundary between the living ocean and the void beyond, guarded by a sentinel of pure darkness.</p><span class="zone-boss-tag">BOSS: Void Sentinel</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/corrupted_spire.png') center/cover"></div><div class="zone-body"><h4>Corrupted Spire</h4><div class="zone-level">Level 18-20</div><p>A once-sacred coral tower now twisted by abyssal corruption, pulsing with dark energy.</p></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:url('/map_nodes/void_throne.png') center/cover"></div><div class="zone-body"><h4>The Abyss Throne</h4><div class="zone-level">Level 18-20</div><p>In the crushing darkness, the Abyss King sits upon a throne of devoured light.</p><span class="zone-boss-tag">FINAL BOSS: The Abyss King</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#0c4a6e,#0284c7,#0c4a6e)"></div><div class="zone-body"><h4>Temple of Tides</h4><div class="zone-level">Level 20 &bull; God Fight</div><p>Poseidon's grand temple where only Crusade champions may challenge divine authority.</p><span class="zone-boss-tag zone-god-tag">GOD: Poseidon</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#450a0a,#be123c,#450a0a)"></div><div class="zone-body"><h4>The Devourer's Maw</h4><div class="zone-level">Level 20 &bull; God Fight</div><p>A churning whirlpool of blood and shadow where Charybdis feasts on souls.</p><span class="zone-boss-tag zone-god-tag">GOD: Charybdis</span></div></div>
-
-    <div class="zone-card"><div class="zone-bg" style="background:linear-gradient(135deg,#2e1065,#7c3aed,#2e1065)"></div><div class="zone-body"><h4>Leviathan Sanctum</h4><div class="zone-level">Level 20 &bull; God Fight</div><p>The infinite abyss where The Leviathan weaves the fabric of reality. <span style="color:var(--muted);font-size:0.7rem;font-style:italic">(Also known as The Weaver's Abyss)</span></p><span class="zone-boss-tag zone-god-tag">GOD: The Leviathan</span></div></div>
-  </div>
-</section>
-
-<!-- ===== CITIES ===== -->
-<section id="cities">
-  <h2 class="cinzel">Cities &amp; Settlements</h2>
-  <div class="divider"></div>
-  <p class="section-sub">Five cities offer safe harbor in the hostile ocean. Trade, rest, upgrade equipment, and prepare for the battles ahead.</p>
-
-  <div class="city-grid">
-    <div class="city-card" style="border-color:rgba(34,211,238,0.3)">
-      <div class="city-banner" style="background:url('/backgrounds/coral_reef_city.png') center/cover"></div>
-      <div class="city-body">
-        <h3 class="cinzel" style="color:#22d3ee">Reef Camp</h3>
-        <p class="city-desc">Your basecamp at the edge of the Coral Shallows. A merchant offers supplies and buys your ocean treasures.</p>
-        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade</span><span>Rest</span><span>Upgrade</span></div>
-        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 5 Pearls &bull; Trade: Standard</div>
-      </div>
-    </div>
-    <div class="city-card" style="border-color:rgba(251,191,36,0.3)">
-      <div class="city-banner" style="background:url('/backgrounds/sunken_temple.png') center/cover"></div>
-      <div class="city-body">
-        <h3 class="cinzel" style="color:#fbbf24">Shell Fortress</h3>
-        <p class="city-desc">A fortified stronghold built into a giant conch shell. The finest pearl smiths work their craft here.</p>
-        <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Reef Shaman (Lv.6+)</div>
-        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (-10%)</span><span>Rest</span><span>Upgrade</span></div>
-        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 10 Pearls &bull; Trade: 10% Discount</div>
-      </div>
-    </div>
-    <div class="city-card" style="border-color:rgba(167,139,250,0.3)">
-      <div class="city-banner" style="background:url('/backgrounds/shadow_citadel.png') center/cover"></div>
-      <div class="city-body">
-        <h3 class="cinzel" style="color:#a78bfa">Ink Haven</h3>
-        <p class="city-desc">A lawless deep-sea port where smuggler fish and mercenary eels trade in secrets and shells.</p>
-        <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Shadow Shark (Lv.11+)</div>
-        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (+10%)</span><span>Rest</span><span>Upgrade</span></div>
-        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 20 Pearls &bull; Trade: 10% Markup (black market)</div>
-      </div>
-    </div>
-    <div class="city-card" style="border-color:rgba(249,115,22,0.3)">
-      <div class="city-banner" style="background:url('/backgrounds/volcanic_vent.png') center/cover"></div>
-      <div class="city-body">
-        <h3 class="cinzel" style="color:#f97316">Vent City</h3>
-        <p class="city-desc">A deep-sea city built around volcanic vents. The heat of the thermal forges never dies.</p>
-        <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Trench Warlord (Lv.8+)</div>
-        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (-15%)</span><span>Rest</span><span>Upgrade</span></div>
-        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 35 Pearls &bull; Trade: 15% Discount (best prices)</div>
-      </div>
-    </div>
-    <div class="city-card" style="border-color:rgba(167,139,250,0.3)">
-      <div class="city-banner" style="background:url('/backgrounds/crystal_caves.png') center/cover"></div>
-      <div class="city-body">
-        <h3 class="cinzel" style="color:#a78bfa">Crystal Spire</h3>
-        <p class="city-desc">An ancient underwater citadel suspended by arcane currents. The most powerful ocean mages convene here.</p>
-        <div style="font-size:0.68rem;color:#f97316;margin-bottom:6px">Unlocked by defeating the Kraken Lich (Lv.13+)</div>
-        <div class="city-services"><span>Arena</span><span>Missions</span><span>Trade (+20%)</span><span>Rest</span><span>Upgrade</span></div>
-        <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Inn: 50 Pearls &bull; Trade: 20% Markup (rare goods)</div>
+      <div class="banner-visual" style="direction: ltr;">
+        <img src="/images/enemies/swordfish_knight.png" alt="Swordfish Knight" />
+        <img src="/images/enemies/lobster_warlord.png" alt="Lobster Warlord" />
+        <img src="/images/enemies/abyss_king.png" alt="Abyss King" />
+        <img src="/images/enemies/charybdis.png" alt="Charybdis" />
+        <img src="/images/enemies/kraken_lich.png" alt="Kraken Lich" />
+        <img src="/images/enemies/void_sentinel.png" alt="Void Sentinel" />
+        <img src="/images/enemies/demon_lord.png" alt="Demon Lord" />
+        <img src="/images/enemies/leviathan.png" alt="Leviathan" />
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== BUILDINGS ===== -->
-<section id="buildings">
-  <h2 class="cinzel">Buildings &amp; Structures</h2>
-  <div class="divider"></div>
-  <p class="section-sub">Discover various structures across the ocean zones &mdash; from resource nodes and shops to rest points and dangerous lairs.</p>
-
-  <div class="building-grid">
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/weapons_shop.png') center/cover"></div>
-      <div class="building-body"><h4>Weapons Shop</h4><p>Purchase and upgrade weapons for your school of warriors.</p></div>
+<section class="feature-banner banner-gbux" id="gbux">
+  <div class="banner-inner">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <img src="/images/icons/gbux.png" alt="GBuX" style="width: 80px; margin-bottom: 16px; filter: drop-shadow(0 0 20px rgba(245,158,11,0.5));" />
+      <h2 style="background: linear-gradient(135deg, var(--gold), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: clamp(1.6rem, 4vw, 2.8rem);">GBuX & Grudge Studios Free AI</h2>
+      <p style="color: var(--text-dim); max-width: 700px; margin: 16px auto 0; font-size: clamp(0.9rem, 1.5vw, 1.05rem);">Betta Warlords is your exclusive gateway to the GBuX reward ecosystem and Grudge Studios' Free AI platform. Play, earn, and unlock access to tools and games that aren't available anywhere else.</p>
     </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/armor_shop.png') center/cover"></div>
-      <div class="building-body"><h4>Armor Shop</h4><p>Browse and buy protective shell armor and enchanted gear.</p></div>
+    <div class="ecosystem-grid">
+      <div class="eco-card fade-in">
+        <div class="eco-icon" style="background: rgba(245,158,11,0.15);">&#128176;</div>
+        <h4>Earn GBuX</h4>
+        <p>Earn GBuX tokens through battles, quests, cNFT breeding, and exploration. GBuX is the universal currency across all Grudge Studios titles and AI tools.</p>
+      </div>
+      <div class="eco-card fade-in">
+        <div class="eco-icon" style="background: rgba(168,85,247,0.15);">&#129302;</div>
+        <h4>Free AI Access</h4>
+        <p>Grudge Studios provides free AI systems powered by advanced language models. AI-driven hero dialogue, battle narration, lore generation, and NPC personalities — all free through gameplay.</p>
+      </div>
+      <div class="eco-card fade-in">
+        <div class="eco-icon" style="background: rgba(34,211,238,0.15);">&#127918;</div>
+        <h4>Game Catalog Access</h4>
+        <p>GBuX earned in Betta Warlords unlocks early access to upcoming Grudge Studios titles. Be the first to play new games before public release.</p>
+      </div>
+      <div class="eco-card fade-in">
+        <div class="eco-icon" style="background: rgba(239,68,68,0.15);">&#128273;</div>
+        <h4>Exclusive Early Access</h4>
+        <p>Betta Warlords players are the ONLY players who can access the early stages of GBuX. This is the founding game — your entry point to everything Grudge Studios builds.</p>
+      </div>
+      <div class="eco-card fade-in">
+        <div class="eco-icon" style="background: rgba(34,197,94,0.15);">&#127793;</div>
+        <h4>cNFT Marketplace</h4>
+        <p>Trade bred Warlords, rare genetic mutations, and legendary morphs on the cNFT marketplace. Your in-game achievements become real digital assets.</p>
+      </div>
+      <div class="eco-card fade-in">
+        <div class="eco-icon" style="background: rgba(217,119,6,0.15);">&#128640;</div>
+        <h4>Founding Player Status</h4>
+        <p>Early players receive permanent Founding Player status across all Grudge Studios platforms — bonus GBuX rates, exclusive cNFT drops, and priority access forever.</p>
+      </div>
     </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/potions_shop.png') center/cover"></div>
-      <div class="building-body"><h4>Potions Shop</h4><p>Stock up on healing elixirs, buffs, and alchemical brews.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/healing_shrine.png') center/cover"></div>
-      <div class="building-body"><h4>Healing Shrine</h4><p>A sacred reef shrine that fully restores health and mana.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/campfire.png') center/cover"></div>
-      <div class="building-body"><h4>Campfire</h4><p>A warm rest point where your school can recover between battles.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/sleeping_bag.png') center/cover"></div>
-      <div class="building-body"><h4>Rest Camp</h4><p>A temporary camp for quick recovery in hostile waters.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/dungeon_gate.png') center/cover"></div>
-      <div class="building-body"><h4>Dungeon Gate</h4><p>An ominous entrance to underwater dungeons filled with danger and loot.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/boss_lair.png') center/cover"></div>
-      <div class="building-body"><h4>Boss Lair</h4><p>The den of a powerful boss creature. Enter at your own risk.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/enemy_patrol.png') center/cover"></div>
-      <div class="building-body"><h4>Enemy Patrol</h4><p>A roaming group of hostile sea creatures guarding their territory.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/treasure_chest.png') center/cover"></div>
-      <div class="building-body"><h4>Treasure Chest</h4><p>A sunken chest containing pearls, gear, and rare items.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/coral_grove.png') center/cover"></div>
-      <div class="building-body"><h4>Coral Grove</h4><p>A resource node &mdash; harvest coral for crafting weapons and armor.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/algae_garden.png') center/cover"></div>
-      <div class="building-body"><h4>Algae Garden</h4><p>A resource node &mdash; gather algae for potions and enchantments.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/pearl_beds.png') center/cover"></div>
-      <div class="building-body"><h4>Pearl Beds</h4><p>A resource node &mdash; collect pearls, the currency of Abyssia.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/shell_deposit.png') center/cover"></div>
-      <div class="building-body"><h4>Shell Deposit</h4><p>A resource node &mdash; mine shells for forging heavy armor and shields.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/crystal_cave.png') center/cover"></div>
-      <div class="building-body"><h4>Crystal Cave</h4><p>A resource node &mdash; extract rare crystals for high-tier enchantments.</p></div>
-    </div>
-    <div class="building-card">
-      <div class="building-img" style="background:url('/images/buildings/crystal_grotto.png') center/cover"></div>
-      <div class="building-body"><h4>Crystal Grotto</h4><p>A sparkling underwater grotto rich with crystalline formations and arcane energy.</p></div>
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="/" class="btn btn-gbux" style="font-size: 1.1rem; padding: 16px 40px;">Play Now — Start Earning GBuX</a>
     </div>
   </div>
 </section>
 
-<!-- ===== RESOURCES ===== -->
-<section id="resources">
-  <h2 class="cinzel">Resources &amp; Economy</h2>
-  <div class="divider"></div>
-  <p class="section-sub">Gather resources from the ocean to forge equipment, brew potions, and strengthen your school of warriors.</p>
+<div class="divider"></div>
 
-  <div class="card-grid" style="max-width:800px;margin:0 auto">
-    <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px">
-      <img src="/sprites/ui/icons/icon_pearl.png" alt="Pearls" style="width:36px;height:36px">
-      <div><h3 class="cinzel" style="color:var(--gold);font-size:0.95rem">Pearls</h3><p>The primary currency of Abyssia. Earned from battles, trading, and exploration. Used to buy equipment, rest at inns, and upgrade gear.</p></div>
+<section class="section">
+  <h2 class="section-title fade-in">The Silence of the Plankton</h2>
+  <p class="section-subtitle fade-in">Fragments of truth scattered through the deep... Can you piece them together?</p>
+  <div style="max-width: 700px; margin: 0 auto;" class="fade-in">
+    <div style="background: rgba(14,22,48,0.6); border: 1px solid rgba(34,211,238,0.15); border-radius: 12px; padding: 24px;">
+      <div style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-style: italic; color: var(--cyan); font-size: 0.9rem;">
+        "The Coral Crown's inscriptions speak of a 'Fourth Vessel' that was never meant to awaken."
+      </div>
+      <div style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-style: italic; color: var(--purple); font-size: 0.9rem;">
+        "Charybdis's mad ravings mention 'the light that ate itself.'"
+      </div>
+      <div style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-style: italic; color: var(--cyan); font-size: 0.9rem;">
+        "In the deepest part of the Hadal Trench, Plankton still glow — but they spell out a single word in an ancient script."
+      </div>
+      <div style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-style: italic; color: var(--red); font-size: 0.9rem;">
+        "The Abyss King isn't conquering the ocean — he's filling a vacuum the Plankton left behind."
+      </div>
+      <div style="padding: 12px 0; font-style: italic; color: var(--teal); font-size: 0.9rem;">
+        "Each Coral Crown fragment restored causes a brief, blinding flash of Plankton light — as if they're watching."
+      </div>
     </div>
-    <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px">
-      <img src="/sprites/ui/icons/icon_coral.png" alt="Coral" style="width:36px;height:36px">
-      <div><h3 class="cinzel" style="color:#f97316;font-size:0.95rem">Coral</h3><p>Harvested from coral groves. Used in crafting weapons and armor. The building material of the deep.</p></div>
-    </div>
-    <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px">
-      <img src="/sprites/ui/icons/icon_shell.png" alt="Shells" style="width:36px;height:36px">
-      <div><h3 class="cinzel" style="color:#94a3b8;font-size:0.95rem">Shells</h3><p>Mined from shell deposits deep in the ocean floor. Essential for forging heavy armor and shields. The ore of the deep.</p></div>
-    </div>
-    <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px">
-      <img src="/sprites/ui/icons/icon_algae.png" alt="Algae" style="width:36px;height:36px">
-      <div><h3 class="cinzel" style="color:#22c55e;font-size:0.95rem">Algae</h3><p>Gathered from kelp forests and anemone gardens. Used in brewing potions and creating magical enchantments.</p></div>
-    </div>
-    <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px">
-      <img src="/sprites/ui/icons/icon_crystal.png" alt="Crystals" style="width:36px;height:36px">
-      <div><h3 class="cinzel" style="color:#a855f7;font-size:0.95rem">Crystals</h3><p>Rare minerals found in crystal grottos and volcanic vents. Required for high-tier enchantments and legendary equipment.</p></div>
-    </div>
+  </div>
+</section>
+
+<section class="section" style="text-align: center; padding-bottom: 40px;">
+  <h2 class="section-title fade-in" style="margin-bottom: 16px;">The Ocean Is Calling</h2>
+  <p class="section-subtitle fade-in" style="margin-bottom: 32px;">Gather your Warlords. Restore the Coral Crown. Discover the Silence. Earn GBuX. Be a founding player of Grudge Studios.</p>
+  <div class="cta-row fade-in">
+    <a href="/" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 40px;">Dive In — Play Betta Warlords</a>
+    <a href="#cnft" class="btn btn-secondary">Learn About cNFT Breeding</a>
+    <a href="#gbux" class="btn btn-gbux">Earn GBuX Now</a>
   </div>
 </section>
 
 <footer class="footer">
-  <img src="/images/logo.png" alt="Betta Warlords">
-  <p class="cinzel" style="color:var(--teal);margin-bottom:4px">BETTA WARLORDS</p>
-  <p>The Sunken Kingdom of Abyssia &mdash; 8 Breeds &bull; 4 Classes &bull; 32 Warlords &bull; 1 Crown</p>
-  <p style="margin-top:12px;font-size:0.7rem">A Beta X Gruda Production</p>
+  <img src="/images/logo.png" alt="Betta Warlords" class="footer-logo" />
+  <p style="font-family: 'Cinzel', serif; font-size: 1rem; color: var(--text); margin-bottom: 4px;">Grudge Studios</p>
+  <p>Betta Warlords — The Sunken Kingdom of Abyssia</p>
+  <p style="font-size: 0.75rem;">Powered by Free AI &bull; cNFT Breeding &bull; GBuX Ecosystem</p>
+  <div class="footer-links">
+    <a href="/">Play Now</a>
+    <a href="#lore">Lore</a>
+    <a href="#breeds">Breeds</a>
+    <a href="#cnft">cNFT</a>
+    <a href="#grudge">Grudge</a>
+    <a href="#gbux">GBuX</a>
+  </div>
+  <p style="margin-top: 24px; font-size: 0.7rem; color: rgba(148,163,184,0.5);">&copy; 2026 Grudge Studios. All rights reserved.</p>
 </footer>
 
 <script>
-document.querySelectorAll('nav.toc a').forEach(a=>{
-  a.addEventListener('click',e=>{
-    e.preventDefault();
-    const t=document.querySelector(a.getAttribute('href'));
-    if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
-  });
-});
+  var particlesEl = document.getElementById('particles');
+  for (var i = 0; i < 30; i++) {
+    var p = document.createElement('div');
+    p.className = 'particle';
+    var size = 2 + Math.random() * 4;
+    var colors = ['rgba(34,211,238,0.3)', 'rgba(168,85,247,0.25)', 'rgba(6,182,212,0.3)'];
+    p.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' + (Math.random() * 100) + '%;animation-duration:' + (8 + Math.random() * 15) + 's;animation-delay:' + (Math.random() * 10) + 's;background:' + colors[Math.floor(Math.random() * 3)] + ';';
+    particlesEl.appendChild(p);
+  }
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(function(el) { observer.observe(el); });
 </script>
+
 </body>
 </html>

@@ -59,3 +59,4 @@ expertMode = true
 deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
 run = ["node", "server.prod.js"]
+publicDir = "dist/public"
