@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/serve-static": "^2.2.0",
     "@wwawing/all": "^3.12.24",
     "discord.js": "^14.25.1",
     "express": "^5.2.1",
@@ -22,6 +23,7 @@
     "rpg-encoder": "^0.6.0",
     "rpg-ts": "^1.7.4",
     "server": "^1.0.42",
+    "static-extend": "^0.1.2",
     "ts": "^0.2.2",
     "zustand": "^5.0.11"
   },
