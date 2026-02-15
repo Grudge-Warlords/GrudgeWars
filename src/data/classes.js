@@ -1,6 +1,6 @@
 export const classDefinitions = {
   warrior: {
-    name: 'Warrior',
+    name: 'Bruiser',
     icon: 'crossed_swords',
     color: '#ef4444',
     description: 'A fearless frontline fighter specializing in raw power and deep-sea defense.',
@@ -17,7 +17,7 @@ export const classDefinitions = {
     signatureAbility: { id: 'invincible', name: 'Abyssal Guard', icon: 'shield', description: 'Become invulnerable for 2 turns, encased in deep-sea pressure armor', type: 'buff', damage: 0, manaCost: 0, staminaCost: 35, cooldown: 8, target: 'self', isInvincible: true, effect: { stat: 'defense', flat: 999, duration: 2 } }
   },
   mage: {
-    name: 'Mage Priest',
+    name: 'Mystic',
     icon: 'crystal',
     color: '#8b5cf6',
     description: 'Master of tidal magic and coral healing arts.',
@@ -32,7 +32,7 @@ export const classDefinitions = {
     signatureAbility: { id: 'mana_shield', name: 'Bubble Shield', icon: 'shield', description: 'Encase yourself in a pressurized bubble barrier', type: 'buff', damage: 0, manaCost: 50, staminaCost: 0, cooldown: 5, target: 'self', effect: { stat: 'defense', flat: 25, duration: 3 } }
   },
   worge: {
-    name: 'Worge',
+    name: 'Vesselist',
     icon: 'wolf',
     color: '#d97706',
     description: 'A shapeshifter who wields current and storm magic, then transforms into a devastating ocean predator.',
@@ -52,7 +52,7 @@ export const classDefinitions = {
     }
   },
   ranger: {
-    name: 'Ranger',
+    name: 'Scraper',
     icon: 'bow',
     color: '#22c55e',
     description: 'A deadly marksman with precise long-range attacks from the kelp canopy.',

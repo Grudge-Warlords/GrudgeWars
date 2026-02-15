@@ -129,10 +129,10 @@ select{background:rgba(0,0,0,0.3);border:1px solid rgba(110,231,183,0.2);color:v
 <div class="center mt" style="padding-top:12px;border-top:1px solid rgba(255,255,255,0.05)">
 <p style="font-size:0.7rem;color:var(--dim);margin-bottom:8px">Or generate a quick demo team:</p>
 <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-<button class="btn" onclick="quickDemo('warrior')">Warrior Team</button>
-<button class="btn" onclick="quickDemo('mage')">Mage Team</button>
-<button class="btn" onclick="quickDemo('ranger')">Ranger Team</button>
-<button class="btn" onclick="quickDemo('worge')">Worge Team</button>
+<button class="btn" onclick="quickDemo('warrior')">Bruiser Team</button>
+<button class="btn" onclick="quickDemo('mage')">Mystic Team</button>
+<button class="btn" onclick="quickDemo('ranger')">Scraper Team</button>
+<button class="btn" onclick="quickDemo('worge')">Vesselist Team</button>
 </div>
 </div>
 </div>
@@ -181,7 +181,7 @@ select{background:rgba(0,0,0,0.3);border:1px solid rgba(110,231,183,0.2);color:v
 
 <script>
 const CLASSES = {
-  warrior: { name:'Warrior', icon:'⚔️', color:'#ef4444', startAttrs:{Strength:5,Vitality:3,Endurance:2,Dexterity:1,Agility:1,Intellect:0,Wisdom:0,Tactics:0},
+  warrior: { name:'Bruiser', icon:'⚔️', color:'#ef4444', startAttrs:{Strength:5,Vitality:3,Endurance:2,Dexterity:1,Agility:1,Intellect:0,Wisdom:0,Tactics:0},
     abilities:[
       {id:'slash',name:'Slash',icon:'⚔️',type:'physical',damage:0.9,manaCost:0,staminaCost:0,cd:0,target:'enemy',desc:'Basic attack, restores resources'},
       {id:'power_strike',name:'Power Strike',icon:'💥',type:'physical',damage:2.0,manaCost:0,staminaCost:25,cd:2,target:'enemy',desc:'Devastating 2x damage blow'},
@@ -189,21 +189,21 @@ const CLASSES = {
       {id:'shield_bash',name:'Shield Bash',icon:'🛡️',type:'physical',damage:0.8,manaCost:0,staminaCost:20,cd:4,target:'enemy',desc:'Stun 1 turn',effect:{type:'stun',dur:1}},
       {id:'cleave',name:'Cleave',icon:'🩸',type:'physical',damage:1.5,manaCost:0,staminaCost:22,cd:3,target:'enemy',desc:'Bleed for 3 turns',effect:{type:'dot',dmg:0.12,dur:3}},
     ]},
-  mage: { name:'Mage Priest', icon:'🔮', color:'#8b5cf6', startAttrs:{Strength:0,Vitality:1,Endurance:1,Dexterity:0,Agility:0,Intellect:5,Wisdom:4,Tactics:1},
+  mage: { name:'Mystic', icon:'🔮', color:'#8b5cf6', startAttrs:{Strength:0,Vitality:1,Endurance:1,Dexterity:0,Agility:0,Intellect:5,Wisdom:4,Tactics:1},
     abilities:[
       {id:'arcane_bolt',name:'Arcane Bolt',icon:'✨',type:'magical',damage:1.0,manaCost:0,staminaCost:0,cd:0,target:'enemy',desc:'Basic spell, restores mana'},
       {id:'fireball',name:'Fireball',icon:'🔥',type:'magical',damage:2.5,manaCost:35,staminaCost:0,cd:3,target:'enemy',desc:'Massive fire damage + burn'},
       {id:'heal',name:'Divine Heal',icon:'💚',type:'heal',damage:0,manaCost:40,staminaCost:0,cd:4,target:'ally',desc:'Restore 30% max HP',healPct:0.3},
       {id:'ice_storm',name:'Ice Storm',icon:'❄️',type:'magical',damage:1.8,manaCost:30,staminaCost:0,cd:3,target:'enemy',desc:'Freeze, -40% enemy damage 2 turns'},
     ]},
-  ranger: { name:'Ranger', icon:'🏹', color:'#22c55e', startAttrs:{Strength:1,Vitality:1,Endurance:1,Dexterity:5,Agility:3,Intellect:0,Wisdom:0,Tactics:1},
+  ranger: { name:'Scraper', icon:'🏹', color:'#22c55e', startAttrs:{Strength:1,Vitality:1,Endurance:1,Dexterity:5,Agility:3,Intellect:0,Wisdom:0,Tactics:1},
     abilities:[
       {id:'quick_shot',name:'Quick Shot',icon:'🏹',type:'physical',damage:0.85,manaCost:0,staminaCost:0,cd:0,target:'enemy',desc:'Basic shot, restores resources'},
       {id:'aimed_shot',name:'Aimed Shot',icon:'🎯',type:'physical',damage:2.2,manaCost:0,staminaCost:28,cd:2,target:'enemy',desc:'Precise high-damage shot'},
       {id:'multi_shot',name:'Multi-Shot',icon:'🌟',type:'physical',damage:1.2,manaCost:0,staminaCost:30,cd:3,target:'all_enemies',desc:'Hit all enemies'},
       {id:'evade',name:'Evade',icon:'💨',type:'buff',damage:0,manaCost:0,staminaCost:15,cd:4,target:'self',desc:'+50% dodge for 2 turns',effect:{stat:'dodge',add:50,dur:2}},
     ]},
-  worge: { name:'Worge', icon:'🐺', color:'#d97706', startAttrs:{Strength:2,Vitality:2,Endurance:1,Dexterity:2,Agility:2,Intellect:2,Wisdom:1,Tactics:0},
+  worge: { name:'Vesselist', icon:'🐺', color:'#d97706', startAttrs:{Strength:2,Vitality:2,Endurance:1,Dexterity:2,Agility:2,Intellect:2,Wisdom:1,Tactics:0},
     abilities:[
       {id:'claw_strike',name:'Claw Strike',icon:'🐾',type:'physical',damage:0.95,manaCost:0,staminaCost:0,cd:0,target:'enemy',desc:'Basic claw attack'},
       {id:'lightning_bolt',name:'Lightning Bolt',icon:'⚡',type:'magical',damage:2.0,manaCost:25,staminaCost:0,cd:2,target:'enemy',desc:'Electric shock damage'},

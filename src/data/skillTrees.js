@@ -1,6 +1,6 @@
 export const skillTrees = {
   warrior: {
-    className: 'Warrior',
+    className: 'Bruiser',
     color: '#ef4444',
     tiers: [
       {
@@ -67,7 +67,7 @@ export const skillTrees = {
     ]
   },
   mage: {
-    className: 'Mage Priest',
+    className: 'Mystic',
     color: '#8b5cf6',
     tiers: [
       {
@@ -141,7 +141,7 @@ export const skillTrees = {
     ]
   },
   worge: {
-    className: 'Worge',
+    className: 'Vesselist',
     color: '#d97706',
     tiers: [
       {
@@ -210,7 +210,7 @@ export const skillTrees = {
     ]
   },
   ranger: {
-    className: 'Ranger',
+    className: 'Scraper',
     color: '#22c55e',
     tiers: [
       {

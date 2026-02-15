@@ -557,7 +557,7 @@ export default function AdminSprite() {
                 {(cls === 'warrior' || cls === 'worge') && (
                   <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#c4b998', marginTop: 4 }}>
                     <input type="checkbox" checked={showTransform} onChange={e => setShowTransform(e.target.checked)} />
-                    {cls === 'warrior' ? 'Demon Blade Transform' : 'Worge Transform'}
+                    {cls === 'warrior' ? 'Demon Blade Transform' : 'Vesselist Transform'}
                   </label>
                 )}
               </div>
