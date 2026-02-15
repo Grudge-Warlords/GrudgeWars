@@ -3177,7 +3177,7 @@ export default function WorldMap() {
               {!citySubmenu && (
                 <div style={{ padding: '4px 6px' }}>
                   <MenuButton
-                    icon="🏟️" label="Arena" sublabel={`${cityArenas.length} available`}
+                    icon="target" label="Arena" sublabel={`${cityArenas.length} available`}
                     color="#f97316" onClick={() => setCitySubmenu('arena')}
                     disabled={cityArenas.length === 0} compact
                   />
@@ -3195,7 +3195,7 @@ export default function WorldMap() {
                     }} compact
                   />
                   <MenuButton
-                    icon="🏨" label="Rest" sublabel={`${city.innCost}g`}
+                    icon="heart" label="Rest" sublabel={`${city.innCost}g`}
                     color="#60a5fa" onClick={() => {
                       restAtInn(city.innCost);
                       setSelectedCity(null);
@@ -3236,7 +3236,7 @@ export default function WorldMap() {
                       onMouseLeave={e => { e.currentTarget.style.background = 'rgba(249,115,22,0.06)'; e.currentTarget.style.borderColor = 'rgba(249,115,22,0.15)'; }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                        <span style={{ color: '#f97316', fontWeight: 700, fontSize: '0.75rem' }}>🏟️ {arena.title}</span>
+                        <span style={{ color: '#f97316', fontWeight: 700, fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 4 }}><InlineIcon name="target" size={14} style={{ marginRight: 0 }} /> {arena.title}</span>
                         <span style={{ color: 'var(--muted)', fontSize: '0.55rem' }}>Lv.{arena.levelRange[0]}-{arena.levelRange[1]}</span>
                       </div>
                       <div style={{ color: 'var(--muted)', fontSize: '0.65rem', marginBottom: 6 }}>{arena.description}</div>
@@ -4822,6 +4822,7 @@ export default function WorldMap() {
 
 function MenuButton({ icon, iconSrc, label, sublabel, color, onClick, glow, disabled, hotkey, compact }) {
   const isSmall = compact;
+  const resolvedSrc = iconSrc || (icon && getIconSrc(icon));
   return (
     <button
       onClick={disabled ? undefined : onClick}
@@ -4855,14 +4856,14 @@ function MenuButton({ icon, iconSrc, label, sublabel, color, onClick, glow, disa
           zIndex: 2,
         }}>{hotkey}</div>
       )}
-      {iconSrc ? (
+      {resolvedSrc ? (
         <div style={{
           width: isSmall ? 24 : 38, height: isSmall ? 24 : 38, borderRadius: isSmall ? 5 : 8, overflow: 'hidden', flexShrink: 0,
           border: `${isSmall ? '1px' : '2px'} solid ${disabled ? 'rgba(80,80,100,0.3)' : `${color}88`}`,
           boxShadow: disabled ? 'none' : `0 0 8px ${color}30, inset 0 0 10px rgba(0,0,0,0.5)`,
           position: 'relative',
         }}>
-          <img src={iconSrc} alt="" style={{
+          <img src={resolvedSrc} alt="" style={{
             width: '100%', height: '100%', objectFit: 'cover',
             filter: disabled ? 'grayscale(1) brightness(0.4)' : 'brightness(1.1) contrast(1.1)',
           }} />

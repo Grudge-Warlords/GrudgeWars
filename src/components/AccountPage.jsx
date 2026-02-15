@@ -236,10 +236,10 @@ function HeroCard({ hero, isSelected, onClick, isActive, isMobile }) {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: 6, fontSize: '0.42rem', color: 'var(--muted)' }}>
-              <span title="Strength" style={{ color: '#ef4444' }}>⚔{stats.strength}</span>
-              <span title="Defense" style={{ color: '#3b82f6' }}>🛡{stats.defense}</span>
-              <span title="Speed" style={{ color: '#22c55e' }}>⚡{stats.speed}</span>
+            <div style={{ display: 'flex', gap: 6, fontSize: '0.42rem', color: 'var(--muted)', alignItems: 'center' }}>
+              <span title="Strength" style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: 1 }}><InlineIcon name="sword" size={9} style={{ marginRight: 0 }} />{stats.strength}</span>
+              <span title="Defense" style={{ color: '#3b82f6', display: 'flex', alignItems: 'center', gap: 1 }}><InlineIcon name="shield" size={9} style={{ marginRight: 0 }} />{stats.defense}</span>
+              <span title="Speed" style={{ color: '#22c55e', display: 'flex', alignItems: 'center', gap: 1 }}><InlineIcon name="energy" size={9} style={{ marginRight: 0 }} />{stats.speed}</span>
             </div>
             <div style={{
               fontSize: '0.55rem', color: 'var(--gold)', fontWeight: 700,
@@ -633,19 +633,19 @@ function HeroDetailPanel({ hero, onClose, isMobile }) {
           border: '1px solid rgba(110,231,183,0.15)', flexShrink: 0,
         }}>
           {[
-            { label: 'HP', value: Math.floor(stats.health), color: '#22c55e', icon: '❤' },
-            { label: 'ATK', value: Math.floor(stats.physicalDamage), color: '#ef4444', icon: '⚔' },
-            { label: 'MP', value: Math.floor(stats.mana), color: '#3b82f6', icon: '💧' },
-            { label: 'DEF', value: Math.floor(stats.defense), color: '#6b7280', icon: '🛡' },
-            { label: 'SP', value: Math.floor(stats.stamina), color: '#f59e0b', icon: '⚡' },
-            { label: 'SPD', value: Math.floor(stats.speed || 0), color: '#22d3ee', icon: '💨' },
-            { label: 'CRIT', value: (stats.criticalChance || 0).toFixed(1) + '%', color: '#f97316', icon: '🎯' },
-            { label: 'MAG', value: Math.floor(stats.magicDamage), color: '#8b5cf6', icon: '✨' },
+            { label: 'HP', value: Math.floor(stats.health), color: '#22c55e', iconName: 'heart' },
+            { label: 'ATK', value: Math.floor(stats.physicalDamage), color: '#ef4444', iconName: 'sword' },
+            { label: 'MP', value: Math.floor(stats.mana), color: '#3b82f6', iconName: 'mana' },
+            { label: 'DEF', value: Math.floor(stats.defense), color: '#6b7280', iconName: 'shield' },
+            { label: 'SP', value: Math.floor(stats.stamina), color: '#f59e0b', iconName: 'energy' },
+            { label: 'SPD', value: Math.floor(stats.speed || 0), color: '#22d3ee', iconName: 'boots' },
+            { label: 'CRIT', value: (stats.criticalChance || 0).toFixed(1) + '%', color: '#f97316', iconName: 'target' },
+            { label: 'MAG', value: Math.floor(stats.magicDamage), color: '#8b5cf6', iconName: 'sparkle' },
           ].map(s => (
             <div key={s.label} style={{
               display: 'flex', alignItems: 'center', gap: 4, padding: '1px 0',
             }}>
-              <span style={{ fontSize: '0.55rem', lineHeight: 1 }}>{s.icon}</span>
+              <InlineIcon name={s.iconName} size={11} style={{ marginRight: 0 }} />
               <span style={{ color: 'var(--muted)', fontSize: '0.6rem', width: 28 }}>{s.label}</span>
               <span style={{ color: s.color, fontSize: '0.7rem', fontWeight: 700, fontFamily: 'monospace' }}>{s.value}</span>
             </div>
