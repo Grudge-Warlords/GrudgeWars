@@ -6,7 +6,7 @@ app.use(express.json());
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-const DISCORD_BOT_TOKEN = process.env.GAME_API_GRUDA;
+const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || process.env.GAME_API_GRUDA;
 const BETA_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID || '1470521372932313283';
 const BOT_CHANNEL_ID = '1472448936735277188';
 const BOT_APP_ID = '1472444305187668009';
@@ -145,7 +145,7 @@ app.get('/api/discord/invite', async (req, res) => {
   }
 });
 
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_GRUDGE_WEBHOOK;
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || process.env.DISCORD_GRUDGE_WEBHOOK;
 const ADMIN_TOKEN = process.env.GAME_API_GRUDA;
 
 function requireAdmin(req, res, next) {
