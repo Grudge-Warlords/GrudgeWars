@@ -172,21 +172,73 @@ export default function TitleScreen() {
 
       <div style={{
         position: 'relative', zIndex: 2, textAlign: 'center',
-        maxWidth: 400, padding: '0 20px',
-        marginTop: 'auto', marginBottom: isMobile ? '15%' : '10%',
+        maxWidth: 400, padding: '0 20px', width: '100%',
+        marginTop: 'auto', marginBottom: isMobile ? '10%' : '8%',
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: isMobile ? '100%' : 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', width: '100%' }}>
           <MenuButton
-            label="DIVE IN"
-            onClick={() => handleLogin('guest')}
+            label="LOGIN WITH DISCORD"
+            onClick={() => handleLogin('discord')}
             primary
             isMobile={isMobile}
-            icon={<EssentialIcon name="Gamepad" size={20} style={{ marginRight: 8 }} />}
+            icon={
+              <svg width="20" height="16" viewBox="0 0 71 55" fill="currentColor" style={{ marginRight: 10, flexShrink: 0 }}>
+                <path d="M60.1 4.9A58.5 58.5 0 0045.4.2a.2.2 0 00-.2.1 40.7 40.7 0 00-1.8 3.7 54 54 0 00-16.2 0A26.4 26.4 0 0025.4.3a.2.2 0 00-.2-.1A58.4 58.4 0 0010.5 4.9a.2.2 0 00-.1.1C1.5 18.7-.9 32.2.3 45.5v.1a58.8 58.8 0 0017.7 9a.2.2 0 00.3-.1 42 42 0 003.6-5.9.2.2 0 00-.1-.3 38.8 38.8 0 01-5.5-2.6.2.2 0 01 0-.4c.4-.3.7-.6 1.1-.9a.2.2 0 01.2 0 42 42 0 0035.6 0 .2.2 0 01.2 0l1.1.9a.2.2 0 010 .4 36.4 36.4 0 01-5.5 2.6.2.2 0 00-.1.3 47.2 47.2 0 003.6 5.9.2.2 0 00.3.1A58.6 58.6 0 0070.3 45.6v-.1c1.4-15.1-2.4-28.2-10.1-39.8a.2.2 0 00-.1-.1zM23.7 37.3c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.4 3.2 6.3 7-2.8 7-6.3 7zm23.2 0c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.4 3.2 6.3 7-2.8 7-6.3 7z"/>
+              </svg>
+            }
+            customStyle={{
+              background: 'linear-gradient(135deg, rgba(88,101,242,0.35), rgba(88,101,242,0.15))',
+              border: '2px solid rgba(88,101,242,0.6)',
+              color: '#c4caff',
+            }}
+            customHoverStyle={{
+              background: 'rgba(88,101,242,0.45)',
+              boxShadow: '0 0 30px rgba(88,101,242,0.3)',
+            }}
           />
+
+          {isPuterAvailable() && (
+            <MenuButton
+              label={puterLoading ? 'SIGNING IN...' : 'SIGN IN WITH PUTER'}
+              onClick={handlePuterLogin}
+              isMobile={isMobile}
+              icon={<span style={{ marginRight: 10, fontSize: 18, flexShrink: 0 }}>&#9729;</span>}
+              customStyle={{
+                background: 'linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.1))',
+                border: '2px solid rgba(34,197,94,0.5)',
+                color: '#86efac',
+              }}
+              customHoverStyle={{
+                background: 'rgba(34,197,94,0.35)',
+                boxShadow: '0 0 30px rgba(34,197,94,0.3)',
+              }}
+            />
+          )}
+
+          <div style={{ width: '60%', height: 1, background: 'rgba(255,255,255,0.08)', margin: '4px 0' }} />
+
+          <button
+            onClick={() => handleLogin('guest')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(176,190,197,0.7)',
+              fontSize: isMobile ? '0.75rem' : '0.8rem',
+              fontFamily: "'Cinzel', serif",
+              letterSpacing: 2,
+              cursor: 'pointer',
+              padding: '8px 16px',
+              transition: 'all 0.3s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#22d3ee'; e.currentTarget.style.textShadow = '0 0 10px rgba(34,211,238,0.3)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(176,190,197,0.7)'; e.currentTarget.style.textShadow = 'none'; }}
+          >
+            PLAY AS GUEST
+          </button>
         </div>
 
         <div style={{
-          color: 'var(--muted)', fontSize: '0.6rem', marginTop: 20, opacity: 0.5,
+          color: 'var(--muted)', fontSize: '0.6rem', marginTop: 16, opacity: 0.5,
           letterSpacing: 1,
         }}>
           &copy; 2026 Grudge Studio
@@ -201,31 +253,7 @@ export default function TitleScreen() {
         bottom: isMobile ? 12 : 20,
         left: isMobile ? 12 : 20,
         zIndex: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-        alignItems: 'flex-start',
       }}>
-        <SideButton
-          label="CONNECT DISCORD"
-          onClick={() => handleLogin('discord')}
-          isMobile={isMobile}
-          icon={
-            <svg width="16" height="13" viewBox="0 0 71 55" fill="currentColor" style={{ marginRight: 8, flexShrink: 0 }}>
-              <path d="M60.1 4.9A58.5 58.5 0 0045.4.2a.2.2 0 00-.2.1 40.7 40.7 0 00-1.8 3.7 54 54 0 00-16.2 0A26.4 26.4 0 0025.4.3a.2.2 0 00-.2-.1A58.4 58.4 0 0010.5 4.9a.2.2 0 00-.1.1C1.5 18.7-.9 32.2.3 45.5v.1a58.8 58.8 0 0017.7 9a.2.2 0 00.3-.1 42 42 0 003.6-5.9.2.2 0 00-.1-.3 38.8 38.8 0 01-5.5-2.6.2.2 0 01 0-.4c.4-.3.7-.6 1.1-.9a.2.2 0 01.2 0 42 42 0 0035.6 0 .2.2 0 01.2 0l1.1.9a.2.2 0 010 .4 36.4 36.4 0 01-5.5 2.6.2.2 0 00-.1.3 47.2 47.2 0 003.6 5.9.2.2 0 00.3.1A58.6 58.6 0 0070.3 45.6v-.1c1.4-15.1-2.4-28.2-10.1-39.8a.2.2 0 00-.1-.1zM23.7 37.3c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.4 3.2 6.3 7-2.8 7-6.3 7zm23.2 0c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.4 3.2 6.3 7-2.8 7-6.3 7z"/>
-            </svg>
-          }
-        />
-
-        {isPuterAvailable() && (
-          <SideButton
-            label={puterLoading ? 'SIGNING IN...' : 'SIGN IN WITH PUTER'}
-            onClick={handlePuterLogin}
-            isMobile={isMobile}
-            icon={<span style={{ marginRight: 8, fontSize: 14, flexShrink: 0 }}>&#9729;</span>}
-          />
-        )}
-
         <SideButton
           label="GRUDGE STUDIO"
           onClick={() => window.open('https://grudgestudio.com', '_blank')}
@@ -237,15 +265,17 @@ export default function TitleScreen() {
   );
 }
 
-function MenuButton({ label, onClick, primary, icon, isMobile }) {
+function MenuButton({ label, onClick, primary, icon, isMobile, customStyle, customHoverStyle }) {
   const [hovered, setHovered] = useState(false);
+
+  const defaultBg = hovered
+    ? 'rgba(34,211,238,0.3)'
+    : 'linear-gradient(135deg, rgba(34,211,238,0.2), rgba(34,211,238,0.08))';
 
   const baseStyle = {
     backdropFilter: 'blur(8px)',
     WebkitBackdropFilter: 'blur(8px)',
-    background: hovered
-      ? 'rgba(34,211,238,0.3)'
-      : 'linear-gradient(135deg, rgba(34,211,238,0.2), rgba(34,211,238,0.08))',
+    background: defaultBg,
     border: '2px solid var(--accent)',
     borderRadius: 8,
     padding: isMobile ? '14px 20px' : '14px 50px',
@@ -256,12 +286,14 @@ function MenuButton({ label, onClick, primary, icon, isMobile }) {
     fontFamily: "'Cinzel', serif",
     letterSpacing: 3,
     transition: 'all 0.3s',
-    width: isMobile ? '100%' : 280,
-    minHeight: 44,
+    width: isMobile ? '100%' : 320,
+    minHeight: 48,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: hovered ? '0 0 30px rgba(34,211,238,0.3)' : 'none',
+    ...customStyle,
+    ...(hovered ? customHoverStyle : {}),
   };
 
   return (
