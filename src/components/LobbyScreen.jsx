@@ -166,6 +166,7 @@ export default function LobbyScreen() {
           <NavItem essentialIcon="Book" label="LORE" active={activeTab === 'lore'} onClick={() => setActiveTab('lore')} isMobile={isMobile} />
           <NavItem essentialIcon="Briefcase" label="ACCOUNT" active={activeTab === 'account'} onClick={() => setActiveTab('account')} isMobile={isMobile} />
           <NavItem essentialIcon="Cloud" label="DISCORD" active={activeTab === 'discord'} onClick={() => setActiveTab('discord')} isMobile={isMobile} />
+          <NavItem essentialIcon="Document" label="WEBSITE" active={false} onClick={() => window.open('/game-index.html', '_blank')} isMobile={isMobile} />
           {!isMobile && <div style={{ flex: 1 }} />}
           <NavItem essentialIcon="Trophy" label="CREDITS" active={activeTab === 'credits'} onClick={() => setActiveTab('credits')} isMobile={isMobile} />
         </div>
