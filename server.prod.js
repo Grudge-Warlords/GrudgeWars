@@ -29,6 +29,9 @@ const PORT = parseInt(process.env.PORT || '3001', 10);
 const pendingStates = new Map();
 
 function getPublicOrigin(req) {
+  if (process.env.DISCORD_REDIRECT_ORIGIN) {
+    return process.env.DISCORD_REDIRECT_ORIGIN.replace(/\/$/, '');
+  }
   const forwardedHost = req.headers['x-forwarded-host'] || req.headers['host'];
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const host = forwardedHost?.split(',')[0]?.trim();
@@ -47,6 +50,7 @@ app.get('/api/discord/login', (req, res) => {
   const state = crypto.randomBytes(16).toString('hex');
   pendingStates.set(state, Date.now());
   const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${state}`;
+  console.log('[OAuth] Login redirect origin:', origin, '| redirect_uri:', decodeURIComponent(redirectUri));
   res.json({ url, state });
 });
 
