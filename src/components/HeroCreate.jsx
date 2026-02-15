@@ -7,6 +7,7 @@ import SpriteAnimation from './SpriteAnimation';
 import WorgeMorphPreview from './WorgeMorphPreview';
 import { getPlayerSprite } from '../data/spriteMap';
 import useIsMobile from '../hooks/useIsMobile';
+import { announceHeroCreated } from '../utils/discordAnnounce';
 
 const ATTRIBUTES = Object.keys(attributeDefinitions);
 
@@ -74,6 +75,7 @@ export default function HeroCreate() {
     setTimeout(() => {
       if (pendingHeroRef.current) {
         addHeroToRoster(pendingHeroRef.current);
+        announceHeroCreated(pendingHeroRef.current);
         pendingHeroRef.current = null;
       }
       setShowCinematic(false);

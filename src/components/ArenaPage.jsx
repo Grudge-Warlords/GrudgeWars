@@ -9,6 +9,7 @@ import { InlineIcon } from '../data/uiSprites';
 import useIsMobile from '../hooks/useIsMobile';
 import { isPuterAvailable } from '../utils/puterService';
 import { useLocationLore } from '../hooks/usePuterAI';
+import { announceArenaChallenge } from '../utils/discordAnnounce';
 
 function postArenaToDiscord(playerName, victories, losses, level, activeHeroes, arenaTitle) {
   const session = (() => {
@@ -107,6 +108,8 @@ export default function ArenaPage() {
   const handleStartArena = (arenaId) => {
     const arena = arenaTemplates.find(a => a.id === arenaId);
     postArenaToDiscord(playerName, victories, losses, level, activeHeroes, arena?.title);
+    const state = useGameStore.getState();
+    announceArenaChallenge(state, arena?.title);
     startArena(arenaId);
   };
 

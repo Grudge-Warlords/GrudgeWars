@@ -155,6 +155,8 @@ app.get('/api/discord/invite', async (req, res) => {
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || process.env.DISCORD_GRUDGE_WEBHOOK;
 const DISCORD_WEBHOOK_CHAT = process.env.DISCORD_WEBHOOK_CHAT;
+const DISCORD_WEBHOOK_URL_ANNOUNCE = process.env.DISCORD_WEBHOOK_URL_ANNOUNCE;
+const ANNOUNCE_CHANNEL_ID = '1472449203283431494';
 const CHAT_CHANNEL_ID = '1472457126885462239';
 const ADMIN_TOKEN = process.env.GAME_API_GRUDA;
 
@@ -506,6 +508,83 @@ async function sendChatWebhook({ content, embeds, username, avatar_url }) {
   }
   return true;
 }
+
+async function sendAnnounceWebhook({ content, embeds, username, avatar_url }) {
+  if (!DISCORD_WEBHOOK_URL_ANNOUNCE) throw new Error('Announce webhook not configured');
+  const payload = {};
+  if (content) payload.content = content;
+  if (embeds) payload.embeds = embeds;
+  payload.username = username || 'Betta Warlords';
+  payload.avatar_url = avatar_url || 'https://grudgewarlords.com/icons/logo.png';
+  const res = await fetch(DISCORD_WEBHOOK_URL_ANNOUNCE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Announce webhook failed (${res.status}): ${err}`);
+  }
+  return true;
+}
+
+const ANNOUNCE_TYPES = {
+  victory: { color: 0xfbbf24, emoji: '⚔️', title: 'Battle Victory' },
+  boss_kill: { color: 0xff4500, emoji: '🔥', title: 'Boss Slain!' },
+  level_up: { color: 0x22d3ee, emoji: '🌊', title: 'Level Up!' },
+  challenge: { color: 0xef4444, emoji: '🏟️', title: 'Arena Challenge' },
+  flawless: { color: 0xe6c300, emoji: '✨', title: 'Flawless Victory!' },
+  hero_created: { color: 0x8b5cf6, emoji: '🐠', title: 'New Warlord Born' },
+  milestone: { color: 0x4ade80, emoji: '🏆', title: 'Milestone Reached' },
+};
+
+const announceRateLimit = new Map();
+app.post('/api/discord/webhook/announce', async (req, res) => {
+  const { type, playerName, details } = req.body;
+  if (!type || !playerName) return res.status(400).json({ error: 'Type and playerName required' });
+
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
+  const rateKey = `${ip}:${type}`;
+  const now = Date.now();
+  const lastPost = announceRateLimit.get(rateKey) || 0;
+  if (now - lastPost < 15000) {
+    return res.status(429).json({ error: 'Please wait before announcing again' });
+  }
+  announceRateLimit.set(rateKey, now);
+
+  const announceType = ANNOUNCE_TYPES[type] || ANNOUNCE_TYPES.victory;
+
+  try {
+    const fields = [];
+    if (details?.warlord) fields.push({ name: 'Warlord', value: details.warlord, inline: true });
+    if (details?.level) fields.push({ name: 'Level', value: `${details.level}`, inline: true });
+    if (details?.location) fields.push({ name: 'Location', value: details.location, inline: true });
+    if (details?.enemies) fields.push({ name: 'Enemies Defeated', value: `${details.enemies}`, inline: true });
+    if (details?.boss) fields.push({ name: 'Boss', value: details.boss, inline: true });
+    if (details?.heroParty) fields.push({ name: 'War Party', value: details.heroParty, inline: false });
+    if (details?.xp) fields.push({ name: 'XP Gained', value: `${details.xp}`, inline: true });
+    if (details?.pearls) fields.push({ name: 'Pearls Earned', value: `${details.pearls}`, inline: true });
+    if (details?.record) fields.push({ name: 'Record', value: details.record, inline: true });
+    if (details?.breed) fields.push({ name: 'Breed', value: details.breed, inline: true });
+    if (details?.class) fields.push({ name: 'Class', value: details.class, inline: true });
+    if (details?.milestone) fields.push({ name: 'Achievement', value: details.milestone, inline: false });
+
+    await sendAnnounceWebhook({
+      content: `${announceType.emoji} **${playerName.slice(0, 50)}** — ${announceType.title}`,
+      embeds: [{
+        title: `${announceType.emoji} ${announceType.title}`,
+        color: announceType.color,
+        fields: fields.slice(0, 10),
+        footer: { text: 'Betta Warlords | Grudge Studios' },
+        timestamp: new Date().toISOString(),
+      }],
+    });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Announce webhook error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 const TOPIC_LABELS = {
   general: { label: 'General', color: 0x22d3ee, emoji: '💬' },

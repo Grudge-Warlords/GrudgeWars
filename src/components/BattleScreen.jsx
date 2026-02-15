@@ -13,6 +13,7 @@ import AbilityIcon from './AbilityIcon';
 import { showTooltip, hideTooltip, updateTooltipPosition } from './GameTooltip';
 import useIsMobile from '../hooks/useIsMobile';
 import { useBattleNarration } from '../hooks/usePuterAI';
+import { announceVictory, announceLevelUp } from '../utils/discordAnnounce';
 import StatusEffectIcons from './StatusEffectIcons';
 import BubbleEmitter from './BubbleEmitter';
 
@@ -1482,7 +1483,16 @@ export default function BattleScreen() {
   }, [autoBattleEnabled, phase, battleCurrentTurn, introComplete, adminPaused]);
 
   useEffect(() => {
-    if (phase === 'victory') playVictory();
+    if (phase === 'victory') {
+      playVictory();
+      if (battleResults && !battleState?.isTraining) {
+        const state = useGameStore.getState();
+        announceVictory(state, battleResults, currentLocation);
+        if (battleResults.leveledUp) {
+          announceLevelUp(battleResults.newLevel);
+        }
+      }
+    }
     if (phase === 'defeat') playDefeat();
   }, [phase]);
 
