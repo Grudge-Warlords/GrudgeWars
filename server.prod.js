@@ -2,12 +2,20 @@ import express from 'express';
 import crypto from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { verifyKeyMiddleware, InteractionType, InteractionResponseType } from 'discord-interactions';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(express.json());
+const DISCORD_PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY;
+
+app.use((req, res, next) => {
+  if (req.path === '/api/discord/interactions') {
+    return next();
+  }
+  express.json()(req, res, next);
+});
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
@@ -600,14 +608,14 @@ const COMMAND_RESPONSES = {
   },
 };
 
-app.post('/api/discord/interactions', async (req, res) => {
+app.post('/api/discord/interactions', verifyKeyMiddleware(DISCORD_PUBLIC_KEY), async (req, res) => {
   const { type, data, member } = req.body;
 
-  if (type === 1) {
-    return res.json({ type: 1 });
+  if (type === InteractionType.PING) {
+    return res.json({ type: InteractionResponseType.PONG });
   }
 
-  if (type === 2 && data?.name === 'warlords') {
+  if (type === InteractionType.APPLICATION_COMMAND && data?.name === 'warlords') {
     const action = data.options?.[0]?.value || 'play';
     const embed = COMMAND_RESPONSES[action] || COMMAND_RESPONSES.play;
     return res.json({
@@ -622,7 +630,7 @@ app.post('/api/discord/interactions', async (req, res) => {
     });
   }
 
-  if (type === 2 && data?.name === 'chat') {
+  if (type === InteractionType.APPLICATION_COMMAND && data?.name === 'chat') {
     const message = data.options?.find(o => o.name === 'message')?.value || '';
     const topicKey = data.options?.find(o => o.name === 'topic')?.value || 'general';
     const topic = TOPIC_LABELS[topicKey] || TOPIC_LABELS.general;
