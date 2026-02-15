@@ -27,6 +27,7 @@ import CraftingPage from './components/CraftingPage';
 import BackgroundsPage from './components/BackgroundsPage';
 import { InlineIcon } from './data/uiSprites';
 import GameTooltipRenderer from './components/GameTooltip';
+import useRouteSync from './hooks/useRouteSync';
 
 function IntroVideoScreen({ onFinish }) {
   const videoRef = useRef(null);
@@ -205,6 +206,8 @@ function GameApp() {
   const gameMessage = useGameStore(s => s.gameMessage);
   const clearMessage = useGameStore(s => s.clearMessage);
   const pendingLoot = useGameStore(s => s.pendingLoot);
+
+  useRouteSync();
 
   const [introVideoDone, setIntroVideoDone] = useState(false);
   const prevScreenRef = useRef(screen);
