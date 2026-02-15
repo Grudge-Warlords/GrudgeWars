@@ -3130,7 +3130,7 @@ const useGameStore = create(persist((set, get) => ({
     return persistedState;
   },
   partialize: (state) => ({
-    screen: state.screen === 'battle' ? 'world' : state.screen,
+    screen: 'title',
     playerName: state.playerName,
     playerRace: state.playerRace,
     playerClass: state.playerClass,
