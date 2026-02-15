@@ -49,6 +49,11 @@ export default function DiscordAuth() {
             loginTime: Date.now(),
           };
           localStorage.setItem('grudge-session', JSON.stringify(session));
+
+          if (window.opener) {
+            try { window.opener.postMessage({ type: 'discord-auth-success', session }, '*'); } catch (e) {}
+            setTimeout(() => window.close(), 1500);
+          }
         }
       })
       .catch(err => {

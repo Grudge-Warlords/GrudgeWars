@@ -79,7 +79,45 @@ export default function TitleScreen() {
       const res = await fetch('/api/discord/login');
       const data = await res.json();
       if (data.state) sessionStorage.setItem('discord_oauth_state', data.state);
-      if (data.url) window.location.href = data.url;
+      if (!data.url) return;
+
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+
+      if (isPWA) {
+        const w = 500, h = 700;
+        const left = (screen.width - w) / 2;
+        const top = (screen.height - h) / 2;
+        const popup = window.open(data.url, 'discord_auth', `width=${w},height=${h},left=${left},top=${top},toolbar=no,menubar=no`);
+
+        const onMessage = (e) => {
+          if (e.data?.type === 'discord-auth-success' && e.data?.session) {
+            window.removeEventListener('message', onMessage);
+            clearInterval(pollTimer);
+            setScreen('intro');
+          }
+        };
+        window.addEventListener('message', onMessage);
+
+        const pollTimer = setInterval(() => {
+          try {
+            if (!popup || popup.closed) {
+              clearInterval(pollTimer);
+              window.removeEventListener('message', onMessage);
+              const session = localStorage.getItem('grudge-session');
+              if (session) {
+                const parsed = JSON.parse(session);
+                if (parsed.type === 'discord' && parsed.loginTime > Date.now() - 120000) {
+                  setScreen('intro');
+                }
+              }
+              return;
+            }
+          } catch (e) {}
+        }, 500);
+      } else {
+        window.location.href = data.url;
+      }
     } catch (err) {
       console.error('Discord login failed:', err);
     }
