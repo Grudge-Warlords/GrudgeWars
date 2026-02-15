@@ -2173,7 +2173,7 @@ export default function WorldMap() {
                 {blocker && (
                   <ShieldBlockerSprite
                     active={blocked}
-                    size={isMobile ? 56 : 50}
+                    size={isMobile ? 84 : 75}
                   />
                 )}
                 {isUnlocked && conquer > 0 && (
@@ -2221,29 +2221,6 @@ export default function WorldMap() {
                     imageRendering: 'pixelated',
                     animation: 'workerIdle 1.6s steps(8) infinite',
                   }} />
-                </div>
-              )}
-              {blocked && (
-                <div style={{
-                  position: 'absolute', top: -22, left: '50%', transform: 'translateX(-50%)',
-                  width: 56, height: 56, pointerEvents: 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <div style={{
-                    width: 31, height: 31,
-                    overflow: 'hidden',
-                    imageRendering: 'pixelated',
-                    transform: 'scale(1.8)',
-                    filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))',
-                  }}>
-                    <div style={{
-                      width: 527, height: 31,
-                      backgroundImage: 'url(/sprites/shield_droid/shield_pulse.png)',
-                      backgroundSize: '527px 31px',
-                      imageRendering: 'pixelated',
-                      animation: 'shieldDroidShield 2.4s steps(17) infinite',
-                    }} />
-                  </div>
                 </div>
               )}
               <div style={{
