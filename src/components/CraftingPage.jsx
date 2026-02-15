@@ -10,7 +10,7 @@ import { useLocationLore } from '../hooks/usePuterAI';
 const RESOURCE_ICONS = {
   gold: { icon: 'pearl', label: 'Pearls', color: '#fbbf24' },
   herbs: { icon: 'herb', label: 'Algae', color: '#22c55e' },
-  wood: { icon: 'wood', label: 'Coral', color: '#a78bfa' },
+  wood: { icon: 'wood', label: 'Root', color: '#a78bfa' },
   ore: { icon: 'ore', label: 'Shells', color: '#94a3b8' },
   crystals: { icon: 'crystal', label: 'Crystals', color: '#22d3ee' },
 };
@@ -57,7 +57,7 @@ export default function CraftingPage() {
               color: '#a855f7', fontSize: isMobile ? '1.3rem' : '1.6rem',
               margin: 0, textShadow: '0 0 20px rgba(168,85,247,0.4)',
             }}>
-              Coral Workshop
+              Root Workshop
             </h1>
             <div style={{ color: 'var(--muted)', fontSize: '0.7rem', marginTop: 2 }}>
               Manage equipment, upgrade gear, and trade resources
@@ -104,7 +104,7 @@ export default function CraftingPage() {
               </div>
             ) : (
               <button
-                onClick={() => generateZoneLore('Coral Workshop', 'An ancient crafting station deep in the reef where master artisans forge weapons from sea materials')}
+                onClick={() => generateZoneLore('Root Workshop', 'An ancient crafting station deep in the grove where master artisans forge weapons from aquatic materials')}
                 disabled={loreLoading}
                 style={{
                   background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.25)',

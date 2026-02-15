@@ -2,7 +2,7 @@ export const missionTemplates = [
   {
     id: 'undead_raid_plains',
     title: 'Barnacle Incursion at the Shallows',
-    description: 'Barnacle Warriors have infested the Coral Shallows! Swim out and clear them before they spread further.',
+    description: 'Barnacle Warriors have infested the Root Shallows! Swim out and clear them before they spread further.',
     targetLocation: 'verdant_plains',
     cityId: 'greenhollow',
     levelRange: [1, 3],
@@ -16,7 +16,7 @@ export const missionTemplates = [
   {
     id: 'wolf_pack_hunt',
     title: 'Mantis Shrimp Rampage',
-    description: 'A pack of Mantis Shrimp has been attacking coral harvesters near Reef Camp. Hunt them down before more damage is done.',
+    description: 'A pack of Mantis Shrimp has been attacking root harvesters near Grove Camp. Hunt them down before more damage is done.',
     targetLocation: 'verdant_plains',
     cityId: 'greenhollow',
     levelRange: [1, 4],
@@ -28,13 +28,13 @@ export const missionTemplates = [
   },
   {
     id: 'goblin_hideout',
-    title: 'Clear the Reef Bandit Den',
-    description: 'Reef Bandits have set up a hideout in the Kelp Forest and are ambushing pearl traders. Root them out.',
+    title: 'Clear the Grove Bandit Den',
+    description: 'Grove Bandits have set up a hideout in the Kelp Forest and are ambushing pearl traders. Root them out.',
     targetLocation: 'dark_forest',
     cityId: 'ironkeep',
     levelRange: [3, 6],
     rounds: [
-      { enemies: ['goblin', 'goblin', 'goblin'], description: 'Reef Bandit scouts spot you first!' },
+      { enemies: ['goblin', 'goblin', 'goblin'], description: 'Grove Bandit scouts spot you first!' },
       { enemies: ['goblin', 'goblin', 'orc'], description: 'Their Hammerhead enforcer charges in with reinforcements!' },
     ],
     rewards: { xp: 80, gold: 55 },
@@ -43,12 +43,12 @@ export const missionTemplates = [
   {
     id: 'dark_forest_corruption',
     title: 'Purge the Kelp Corruption',
-    description: 'Dark ink magic is corrupting the kelp forest. Destroy the source of the taint before it spreads to the reefs.',
+    description: 'Dark ink magic is corrupting the kelp forest. Destroy the source of the taint before it spreads to the groves.',
     targetLocation: 'dark_forest',
     cityId: 'ironkeep',
     levelRange: [4, 7],
     rounds: [
-      { enemies: ['wolf', 'skeleton'], description: 'Corrupted sea creatures guard the path!' },
+      { enemies: ['wolf', 'skeleton'], description: 'Corrupted water creatures guard the path!' },
       { enemies: ['dark_mage', 'skeleton', 'skeleton'], description: 'The Ink Sorcerers maintain the corruption!' },
     ],
     rewards: { xp: 100, gold: 70 },
@@ -99,13 +99,13 @@ export const missionTemplates = [
   },
   {
     id: 'dragon_egg_retrieval',
-    title: 'Sea Drake Egg Recovery',
-    description: 'A Sea Drake egg was stolen from the deep trenches. Retrieve it before the mother Sea Drake destroys the nearby settlements.',
+    title: 'River Drake Egg Recovery',
+    description: 'A River Drake egg was stolen from the deep trenches. Retrieve it before the mother River Drake destroys the nearby settlements.',
     targetLocation: 'dragon_peaks',
     cityId: 'emberpeak',
     levelRange: [12, 16],
     rounds: [
-      { enemies: ['dragon_whelp', 'dragon_whelp'], description: 'Young Sea Drakes guard the stolen egg!' },
+      { enemies: ['dragon_whelp', 'dragon_whelp'], description: 'Young River Drakes guard the stolen egg!' },
       { enemies: ['dragon_whelp', 'orc', 'dark_mage'], description: 'The thieves won\'t give up their prize!' },
     ],
     rewards: { xp: 300, gold: 200 },
@@ -129,12 +129,12 @@ export const missionTemplates = [
   {
     id: 'demon_incursion',
     title: 'Seal the Abyssal Rift',
-    description: 'A rift has opened near Crystal Spire, spewing abyssal horrors into the ocean. Seal it before it consumes everything.',
+    description: 'A rift has opened near Crystal Spire, spewing abyssal horrors into the waters. Seal it before it consumes everything.',
     targetLocation: 'demon_gate',
     cityId: 'crystalspire',
     levelRange: [17, 20],
     rounds: [
-      { enemies: ['dragon_whelp', 'dark_mage', 'dark_mage'], description: 'Corrupted deep-sea creatures pour from the rift!' },
+      { enemies: ['dragon_whelp', 'dark_mage', 'dark_mage'], description: 'Corrupted deepwater creatures pour from the rift!' },
       { enemies: ['demon_lord', 'lich'], description: 'A Leviathan emerges to defend the rift!' },
     ],
     rewards: { xp: 500, gold: 400 },
@@ -145,8 +145,8 @@ export const missionTemplates = [
 export const arenaTemplates = [
   {
     id: 'arena_rookie',
-    title: 'Tide Pool Trial',
-    description: 'Prove yourself against the weakest challengers in the coral arena.',
+    title: 'Current Pool Trial',
+    description: 'Prove yourself against the weakest challengers in the root arena.',
     levelRange: [1, 5],
     cityId: 'greenhollow',
     enemies: ['goblin', 'wolf'],
@@ -154,7 +154,7 @@ export const arenaTemplates = [
   },
   {
     id: 'arena_brawl',
-    title: 'Reef Brawl',
+    title: 'Grove Brawl',
     description: 'A chaotic free-for-all in the fighting grotto.',
     levelRange: [1, 5],
     cityId: 'greenhollow',
@@ -164,7 +164,7 @@ export const arenaTemplates = [
   {
     id: 'arena_forest_fury',
     title: 'Kelp Forest Fury',
-    description: 'Sea beasts from the Kelp Forest have been caged for your challenge.',
+    description: 'Water beasts from the Kelp Forest have been caged for your challenge.',
     levelRange: [3, 8],
     cityId: 'ironkeep',
     enemies: ['wolf', 'wolf', 'skeleton'],
@@ -200,7 +200,7 @@ export const arenaTemplates = [
   {
     id: 'arena_fire_trial',
     title: 'Trial by Magma',
-    description: 'Survive the volcanic arena against Sea Drakes.',
+    description: 'Survive the volcanic arena against River Drakes.',
     levelRange: [12, 17],
     cityId: 'emberpeak',
     enemies: ['dragon_whelp', 'dragon_whelp'],
@@ -227,7 +227,7 @@ export const arenaTemplates = [
   {
     id: 'arena_ultimate',
     title: 'Abyssal Challenge',
-    description: 'Only the strongest ocean warriors dare enter this legendary arena of the deep.',
+    description: 'Only the strongest water warriors dare enter this legendary arena of the deep.',
     levelRange: [18, 20],
     cityId: 'crystalspire',
     enemies: ['demon_lord', 'lich'],

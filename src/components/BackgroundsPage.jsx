@@ -3,15 +3,15 @@ import React, { useState } from 'react';
 const battleBackgrounds = [
   {
     file: 'ocean_battle_new.png',
-    name: 'Ocean Battle',
-    description: 'Bright coral reef waters — the default shallow zone battlefield.',
+    name: 'Shallow Waters Battle',
+    description: 'Bright root grove waters — the default shallow zone battlefield.',
     overlay: null,
     locations: [
-      { id: 'coral_shallows', name: 'Coral Shallows', enemies: ['Reef Bandit', 'Barnacle Warrior', 'Mantis Shrimp'] },
-      { id: 'anemone_garden', name: 'Anemone Garden', enemies: ['Reef Bandit', 'Barnacle Warrior'] },
-      { id: 'tide_stream', name: 'Tide Stream', enemies: ['Reef Bandit', 'Mantis Shrimp'] },
+      { id: 'coral_shallows', name: 'Root Shallows', enemies: ['Grove Bandit', 'Barnacle Warrior', 'Mantis Shrimp'] },
+      { id: 'anemone_garden', name: 'Anemone Garden', enemies: ['Grove Bandit', 'Barnacle Warrior'] },
+      { id: 'tide_stream', name: 'Current Stream', enemies: ['Grove Bandit', 'Mantis Shrimp'] },
       { id: 'clam_beds', name: 'Clam Beds', enemies: ['Barnacle Warrior'] },
-      { id: 'verdant_plains', name: 'Verdant Plains', enemies: ['Reef Bandit', 'Mantis Shrimp'] },
+      { id: 'verdant_plains', name: 'Verdant Plains', enemies: ['Grove Bandit', 'Mantis Shrimp'] },
     ],
     context: 'training',
   },
@@ -26,13 +26,13 @@ const battleBackgrounds = [
       { id: 'shadow_forest', name: 'Shadow Forest', enemies: ['Shadow Eel', 'Shadow Manta'] },
       { id: 'dark_forest', name: 'Dark Forest', enemies: ['Shadow Eel', 'Ink Sorcerer'] },
       { id: 'thornwood_pass', name: 'Thornwood Pass', enemies: ['Shadow Eel'] },
-      { id: 'mystic_grove', name: 'Mystic Grove', enemies: ['Ink Sorcerer', 'Coral Priestess'] },
+      { id: 'mystic_grove', name: 'Mystic Grove', enemies: ['Ink Sorcerer', 'Root Priestess'] },
     ],
   },
   {
     file: 'biolume_battle.png',
     name: 'Bioluminescent Battle',
-    description: 'Glowing deep-sea caves illuminated by living light.',
+    description: 'Glowing deepwater caves illuminated by living light.',
     overlay: null,
     locations: [
       { id: 'jellyfish_drift', name: 'Jellyfish Drift', enemies: ['Jellyfish', 'Water Elemental'] },
@@ -60,7 +60,7 @@ const battleBackgrounds = [
     description: 'Ancient submerged temple ruins with mystical energy.',
     overlay: null,
     locations: [
-      { id: 'pearl_gate', name: 'Pearl Gate', enemies: ['Stone Guardian', 'Coral Priestess'] },
+      { id: 'pearl_gate', name: 'Pearl Gate', enemies: ['Stone Guardian', 'Root Priestess'] },
       { id: 'sunken_temple', name: 'Sunken Temple', enemies: ['Stone Guardian', 'Water Priestess'] },
       { id: 'ancient_ruins', name: 'Ancient Ruins', enemies: ['Stone Guardian', 'Abyssal Knight'] },
       { id: 'cursed_ruins', name: 'Cursed Ruins', enemies: ['Abyssal Knight', 'Ink Sorcerer'] },
@@ -72,16 +72,16 @@ const battleBackgrounds = [
   {
     file: 'deep_trench_battle.png',
     name: 'Deep Trench Battle',
-    description: 'Crushing abyssal depths — the darkest zones of the ocean.',
+    description: 'Crushing abyssal depths — the darkest zones of the waters.',
     overlay: null,
     locations: [
-      { id: 'abyssal_trench', name: 'Abyssal Trench', enemies: ['Sea Serpent', 'Shadow Manta'] },
-      { id: 'leviathan_lair', name: 'Leviathan Lair', enemies: ['Leviathan', 'Sea Serpent'] },
+      { id: 'abyssal_trench', name: 'Abyssal Trench', enemies: ['Water Serpent', 'Shadow Manta'] },
+      { id: 'leviathan_lair', name: 'Leviathan Lair', enemies: ['Leviathan', 'Water Serpent'] },
       { id: 'void_threshold', name: 'Void Threshold', enemies: ['Void Sentinel', 'Shadow Manta'] },
       { id: 'corrupted_spire', name: 'Corrupted Spire', enemies: ['Void Sentinel', 'Ink Sorcerer'] },
-      { id: 'abyssal_depths', name: 'Abyssal Depths', enemies: ['Sea Serpent', 'Void Sentinel'] },
+      { id: 'abyssal_depths', name: 'Abyssal Depths', enemies: ['Water Serpent', 'Void Sentinel'] },
       { id: 'shadow_citadel', name: 'Shadow Citadel', enemies: ['Shadow Manta', 'Abyssal Knight'] },
-      { id: 'dreadmaw_canyon', name: 'Dreadmaw Canyon', enemies: ['Sea Serpent', 'Shadow Eel'] },
+      { id: 'dreadmaw_canyon', name: 'Dreadmaw Canyon', enemies: ['Water Serpent', 'Shadow Eel'] },
       { id: 'maw_of_madra', name: 'Maw of Madra', enemies: ['Void Sentinel', 'Shadow Manta'] },
     ],
     context: 'dungeon-void',
@@ -116,13 +116,13 @@ const battleBackgrounds = [
   {
     file: 'maelstrom_battle.png',
     name: 'Maelstrom Battle',
-    description: 'Swirling vortex of oceanic fury — storm and chaos zones.',
+    description: 'Swirling vortex of aquatic fury — storm and chaos zones.',
     overlay: null,
     locations: [
-      { id: 'maelstrom', name: 'Maelstrom', enemies: ['Kraken Lich', 'Sea Serpent'] },
+      { id: 'maelstrom', name: 'Maelstrom', enemies: ['Kraken Lich', 'Water Serpent'] },
       { id: 'demon_gate', name: 'Demon Gate', enemies: ['Demon Lord', 'Void Sentinel'] },
       { id: 'stormspire_peak', name: 'Stormspire Peak', enemies: ['Kraken Lich', 'Water Elemental'] },
-      { id: 'windswept_ridge', name: 'Windswept Ridge', enemies: ['Sea Serpent', 'Shadow Manta'] },
+      { id: 'windswept_ridge', name: 'Windswept Ridge', enemies: ['Water Serpent', 'Shadow Manta'] },
     ],
   },
   {
@@ -147,7 +147,7 @@ const battleBackgrounds = [
   },
   {
     file: 'scene_dungeon_ocean.png',
-    name: 'Ocean Dungeon',
+    name: 'Depths Dungeon',
     description: 'Default dungeon encounter background for non-themed dungeons.',
     overlay: null,
     locations: [],
@@ -172,7 +172,7 @@ const missingAssignments = [
     note: 'The three Gorgon boss fights use generic zone backgrounds. Unique Gorgon lair backgrounds would elevate these encounters.',
   },
   {
-    location: 'Reef Hunt Mini-game',
+    location: 'Grove Hunt Mini-game',
     issue: 'different-system',
     note: 'Uses reef_hunt_bg.png — canvas-based mini-game, not the standard battle system.',
   },

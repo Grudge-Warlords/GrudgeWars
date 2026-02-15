@@ -2,16 +2,16 @@ const IDLE_CHATTER = [
   { trigger: 'low_health', lines: [
     "{name}: My fins are torn... I need to rest in calmer waters.",
     "{name}: Anyone have a healing anemone? I'm barely swimming.",
-    "{name}: We should find a reef shelter before the next fight.",
+    "{name}: We should find a grove shelter before the next fight.",
   ]},
   { trigger: 'high_gold', lines: [
     "{name}: Our pearl pouch is overflowing. Time to visit the traders!",
-    "{name}: With these pearls we could buy something legendary from the Coral Market.",
+    "{name}: With these pearls we could buy something legendary from the Root Market.",
     "{name}: The shell merchants will be thrilled to see us.",
   ]},
   { trigger: 'low_gold', lines: [
     "{name}: We're running low on pearls... need more hunts.",
-    "{name}: Can't afford a single coral shard at this rate.",
+    "{name}: Can't afford a single root shard at this rate.",
     "{name}: Maybe we should trade some old shells.",
   ]},
   { trigger: 'boss_nearby', lines: [
@@ -26,12 +26,12 @@ const IDLE_CHATTER = [
   ]},
   { trigger: 'high_conquer', lines: [
     "{name}: We control this territory now. Time to push into deeper waters.",
-    "{name}: The reef dwellers look relieved. Our work here is nearly done.",
+    "{name}: The grove dwellers look relieved. Our work here is nearly done.",
     "{name}: This zone is almost fully ours. Onward to new depths!",
   ]},
   { trigger: 'new_zone', lines: [
     "{name}: Never swam these currents before. Keep your fins ready.",
-    "{name}: New waters... I wonder what treasures the tide has hidden.",
+    "{name}: New waters... I wonder what treasures the current has hidden.",
     "{name}: The bioluminescence is different here. Let's explore carefully.",
   ]},
 ];
@@ -40,17 +40,17 @@ const RESPONSES = [
   { trigger: 'low_health', lines: [
     "{name}: Agreed, let's find a warm vent to recover.",
     "{name}: I'll guard the flank. Hang in there.",
-    "{name}: Here, use my last healing coral.",
+    "{name}: Here, use my last healing root.",
   ]},
   { trigger: 'high_gold', lines: [
     "{name}: I've had my eye on a sharktooth blade!",
-    "{name}: Let's visit the Coral Market then.",
+    "{name}: Let's visit the Root Market then.",
     "{name}: Dibs on the first upgrade!",
   ]},
   { trigger: 'low_gold', lines: [
     "{name}: The grind never stops...",
     "{name}: More battles, more pearls. Simple as that.",
-    "{name}: I know a good hunting reef nearby.",
+    "{name}: I know a good hunting grove nearby.",
   ]},
   { trigger: 'boss_nearby', lines: [
     "{name}: I'm ready. Let's take it down together.",
@@ -65,7 +65,7 @@ const RESPONSES = [
   { trigger: 'high_conquer', lines: [
     "{name}: The harvest yields here are incredible now.",
     "{name}: Let's leave scouts behind and swim on.",
-    "{name}: New challenges await beyond these reefs.",
+    "{name}: New challenges await beyond these groves.",
   ]},
   { trigger: 'new_zone', lines: [
     "{name}: I've heard whispers about this place from passing currents...",
@@ -75,20 +75,20 @@ const RESPONSES = [
 ];
 
 const GENERIC_CHATTER = [
-  ["{a}: Think we'll ever find the Coral Crown?", "{b}: Only if we're strong enough to survive the Abyss."],
+  ["{a}: Think we'll ever find the Root Crown?", "{b}: Only if we're strong enough to survive the Abyss."],
   ["{a}: My tail fin is getting stronger every day.", "{b}: Just don't smack me showing off your flares."],
   ["{a}: Do you think we'll be remembered?", "{b}: Legends of the deep are made, not born. Keep swimming."],
   ["{a}: I miss resting in a warm anemone bed.", "{b}: After the next battle. Promise."],
   ["{a}: What drives you to keep fighting?", "{b}: Grudges don't settle themselves in these waters."],
   ["{a}: The bioluminescence looks different out here.", "{b}: That's the corruption spreading from the Abyss. We have to stop it."],
   ["{a}: Ever wonder what's beyond the Hadal Trench?", "{b}: Nothing good. But we'll face it fin to fin."],
-  ["{a}: My gear could use an upgrade.", "{b}: Mine too. Let's find a city reef soon."],
+  ["{a}: My gear could use an upgrade.", "{b}: Mine too. Let's find a city grove soon."],
   ["{a}: How many battles have we survived?", "{b}: Lost count. But each one made our scales tougher."],
   ["{a}: I heard the Volcanic Hearth hides ancient weapons.", "{b}: Then let's dive down and claim them!"],
   ["{a}: You swim well for someone your size.", "{b}: Size isn't everything. Speed and agility win fights."],
   ["{a}: These waters are cursed...", "{b}: Then we'll be the ones to cleanse them."],
   ["{a}: Ready for another round?", "{b}: Always. Let's go hunt."],
-  ["{a}: I need to learn some new abilities.", "{b}: The skill reef has so much potential."],
+  ["{a}: I need to learn some new abilities.", "{b}: The skill grove has so much potential."],
   ["{a}: Remember that last boss fight?", "{b}: How could I forget? That kraken was intense!"],
   ["{a}: Our school is getting stronger.", "{b}: Strong enough to take on the Leviathan itself."],
   ["{a}: What should we do next?", "{b}: Push into deeper territory. We can handle the pressure."],
@@ -109,7 +109,7 @@ const GOAL_CHATTER = [
 export const QUICK_RESPONSES = {
   low_health: [
     { label: 'Rest', icon: 'heart', action: 'rest' },
-    { label: 'Use Coral', icon: 'crystal', action: 'use_potion' },
+    { label: 'Use Root', icon: 'crystal', action: 'use_potion' },
   ],
   high_gold: [
     { label: 'Trade', icon: 'gold', action: 'open_trade' },
@@ -153,7 +153,7 @@ const RACE_CHATTER = {
   blue_betta: [
     "{name}: *fans halfmoon fins majestically* These currents feel like home.",
     "{name}: A Halfmoon's spread is unmatched. Watch and learn.",
-    "{name}: The tide favors the graceful. Let us ride it.",
+    "{name}: The current favors the graceful. Let us ride it.",
   ],
   red_betta: [
     "{name}: *snaps jaws* Plakats don't back down from any fight.",
@@ -188,7 +188,7 @@ const RACE_CHATTER = {
   pink_betta: [
     "{name}: *displays butterfly pattern fins* Beauty and lethality in every fin.",
     "{name}: A Butterfly's banded fins confuse predators. It's tactical.",
-    "{name}: The coral gardens remind me of my spawning reef.",
+    "{name}: The root gardens remind me of my spawning grove.",
   ],
 };
 
@@ -201,10 +201,10 @@ const CLASS_CHATTER = {
   mage: [
     "{name}: I sense arcane currents flowing nearby...",
     "{name}: Knowledge of the deep is the greatest weapon.",
-    "{name}: My tide magic is charged and ready.",
+    "{name}: My current magic is charged and ready.",
   ],
   rogue: [
-    "{name}: *blends into the reef shadow* All clear... for now.",
+    "{name}: *blends into the grove shadow* All clear... for now.",
     "{name}: The best fights end before the prey even sees you coming.",
     "{name}: I found a shortcut through the kelp. Follow me.",
   ],

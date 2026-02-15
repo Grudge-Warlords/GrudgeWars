@@ -16,13 +16,13 @@ export const UPGRADE_COSTS = { 1: 100, 2: 250, 3: 500, 4: 1000, 5: 2500, 6: 5000
 export const WEAPON_TYPES = {
   sword: { name: 'Fin Blade', icon: 'sword', hand: '1h' },
   axe: { name: 'Claw Axe', icon: 'axe', hand: '1h' },
-  greatsword: { name: 'Tidal Blade', icon: 'crossed_swords', hand: '2h' },
+  greatsword: { name: 'Current Blade', icon: 'crossed_swords', hand: '2h' },
   greataxe: { name: 'Anchor Axe', icon: 'axe', hand: '2h' },
   hammer2h: { name: 'Trident', icon: 'hammer', hand: '2h' },
   hammer1h: { name: 'Conch', icon: 'hammer', hand: '1h' },
   shield: { name: 'Shell Guard', icon: 'shield', hand: '1h' },
-  staff: { name: 'Coral Staff', icon: 'wand', hand: '2h' },
-  dagger: { name: 'Sea Spine', icon: 'sword', hand: '1h' },
+  staff: { name: 'Root Staff', icon: 'wand', hand: '2h' },
+  dagger: { name: 'Water Spine', icon: 'sword', hand: '1h' },
   bow: { name: 'Spine Bow', icon: 'bow', hand: '2h' },
   crossbow: { name: 'Harpoon', icon: 'bow', hand: '2h' },
   gun: { name: 'Bubble Gun', icon: 'star', hand: '2h' },
@@ -46,7 +46,7 @@ export const WEAPON_SKILLS = {
   axe: {
     slot1: [
       { id: 'ws_axe_chop', name: 'Claw Chop', icon: 'axe', description: 'A brutal claw strike restoring resources', type: 'physical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 4, staminaGain: 9 },
-      { id: 'ws_axe_hack', name: 'Reef Hack', icon: 'axe', description: 'A savage hack with coral-edged claws', type: 'physical', damage: 1.1, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 5, staminaGain: 7 },
+      { id: 'ws_axe_hack', name: 'Grove Hack', icon: 'axe', description: 'A savage hack with root-edged claws', type: 'physical', damage: 1.1, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 5, staminaGain: 7 },
     ],
     slot23: [
       { id: 'ws_rend', name: 'Scale Rend', icon: 'target', description: 'Rip into the enemy tearing scales, causing heavy bleed for 3 turns', type: 'physical', damage: 1.4, manaCost: 0, staminaCost: 20, cooldown: 3, target: 'enemy', effect: { type: 'dot', damage: 0.15, duration: 3 } },
@@ -56,12 +56,12 @@ export const WEAPON_SKILLS = {
   },
   greatsword: {
     slot1: [
-      { id: 'ws_gs_sweep', name: 'Tidal Sweep', icon: 'crossed_swords', description: 'A wide sweeping tidal strike that restores resources', type: 'physical', damage: 1.1, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 5, staminaGain: 8 },
+      { id: 'ws_gs_sweep', name: 'Current Sweep', icon: 'crossed_swords', description: 'A wide sweeping current strike that restores resources', type: 'physical', damage: 1.1, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 5, staminaGain: 8 },
       { id: 'ws_gs_overhead', name: 'Overhead Crash', icon: 'crossed_swords', description: 'A powerful overhead crash from above', type: 'physical', damage: 1.2, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 6, staminaGain: 7 },
     ],
     slot23: [
       { id: 'ws_gs_cleave', name: 'Abyssal Cleave', icon: 'bomb', description: 'Massive cleaving strike dealing 2x damage', type: 'physical', damage: 2.0, manaCost: 0, staminaCost: 25, cooldown: 2, target: 'enemy' },
-      { id: 'ws_gs_whirlwind', name: 'Ocean Tempest', icon: 'chaos', description: 'Spin creating a tempest of crushing water', type: 'physical', damage: 1.7, manaCost: 0, staminaCost: 22, cooldown: 3, target: 'enemy' },
+      { id: 'ws_gs_whirlwind', name: 'Waters Tempest', icon: 'chaos', description: 'Spin creating a tempest of crushing water', type: 'physical', damage: 1.7, manaCost: 0, staminaCost: 22, cooldown: 3, target: 'enemy' },
       { id: 'ws_gs_execute', name: 'Depth Crush', icon: 'skull', description: 'Aim for weak points, dealing bonus damage to low HP targets', type: 'physical', damage: 1.5, manaCost: 0, staminaCost: 28, cooldown: 4, target: 'enemy', executeDamage: 2.5, executeThreshold: 0.3 },
     ],
   },
@@ -72,19 +72,19 @@ export const WEAPON_SKILLS = {
     ],
     slot23: [
       { id: 'ws_ga_rampage', name: 'Feeding Frenzy', icon: 'bomb', description: 'Enter a frenzy, boosting damage by 25% for 3 turns', type: 'buff', damage: 0, manaCost: 0, staminaCost: 28, cooldown: 5, target: 'self', effect: { stat: 'damage', multiplier: 1.25, duration: 3 } },
-      { id: 'ws_ga_bonecrusher', name: 'Shell Crusher', icon: 'skull', description: 'Crush the enemy with overwhelming oceanic force', type: 'physical', damage: 2.2, manaCost: 0, staminaCost: 30, cooldown: 3, target: 'enemy' },
-      { id: 'ws_ga_bloodrage', name: 'Bloodtide', icon: 'target', description: 'Sacrifice HP for massive tidal damage', type: 'physical', damage: 2.5, manaCost: 0, staminaCost: 20, cooldown: 4, target: 'enemy' },
+      { id: 'ws_ga_bonecrusher', name: 'Shell Crusher', icon: 'skull', description: 'Crush the enemy with overwhelming force', type: 'physical', damage: 2.2, manaCost: 0, staminaCost: 30, cooldown: 3, target: 'enemy' },
+      { id: 'ws_ga_bloodrage', name: 'Bloodcurrent', icon: 'target', description: 'Sacrifice HP for massive current damage', type: 'physical', damage: 2.5, manaCost: 0, staminaCost: 20, cooldown: 4, target: 'enemy' },
     ],
   },
   hammer2h: {
     slot1: [
       { id: 'ws_h2_smash', name: 'Trident Smash', icon: 'hammer', description: 'A thunderous downward trident smash', type: 'physical', damage: 1.1, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 4, staminaGain: 9 },
-      { id: 'ws_h2_bash', name: 'Coral Bash', icon: 'hammer', description: 'Bash with hardened coral', type: 'physical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 5, staminaGain: 8 },
+      { id: 'ws_h2_bash', name: 'Root Bash', icon: 'hammer', description: 'Bash with hardened root', type: 'physical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 5, staminaGain: 8 },
     ],
     slot23: [
-      { id: 'ws_h2_shockwave', name: 'Pressure Wave', icon: 'bomb', description: 'Slam the seafloor sending a pressure wave', type: 'physical', damage: 1.8, manaCost: 0, staminaCost: 25, cooldown: 3, target: 'enemy', effect: { type: 'stun', duration: 1 } },
-      { id: 'ws_h2_pulverize', name: 'Depth Charge', icon: 'skull', description: 'Crush the target with immense deep-sea pressure', type: 'physical', damage: 2.3, manaCost: 0, staminaCost: 30, cooldown: 4, target: 'enemy' },
-      { id: 'ws_h2_earthshatter', name: 'Seafloor Shatter', icon: 'fire', description: 'Shatter the seafloor reducing enemy defense for 3 turns', type: 'physical', damage: 1.5, manaCost: 0, staminaCost: 22, cooldown: 3, target: 'enemy', effect: { stat: 'defense', flat: -15, duration: 3 } },
+      { id: 'ws_h2_shockwave', name: 'Pressure Wave', icon: 'bomb', description: 'Slam the lakebed sending a pressure wave', type: 'physical', damage: 1.8, manaCost: 0, staminaCost: 25, cooldown: 3, target: 'enemy', effect: { type: 'stun', duration: 1 } },
+      { id: 'ws_h2_pulverize', name: 'Depth Charge', icon: 'skull', description: 'Crush the target with immense deepwater pressure', type: 'physical', damage: 2.3, manaCost: 0, staminaCost: 30, cooldown: 4, target: 'enemy' },
+      { id: 'ws_h2_earthshatter', name: 'Lakebed Shatter', icon: 'fire', description: 'Shatter the lakebed reducing enemy defense for 3 turns', type: 'physical', damage: 1.5, manaCost: 0, staminaCost: 22, cooldown: 3, target: 'enemy', effect: { stat: 'defense', flat: -15, duration: 3 } },
     ],
   },
   hammer1h: {
@@ -94,18 +94,18 @@ export const WEAPON_SKILLS = {
     ],
     slot23: [
       { id: 'ws_h1_concuss', name: 'Stunning Strike', icon: 'sparkle', description: 'Stun the target with a precise concussive strike', type: 'physical', damage: 1.2, manaCost: 0, staminaCost: 18, cooldown: 3, target: 'enemy', effect: { type: 'stun', duration: 1 } },
-      { id: 'ws_h1_chain_smash', name: 'Tide Chain', icon: 'battle', description: 'Rapid conch strikes building momentum like waves', type: 'physical', damage: 1.6, manaCost: 0, staminaCost: 20, cooldown: 2, target: 'enemy' },
+      { id: 'ws_h1_chain_smash', name: 'Current Chain', icon: 'battle', description: 'Rapid conch strikes building momentum like currents', type: 'physical', damage: 1.6, manaCost: 0, staminaCost: 20, cooldown: 2, target: 'enemy' },
       { id: 'ws_h1_thunderstrike', name: 'Storm Surge', icon: 'lightning', description: 'Channel storm energy through your conch', type: 'magical', damage: 1.8, manaCost: 20, staminaCost: 0, cooldown: 3, target: 'enemy', effect: { type: 'dot', damage: 0.1, duration: 2 } },
     ],
   },
   staff: {
     slot1: [
-      { id: 'ws_staff_strike', name: 'Coral Staff Strike', icon: 'wand', description: 'Channel tidal energy through your staff', type: 'magical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 8, staminaGain: 4 },
+      { id: 'ws_staff_strike', name: 'Root Staff Strike', icon: 'wand', description: 'Channel current energy through your staff', type: 'magical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 8, staminaGain: 4 },
       { id: 'ws_staff_pulse', name: 'Bioluminescent Pulse', icon: 'sparkle', description: 'Emit a pulse of bioluminescent magic', type: 'magical', damage: 0.9, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 9, staminaGain: 3 },
     ],
     slot23: [
-      { id: 'ws_staff_nova', name: 'Tidal Nova', icon: 'sparkle', description: 'Release a burst of tidal energy', type: 'magical', damage: 2.0, manaCost: 30, staminaCost: 0, cooldown: 3, target: 'enemy' },
-      { id: 'ws_staff_barrier', name: 'Coral Barrier', icon: 'shield', description: 'Raise a coral barrier boosting defense for 3 turns', type: 'buff', damage: 0, manaCost: 25, staminaCost: 0, cooldown: 4, target: 'self', effect: { stat: 'defense', flat: 18, duration: 3 } },
+      { id: 'ws_staff_nova', name: 'Current Nova', icon: 'sparkle', description: 'Release a burst of current energy', type: 'magical', damage: 2.0, manaCost: 30, staminaCost: 0, cooldown: 3, target: 'enemy' },
+      { id: 'ws_staff_barrier', name: 'Root Barrier', icon: 'shield', description: 'Raise a root barrier boosting defense for 3 turns', type: 'buff', damage: 0, manaCost: 25, staminaCost: 0, cooldown: 4, target: 'self', effect: { stat: 'defense', flat: 18, duration: 3 } },
       { id: 'ws_staff_drain', name: 'Siphon Current', icon: 'chaos', description: 'Drain life force from the target like a remora', type: 'magical', damage: 1.4, manaCost: 20, staminaCost: 0, cooldown: 3, target: 'enemy', drainPercent: 0.15 },
     ],
   },
@@ -115,9 +115,9 @@ export const WEAPON_SKILLS = {
       { id: 'ws_dagger_slash', name: 'Barb Slash', icon: 'sword', description: 'A swift slash with a venomous barb', type: 'physical', damage: 0.9, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 4, staminaGain: 9 },
     ],
     slot23: [
-      { id: 'ws_backstab', name: 'Ambush Strike', icon: 'sword', description: 'Strike from the shadows of the reef for critical damage', type: 'physical', damage: 2.0, manaCost: 0, staminaCost: 22, cooldown: 3, target: 'enemy', guaranteedCrit: true },
+      { id: 'ws_backstab', name: 'Ambush Strike', icon: 'sword', description: 'Strike from the shadows of the grove for critical damage', type: 'physical', damage: 2.0, manaCost: 0, staminaCost: 22, cooldown: 3, target: 'enemy', guaranteedCrit: true },
       { id: 'ws_envenom', name: 'Lionfish Sting', icon: 'skull', description: 'Apply deadly lionfish venom dealing damage over 4 turns', type: 'physical', damage: 0.8, manaCost: 0, staminaCost: 15, cooldown: 3, target: 'enemy', effect: { type: 'dot', damage: 0.18, duration: 4 } },
-      { id: 'ws_fan_of_knives', name: 'Fan of Spines', icon: 'star', description: 'Hurl a fan of sea urchin spines at the target', type: 'physical', damage: 1.7, manaCost: 0, staminaCost: 20, cooldown: 3, target: 'enemy' },
+      { id: 'ws_fan_of_knives', name: 'Fan of Spines', icon: 'star', description: 'Hurl a fan of water urchin spines at the target', type: 'physical', damage: 1.7, manaCost: 0, staminaCost: 20, cooldown: 3, target: 'enemy' },
     ],
   },
   bow: {
@@ -149,7 +149,7 @@ export const WEAPON_SKILLS = {
     ],
     slot23: [
       { id: 'ws_gun_sniper', name: 'Depth Snipe', icon: 'target', description: 'A carefully aimed shot that always crits', type: 'physical', damage: 2.0, manaCost: 0, staminaCost: 22, cooldown: 3, target: 'enemy', guaranteedCrit: true },
-      { id: 'ws_gun_buckshot', name: 'Scatter Shot', icon: 'bomb', description: 'Blast with scattered coral shrapnel for heavy damage', type: 'physical', damage: 2.2, manaCost: 0, staminaCost: 25, cooldown: 3, target: 'enemy' },
+      { id: 'ws_gun_buckshot', name: 'Scatter Shot', icon: 'bomb', description: 'Blast with scattered root shrapnel for heavy damage', type: 'physical', damage: 2.2, manaCost: 0, staminaCost: 25, cooldown: 3, target: 'enemy' },
       { id: 'ws_gun_suppressive', name: 'Ink Cloud', icon: 'fire', description: 'Lay down an ink cloud reducing enemy damage for 2 turns', type: 'physical', damage: 1.0, manaCost: 0, staminaCost: 20, cooldown: 4, target: 'enemy', effect: { stat: 'damage', multiplier: 0.65, duration: 2 } },
     ],
   },
@@ -166,13 +166,13 @@ export const WEAPON_SKILLS = {
   },
   tome: {
     slot1: [
-      { id: 'ws_tome_bolt', name: 'Tidal Bolt', icon: 'sparkle', description: 'Channel a bolt of tidal energy from your tome', type: 'magical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 9, staminaGain: 3 },
-      { id: 'ws_tome_blast', name: 'Deep Sea Blast', icon: 'crystal', description: 'Unleash abyssal power from ancient waterlogged pages', type: 'magical', damage: 0.9, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 8, staminaGain: 4 },
+      { id: 'ws_tome_bolt', name: 'Current Bolt', icon: 'sparkle', description: 'Channel a bolt of current energy from your tome', type: 'magical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 9, staminaGain: 3 },
+      { id: 'ws_tome_blast', name: 'Deep Water Blast', icon: 'crystal', description: 'Unleash abyssal power from ancient waterlogged pages', type: 'magical', damage: 0.9, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 8, staminaGain: 4 },
     ],
     slot23: [
-      { id: 'ws_tome_curse', name: 'Sea Curse', icon: 'skull', description: 'Curse the target with ancient sea magic, reducing their damage for 3 turns', type: 'magical', damage: 1.0, manaCost: 25, staminaCost: 0, cooldown: 3, target: 'enemy', effect: { stat: 'damage', multiplier: 0.65, duration: 3 } },
+      { id: 'ws_tome_curse', name: 'Water Curse', icon: 'skull', description: 'Curse the target with ancient water magic, reducing their damage for 3 turns', type: 'magical', damage: 1.0, manaCost: 25, staminaCost: 0, cooldown: 3, target: 'enemy', effect: { stat: 'damage', multiplier: 0.65, duration: 3 } },
       { id: 'ws_tome_hex', name: 'Kraken Hex', icon: 'chaos', description: 'Hex the enemy with kraken magic', type: 'magical', damage: 1.8, manaCost: 30, staminaCost: 0, cooldown: 3, target: 'enemy', effect: { type: 'dot', damage: 0.12, duration: 3 } },
-      { id: 'ws_tome_restore', name: 'Tome of Tides', icon: 'heart', description: 'Read a healing tide incantation restoring 20% HP', type: 'heal', damage: 0, manaCost: 30, staminaCost: 0, cooldown: 4, target: 'self', healPercent: 0.20 },
+      { id: 'ws_tome_restore', name: 'Tome of Currents', icon: 'heart', description: 'Read a healing current incantation restoring 20% HP', type: 'heal', damage: 0, manaCost: 30, staminaCost: 0, cooldown: 4, target: 'self', healPercent: 0.20 },
     ],
   },
 };
@@ -186,7 +186,7 @@ export const ARMOR_TYPES = {
 export const HELMET_TYPES = {
   plate: { name: 'Shell Helm', icon: 'helm' },
   leather: { name: 'Scale Hood', icon: 'helm' },
-  cloth: { name: 'Coral Crown', icon: 'crown' },
+  cloth: { name: 'Root Crown', icon: 'crown' },
 };
 
 export const FEET_TYPES = {
@@ -229,17 +229,17 @@ export const CLASS_EQUIPMENT_RULES = {
 const weaponTemplates = [
   { id: 'bloodfeud_blade', name: 'Tidefury Fin', slot: 'weapon', weaponType: 'sword', icon: 'sword', classReq: ['warrior'], stats: { physicalDamage: 6, criticalChance: 3, block: 2 } },
   { id: 'wraithfang', name: 'Abyssal Fang', slot: 'weapon', weaponType: 'sword', icon: 'sword', classReq: ['warrior'], stats: { physicalDamage: 7, criticalChance: 5, drainHealth: 2 } },
-  { id: 'oathbreaker', name: 'Oathcoral', slot: 'weapon', weaponType: 'sword', icon: 'sword', classReq: ['warrior'], stats: { physicalDamage: 5, block: 4, defense: 3 } },
-  { id: 'kinrend', name: 'Riptide Edge', slot: 'weapon', weaponType: 'sword', icon: 'sword', classReq: ['warrior'], stats: { physicalDamage: 6, criticalChance: 4, attackSpeed: 3 } },
+  { id: 'oathbreaker', name: 'Oathroot', slot: 'weapon', weaponType: 'sword', icon: 'sword', classReq: ['warrior'], stats: { physicalDamage: 5, block: 4, defense: 3 } },
+  { id: 'kinrend', name: 'Rapids Edge', slot: 'weapon', weaponType: 'sword', icon: 'sword', classReq: ['warrior'], stats: { physicalDamage: 6, criticalChance: 4, attackSpeed: 3 } },
   { id: 'dusksinger', name: 'Siren Fin', slot: 'weapon', weaponType: 'sword', icon: 'sword', classReq: ['warrior'], stats: { physicalDamage: 6, criticalChance: 6, criticalDamage: 5 } },
   { id: 'emberclad', name: 'Volcanic Fin', slot: 'weapon', weaponType: 'sword', icon: 'sword', classReq: ['warrior'], stats: { physicalDamage: 7, criticalChance: 4, block: 3 } },
 
-  { id: 'gorehowl', name: 'Reef Cleaver', slot: 'weapon', weaponType: 'axe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 8, criticalDamage: 6 } },
+  { id: 'gorehowl', name: 'Grove Cleaver', slot: 'weapon', weaponType: 'axe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 8, criticalDamage: 6 } },
   { id: 'skullsplitter', name: 'Shell Splitter', slot: 'weapon', weaponType: 'axe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 8, criticalDamage: 4, armorPenetration: 2 } },
   { id: 'veinreaver', name: 'Current Reaver', slot: 'weapon', weaponType: 'axe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 7, criticalDamage: 5, drainHealth: 2 } },
   { id: 'ironmaw', name: 'Iron Jaw', slot: 'weapon', weaponType: 'axe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 8, block: 3, defense: 3 } },
   { id: 'dreadcleaver', name: 'Dread Claw', slot: 'weapon', weaponType: 'axe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 7, criticalDamage: 5, attackSpeed: 3 } },
-  { id: 'bonehew', name: 'Coral Hewer', slot: 'weapon', weaponType: 'axe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 9, block: 4, defense: 2 } },
+  { id: 'bonehew', name: 'Root Hewer', slot: 'weapon', weaponType: 'axe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 9, block: 4, defense: 2 } },
 
   { id: 'nightfang', name: 'Moray Fang', slot: 'weapon', weaponType: 'dagger', icon: 'dagger', classReq: ['worge', 'ranger'], stats: { physicalDamage: 5, criticalChance: 8, drainHealth: 2 } },
   { id: 'bloodshiv', name: 'Barracuda Shiv', slot: 'weapon', weaponType: 'dagger', icon: 'dagger', classReq: ['worge', 'ranger'], stats: { physicalDamage: 5, criticalChance: 9, attackSpeed: 3 } },
@@ -249,21 +249,21 @@ const weaponTemplates = [
   { id: 'duskblade', name: 'Twilight Barb', slot: 'weapon', weaponType: 'dagger', icon: 'dagger', classReq: ['worge', 'ranger'], stats: { physicalDamage: 5, criticalChance: 11, criticalDamage: 8 } },
 
   { id: 'skullsunder', name: 'Anchor Sunder', slot: 'weapon', weaponType: 'greataxe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 12, criticalDamage: 8, armorPenetration: 3 } },
-  { id: 'bloodreaver_ga', name: 'Tide Reaver', slot: 'weapon', weaponType: 'greataxe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 13, criticalDamage: 6, drainHealth: 3 } },
+  { id: 'bloodreaver_ga', name: 'Current Reaver', slot: 'weapon', weaponType: 'greataxe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 13, criticalDamage: 6, drainHealth: 3 } },
   { id: 'wraithhew', name: 'Phantom Hewer', slot: 'weapon', weaponType: 'greataxe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 11, criticalDamage: 7, attackSpeed: 3 } },
   { id: 'embermaul', name: 'Magma Maul', slot: 'weapon', weaponType: 'greataxe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 12, criticalDamage: 6, magicDamage: 3 } },
   { id: 'ironrend', name: 'Iron Anchor', slot: 'weapon', weaponType: 'greataxe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 13, block: 4, defense: 4 } },
   { id: 'dusksplitter', name: 'Depth Splitter', slot: 'weapon', weaponType: 'greataxe', icon: 'axe', classReq: ['warrior'], stats: { physicalDamage: 11, criticalDamage: 9, criticalChance: 4 } },
 
   { id: 'doomspire', name: 'Leviathan Fin', slot: 'weapon', weaponType: 'greatsword', icon: 'crossed_swords', classReq: ['warrior'], stats: { physicalDamage: 11, criticalChance: 4, armorPenetration: 3 } },
-  { id: 'bloodspire', name: 'Crimson Tide', slot: 'weapon', weaponType: 'greatsword', icon: 'crossed_swords', classReq: ['warrior'], stats: { physicalDamage: 12, drainHealth: 3, defense: 3 } },
+  { id: 'bloodspire', name: 'Crimson Current', slot: 'weapon', weaponType: 'greatsword', icon: 'crossed_swords', classReq: ['warrior'], stats: { physicalDamage: 12, drainHealth: 3, defense: 3 } },
   { id: 'wraithblade_gs', name: 'Phantom Blade', slot: 'weapon', weaponType: 'greatsword', icon: 'crossed_swords', classReq: ['warrior'], stats: { physicalDamage: 10, criticalChance: 5, criticalDamage: 8 } },
   { id: 'emberbrand', name: 'Hydrothermal Edge', slot: 'weapon', weaponType: 'greatsword', icon: 'crossed_swords', classReq: ['warrior'], stats: { physicalDamage: 11, magicDamage: 3, criticalChance: 4 } },
   { id: 'ironwrath', name: 'Iron Kelp', slot: 'weapon', weaponType: 'greatsword', icon: 'crossed_swords', classReq: ['warrior'], stats: { physicalDamage: 12, block: 5, defense: 4 } },
   { id: 'duskreaver_gs', name: 'Depth Reaver', slot: 'weapon', weaponType: 'greatsword', icon: 'crossed_swords', classReq: ['warrior'], stats: { physicalDamage: 10, criticalChance: 6, attackSpeed: 4 } },
 
   { id: 'titanmaul', name: 'Titan Trident', slot: 'weapon', weaponType: 'hammer2h', icon: 'hammer', classReq: ['warrior'], stats: { physicalDamage: 14, defense: 5, block: 4 } },
-  { id: 'bloodcrusher', name: 'Coral Crusher', slot: 'weapon', weaponType: 'hammer2h', icon: 'hammer', classReq: ['warrior'], stats: { physicalDamage: 14, drainHealth: 3, armorPenetration: 3 } },
+  { id: 'bloodcrusher', name: 'Root Crusher', slot: 'weapon', weaponType: 'hammer2h', icon: 'hammer', classReq: ['warrior'], stats: { physicalDamage: 14, drainHealth: 3, armorPenetration: 3 } },
   { id: 'wraithmaul', name: 'Phantom Trident', slot: 'weapon', weaponType: 'hammer2h', icon: 'hammer', classReq: ['warrior'], stats: { physicalDamage: 13, criticalDamage: 6, defense: 4 } },
   { id: 'emberforge', name: 'Vent Forged Trident', slot: 'weapon', weaponType: 'hammer2h', icon: 'hammer', classReq: ['warrior'], stats: { physicalDamage: 14, magicDamage: 3, block: 5 } },
   { id: 'ironbreaker', name: 'Shellbreaker', slot: 'weapon', weaponType: 'hammer2h', icon: 'hammer', classReq: ['warrior'], stats: { physicalDamage: 15, block: 6, defense: 5 } },
@@ -273,17 +273,17 @@ const weaponTemplates = [
   { id: 'bloodmaul', name: 'Crimson Conch', slot: 'weapon', weaponType: 'hammer1h', icon: 'hammer', classReq: ['worge'], stats: { physicalDamage: 5, magicDamage: 2, drainHealth: 2, attackSpeed: 3 } },
   { id: 'wraithknocker', name: 'Phantom Conch', slot: 'weapon', weaponType: 'hammer1h', icon: 'hammer', classReq: ['worge'], stats: { physicalDamage: 4, magicDamage: 3, evasion: 3, attackSpeed: 3 } },
   { id: 'embermallet', name: 'Vent Conch', slot: 'weapon', weaponType: 'hammer1h', icon: 'hammer', classReq: ['worge'], stats: { physicalDamage: 4, magicDamage: 3, defense: 3, block: 3 } },
-  { id: 'ironshard', name: 'Reef Conch', slot: 'weapon', weaponType: 'hammer1h', icon: 'hammer', classReq: ['worge'], stats: { physicalDamage: 5, magicDamage: 1, block: 5, defense: 4 } },
+  { id: 'ironshard', name: 'Grove Conch', slot: 'weapon', weaponType: 'hammer1h', icon: 'hammer', classReq: ['worge'], stats: { physicalDamage: 5, magicDamage: 1, block: 5, defense: 4 } },
   { id: 'duskhammer', name: 'Twilight Conch', slot: 'weapon', weaponType: 'hammer1h', icon: 'hammer', classReq: ['worge'], stats: { physicalDamage: 4, magicDamage: 2, criticalChance: 5, attackSpeed: 4 } },
 
-  { id: 'wraithbone_bow', name: 'Coral Spine Bow', slot: 'weapon', weaponType: 'bow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 6, criticalChance: 6, accuracy: 4 } },
+  { id: 'wraithbone_bow', name: 'Root Spine Bow', slot: 'weapon', weaponType: 'bow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 6, criticalChance: 6, accuracy: 4 } },
   { id: 'bloodstring_bow', name: 'Crimson Spine Bow', slot: 'weapon', weaponType: 'bow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 7, criticalChance: 7, attackSpeed: 3 } },
-  { id: 'shadowflight_bow', name: 'Shadow Reef Bow', slot: 'weapon', weaponType: 'bow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 6, criticalChance: 8, criticalDamage: 6 } },
+  { id: 'shadowflight_bow', name: 'Shadow Grove Bow', slot: 'weapon', weaponType: 'bow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 6, criticalChance: 8, criticalDamage: 6 } },
   { id: 'emberthorn_bow', name: 'Vent Thorn Bow', slot: 'weapon', weaponType: 'bow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 7, criticalChance: 5, magicDamage: 2 } },
   { id: 'ironvine_bow', name: 'Kelp Vine Bow', slot: 'weapon', weaponType: 'bow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 6, criticalChance: 4, defense: 3, accuracy: 5 } },
   { id: 'duskreaver_bow', name: 'Deep Current Bow', slot: 'weapon', weaponType: 'bow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 7, criticalChance: 9, criticalDamage: 8 } },
 
-  { id: 'ironveil_repeater', name: 'Reef Harpoon', slot: 'weapon', weaponType: 'crossbow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 8, criticalDamage: 7, accuracy: 4 } },
+  { id: 'ironveil_repeater', name: 'Grove Harpoon', slot: 'weapon', weaponType: 'crossbow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 8, criticalDamage: 7, accuracy: 4 } },
   { id: 'skullpiercer', name: 'Shell Piercer', slot: 'weapon', weaponType: 'crossbow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 9, criticalDamage: 9, armorPenetration: 3 } },
   { id: 'bloodreaver_xbow', name: 'Crimson Harpoon', slot: 'weapon', weaponType: 'crossbow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 8, drainHealth: 2, criticalDamage: 6 } },
   { id: 'wraithspike', name: 'Phantom Harpoon', slot: 'weapon', weaponType: 'crossbow', icon: 'bow', classReq: ['ranger'], stats: { physicalDamage: 8, criticalDamage: 8, evasion: 3 } },
@@ -293,7 +293,7 @@ const weaponTemplates = [
   { id: 'bloodshot_flintlock', name: 'Pressure Cannon', slot: 'weapon', weaponType: 'gun', icon: 'star', classReq: ['ranger'], stats: { physicalDamage: 10, criticalDamage: 8, accuracy: 3 } },
   { id: 'wraithfire_pistol', name: 'Biolume Blaster', slot: 'weapon', weaponType: 'gun', icon: 'star', classReq: ['ranger'], stats: { physicalDamage: 10, magicDamage: 3, criticalDamage: 6 } },
   { id: 'embercannon', name: 'Hydrothermal Cannon', slot: 'weapon', weaponType: 'gun', icon: 'star', classReq: ['ranger'], stats: { physicalDamage: 12, criticalDamage: 10, armorPenetration: 4 } },
-  { id: 'ironbore_musket', name: 'Reef Bore Cannon', slot: 'weapon', weaponType: 'gun', icon: 'star', classReq: ['ranger'], stats: { physicalDamage: 11, armorPenetration: 5, accuracy: 4 } },
+  { id: 'ironbore_musket', name: 'Grove Bore Cannon', slot: 'weapon', weaponType: 'gun', icon: 'star', classReq: ['ranger'], stats: { physicalDamage: 11, armorPenetration: 5, accuracy: 4 } },
   { id: 'duskshot_repeater', name: 'Deep Shot Repeater', slot: 'weapon', weaponType: 'gun', icon: 'star', classReq: ['ranger'], stats: { physicalDamage: 9, attackSpeed: 5, criticalChance: 4 } },
   { id: 'skullblast_cannon', name: 'Abyssal Cannon', slot: 'weapon', weaponType: 'gun', icon: 'star', classReq: ['ranger'], stats: { physicalDamage: 13, criticalDamage: 12 } },
 
@@ -304,18 +304,18 @@ const weaponTemplates = [
   { id: 'duskpiercer_lance', name: 'Depth Piercer', slot: 'weapon', weaponType: 'lance', icon: 'lance', classReq: ['ranger'], stats: { physicalDamage: 7, criticalChance: 6, criticalDamage: 6 } },
   { id: 'skullimpaler', name: 'Narwhal Impaler', slot: 'weapon', weaponType: 'lance', icon: 'lance', classReq: ['ranger'], stats: { physicalDamage: 9, armorPenetration: 4, accuracy: 4 } },
 
-  { id: 'bloodthorn_staff', name: 'Crimson Coral Staff', slot: 'weapon', weaponType: 'staff', icon: 'staff', classReq: ['mage', 'worge'], stats: { magicDamage: 5, mana: 20, drainHealth: 2 } },
+  { id: 'bloodthorn_staff', name: 'Crimson Root Staff', slot: 'weapon', weaponType: 'staff', icon: 'staff', classReq: ['mage', 'worge'], stats: { magicDamage: 5, mana: 20, drainHealth: 2 } },
   { id: 'wraithwood_staff', name: 'Driftwood Staff', slot: 'weapon', weaponType: 'staff', icon: 'staff', classReq: ['mage', 'worge'], stats: { magicDamage: 5, mana: 25, manaRegen: 1 } },
   { id: 'emberspire_staff', name: 'Vent Spire Staff', slot: 'weapon', weaponType: 'staff', icon: 'staff', classReq: ['mage', 'worge'], stats: { magicDamage: 6, mana: 20, criticalChance: 3 } },
-  { id: 'ironsoul_staff', name: 'Reef Soul Staff', slot: 'weapon', weaponType: 'staff', icon: 'staff', classReq: ['mage', 'worge'], stats: { magicDamage: 4, mana: 30, defense: 3, resistance: 3 } },
-  { id: 'duskweaver_staff', name: 'Tide Weaver Staff', slot: 'weapon', weaponType: 'staff', icon: 'staff', classReq: ['mage', 'worge'], stats: { magicDamage: 6, mana: 20, cooldownReduction: 3 } },
+  { id: 'ironsoul_staff', name: 'Grove Soul Staff', slot: 'weapon', weaponType: 'staff', icon: 'staff', classReq: ['mage', 'worge'], stats: { magicDamage: 4, mana: 30, defense: 3, resistance: 3 } },
+  { id: 'duskweaver_staff', name: 'Current Weaver Staff', slot: 'weapon', weaponType: 'staff', icon: 'staff', classReq: ['mage', 'worge'], stats: { magicDamage: 6, mana: 20, cooldownReduction: 3 } },
   { id: 'skullshroud_staff', name: 'Abyssal Staff', slot: 'weapon', weaponType: 'staff', icon: 'staff', classReq: ['mage', 'worge'], stats: { magicDamage: 7, mana: 15, drainHealth: 3 } },
 
-  { id: 'grimoire_grudges', name: 'Codex of Tides', slot: 'weapon', weaponType: 'tome', icon: 'book', classReq: ['mage'], stats: { magicDamage: 5, mana: 25, cooldownReduction: 2 } },
+  { id: 'grimoire_grudges', name: 'Codex of Currents', slot: 'weapon', weaponType: 'tome', icon: 'book', classReq: ['mage'], stats: { magicDamage: 5, mana: 25, cooldownReduction: 2 } },
   { id: 'bloodscript_tome', name: 'Crimson Codex', slot: 'weapon', weaponType: 'tome', icon: 'book', classReq: ['mage'], stats: { magicDamage: 6, mana: 20, drainHealth: 2 } },
   { id: 'wraith_codex', name: 'Phantom Codex', slot: 'weapon', weaponType: 'tome', icon: 'book', classReq: ['mage'], stats: { magicDamage: 5, mana: 30, manaRegen: 1.5 } },
   { id: 'ember_lexicon', name: 'Volcanic Lexicon', slot: 'weapon', weaponType: 'tome', icon: 'book', classReq: ['mage'], stats: { magicDamage: 6, mana: 20, criticalChance: 4 } },
-  { id: 'ironsoul_grimoire', name: 'Reef Grimoire', slot: 'weapon', weaponType: 'tome', icon: 'book', classReq: ['mage'], stats: { magicDamage: 4, mana: 30, defense: 3, resistance: 4 } },
+  { id: 'ironsoul_grimoire', name: 'Grove Grimoire', slot: 'weapon', weaponType: 'tome', icon: 'book', classReq: ['mage'], stats: { magicDamage: 4, mana: 30, defense: 3, resistance: 4 } },
   { id: 'duskbound_tome', name: 'Abyssal Codex', slot: 'weapon', weaponType: 'tome', icon: 'book', classReq: ['mage'], stats: { magicDamage: 7, mana: 15, cooldownReduction: 3 } },
 ];
 
@@ -323,14 +323,14 @@ const offhandTemplates = [
   { id: 'bloodward_shield', name: 'Crimson Shell', slot: 'offhand', weaponType: 'shield', icon: 'shield', classReq: ['warrior'], stats: { defense: 5, block: 6, health: 20 } },
   { id: 'wraithguard_bulwark', name: 'Phantom Bulwark', slot: 'offhand', weaponType: 'shield', icon: 'shield', classReq: ['warrior'], stats: { defense: 6, block: 8, resistance: 4 } },
   { id: 'emberbulwark', name: 'Volcanic Shell', slot: 'offhand', weaponType: 'shield', icon: 'shield', classReq: ['warrior'], stats: { defense: 6, block: 7, health: 25, damageReduction: 2 } },
-  { id: 'ironfort_shield', name: 'Iron Reef Shell', slot: 'offhand', weaponType: 'shield', icon: 'shield', classReq: ['warrior'], stats: { defense: 8, block: 10, health: 30 } },
+  { id: 'ironfort_shield', name: 'Iron Grove Shell', slot: 'offhand', weaponType: 'shield', icon: 'shield', classReq: ['warrior'], stats: { defense: 8, block: 10, health: 30 } },
   { id: 'duskwall', name: 'Depth Wall', slot: 'offhand', weaponType: 'shield', icon: 'shield', classReq: ['warrior'], stats: { defense: 5, block: 6, evasion: 4, attackSpeed: 2 } },
   { id: 'skullshield', name: 'Nautilus Guard', slot: 'offhand', weaponType: 'shield', icon: 'shield', classReq: ['warrior'], stats: { defense: 7, block: 9, damageReduction: 3, health: 15 } },
 
   { id: 'bloodstone_orb', name: 'Crimson Pearl', slot: 'offhand', weaponType: 'relic', icon: 'crystal', classReq: ['mage'], stats: { magicDamage: 3, mana: 20, drainHealth: 2 } },
   { id: 'wraithsoul_crystal', name: 'Phantom Crystal', slot: 'offhand', weaponType: 'relic', icon: 'crystal', classReq: ['mage'], stats: { magicDamage: 3, mana: 25, manaRegen: 1 } },
   { id: 'emberheart_focus', name: 'Volcanic Focus', slot: 'offhand', weaponType: 'relic', icon: 'crystal', classReq: ['mage'], stats: { magicDamage: 4, mana: 20, criticalChance: 3 } },
-  { id: 'ironsoul_relic', name: 'Reef Relic', slot: 'offhand', weaponType: 'relic', icon: 'crystal', classReq: ['mage'], stats: { magicDamage: 2, mana: 30, resistance: 4, defense: 2 } },
+  { id: 'ironsoul_relic', name: 'Grove Relic', slot: 'offhand', weaponType: 'relic', icon: 'crystal', classReq: ['mage'], stats: { magicDamage: 2, mana: 30, resistance: 4, defense: 2 } },
   { id: 'duskbound_skull', name: 'Abyssal Skull', slot: 'offhand', weaponType: 'relic', icon: 'crystal', classReq: ['mage'], stats: { magicDamage: 4, mana: 20, cooldownReduction: 3 } },
   { id: 'voidheart_relic', name: 'Deep Void Pearl', slot: 'offhand', weaponType: 'relic', icon: 'crystal', classReq: ['mage'], stats: { magicDamage: 5, mana: 30, manaRegen: 1.5, drainHealth: 2 } },
 ];
@@ -339,7 +339,7 @@ const armorTemplates = [
   { id: 'bloodforged_mail', name: 'Crimson Shell Mail', slot: 'armor', armorType: 'metal', icon: 'armor', classReq: ['warrior', 'ranger'], stats: { defense: 6, health: 25 } },
   { id: 'wraithsteel_plate', name: 'Phantom Scale Plate', slot: 'armor', armorType: 'metal', icon: 'armor', classReq: ['warrior', 'ranger'], stats: { defense: 7, health: 20, resistance: 4 } },
   { id: 'emberguard_plate', name: 'Volcanic Shell Plate', slot: 'armor', armorType: 'metal', icon: 'armor', classReq: ['warrior', 'ranger'], stats: { defense: 7, health: 25, damageReduction: 2 } },
-  { id: 'ironbound_armor', name: 'Iron Reef Armor', slot: 'armor', armorType: 'metal', icon: 'armor', classReq: ['warrior', 'ranger'], stats: { defense: 9, health: 30, block: 3 } },
+  { id: 'ironbound_armor', name: 'Iron Grove Armor', slot: 'armor', armorType: 'metal', icon: 'armor', classReq: ['warrior', 'ranger'], stats: { defense: 9, health: 30, block: 3 } },
   { id: 'duskthorn_plate', name: 'Depth Thorn Plate', slot: 'armor', armorType: 'metal', icon: 'armor', classReq: ['warrior', 'ranger'], stats: { defense: 6, health: 20, evasion: 3, attackSpeed: 2 } },
   { id: 'skullforge_plate', name: 'Nautilus Plate', slot: 'armor', armorType: 'metal', icon: 'armor', classReq: ['warrior', 'ranger'], stats: { defense: 8, health: 25, damageReduction: 3 } },
 
@@ -353,7 +353,7 @@ const armorTemplates = [
   { id: 'bloodweave_robe', name: 'Crimson Kelp Robe', slot: 'armor', armorType: 'cloth', icon: 'armor', classReq: ['mage', 'worge'], stats: { defense: 2, mana: 25, resistance: 4, drainHealth: 1 } },
   { id: 'wraithshroud_vestment', name: 'Phantom Vestment', slot: 'armor', armorType: 'cloth', icon: 'armor', classReq: ['mage', 'worge'], stats: { defense: 2, mana: 30, resistance: 5, manaRegen: 1 } },
   { id: 'emberwoven_robe', name: 'Volcanic Weave Robe', slot: 'armor', armorType: 'cloth', icon: 'armor', classReq: ['mage', 'worge'], stats: { defense: 3, mana: 25, resistance: 3, magicDamage: 2 } },
-  { id: 'ironsoul_vestment', name: 'Reef Soul Vestment', slot: 'armor', armorType: 'cloth', icon: 'armor', classReq: ['mage', 'worge'], stats: { defense: 4, mana: 20, resistance: 6, health: 15 } },
+  { id: 'ironsoul_vestment', name: 'Grove Soul Vestment', slot: 'armor', armorType: 'cloth', icon: 'armor', classReq: ['mage', 'worge'], stats: { defense: 4, mana: 20, resistance: 6, health: 15 } },
   { id: 'duskthread_robe', name: 'Depth Thread Robe', slot: 'armor', armorType: 'cloth', icon: 'armor', classReq: ['mage', 'worge'], stats: { defense: 2, mana: 25, resistance: 3, cooldownReduction: 3 } },
   { id: 'skullveil_robe', name: 'Abyssal Veil Robe', slot: 'armor', armorType: 'cloth', icon: 'armor', classReq: ['mage', 'worge'], stats: { defense: 3, mana: 30, resistance: 4, magicDamage: 3 } },
 ];
@@ -362,7 +362,7 @@ const helmetTemplates = [
   { id: 'bloodforged_helm', name: 'Crimson Shell Helm', slot: 'helmet', helmetType: 'plate', icon: 'helm', classReq: ['warrior', 'ranger'], stats: { defense: 4, health: 20, damageReduction: 1 } },
   { id: 'wraithsteel_helm', name: 'Phantom Scale Helm', slot: 'helmet', helmetType: 'plate', icon: 'helm', classReq: ['warrior', 'ranger'], stats: { defense: 5, health: 15, resistance: 3 } },
   { id: 'emberguard_helm', name: 'Volcanic Shell Helm', slot: 'helmet', helmetType: 'plate', icon: 'helm', classReq: ['warrior', 'ranger'], stats: { defense: 5, health: 25, block: 2 } },
-  { id: 'ironbound_helm', name: 'Iron Reef Helm', slot: 'helmet', helmetType: 'plate', icon: 'helm', classReq: ['warrior', 'ranger'], stats: { defense: 6, health: 30 } },
+  { id: 'ironbound_helm', name: 'Iron Grove Helm', slot: 'helmet', helmetType: 'plate', icon: 'helm', classReq: ['warrior', 'ranger'], stats: { defense: 6, health: 30 } },
   { id: 'duskthorn_helm', name: 'Depth Thorn Helm', slot: 'helmet', helmetType: 'plate', icon: 'helm', classReq: ['warrior', 'ranger'], stats: { defense: 4, health: 15, criticalChance: 2, evasion: 2 } },
   { id: 'skullforge_helm', name: 'Nautilus Helm', slot: 'helmet', helmetType: 'plate', icon: 'helm', classReq: ['warrior', 'ranger'], stats: { defense: 5, health: 20, armorPenetration: 2 } },
 
@@ -373,10 +373,10 @@ const helmetTemplates = [
   { id: 'duskcloak_hood', name: 'Depth Cloak Hood', slot: 'helmet', helmetType: 'leather', icon: 'helm', classReq: ['worge', 'ranger'], stats: { defense: 2, evasion: 5, criticalChance: 3 } },
   { id: 'skullthorn_hood', name: 'Urchin Hood', slot: 'helmet', helmetType: 'leather', icon: 'helm', classReq: ['worge', 'ranger'], stats: { defense: 3, evasion: 3, physicalDamage: 2 } },
 
-  { id: 'bloodweave_crown', name: 'Crimson Coral Crown', slot: 'helmet', helmetType: 'cloth', icon: 'crown', classReq: ['mage', 'worge'], stats: { mana: 20, resistance: 3, magicDamage: 2 } },
+  { id: 'bloodweave_crown', name: 'Crimson Root Crown', slot: 'helmet', helmetType: 'cloth', icon: 'crown', classReq: ['mage', 'worge'], stats: { mana: 20, resistance: 3, magicDamage: 2 } },
   { id: 'wraithshroud_crown', name: 'Phantom Crown', slot: 'helmet', helmetType: 'cloth', icon: 'crown', classReq: ['mage', 'worge'], stats: { mana: 25, resistance: 4, manaRegen: 1 } },
   { id: 'emberwoven_crown', name: 'Volcanic Crown', slot: 'helmet', helmetType: 'cloth', icon: 'crown', classReq: ['mage', 'worge'], stats: { mana: 20, magicDamage: 3, criticalChance: 2 } },
-  { id: 'ironsoul_crown', name: 'Reef Soul Crown', slot: 'helmet', helmetType: 'cloth', icon: 'crown', classReq: ['mage', 'worge'], stats: { mana: 20, defense: 3, resistance: 4 } },
+  { id: 'ironsoul_crown', name: 'Grove Soul Crown', slot: 'helmet', helmetType: 'cloth', icon: 'crown', classReq: ['mage', 'worge'], stats: { mana: 20, defense: 3, resistance: 4 } },
   { id: 'duskthread_crown', name: 'Depth Thread Crown', slot: 'helmet', helmetType: 'cloth', icon: 'crown', classReq: ['mage', 'worge'], stats: { mana: 20, magicDamage: 2, cooldownReduction: 3 } },
   { id: 'skullveil_crown', name: 'Abyssal Crown', slot: 'helmet', helmetType: 'cloth', icon: 'crown', classReq: ['mage', 'worge'], stats: { mana: 25, magicDamage: 3, drainHealth: 1 } },
 ];
@@ -385,7 +385,7 @@ const feetTemplates = [
   { id: 'bloodforged_greaves', name: 'Crimson Shell Greaves', slot: 'feet', feetType: 'plate', icon: 'boots', classReq: ['warrior', 'ranger'], stats: { defense: 3, health: 15, block: 2 } },
   { id: 'wraithsteel_greaves', name: 'Phantom Scale Greaves', slot: 'feet', feetType: 'plate', icon: 'boots', classReq: ['warrior', 'ranger'], stats: { defense: 4, health: 10, resistance: 2 } },
   { id: 'emberguard_greaves', name: 'Volcanic Shell Greaves', slot: 'feet', feetType: 'plate', icon: 'boots', classReq: ['warrior', 'ranger'], stats: { defense: 4, health: 20, damageReduction: 1 } },
-  { id: 'ironbound_greaves', name: 'Iron Reef Greaves', slot: 'feet', feetType: 'plate', icon: 'boots', classReq: ['warrior', 'ranger'], stats: { defense: 5, health: 20, block: 3 } },
+  { id: 'ironbound_greaves', name: 'Iron Grove Greaves', slot: 'feet', feetType: 'plate', icon: 'boots', classReq: ['warrior', 'ranger'], stats: { defense: 5, health: 20, block: 3 } },
   { id: 'duskthorn_greaves', name: 'Depth Thorn Greaves', slot: 'feet', feetType: 'plate', icon: 'boots', classReq: ['warrior', 'ranger'], stats: { defense: 3, attackSpeed: 3, evasion: 2 } },
   { id: 'skullforge_greaves', name: 'Nautilus Greaves', slot: 'feet', feetType: 'plate', icon: 'boots', classReq: ['warrior', 'ranger'], stats: { defense: 4, health: 15, armorPenetration: 2 } },
 
@@ -399,45 +399,45 @@ const feetTemplates = [
   { id: 'bloodweave_sandals', name: 'Crimson Kelp Wraps', slot: 'feet', feetType: 'cloth', icon: 'boots', classReq: ['mage', 'worge'], stats: { mana: 15, resistance: 2, manaRegen: 1 } },
   { id: 'wraithshroud_sandals', name: 'Phantom Wraps', slot: 'feet', feetType: 'cloth', icon: 'boots', classReq: ['mage', 'worge'], stats: { mana: 20, resistance: 3 } },
   { id: 'emberwoven_sandals', name: 'Volcanic Wraps', slot: 'feet', feetType: 'cloth', icon: 'boots', classReq: ['mage', 'worge'], stats: { mana: 15, magicDamage: 2, cooldownReduction: 2 } },
-  { id: 'ironsoul_sandals', name: 'Reef Soul Wraps', slot: 'feet', feetType: 'cloth', icon: 'boots', classReq: ['mage', 'worge'], stats: { mana: 15, defense: 2, resistance: 3 } },
+  { id: 'ironsoul_sandals', name: 'Grove Soul Wraps', slot: 'feet', feetType: 'cloth', icon: 'boots', classReq: ['mage', 'worge'], stats: { mana: 15, defense: 2, resistance: 3 } },
   { id: 'duskthread_sandals', name: 'Depth Thread Wraps', slot: 'feet', feetType: 'cloth', icon: 'boots', classReq: ['mage', 'worge'], stats: { mana: 15, evasion: 3, attackSpeed: 2 } },
   { id: 'skullveil_sandals', name: 'Abyssal Wraps', slot: 'feet', feetType: 'cloth', icon: 'boots', classReq: ['mage', 'worge'], stats: { mana: 20, magicDamage: 2, drainHealth: 1 } },
 ];
 
 const ringTemplates = [
-  { id: 'bloodrage_ring', name: 'Crimson Tide Ring', slot: 'ring', icon: 'ring', stats: { physicalDamage: 3, criticalChance: 3 } },
+  { id: 'bloodrage_ring', name: 'Crimson Current Ring', slot: 'ring', icon: 'ring', stats: { physicalDamage: 3, criticalChance: 3 } },
   { id: 'wraithfury_band', name: 'Phantom Current Band', slot: 'ring', icon: 'ring', stats: { physicalDamage: 3, attackSpeed: 4 } },
   { id: 'emberflame_signet', name: 'Volcanic Signet', slot: 'ring', icon: 'ring', stats: { magicDamage: 3, criticalDamage: 6 } },
-  { id: 'ironwill_ring', name: 'Iron Reef Ring', slot: 'ring', icon: 'ring', stats: { physicalDamage: 2, defense: 4 } },
+  { id: 'ironwill_ring', name: 'Iron Grove Ring', slot: 'ring', icon: 'ring', stats: { physicalDamage: 2, defense: 4 } },
   { id: 'duskstrike_ring', name: 'Depth Strike Ring', slot: 'ring', icon: 'ring', stats: { criticalChance: 4, criticalDamage: 8 } },
   { id: 'skullcrush_band', name: 'Shell Crush Band', slot: 'ring', icon: 'ring', stats: { physicalDamage: 3, armorPenetration: 3 } },
   { id: 'swiftblade_trinket', name: 'Swiftfin Trinket', slot: 'ring', icon: 'lightning', stats: { attackSpeed: 5, criticalChance: 3 } },
   { id: 'shadow_step_ring', name: 'Shadow Current Ring', slot: 'ring', icon: 'lightning', stats: { evasion: 5, attackSpeed: 4 } },
   { id: 'ember_quickness', name: 'Slipstream Charm', slot: 'ring', icon: 'lightning', stats: { attackSpeed: 5, cooldownReduction: 3 } },
-  { id: 'ironside_buckle', name: 'Reef Buckle', slot: 'ring', icon: 'lightning', stats: { block: 5, defense: 3 } },
+  { id: 'ironside_buckle', name: 'Grove Buckle', slot: 'ring', icon: 'lightning', stats: { block: 5, defense: 3 } },
   { id: 'duskrunner_boots', name: 'Depth Runner Fins', slot: 'ring', icon: 'lightning', stats: { evasion: 4, attackSpeed: 5 } },
-  { id: 'grudgebearer_seal', name: 'Tidecaller Seal', slot: 'ring', icon: 'lightning', stats: { physicalDamage: 2, magicDamage: 2, criticalChance: 2, criticalDamage: 4 } },
+  { id: 'grudgebearer_seal', name: 'Currentcaller Seal', slot: 'ring', icon: 'lightning', stats: { physicalDamage: 2, magicDamage: 2, criticalChance: 2, criticalDamage: 4 } },
 ];
 
 const relicTemplates = [
   { id: 'bloodward_amulet', name: 'Crimson Amulet', slot: 'relic', icon: 'crystal', stats: { defense: 4, health: 25 } },
   { id: 'wraithshield_pendant', name: 'Phantom Pendant', slot: 'relic', icon: 'crystal', stats: { resistance: 5, evasion: 3 } },
   { id: 'emberbark_talisman', name: 'Volcanic Talisman', slot: 'relic', icon: 'crystal', stats: { defense: 3, damageReduction: 3 } },
-  { id: 'ironheart_medallion', name: 'Iron Reef Medallion', slot: 'relic', icon: 'crystal', stats: { health: 30, block: 4 } },
+  { id: 'ironheart_medallion', name: 'Iron Grove Medallion', slot: 'relic', icon: 'crystal', stats: { health: 30, block: 4 } },
   { id: 'duskguard_charm', name: 'Depth Guard Charm', slot: 'relic', icon: 'crystal', stats: { defense: 3, resistance: 4 } },
   { id: 'skullfort_talisman', name: 'Nautilus Talisman', slot: 'relic', icon: 'crystal', stats: { damageReduction: 3, health: 20 } },
   { id: 'bloodmoon_crystal', name: 'Crimson Moon Crystal', slot: 'relic', icon: 'crystal', stats: { magicDamage: 4, mana: 25 } },
   { id: 'wraithsoul_gem', name: 'Phantom Gem', slot: 'relic', icon: 'crystal', stats: { magicDamage: 3, manaRegen: 2 } },
   { id: 'embervoid_prism', name: 'Volcanic Prism', slot: 'relic', icon: 'crystal', stats: { magicDamage: 3, cooldownReduction: 4 } },
-  { id: 'ironsoul_shard', name: 'Reef Soul Shard', slot: 'relic', icon: 'crystal', stats: { mana: 30, resistance: 4 } },
-  { id: 'duskweaver_stone', name: 'Tide Weaver Stone', slot: 'relic', icon: 'crystal', stats: { magicDamage: 4, mana: 20 } },
+  { id: 'ironsoul_shard', name: 'Grove Soul Shard', slot: 'relic', icon: 'crystal', stats: { mana: 30, resistance: 4 } },
+  { id: 'duskweaver_stone', name: 'Current Weaver Stone', slot: 'relic', icon: 'crystal', stats: { magicDamage: 4, mana: 20 } },
   { id: 'void_crystal', name: 'Abyss Crystal', slot: 'relic', icon: 'crystal', stats: { magicDamage: 4, drainHealth: 3 } },
-  { id: 'lifesblood_totem', name: 'Sea Sponge Totem', slot: 'relic', icon: 'nature', stats: { healthRegen: 3, health: 30 } },
+  { id: 'lifesblood_totem', name: 'Water Sponge Totem', slot: 'relic', icon: 'nature', stats: { healthRegen: 3, health: 30 } },
   { id: 'wraithbalm_idol', name: 'Phantom Idol', slot: 'relic', icon: 'nature', stats: { healthRegen: 2, manaRegen: 2 } },
-  { id: 'emberheart_totem', name: 'Coral Heart Totem', slot: 'relic', icon: 'nature', stats: { health: 25, resistance: 4 } },
-  { id: 'ironpulse_stone', name: 'Reef Pulse Stone', slot: 'relic', icon: 'nature', stats: { healthRegen: 3, defense: 3 } },
+  { id: 'emberheart_totem', name: 'Root Heart Totem', slot: 'relic', icon: 'nature', stats: { health: 25, resistance: 4 } },
+  { id: 'ironpulse_stone', name: 'Grove Pulse Stone', slot: 'relic', icon: 'nature', stats: { healthRegen: 3, defense: 3 } },
   { id: 'duskleaf_charm', name: 'Kelp Leaf Charm', slot: 'relic', icon: 'nature', stats: { healthRegen: 2, evasion: 4 } },
-  { id: 'natures_heart', name: 'Ocean Heart', slot: 'relic', icon: 'nature', stats: { health: 25, manaRegen: 2 } },
+  { id: 'natures_heart', name: 'Waters Heart', slot: 'relic', icon: 'nature', stats: { health: 25, manaRegen: 2 } },
 ];
 
 export const allEquipmentTemplates = [...weaponTemplates, ...offhandTemplates, ...armorTemplates, ...helmetTemplates, ...feetTemplates, ...ringTemplates, ...relicTemplates];
@@ -684,12 +684,12 @@ export function getSellPrice(item) {
 }
 
 export const CONSUMABLE_ITEMS = [
-  { id: 'health_potion', name: 'Healing Tide Elixir', icon: 'heart', slot: 'consumable', consumableType: 'health', description: 'Restores 40% HP to one ally', price: 50 },
-  { id: 'mana_potion', name: 'Mana Coral Elixir', icon: 'mana', slot: 'consumable', consumableType: 'mana', description: 'Restores 40% MP to one ally', price: 45 },
+  { id: 'health_potion', name: 'Healing Current Elixir', icon: 'heart', slot: 'consumable', consumableType: 'health', description: 'Restores 40% HP to one ally', price: 50 },
+  { id: 'mana_potion', name: 'Mana Root Elixir', icon: 'mana', slot: 'consumable', consumableType: 'mana', description: 'Restores 40% MP to one ally', price: 45 },
   { id: 'stamina_potion', name: 'Stamina Kelp Tonic', icon: 'energy', slot: 'consumable', consumableType: 'stamina', description: 'Restores 40% SP to one ally', price: 40 },
   { id: 'speed_potion', name: 'Slipstream Tonic', icon: 'lightning', slot: 'consumable', consumableType: 'speed', description: 'Boosts speed by 50% for 3 turns', price: 60 },
   { id: 'cure_potion', name: 'Purifying Anemone', icon: 'sparkle', slot: 'consumable', consumableType: 'cure', description: 'Removes all debuffs and DoTs from one ally', price: 55 },
-  { id: 'rezzy', name: 'Sea Sponge', icon: 'lance', slot: 'consumable', consumableType: 'resurrect', description: 'Resurrects a fallen ally with 30% HP', price: 200 },
+  { id: 'rezzy', name: 'Water Sponge', icon: 'lance', slot: 'consumable', consumableType: 'resurrect', description: 'Resurrects a fallen ally with 30% HP', price: 200 },
 ];
 
 export function createConsumable(templateId) {

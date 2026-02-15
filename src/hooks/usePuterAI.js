@@ -13,8 +13,8 @@ const BATTLE_FALLBACKS = [
 ];
 
 const LORE_FALLBACKS = [
-  (z) => `The ancient waters of ${z} hold secrets that even the oldest currents have forgotten. Whispers of the First Tide War echo through these depths.`,
-  (z) => `${z} pulses with a mysterious energy. Bioluminescent patterns shift across the coral, spelling warnings in a language long forgotten.`,
+  (z) => `The ancient waters of ${z} hold secrets that even the oldest currents have forgotten. Whispers of the First Current War echo through these depths.`,
+  (z) => `${z} pulses with a mysterious energy. Bioluminescent patterns shift across the roots, spelling warnings in a language long forgotten.`,
   (z) => `Few dare to venture deep into ${z}. Those who return speak of strange lights and the distant song of leviathans.`,
 ];
 

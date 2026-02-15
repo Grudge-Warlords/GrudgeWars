@@ -1,8 +1,8 @@
 export const cities = [
   {
     id: 'greenhollow',
-    name: 'Reef Camp',
-    description: 'Your basecamp at the edge of the Coral Shallows. A merchant offers supplies and buys your ocean treasures.',
+    name: 'Grove Camp',
+    description: 'Your basecamp at the edge of the Root Shallows. A merchant offers supplies and buys your water treasures.',
     icon: 'camp',
     color: '#22d3ee',
     glow: 'rgba(34,211,238,0.4)',
@@ -16,7 +16,7 @@ export const cities = [
   {
     id: 'ironkeep',
     name: 'Shell Fortress',
-    description: 'A fortified stronghold built into a giant conch shell. The finest pearl smiths work their craft here. Unlocked by defeating the Reef Shaman.',
+    description: 'A fortified stronghold built into a giant conch shell. The finest pearl smiths work their craft here. Unlocked by defeating the Grove Shaman.',
     icon: 'shield',
     color: '#fbbf24',
     glow: 'rgba(251,191,36,0.4)',
@@ -30,7 +30,7 @@ export const cities = [
   {
     id: 'shadowhaven',
     name: 'Ink Haven',
-    description: 'A lawless deep-sea port where smuggler fish and mercenary eels trade in secrets and shells. Unlocked by defeating the Shadow Shark.',
+    description: 'A lawless deepwater port where smuggler fish and mercenary eels trade in secrets and shells. Unlocked by defeating the Shadow Shark.',
     icon: 'skull',
     color: '#a78bfa',
     glow: 'rgba(167,139,250,0.4)',
@@ -44,7 +44,7 @@ export const cities = [
   {
     id: 'emberpeak',
     name: 'Vent City',
-    description: 'A deep-sea city built around volcanic vents. The heat of the thermal forges never dies. Unlocked by defeating the Trench Warlord.',
+    description: 'A deepwater city built around volcanic vents. The heat of the thermal forges never dies. Unlocked by defeating the Trench Warlord.',
     icon: 'hammer',
     color: '#f97316',
     glow: 'rgba(249,115,22,0.4)',
@@ -58,7 +58,7 @@ export const cities = [
   {
     id: 'crystalspire',
     name: 'Crystal Spire',
-    description: 'An ancient underwater citadel suspended by arcane currents. The most powerful ocean mages convene here. Unlocked by defeating the Kraken Lich.',
+    description: 'An ancient underwater citadel suspended by arcane currents. The most powerful water mages convene here. Unlocked by defeating the Kraken Lich.',
     icon: 'chaos',
     color: '#a78bfa',
     glow: 'rgba(167,139,250,0.4)',

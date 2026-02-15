@@ -119,7 +119,7 @@ export function getRewardDescription(event) {
   if (event.rewards.gold) parts.push(`${event.rewards.gold} Pearls`);
   if (event.rewards.xp) parts.push(`${event.rewards.xp} XP`);
   if (event.rewards.bonusLootTier) parts.push('Bonus Loot');
-  if (event.rewards.materials) parts.push(`${event.rewards.materials} Reef Materials`);
+  if (event.rewards.materials) parts.push(`${event.rewards.materials} Grove Materials`);
   if (event.rewards.potions) parts.push(`${event.rewards.potions} Elixirs`);
   return parts.join('  ');
 }

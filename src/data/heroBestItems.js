@@ -7,11 +7,11 @@ export const HERO_BEST_ITEMS = {
       happyLines: [
         "The Abyssal Fang... it sings to me.",
         "Finally, a blade worthy of my fins!",
-        "With this fang, none shall challenge my reef.",
+        "With this fang, none shall challenge my grove.",
       ],
       wantLines: [
         "I dream of wielding the Abyssal Fang...",
-        "Have you found the Crimson Tide Ring? It calls to me.",
+        "Have you found the Crimson Current Ring? It calls to me.",
         "An amulet of crimson... I sense one nearby.",
       ],
     },
@@ -21,12 +21,12 @@ export const HERO_BEST_ITEMS = {
       relic: 'bloodward_amulet',
       happyLines: [
         "Volcanic Fin burns bright in my grasp!",
-        "Iron will, iron reef, iron resolve!",
+        "Iron will, iron grove, iron resolve!",
         "This heat... it fuels my fighting spirit!",
       ],
       wantLines: [
         "The Volcanic Fin... I can feel its heat calling.",
-        "A ring of iron reef would suit my scales.",
+        "A ring of iron grove would suit my scales.",
         "I need something to protect this fierce heart.",
       ],
     },
@@ -50,12 +50,12 @@ export const HERO_BEST_ITEMS = {
       ring: 'ironwill_ring',
       relic: 'bloodward_amulet',
       happyLines: [
-        "Oathcoral... steady as the ancient reefs.",
+        "Oathroot... steady as the ancient groves.",
         "This ring grounds me like bedrock.",
         "Protected. Serene. Ready.",
       ],
       wantLines: [
-        "I seek Oathcoral... a weapon of honor.",
+        "I seek Oathroot... a weapon of honor.",
         "An iron ring would steady my resolve.",
         "Protection for the journey ahead...",
       ],
@@ -80,12 +80,12 @@ export const HERO_BEST_ITEMS = {
       ring: 'duskstrike_ring',
       relic: 'bloodward_amulet',
       happyLines: [
-        "Riptide Edge cuts like my crown spikes!",
+        "Rapids Edge cuts like my crown spikes!",
         "Critical strikes fit a crowned warrior!",
         "My rays gleam with this power!",
       ],
       wantLines: [
-        "Riptide Edge... swift as my spiked fins.",
+        "Rapids Edge... swift as my spiked fins.",
         "A ring of deep strikes would crown me.",
         "I deserve protection worthy of royalty.",
       ],
@@ -95,12 +95,12 @@ export const HERO_BEST_ITEMS = {
       ring: 'bloodrage_ring',
       relic: 'bloodward_amulet',
       happyLines: [
-        "Reef Cleaver! My scales burn with joy!",
+        "Grove Cleaver! My scales burn with joy!",
         "Crimson rage matches my dragonscales!",
         "Armored and armed. Come at me!",
       ],
       wantLines: [
-        "The Reef Cleaver... I can feel it waiting.",
+        "The Grove Cleaver... I can feel it waiting.",
         "A crimson ring for a dragon-scaled warrior.",
         "My thick scales need a worthy amulet.",
       ],

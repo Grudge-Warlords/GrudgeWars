@@ -3,7 +3,7 @@ export const classDefinitions = {
     name: 'Bruiser',
     icon: 'crossed_swords',
     color: '#ef4444',
-    description: 'A fearless frontline fighter specializing in raw power and deep-sea defense.',
+    description: 'A fearless frontline fighter specializing in raw power and deepwater defense.',
     lore: 'Bred in the crushing depths of the Hadal Trench, Warriors are the backbone of any war party. Their strength and endurance are unmatched in the deep.',
     startingAttributes: { Strength: 5, Vitality: 3, Endurance: 2, Dexterity: 1, Agility: 1, Intellect: 0, Wisdom: 0, Tactics: 0 },
     abilities: [
@@ -14,19 +14,19 @@ export const classDefinitions = {
       { id: 'cleave', name: 'Razor Fin', icon: 'target', description: 'Slice deep with razor-sharp fins, causing bleed for 3 turns', type: 'physical', damage: 1.5, manaCost: 0, staminaCost: 22, cooldown: 3, target: 'enemy', effect: { type: 'dot', damage: 0.12, duration: 3 } },
       { id: 'demon_blade', name: 'Leviathan Form', icon: 'sword', description: 'Transform into a Leviathan for 3 turns, gaining +40% damage and +15 defense', type: 'buff', damage: 0, manaCost: 0, staminaCost: 40, cooldown: 8, target: 'self', isDemonBlade: true, effect: { stat: 'damage', multiplier: 1.4, duration: 3 }, defenseBoost: { stat: 'defense', flat: 15, duration: 3 } },
     ],
-    signatureAbility: { id: 'invincible', name: 'Abyssal Guard', icon: 'shield', description: 'Become invulnerable for 2 turns, encased in deep-sea pressure armor', type: 'buff', damage: 0, manaCost: 0, staminaCost: 35, cooldown: 8, target: 'self', isInvincible: true, effect: { stat: 'defense', flat: 999, duration: 2 } }
+    signatureAbility: { id: 'invincible', name: 'Abyssal Guard', icon: 'shield', description: 'Become invulnerable for 2 turns, encased in deepwater pressure armor', type: 'buff', damage: 0, manaCost: 0, staminaCost: 35, cooldown: 8, target: 'self', isInvincible: true, effect: { stat: 'defense', flat: 999, duration: 2 } }
   },
   mage: {
     name: 'Mystic',
     icon: 'crystal',
     color: '#8b5cf6',
-    description: 'Master of tidal magic and coral healing arts.',
-    lore: 'Drawing power from volcanic vents and ancient coral ley lines, Mage Priests wield destructive tidal magic alongside sacred healing — a balance few can master.',
+    description: 'Master of current magic and root healing arts.',
+    lore: 'Drawing power from volcanic vents and ancient root ley lines, Mage Priests wield destructive current magic alongside sacred healing — a balance few can master.',
     startingAttributes: { Strength: 0, Vitality: 1, Endurance: 1, Dexterity: 0, Agility: 0, Intellect: 5, Wisdom: 4, Tactics: 1 },
     abilities: [
-      { id: 'arcane_bolt', name: 'Tidal Bolt', icon: 'sparkle', description: 'A focused tidal pulse that restores resources', type: 'magical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 8, staminaGain: 5 },
+      { id: 'arcane_bolt', name: 'Current Bolt', icon: 'sparkle', description: 'A focused current pulse that restores resources', type: 'magical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 8, staminaGain: 5 },
       { id: 'fireball', name: 'Hydrothermal Blast', icon: 'fire', description: 'Hurls superheated vent water dealing massive damage + burn', type: 'magical', damage: 2.5, manaCost: 35, staminaCost: 0, cooldown: 3, target: 'enemy', effect: { type: 'dot', damage: 0.1, duration: 2 } },
-      { id: 'heal', name: 'Coral Mend', icon: 'heart', description: 'Restore 30% of max HP with regenerative coral magic', type: 'heal', damage: 0, manaCost: 40, staminaCost: 0, cooldown: 4, target: 'self', healPercent: 0.30 },
+      { id: 'heal', name: 'Root Mend', icon: 'heart', description: 'Restore 30% of max HP with regenerative root magic', type: 'heal', damage: 0, manaCost: 40, staminaCost: 0, cooldown: 4, target: 'self', healPercent: 0.30 },
       { id: 'ice_storm', name: 'Frozen Current', icon: 'ice', description: 'Freezes the enemy in an icy current, reducing their damage', type: 'magical', damage: 1.8, manaCost: 30, staminaCost: 0, cooldown: 3, target: 'enemy', effect: { stat: 'damage', multiplier: 0.6, duration: 2 } },
     ],
     signatureAbility: { id: 'mana_shield', name: 'Bubble Shield', icon: 'shield', description: 'Encase yourself in a pressurized bubble barrier', type: 'buff', damage: 0, manaCost: 50, staminaCost: 0, cooldown: 5, target: 'self', effect: { stat: 'defense', flat: 25, duration: 3 } }
@@ -35,8 +35,8 @@ export const classDefinitions = {
     name: 'Vesselist',
     icon: 'wolf',
     color: '#d97706',
-    description: 'A shapeshifter who wields current and storm magic, then transforms into a devastating ocean predator.',
-    lore: 'Worges swim between forms — scholars of current and reef in mortal guise, unstoppable predators in beast form. Their conch and spine channel primal ocean energies until the wild within is unleashed.',
+    description: 'A shapeshifter who wields current and storm magic, then transforms into a devastating lake predator.',
+    lore: 'Worges swim between forms — scholars of current and grove in mortal guise, unstoppable predators in beast form. Their conch and spine channel primal water energies until the wild within is unleashed.',
     startingAttributes: { Strength: 2, Vitality: 2, Endurance: 1, Dexterity: 2, Agility: 2, Intellect: 2, Wisdom: 1, Tactics: 0 },
     abilities: [
       { id: 'mace_strike', name: 'Conch Strike', icon: 'hammer', description: 'A current-charged conch blow that restores resources', type: 'physical', damage: 1.0, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 6, staminaGain: 6 },
@@ -61,7 +61,7 @@ export const classDefinitions = {
     abilities: [
       { id: 'quick_shot', name: 'Spine Dart', icon: 'bow', description: 'A swift spine dart that restores resources', type: 'physical', damage: 0.8, manaCost: 0, staminaCost: 0, cooldown: 0, target: 'enemy', manaGain: 4, staminaGain: 7 },
       { id: 'aimed_shot', name: 'Harpoon Shot', icon: 'target', description: 'A carefully aimed harpoon that always crits', type: 'physical', damage: 2.0, manaCost: 0, staminaCost: 20, cooldown: 2, target: 'enemy', guaranteedCrit: true },
-      { id: 'poison_arrow', name: 'Toxic Barb', icon: 'skull', description: 'Poisons the enemy with a toxic sea barb for damage over time', type: 'physical', damage: 0.7, manaCost: 0, staminaCost: 15, cooldown: 3, target: 'enemy', effect: { type: 'dot', damage: 0.2, duration: 3 } },
+      { id: 'poison_arrow', name: 'Toxic Barb', icon: 'skull', description: 'Poisons the enemy with a toxic barb for damage over time', type: 'physical', damage: 0.7, manaCost: 0, staminaCost: 15, cooldown: 3, target: 'enemy', effect: { type: 'dot', damage: 0.2, duration: 3 } },
       { id: 'evasive_maneuver', name: 'Slipstream', icon: 'energy', description: 'Increase evasion by 50% for 2 turns by riding the current', type: 'buff', damage: 0, manaCost: 0, staminaCost: 15, cooldown: 4, target: 'self', effect: { stat: 'evasion', flat: 50, duration: 2 } },
       { id: 'volley', name: 'Spine Volley', icon: 'bow', description: 'Rain spines for heavy damage', type: 'physical', damage: 2.4, manaCost: 0, staminaCost: 28, cooldown: 4, target: 'enemy' },
     ],

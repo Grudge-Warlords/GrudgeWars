@@ -2,18 +2,18 @@ export const CHAPTERS = [
   {
     id: 'ch1',
     number: 1,
-    title: 'The Darkening Tide',
+    title: 'The Darkening Current',
     subtitle: 'Awakening in Silence',
-    description: 'The Plankton Magic has gone silent. The Coral Crown lies shattered. You are a young Betta Warlord who must gather allies and discover why the ocean has gone dark.',
+    description: 'The Plankton Magic has gone silent. The Root Crown lies shattered. You are a young Betta Warlord who must gather allies and discover why the waters have gone dark.',
     objectives: [
       { id: 'ch1_create', text: 'Create your first Warlord', type: 'create_hero', target: 1, icon: 'sword' },
       { id: 'ch1_train', text: 'Complete training in the shallows', type: 'complete_training', target: 1, icon: 'shield' },
-      { id: 'ch1_explore', text: 'Explore the Coral Shallows', type: 'visit_zone', zoneId: 'verdant_plains', icon: 'compass' },
+      { id: 'ch1_explore', text: 'Explore the Root Shallows', type: 'visit_zone', zoneId: 'verdant_plains', icon: 'compass' },
       { id: 'ch1_battle', text: 'Win 3 battles', type: 'win_battles', target: 3, icon: 'battle' },
     ],
     reward: { pearls: 100, xp: 50, item: 'coral_shard' },
     requiredLevel: 1,
-    loreReveal: 'The elders speak of three magics that once held the ocean in balance. The Betta carried the Fire of Will. Now only Will remains.',
+    loreReveal: 'The elders speak of three magics that once held the waters in balance. The Betta carried the Fire of Will. Now only Will remains.',
     vesselFocus: 'betta',
   },
   {
@@ -63,7 +63,7 @@ export const CHAPTERS = [
     ],
     reward: { pearls: 500, xp: 400, item: 'crown_fragment_1' },
     requiredLevel: 8,
-    loreReveal: 'As Scylla falls, a flash of Plankton light erupts from her form — blinding, warm, and achingly familiar. The first fragment of the Coral Crown materializes from the light. The Plankton are watching.',
+    loreReveal: 'As Scylla falls, a flash of Plankton light erupts from her form — blinding, warm, and achingly familiar. The first fragment of the Root Crown materializes from the light. The Plankton are watching.',
     vesselFocus: 'gorgon',
   },
   {
@@ -73,14 +73,14 @@ export const CHAPTERS = [
     subtitle: 'The Deepening Mystery',
     description: 'With one Crown fragment recovered, the truth draws closer. The mid-waters hold Medusa\'s domain and darker secrets about the Plankton Silence.',
     objectives: [
-      { id: 'ch5_fortress', text: 'Reach the Coral Fortress', type: 'visit_zone', zoneId: 'iron_peaks', icon: 'compass' },
+      { id: 'ch5_fortress', text: 'Reach the Root Fortress', type: 'visit_zone', zoneId: 'iron_peaks', icon: 'compass' },
       { id: 'ch5_vent', text: 'Explore the Thermal Vent', type: 'visit_zone', zoneId: 'blood_canyon', icon: 'fire' },
       { id: 'ch5_level13', text: 'Reach level 13', type: 'reach_level', target: 13, icon: 'chart' },
       { id: 'ch5_skills3', text: 'Unlock 5 skill tree abilities across party', type: 'unlock_skill', target: 5, icon: 'sparkle' },
     ],
     reward: { pearls: 500, xp: 500 },
     requiredLevel: 11,
-    loreReveal: 'Deep in the Coral Fortress, you find Gorgon carvings that predate the kingdom. They show four figures, not three. The inscriptions mention a "Fourth Vessel" — something that was never meant to awaken.',
+    loreReveal: 'Deep in the Root Fortress, you find Gorgon carvings that predate the kingdom. They show four figures, not three. The inscriptions mention a "Fourth Vessel" — something that was never meant to awaken.',
     vesselFocus: 'plankton',
   },
   {
@@ -112,7 +112,7 @@ export const CHAPTERS = [
     ],
     reward: { pearls: 1000, xp: 900 },
     requiredLevel: 18,
-    loreReveal: 'In the Hadal Trench, impossible deep, Plankton still glow. But they don\'t drift randomly — they form patterns, letters, a single word written in light older than the ocean itself. The word is: "REMEMBER."',
+    loreReveal: 'In the Hadal Trench, impossible deep, Plankton still glow. But they don\'t drift randomly — they form patterns, letters, a single word written in light older than the waters themselves. The word is: "REMEMBER."',
     vesselFocus: 'plankton',
   },
   {
@@ -128,7 +128,7 @@ export const CHAPTERS = [
     ],
     reward: { pearls: 2000, xp: 1500, item: 'crown_fragment_3' },
     requiredLevel: 20,
-    loreReveal: 'The Coral Crown is whole again. As the three fragments unite, the ocean fills with blinding Plankton light. A voice speaks — not from any creature, but from the water itself: "We withdrew because We felt the Fourth Vessel stir. We are the Light of Unity. If We had stayed, the Fourth would have consumed Us to fuel its awakening. We chose silence so that you — the Fire of Will — could grow strong enough to face what comes. The time is near. The Abyss King rises. Remember what you fight for."',
+    loreReveal: 'The Root Crown is whole again. As the three fragments unite, the waters fill with blinding Plankton light. A voice speaks — not from any creature, but from the water itself: "We withdrew because We felt the Fourth Vessel stir. We are the Light of Unity. If We had stayed, the Fourth would have consumed Us to fuel its awakening. We chose silence so that you — the Fire of Will — could grow strong enough to face what comes. The time is near. The Abyss King rises. Remember what you fight for."',
     vesselFocus: 'all',
   },
 ];

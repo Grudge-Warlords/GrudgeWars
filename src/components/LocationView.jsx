@@ -401,7 +401,7 @@ export default function LocationView() {
                     minHeight: 32,
                   }}
                 >
-                  {loreLoading ? 'Channeling the tides...' : 'Generate AI Lore'}
+                  {loreLoading ? 'Channeling the currents...' : 'Generate AI Lore'}
                 </button>
               )}
             </div>

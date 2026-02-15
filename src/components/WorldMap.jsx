@@ -278,7 +278,7 @@ const locationIcons = {
 
 const terrainRegions = [
   {
-    name: 'Coral Reefs',
+    name: 'Root Groves',
     fill: 'rgba(20,184,166,0.06)',
     stroke: 'rgba(20,184,166,0.15)',
     points: '4,60 22,60 32,70 42,84 42,92 4,92',

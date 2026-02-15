@@ -1505,7 +1505,7 @@ export const enemyAbilityEffects = {
   'Void Blast': { effect: 'thunderProjectile2', beam: 'purple', followUp: [{ effect: 'arcanebolt', delay: 250 }, { effect: 'arcanemist', delay: 480 }] },
   'Annihilate': { effect: 'fireExplosion2', beam: 'red', followUp: [{ effect: 'flamestrike', delay: 200, filter: 'saturate(1.5)' }, { effect: 'hitBurst', delay: 450 }] },
   'Reality Tear': { effect: 'felSpell', beam: 'purple', followUp: [{ effect: 'arcanelighting', delay: 250 }, { effect: 'arcanemist', delay: 480 }] },
-  'Tidal Strike': { effect: 'freezing', beam: 'purple' },
+  'Current Strike': { effect: 'freezing', beam: 'purple' },
   'Torrent': { effect: 'thunderProjectile2', beam: 'purple' },
   'Tsunami': { effect: 'fireExplosion', beam: 'purple' },
   'Vine Lash': { effect: 'windHit', beam: 'green' },
@@ -1514,7 +1514,7 @@ export const enemyAbilityEffects = {
   'Regenerate': { effect: 'healEffect', beam: 'green' },
   'Thorn Armor': { effect: 'protectionCircle', beam: 'green' },
   'Root Bind': { effect: 'windBreath', beam: 'green', followUp: [{ effect: 'windProjectile', delay: 350 }, { effect: 'windHit', delay: 600 }] },
-  'Healing Tide': { effect: 'healingwave', beam: 'purple' },
+  'Healing Current': { effect: 'healingwave', beam: 'purple' },
   'Frozen Prison': { effect: 'frozenIce', beam: 'purple' },
   'Soul Drain': { effect: 'arcanelighting', beam: 'purple' },
   'Raise Dead': { effect: 'arcanemist', beam: 'purple' },
@@ -1567,8 +1567,8 @@ export const enemyAbilityEffects = {
   'Shadow Strike': { effect: 'hitEffect1', beam: null },
   'Dark Frenzy': { effect: 'fireSpin', beam: null },
   'Shadow Leap': { effect: 'critSlash', beam: 'purple' },
-  'Tidal Strike': { effect: 'freezing', beam: 'blue' },
-  'Healing Tide': { effect: 'healingwave', beam: 'blue' },
+  'Current Strike': { effect: 'freezing', beam: 'blue' },
+  'Healing Current': { effect: 'healingwave', beam: 'blue' },
   'Frozen Prison': { effect: 'frozenIce', beam: 'blue' },
 };
 
@@ -1748,7 +1748,7 @@ export const SCENE_NPCS = {
     { id: 'field_trout', npc: 'rainbow_trout', name: 'Flash', x: 85, y: 50, flip: true },
   ],
   portal: [
-    { id: 'portal_anchovy', npc: 'anchovy', name: 'Tide Keeper', x: 12, y: 45, flip: false },
+    { id: 'portal_anchovy', npc: 'anchovy', name: 'Current Keeper', x: 12, y: 45, flip: false },
     { id: 'portal_pufferfish', npc: 'pufferfish', name: 'Abyssal Guard', x: 88, y: 45, flip: true },
   ],
 };

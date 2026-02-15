@@ -58,10 +58,10 @@ const BETTA_WIKI_KNOWLEDGE = `REAL BETTA FACTS (use naturally in dialogue):
 
 const PERSONALITY_SEEDS = {
   warrior: { traits: 'brave, direct, protective, battle-hungry', voice: 'speaks with military confidence and honor, sometimes terse and commanding' },
-  mage: { traits: 'curious, mystical, scholarly, contemplative', voice: 'speaks with arcane wisdom about ocean magic and ley currents, sometimes cryptically brief' },
+  mage: { traits: 'curious, mystical, scholarly, contemplative', voice: 'speaks with arcane wisdom about water magic and ley currents, sometimes cryptically brief' },
   worge: { traits: 'cunning, stealthy, witty, street-smart', voice: 'speaks with sly humor and keen observation, often sharp and concise' },
   ranger: { traits: 'observant, patient, nature-attuned, independent', voice: 'speaks with quiet awareness of surroundings, sometimes in clipped hunter shorthand' },
-  cleric: { traits: 'compassionate, devout, calm, resolute', voice: 'speaks with spiritual reverence for the ocean spirits, sometimes in serene brevity' },
+  cleric: { traits: 'compassionate, devout, calm, resolute', voice: 'speaks with spiritual reverence for the water spirits, sometimes in serene brevity' },
   rogue: { traits: 'cunning, stealthy, witty, street-smart', voice: 'speaks with sly humor and keen observation' },
 };
 
@@ -126,7 +126,7 @@ function buildSystemPrompt(hero, context = {}) {
   let prompt = `You are ${identity.name} (ID: ${identity.uid}), a level ${identity.level} ${raceFlavor} of the ${hero.classId} class in "Betta Warlords," an underwater RPG set in the Sunken Kingdom of Abyssia.
 
 PERSONALITY: ${classSeed.traits}. You ${classSeed.voice}.
-WORLD: Underwater ocean kingdom with coral reefs, deep trenches, volcanic vents, frozen depths. Currency is Pearls. Enemies are sea creatures.
+WORLD: Underwater freshwater kingdom with root groves, deep trenches, volcanic vents, frozen depths. Currency is Pearls. Enemies are aquatic creatures.
 
 ${BETTA_WIKI_KNOWLEDGE}`;
 
@@ -358,7 +358,7 @@ export async function generateAIDialogue(hero, contextType, contextData = {}) {
         break;
       }
       case 'lore': {
-        userPrompt = contextData.prompt || `Generate atmospheric lore about ${contextData.zoneName || 'the deep ocean'}.`;
+        userPrompt = contextData.prompt || `Generate atmospheric lore about ${contextData.zoneName || 'the deep waters'}.`;
         break;
       }
       case 'npc_dialogue': {

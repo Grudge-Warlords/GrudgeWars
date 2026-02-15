@@ -13,17 +13,17 @@ import useIsMobile from '../hooks/useIsMobile';
 const RESOURCE_NODES = [
   { id: 'gold_mine', name: 'Pearl Beds', icon: 'pickaxe', resource: 'gold', x: 18, y: 30, color: '#fbbf24', img: '/images/buildings/pearl_beds.png' },
   { id: 'herb_garden', name: 'Algae Garden', icon: 'nature', resource: 'herbs', x: 72, y: 28, color: '#4ade80', img: '/images/buildings/algae_garden.png' },
-  { id: 'lumber_yard', name: 'Coral Grove', icon: 'wood', resource: 'wood', x: 12, y: 58, color: '#22d3ee', img: '/images/buildings/coral_grove.png' },
+  { id: 'lumber_yard', name: 'Root Grove', icon: 'wood', resource: 'wood', x: 12, y: 58, color: '#22d3ee', img: '/images/buildings/coral_grove.png' },
   { id: 'ore_vein', name: 'Shell Deposit', icon: 'ore', resource: 'ore', x: 80, y: 55, color: '#94a3b8', img: '/images/buildings/shell_deposit.png' },
   { id: 'crystal_cave', name: 'Crystal Grotto', icon: 'diamond', resource: 'crystals', x: 50, y: 22, color: '#a78bfa', img: '/images/buildings/crystal_grotto.png' },
 ];
 
 const REST_NODE = { id: 'rest_spot', name: 'Rest', x: 35, y: 55, color: '#818cf8', img: '/images/buildings/sleeping_bag.png' };
 const CHEST_NODE = { id: 'inventory_chest', name: 'Inventory', x: 90, y: 48, color: '#f59e0b', img: '/images/buildings/treasure_chest.png' };
-const REEF_HUNT_NODE = { id: 'reef_hunt', name: 'Reef Hunt', x: 55, y: 35, color: '#22d3ee', img: '/images/buildings/crystal_grotto.png' };
+const REEF_HUNT_NODE = { id: 'reef_hunt', name: 'Grove Hunt', x: 55, y: 35, color: '#22d3ee', img: '/images/buildings/crystal_grotto.png' };
 
 const SELL_PRICES = { gold: 1, herbs: 2, wood: 2, ore: 4, crystals: 8 };
-const RESOURCE_LABELS = { gold: 'Pearls', herbs: 'Algae', wood: 'Coral', ore: 'Shells', crystals: 'Crystals' };
+const RESOURCE_LABELS = { gold: 'Pearls', herbs: 'Algae', wood: 'Root', ore: 'Shells', crystals: 'Crystals' };
 
 const SPAWN_POS = { x: 50, y: -8 };
 const LAND_POS = { x: 45, y: 75 };

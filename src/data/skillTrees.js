@@ -4,7 +4,7 @@ export const skillTrees = {
     color: '#ef4444',
     tiers: [
       {
-        name: 'Tide 1 - Deep Combat',
+        name: 'Current 1 - Deep Combat',
         requiredLevel: 1,
         skills: [
           { id: 'w_taunt', name: 'Threatening Display', icon: 'skill_taunt', description: 'Flare your fins to force enemies to target you', effect: '+15% Threat', maxPoints: 3, bonuses: { defense: 5 } },
@@ -13,20 +13,20 @@ export const skillTrees = {
         ]
       },
       {
-        name: 'Tide 5 - Reef Guardian',
+        name: 'Current 5 - Grove Guardian',
         requiredLevel: 5,
         skills: [
-          { id: 'w_damage_surge', name: 'Tidal Surge', icon: 'skill_damage_surge', description: 'Ride a surge of current for temporary damage boost', effect: '+25% Damage for 3 turns', maxPoints: 3, requires: 'w_quick_strike', bonuses: { damage: 3 } },
+          { id: 'w_damage_surge', name: 'Current Surge', icon: 'skill_damage_surge', description: 'Ride a surge of current for temporary damage boost', effect: '+25% Damage for 3 turns', maxPoints: 3, requires: 'w_quick_strike', bonuses: { damage: 3 } },
           { id: 'w_guardian_aura', name: "Shell Guard Aura", icon: 'shield', description: 'Harden your shell, boosting defense', effect: '+15% Party Defense', maxPoints: 3, requires: 'w_taunt', bonuses: { defense: 8 },
             grantedAbility: { id: 'guardian_aura', name: "Shell Guard Aura", icon: 'shield', description: 'Reinforce your shell, gaining +20 defense for 3 turns', type: 'buff', damage: 0, manaCost: 0, staminaCost: 20, cooldown: 5, target: 'self', effect: { stat: 'defense', flat: 20, duration: 3 } }
           },
-          { id: 'w_demoralizing_shout', name: 'Predator Roar', icon: 'skill_demoralizing_shout', description: 'A deep-sea bellow that weakens enemy attacks', effect: '-20% Enemy Attack', maxPoints: 3, requires: 'w_taunt', bonuses: { defense: 3 },
+          { id: 'w_demoralizing_shout', name: 'Predator Roar', icon: 'skill_demoralizing_shout', description: 'A deepwater bellow that weakens enemy attacks', effect: '-20% Enemy Attack', maxPoints: 3, requires: 'w_taunt', bonuses: { defense: 3 },
             grantedAbility: { id: 'demoralizing_shout', name: 'Predator Roar', icon: 'battle', description: 'Roar from the deep, reducing enemy attack by 20% for 3 turns', type: 'debuff', damage: 0, manaCost: 0, staminaCost: 15, cooldown: 5, target: 'enemy', effect: { type: 'lower_attack', percent: 0.20, duration: 3 } }
           }
         ]
       },
       {
-        name: 'Tide 10 - Abyssal Arts',
+        name: 'Current 10 - Abyssal Arts',
         requiredLevel: 10,
         skills: [
           { id: 'w_dual_wield', name: 'Twin Fins', icon: 'skill_dual_wield', description: 'Attack with both fins in rapid succession', effect: '+30% Attack Speed', maxPoints: 1, requires: 'w_damage_surge', bonuses: { attackSpeed: 15 } },
@@ -43,7 +43,7 @@ export const skillTrees = {
         ]
       },
       {
-        name: 'Tide 15 - Warlord',
+        name: 'Current 15 - Warlord',
         requiredLevel: 15,
         skills: [
           { id: 'w_execute', name: 'Finishing Bite', icon: 'skill_execute', description: 'Devastating bite against weakened prey', effect: '+50% Damage below 30% HP', maxPoints: 1, requires: 'w_dual_wield', bonuses: { damage: 10 },
@@ -55,7 +55,7 @@ export const skillTrees = {
         ]
       },
       {
-        name: 'Tide 20 - Leviathan',
+        name: 'Current 20 - Leviathan',
         requiredLevel: 20,
         skills: [
           { id: 'w_avatar', name: 'Leviathan Ascension', icon: 'skill_avatar', description: 'Channel the ancient Leviathan, boosting all combat stats', effect: 'Ultimate Transformation', maxPoints: 1, requires: 'w_execute', bonuses: { damage: 15, defense: 15, health: 50 },
@@ -71,16 +71,16 @@ export const skillTrees = {
     color: '#8b5cf6',
     tiers: [
       {
-        name: 'Tide 1 - Coral Arts',
+        name: 'Current 1 - Root Arts',
         requiredLevel: 1,
         skills: [
-          { id: 'm_mana_flow', name: 'Ley Current', icon: 'skill_mana_flow', description: 'Tap into the coral ley lines for faster mana recovery', effect: '+20% Mana Regen', maxPoints: 3, bonuses: { manaRegen: 0.5 } },
-          { id: 'm_arcane_focus', name: 'Tidal Focus', icon: 'skill_arcane_focus', description: 'Channel tidal energy for increased spell damage', effect: '+10% Spell Damage', maxPoints: 3, bonuses: { damage: 3 } },
+          { id: 'm_mana_flow', name: 'Ley Current', icon: 'skill_mana_flow', description: 'Tap into the root ley lines for faster mana recovery', effect: '+20% Mana Regen', maxPoints: 3, bonuses: { manaRegen: 0.5 } },
+          { id: 'm_arcane_focus', name: 'Current Focus', icon: 'skill_arcane_focus', description: 'Channel current energy for increased spell damage', effect: '+10% Spell Damage', maxPoints: 3, bonuses: { damage: 3 } },
           { id: 'm_enfeeble', name: 'Ink Cloud', icon: 'skill_enfeeble', description: 'Spells leave an ink residue that saps enemy strength', effect: '-8% Enemy Attack on Hit', maxPoints: 3, bonuses: { defense: 2 }, passive: true, procEffect: { type: 'lower_attack', percent: 0.08, duration: 2 } }
         ]
       },
       {
-        name: 'Tide 5 - Elemental Depths',
+        name: 'Current 5 - Elemental Depths',
         requiredLevel: 5,
         skills: [
           { id: 'm_fire_mastery', name: 'Vent Mastery', icon: 'skill_fire_mastery', description: 'Command hydrothermal vent energy', effect: '+25% Thermal Damage', maxPoints: 3, requires: 'm_arcane_focus', bonuses: { damage: 5 } },
@@ -88,19 +88,19 @@ export const skillTrees = {
           { id: 'm_flame_brand', name: 'Vent Sear', icon: 'skill_flame_brand', description: 'Brand the target with superheated vent water', effect: 'Burn DOT', maxPoints: 3, requires: 'm_arcane_focus', bonuses: { damage: 3 },
             grantedAbility: { id: 'flame_brand', name: 'Vent Sear', icon: 'fire', description: 'Scald the target with vent heat, burning for 15% spell damage over 4 turns', type: 'magical', damage: 0.6, manaCost: 20, staminaCost: 0, cooldown: 3, target: 'enemy', effect: { type: 'burn', damage: 0.15, duration: 4 } }
           },
-          { id: 'm_blessing', name: 'Coral Blessing', icon: 'skill_blessing', description: 'Sacred coral light heals over time', effect: 'Heal Over Time', maxPoints: 3, requires: 'm_mana_flow', bonuses: { health: 10 },
-            grantedAbility: { id: 'blessing', name: 'Coral Blessing', icon: 'sparkle', description: 'Bless yourself with coral radiance, healing 8% HP per turn for 4 turns', type: 'heal_over_time', damage: 0, manaCost: 22, staminaCost: 0, cooldown: 5, target: 'self', healPercent: 0.08, duration: 4 }
+          { id: 'm_blessing', name: 'Root Blessing', icon: 'skill_blessing', description: 'Sacred root light heals over time', effect: 'Heal Over Time', maxPoints: 3, requires: 'm_mana_flow', bonuses: { health: 10 },
+            grantedAbility: { id: 'blessing', name: 'Root Blessing', icon: 'sparkle', description: 'Bless yourself with root radiance, healing 8% HP per turn for 4 turns', type: 'heal_over_time', damage: 0, manaCost: 22, staminaCost: 0, cooldown: 5, target: 'self', healPercent: 0.08, duration: 4 }
           }
         ]
       },
       {
-        name: 'Tide 10 - Deep Channeling',
+        name: 'Current 10 - Deep Channeling',
         requiredLevel: 10,
         skills: [
           { id: 'm_meteor', name: 'Depth Bomb', icon: 'skill_meteor_strike', description: 'Compress water pressure into a devastating explosion', effect: 'Massive Damage', maxPoints: 1, requires: 'm_fire_mastery', bonuses: { damage: 12 },
-            grantedAbility: { id: 'meteor_strike', name: 'Depth Bomb', icon: 'bomb', description: 'Detonate compressed deep-sea pressure for massive damage', type: 'magical', damage: 3.0, manaCost: 50, staminaCost: 0, cooldown: 5, target: 'enemy', effect: { type: 'burn', damage: 0.15, duration: 2 } }
+            grantedAbility: { id: 'meteor_strike', name: 'Depth Bomb', icon: 'bomb', description: 'Detonate compressed deepwater pressure for massive damage', type: 'magical', damage: 3.0, manaCost: 50, staminaCost: 0, cooldown: 5, target: 'enemy', effect: { type: 'burn', damage: 0.15, duration: 2 } }
           },
-          { id: 'm_divine_shield', name: 'Pressure Barrier', icon: 'skill_divine_shield', description: 'A shield of compressed deep-sea pressure', effect: 'Absorb Damage', maxPoints: 3, requires: 'm_ice_mastery', bonuses: { defense: 6, resistance: 3 } },
+          { id: 'm_divine_shield', name: 'Pressure Barrier', icon: 'skill_divine_shield', description: 'A shield of compressed deepwater pressure', effect: 'Absorb Damage', maxPoints: 3, requires: 'm_ice_mastery', bonuses: { defense: 6, resistance: 3 } },
           { id: 'm_chain_lightning', name: 'Bio-Electric Surge', icon: 'skill_chain_lightning', description: 'Bioelectric energy arcs between foes like an electric eel', effect: 'Hit Multiple Targets', maxPoints: 2, requires: 'm_arcane_focus', bonuses: { damage: 6, criticalChance: 3 },
             grantedAbility: { id: 'chain_lightning', name: 'Bio-Electric Surge', icon: 'lightning', description: 'Launch arcing bioelectric energy that chains between enemies', type: 'magical', damage: 2.2, manaCost: 35, staminaCost: 0, cooldown: 3, target: 'enemy', effect: { type: 'dot', damage: 0.08, duration: 2 } }
           },
@@ -113,29 +113,29 @@ export const skillTrees = {
         ]
       },
       {
-        name: 'Tide 15 - Grand Tidecaller',
+        name: 'Current 15 - Grand Currentcaller',
         requiredLevel: 15,
         skills: [
-          { id: 'm_spell_echo', name: 'Tidal Echo', icon: 'skill_spell_echo', description: 'Spells reverberate through the water, chance to double cast', effect: '20% Echo Chance', maxPoints: 2, requires: 'm_meteor', bonuses: { damage: 8, mana: 20 } },
+          { id: 'm_spell_echo', name: 'Current Echo', icon: 'skill_spell_echo', description: 'Spells reverberate through the water, chance to double cast', effect: '20% Echo Chance', maxPoints: 2, requires: 'm_meteor', bonuses: { damage: 8, mana: 20 } },
           { id: 'm_holy_nova', name: 'Bioluminescent Burst', icon: 'skill_holy_nova', description: 'Release a burst of bioluminescent healing energy', effect: 'Burst Heal + Damage', maxPoints: 2, requires: 'm_divine_shield', bonuses: { health: 30, damage: 5 },
             grantedAbility: { id: 'holy_nova', name: 'Bioluminescent Burst', icon: 'sparkle', description: 'Release bioluminescent energy, healing yourself for 25% HP', type: 'heal', damage: 0, manaCost: 45, staminaCost: 0, cooldown: 5, target: 'self', healPercent: 0.25 }
           },
           { id: 'm_confuse', name: 'Ink Hex', icon: 'skill_bewilderment', description: 'Toxic ink clouds befuddle the target mind', effect: 'Confuse 2 Turns', maxPoints: 2, requires: 'm_sleep', bonuses: { mana: 15 },
             grantedAbility: { id: 'bewilderment', name: 'Ink Hex', icon: 'chaos', description: 'Cloud the enemy mind with toxic ink for 2 turns. They may attack allies.', type: 'magical', damage: 0, manaCost: 35, staminaCost: 0, cooldown: 6, target: 'enemy', effect: { type: 'confuse', duration: 2 } }
           },
-          { id: 'm_purify', name: 'Purifying Tide', icon: 'skill_purify', description: 'Cleanse all toxins with pure ocean water', effect: 'Remove Debuffs', maxPoints: 1, requires: 'm_blessing', bonuses: { health: 20 },
-            grantedAbility: { id: 'purify', name: 'Purifying Tide', icon: 'sparkle', description: 'Cleanse all debuffs from yourself with purifying water and heal 15% HP', type: 'heal', damage: 0, manaCost: 30, staminaCost: 0, cooldown: 6, target: 'self', healPercent: 0.15, cleanse: true }
+          { id: 'm_purify', name: 'Purifying Current', icon: 'skill_purify', description: 'Cleanse all toxins with pure freshwater', effect: 'Remove Debuffs', maxPoints: 1, requires: 'm_blessing', bonuses: { health: 20 },
+            grantedAbility: { id: 'purify', name: 'Purifying Current', icon: 'sparkle', description: 'Cleanse all debuffs from yourself with purifying water and heal 15% HP', type: 'heal', damage: 0, manaCost: 30, staminaCost: 0, cooldown: 6, target: 'self', healPercent: 0.15, cleanse: true }
           }
         ]
       },
       {
-        name: 'Tide 20 - Abyssal Oracle',
+        name: 'Current 20 - Abyssal Oracle',
         requiredLevel: 20,
         skills: [
-          { id: 'm_arcane_cataclysm', name: 'Maelstrom', icon: 'skill_arcane_cataclysm', description: 'Summon a devastating underwater maelstrom of pure tidal energy', effect: 'Ultimate: Tidal Storm', maxPoints: 1, requires: 'm_spell_echo', bonuses: { damage: 20, mana: 50, criticalChance: 10 },
-            grantedAbility: { id: 'arcane_cataclysm', name: 'Maelstrom', icon: 'star', description: 'Unleash a devastating maelstrom of crushing tidal forces', type: 'magical', damage: 4.0, manaCost: 70, staminaCost: 0, cooldown: 8, target: 'enemy' }
+          { id: 'm_arcane_cataclysm', name: 'Maelstrom', icon: 'skill_arcane_cataclysm', description: 'Summon a devastating underwater maelstrom of pure current energy', effect: 'Ultimate: Current Storm', maxPoints: 1, requires: 'm_spell_echo', bonuses: { damage: 20, mana: 50, criticalChance: 10 },
+            grantedAbility: { id: 'arcane_cataclysm', name: 'Maelstrom', icon: 'star', description: 'Unleash a devastating maelstrom of crushing current forces', type: 'magical', damage: 4.0, manaCost: 70, staminaCost: 0, cooldown: 8, target: 'enemy' }
           },
-          { id: 'm_spellweave', name: 'Tidecaller Mastery', icon: 'skill_spellweave', description: 'Spells carry random ocean afflictions (scald, sleep, confuse, corrode)', effect: 'Random Debuff Proc', maxPoints: 1, requires: 'm_confuse', bonuses: { damage: 10, mana: 25 }, passive: true, procEffect: { type: 'random_debuff', options: ['burn', 'sleep', 'confuse', 'lower_defense'], chance: 0.20 } }
+          { id: 'm_spellweave', name: 'Currentcaller Mastery', icon: 'skill_spellweave', description: 'Spells carry random water afflictions (scald, sleep, confuse, corrode)', effect: 'Random Debuff Proc', maxPoints: 1, requires: 'm_confuse', bonuses: { damage: 10, mana: 25 }, passive: true, procEffect: { type: 'random_debuff', options: ['burn', 'sleep', 'confuse', 'lower_defense'], chance: 0.20 } }
         ]
       }
     ]
@@ -145,30 +145,30 @@ export const skillTrees = {
     color: '#d97706',
     tiers: [
       {
-        name: 'Tide 1 - Primal Current',
+        name: 'Current 1 - Primal Current',
         requiredLevel: 1,
         skills: [
           { id: 'wr_storm_touch', name: 'Storm Current', icon: 'skill_storm_touch', description: 'Channel bioelectric currents for stronger strikes', effect: '+15% Storm Damage', maxPoints: 3, bonuses: { damage: 3 } },
-          { id: 'wr_bark_skin', name: 'Coral Plating', icon: 'skill_bark_skin', description: 'Grow protective coral armor over your scales', effect: '+10% Defense', maxPoints: 3, bonuses: { defense: 4, health: 10 } },
+          { id: 'wr_bark_skin', name: 'Root Plating', icon: 'skill_bark_skin', description: 'Grow protective root armor over your scales', effect: '+10% Defense', maxPoints: 3, bonuses: { defense: 4, health: 10 } },
           { id: 'wr_feral_instinct', name: 'Predator Instinct', icon: 'skill_feral_instinct', description: 'Chance for a bonus follow-up strike driven by hunting instinct', effect: '+8% Proc Chance', maxPoints: 3, bonuses: { procChance: 3, attackSpeed: 2 }, passive: true, procEffect: { type: 'extra_attack', damage: 0.5 } }
         ]
       },
       {
-        name: 'Tide 5 - Dual Nature',
+        name: 'Current 5 - Dual Nature',
         requiredLevel: 5,
         skills: [
           { id: 'wr_weapon_mastery', name: 'Conch & Spine Mastery', icon: 'skill_weapon_mastery', description: 'Master the conch and venomous spine', effect: '+20% Weapon Damage', maxPoints: 3, requires: 'wr_storm_touch', bonuses: { damage: 4, criticalChance: 3 } },
           { id: 'wr_wild_growth', name: 'Kelp Renewal', icon: 'skill_wild_growth', description: 'Nature heals strengthen through kelp magic', effect: '+25% Heal Power', maxPoints: 3, requires: 'wr_bark_skin', bonuses: { health: 15 } },
-          { id: 'wr_lacerate', name: 'Reef Shred', icon: 'skill_lacerate', description: 'Rake with coral-edged claws causing deep wounds', effect: 'Bleed DOT', maxPoints: 3, requires: 'wr_feral_instinct', bonuses: { damage: 3 },
-            grantedAbility: { id: 'lacerate', name: 'Reef Shred', icon: 'target', description: 'Shred the target with coral claws, causing bleed for 10% damage over 4 turns', type: 'physical', damage: 1.0, manaCost: 0, staminaCost: 14, cooldown: 3, target: 'enemy', effect: { type: 'bleed', damage: 0.10, duration: 4 } }
+          { id: 'wr_lacerate', name: 'Grove Shred', icon: 'skill_lacerate', description: 'Rake with root-edged claws causing deep wounds', effect: 'Bleed DOT', maxPoints: 3, requires: 'wr_feral_instinct', bonuses: { damage: 3 },
+            grantedAbility: { id: 'lacerate', name: 'Grove Shred', icon: 'target', description: 'Shred the target with root claws, causing bleed for 10% damage over 4 turns', type: 'physical', damage: 1.0, manaCost: 0, staminaCost: 14, cooldown: 3, target: 'enemy', effect: { type: 'bleed', damage: 0.10, duration: 4 } }
           },
-          { id: 'wr_soothing_rain', name: 'Healing Tide', icon: 'skill_soothing_rain', description: 'Call a gentle tide that mends wounds over time', effect: 'Heal Over Time', maxPoints: 3, requires: 'wr_bark_skin', bonuses: { health: 10 },
-            grantedAbility: { id: 'soothing_rain', name: 'Healing Tide', icon: 'nature', description: 'Call a healing tide that restores 6% HP per turn for 5 turns', type: 'heal_over_time', damage: 0, manaCost: 18, staminaCost: 0, cooldown: 5, target: 'self', healPercent: 0.06, duration: 5 }
+          { id: 'wr_soothing_rain', name: 'Healing Current', icon: 'skill_soothing_rain', description: 'Call a gentle current that mends wounds over time', effect: 'Heal Over Time', maxPoints: 3, requires: 'wr_bark_skin', bonuses: { health: 10 },
+            grantedAbility: { id: 'soothing_rain', name: 'Healing Current', icon: 'nature', description: 'Call a healing current that restores 6% HP per turn for 5 turns', type: 'heal_over_time', damage: 0, manaCost: 18, staminaCost: 0, cooldown: 5, target: 'self', healPercent: 0.06, duration: 5 }
           }
         ]
       },
       {
-        name: 'Tide 10 - Shapeshifter',
+        name: 'Current 10 - Shapeshifter',
         requiredLevel: 10,
         skills: [
           { id: 'wr_thunderclap', name: 'Electric Shockwave', icon: 'skill_thunderclap', description: 'Release a shockwave of bioelectric energy', effect: 'Spell Stun Chance', maxPoints: 1, requires: 'wr_weapon_mastery', bonuses: { damage: 10 },
@@ -184,25 +184,25 @@ export const skillTrees = {
         ]
       },
       {
-        name: 'Tide 15 - Ocean Warden',
+        name: 'Current 15 - Waters Warden',
         requiredLevel: 15,
         skills: [
-          { id: 'wr_tempest', name: 'Riptide Tempest', icon: 'skill_tempest', description: 'Unleash the fury of storm and sea as one', effect: '+40% Storm Power', maxPoints: 1, requires: 'wr_thunderclap', bonuses: { damage: 8, attackSpeed: 10 },
-            grantedAbility: { id: 'tempest', name: 'Riptide Tempest', icon: 'chaos', description: 'Summon a raging riptide dealing heavy storm damage', type: 'magical', damage: 2.5, manaCost: 40, staminaCost: 0, cooldown: 4, target: 'enemy', effect: { type: 'lower_attack', percent: 0.15, duration: 2 } }
+          { id: 'wr_tempest', name: 'Rapids Tempest', icon: 'skill_tempest', description: 'Unleash the fury of storm and water as one', effect: '+40% Storm Power', maxPoints: 1, requires: 'wr_thunderclap', bonuses: { damage: 8, attackSpeed: 10 },
+            grantedAbility: { id: 'tempest', name: 'Rapids Tempest', icon: 'chaos', description: 'Summon a raging rapids dealing heavy storm damage', type: 'magical', damage: 2.5, manaCost: 40, staminaCost: 0, cooldown: 4, target: 'enemy', effect: { type: 'lower_attack', percent: 0.15, duration: 2 } }
           },
-          { id: 'wr_rejuvenate', name: 'Tidal Regeneration', icon: 'skill_rejuvenate', description: 'The ocean itself mends your wounds passively', effect: 'Passive Regen', maxPoints: 2, requires: 'wr_iron_hide', bonuses: { drainHealth: 5, health: 20 } },
-          { id: 'wr_primal_roar', name: 'Abyssal Howl', icon: 'skill_primal_roar', description: 'A terrifying deep-sea howl that disorients and weakens', effect: 'Confuse + Lower Attack', maxPoints: 2, requires: 'wr_iron_hide', bonuses: { defense: 5 },
+          { id: 'wr_rejuvenate', name: 'Current Regeneration', icon: 'skill_rejuvenate', description: 'The water itself mends your wounds passively', effect: 'Passive Regen', maxPoints: 2, requires: 'wr_iron_hide', bonuses: { drainHealth: 5, health: 20 } },
+          { id: 'wr_primal_roar', name: 'Abyssal Howl', icon: 'skill_primal_roar', description: 'A terrifying deepwater howl that disorients and weakens', effect: 'Confuse + Lower Attack', maxPoints: 2, requires: 'wr_iron_hide', bonuses: { defense: 5 },
             grantedAbility: { id: 'primal_roar', name: 'Abyssal Howl', icon: 'wolf', description: 'Unleash an abyssal howl that confuses the enemy for 2 turns and lowers attack by 15%', type: 'debuff', damage: 0, manaCost: 0, staminaCost: 25, cooldown: 6, target: 'enemy', effect: { type: 'confuse', duration: 2 }, secondaryEffect: { type: 'lower_attack', percent: 0.15, duration: 2 } }
           },
           { id: 'wr_savage_bleed', name: 'Shark Frenzy Rend', icon: 'skill_savage_rend', description: 'Shark form attacks cause deep, bleeding wounds', effect: 'Shark Bleed Proc', maxPoints: 2, requires: 'wr_lacerate', bonuses: { damage: 6 }, passive: true, procEffect: { type: 'bleed', damage: 0.12, duration: 3 } }
         ]
       },
       {
-        name: 'Tide 20 - Primal Leviathan',
+        name: 'Current 20 - Primal Leviathan',
         requiredLevel: 20,
         skills: [
-          { id: 'wr_natures_wrath', name: "Ocean's Wrath", icon: 'star', description: 'Command storm, sea, and beast as one devastating force', effect: 'Ultimate: Primal Tsunami', maxPoints: 1, requires: 'wr_tempest', bonuses: { damage: 15, attackSpeed: 15, health: 40 },
-            grantedAbility: { id: 'natures_wrath', name: "Ocean's Wrath", icon: 'star', description: 'Unleash the full wrath of the ocean in a devastating tidal assault', type: 'magical', damage: 3.5, manaCost: 50, staminaCost: 20, cooldown: 8, target: 'enemy', effect: { type: 'dot', damage: 0.2, duration: 3 } }
+          { id: 'wr_natures_wrath', name: "Waters' Wrath", icon: 'star', description: 'Command storm, water, and beast as one devastating force', effect: 'Ultimate: Primal Tsunami', maxPoints: 1, requires: 'wr_tempest', bonuses: { damage: 15, attackSpeed: 15, health: 40 },
+            grantedAbility: { id: 'natures_wrath', name: "Waters' Wrath", icon: 'star', description: 'Unleash the full wrath of the waters in a devastating current assault', type: 'magical', damage: 3.5, manaCost: 50, staminaCost: 20, cooldown: 8, target: 'enemy', effect: { type: 'dot', damage: 0.2, duration: 3 } }
           },
           { id: 'wr_alpha_predator', name: 'Alpha Shark', icon: 'skill_alpha_predator', description: 'Each kill in shark form extends duration and heals like the apex of the deep', effect: 'Kill Sustain', maxPoints: 1, requires: 'wr_primal_roar', bonuses: { damage: 10, health: 30, drainHealth: 8 }, passive: true }
         ]
@@ -214,7 +214,7 @@ export const skillTrees = {
     color: '#22c55e',
     tiers: [
       {
-        name: 'Tide 1 - Spine Mastery',
+        name: 'Current 1 - Spine Mastery',
         requiredLevel: 1,
         skills: [
           { id: 'r_precision', name: 'Precision', icon: 'skill_precision', description: 'Sharpen your aim for deadly accuracy', effect: '+15% Accuracy', maxPoints: 3, bonuses: { accuracy: 5, criticalChance: 2 } },
@@ -223,12 +223,12 @@ export const skillTrees = {
         ]
       },
       {
-        name: 'Tide 5 - Hunter of the Deep',
+        name: 'Current 5 - Hunter of the Deep',
         requiredLevel: 5,
         skills: [
           { id: 'r_headshot', name: 'Weak Point Strike', icon: 'skill_headshot', description: 'Target vulnerable gill and eye spots for critical damage', effect: '+50% Crit Damage', maxPoints: 3, requires: 'r_precision', bonuses: { criticalDamage: 15 } },
           { id: 'r_evasion', name: 'Current Rider', icon: 'nature', description: 'Ride the currents to dodge attacks', effect: '+15% Evasion', maxPoints: 3, requires: 'r_swift_draw', bonuses: { evasion: 5 } },
-          { id: 'r_venom_arrow', name: 'Venom Spine', icon: 'skill_venom_arrow', description: 'Tip spines with potent sea snake venom', effect: 'Poison DOT', maxPoints: 3, requires: 'r_precision', bonuses: { damage: 3 },
+          { id: 'r_venom_arrow', name: 'Venom Spine', icon: 'skill_venom_arrow', description: 'Tip spines with potent water snake venom', effect: 'Poison DOT', maxPoints: 3, requires: 'r_precision', bonuses: { damage: 3 },
             grantedAbility: { id: 'venom_arrow', name: 'Venom Spine', icon: 'skull', description: 'Fire a venom-tipped spine that poisons for damage over 4 turns', type: 'physical', damage: 0.7, manaCost: 0, staminaCost: 14, cooldown: 3, target: 'enemy', effect: { type: 'poison', damage: 0.12, duration: 4 } }
           },
           { id: 'r_hunters_mark', name: "Predator's Mark", icon: 'target', description: 'Mark prey, exposing weaknesses to the hunting party', effect: '-15% Enemy Defense', maxPoints: 3, requires: 'r_crippling_shot', bonuses: { damage: 2, criticalChance: 2 },
@@ -237,7 +237,7 @@ export const skillTrees = {
         ]
       },
       {
-        name: 'Tide 10 - Sharpshooter',
+        name: 'Current 10 - Sharpshooter',
         requiredLevel: 10,
         skills: [
           { id: 'r_piercing', name: 'Piercing Harpoon', icon: 'skill_piercing_shot', description: 'Harpoon spines that pierce through shell and scale', effect: '25% Armor Pen', maxPoints: 1, requires: 'r_headshot', bonuses: { armorPenetration: 10, damage: 5 },
@@ -255,7 +255,7 @@ export const skillTrees = {
         ]
       },
       {
-        name: 'Tide 15 - Shadow Hunter',
+        name: 'Current 15 - Shadow Hunter',
         requiredLevel: 15,
         skills: [
           { id: 'r_sniper', name: 'Abyssal Sniper', icon: 'skill_sniper', description: 'Strike from the deepest shadows with perfect precision', effect: '+100% Range Damage', maxPoints: 1, requires: 'r_piercing', bonuses: { damage: 12, criticalChance: 8 },
@@ -271,13 +271,13 @@ export const skillTrees = {
         ]
       },
       {
-        name: 'Tide 20 - Phantom of the Deep',
+        name: 'Current 20 - Phantom of the Deep',
         requiredLevel: 20,
         skills: [
           { id: 'r_arrow_storm', name: 'Spine Tempest', icon: 'skill_arrow_storm', description: 'Rain a devastating storm of razor spines from the depths', effect: 'Ultimate: Spine Rain', maxPoints: 1, requires: 'r_sniper', bonuses: { damage: 18, criticalChance: 10, attackSpeed: 10 },
             grantedAbility: { id: 'arrow_storm', name: 'Spine Tempest', icon: 'star', description: 'Rain a devastating storm of razor spines from above', type: 'physical', damage: 3.5, manaCost: 0, staminaCost: 40, cooldown: 7, target: 'enemy' }
           },
-          { id: 'r_death_blossom', name: 'Sea Urchin Cascade', icon: 'skill_death_blossom', description: 'Every attack deploys a cascade of toxins — poison, bleed, and corrosion all at once', effect: 'Multi-DOT Proc', maxPoints: 1, requires: 'r_bleed_arrow', bonuses: { damage: 12, criticalChance: 8 }, passive: true, procEffect: { type: 'multi_dot', effects: ['poison', 'bleed', 'lower_defense'], chance: 0.25 } }
+          { id: 'r_death_blossom', name: 'Water Urchin Cascade', icon: 'skill_death_blossom', description: 'Every attack deploys a cascade of toxins — poison, bleed, and corrosion all at once', effect: 'Multi-DOT Proc', maxPoints: 1, requires: 'r_bleed_arrow', bonuses: { damage: 12, criticalChance: 8 }, passive: true, procEffect: { type: 'multi_dot', effects: ['poison', 'bleed', 'lower_defense'], chance: 0.25 } }
         ]
       }
     ]

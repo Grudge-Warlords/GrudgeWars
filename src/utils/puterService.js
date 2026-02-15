@@ -48,7 +48,7 @@ export const puterAI = {
   },
 
   async generateLore(context) {
-    const systemPrompt = `You are a lore master for "Betta Warlords," an underwater ocean RPG set in the Sunken Kingdom of Abyssia. Generate short, atmospheric lore snippets (2-3 sentences max). Use underwater/ocean themes: coral, tides, betta fish, sea creatures, deep trenches. Keep it mysterious and epic.`;
+    const systemPrompt = `You are a lore master for "Betta Warlords," an underwater freshwater RPG set in the Sunken Kingdom of Abyssia. Generate short, atmospheric lore snippets (2-3 sentences max). Use underwater/freshwater themes: roots, currents, betta fish, aquatic creatures, deep trenches. Keep it mysterious and epic.`;
     const resp = await puterAI.chat([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: context },
@@ -57,7 +57,7 @@ export const puterAI = {
   },
 
   async battleNarration(attacker, defender, ability, damage) {
-    const prompt = `In 1 short sentence, narrate this RPG battle action: ${attacker} uses ${ability} on ${defender} for ${damage} damage. Underwater ocean theme.`;
+    const prompt = `In 1 short sentence, narrate this RPG battle action: ${attacker} uses ${ability} on ${defender} for ${damage} damage. Underwater freshwater theme.`;
     const resp = await puterAI.chat(prompt);
     return typeof resp === 'string' ? resp : resp?.message?.content || resp?.toString() || '';
   },

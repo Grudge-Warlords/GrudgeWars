@@ -16,7 +16,7 @@ export const enemyTemplates = {
     ]
   },
   goblin: {
-    name: 'Reef Bandit', icon: 'sword', color: '#0ea5e9', portrait: '/images/enemies/puffer_scout.png',
+    name: 'Grove Bandit', icon: 'sword', color: '#0ea5e9', portrait: '/images/enemies/puffer_scout.png',
     baseHealth: 80, baseDamage: 12, baseDefense: 5, baseMana: 20,
     xpReward: 15, goldReward: 8, speed: 14,
     abilities: [
@@ -73,12 +73,12 @@ export const enemyTemplates = {
     ]
   },
   water_priestess_mage: {
-    name: 'Coral Priestess', icon: 'ice', color: '#0891b2', portrait: '/images/enemies/water_priestess.png',
+    name: 'Root Priestess', icon: 'ice', color: '#0891b2', portrait: '/images/enemies/water_priestess.png',
     baseHealth: 110, baseDamage: 20, baseMagicDamage: 32, baseDefense: 12, baseMana: 150,
     xpReward: 38, goldReward: 24, speed: 12,
     abilities: [
-      { id: 'wp_bolt', name: 'Tidal Strike', icon: 'ice', type: 'magical', damage: 1.3, description: 'A bolt of pressurized water' },
-      { id: 'wp_heal', name: 'Healing Tide', icon: 'heart', type: 'heal', damage: 0, cooldown: 4, description: 'Heals with tidal energy', healPercent: 0.15 },
+      { id: 'wp_bolt', name: 'Current Strike', icon: 'ice', type: 'magical', damage: 1.3, description: 'A bolt of pressurized water' },
+      { id: 'wp_heal', name: 'Healing Current', icon: 'heart', type: 'heal', damage: 0, cooldown: 4, description: 'Heals with current energy', healPercent: 0.15 },
       { id: 'wp_frost', name: 'Frozen Prison', icon: 'ice', type: 'magical', damage: 1.8, cooldown: 3, description: 'Encases in ice', effect: { type: 'stun', duration: 1 } },
     ]
   },
@@ -89,11 +89,11 @@ export const enemyTemplates = {
     abilities: [
       { id: 'smash', name: 'Hammer Strike', icon: 'sword', type: 'physical', damage: 1.2, description: 'A devastating claw punch' },
       { id: 'berserk', name: 'Cavitation Rage', icon: 'fire', type: 'buff', damage: 0, cooldown: 5, description: 'Enters a cavitation-powered frenzy', effect: { stat: 'damage', multiplier: 1.6, duration: 3 } },
-      { id: 'ground_pound', name: 'Seafloor Shatter', icon: 'sword', type: 'physical', damage: 1.8, cooldown: 3, description: 'Smashes the ocean floor with tremendous force' },
+      { id: 'ground_pound', name: 'Lakebed Shatter', icon: 'sword', type: 'physical', damage: 1.8, cooldown: 3, description: 'Smashes the lakebed with tremendous force' },
     ]
   },
   dragon_whelp: {
-    name: 'Sea Drake', icon: 'fire', color: '#0d9488', portrait: '/images/enemies/sea_serpent.png',
+    name: 'River Drake', icon: 'fire', color: '#0d9488', portrait: '/images/enemies/sea_serpent.png',
     baseHealth: 150, baseDamage: 30, baseDefense: 18, baseMana: 80,
     xpReward: 45, goldReward: 30, speed: 15,
     abilities: [
@@ -108,13 +108,13 @@ export const enemyTemplates = {
     xpReward: 120, goldReward: 90, speed: 11,
     isBoss: true,
     abilities: [
-      { id: 'soul_bolt', name: 'Abyssal Bolt', icon: 'skull', type: 'magical', damage: 1.4, description: 'A bolt of deep-sea necromantic energy' },
+      { id: 'soul_bolt', name: 'Abyssal Bolt', icon: 'skull', type: 'magical', damage: 1.4, description: 'A bolt of deepwater necromantic energy' },
       { id: 'death_coil', name: 'Depth Coil', icon: 'skull', type: 'magical', damage: 2.5, cooldown: 3, description: 'Devastating tentacle blast that drains life', drainPercent: 0.4 },
-      { id: 'bone_shield', name: 'Coral Armor', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Summons a shell of ancient coral', effect: { stat: 'defense', flat: 40, duration: 3 } },
-      { id: 'soul_drain', name: 'Ink Drain', icon: 'crystal', type: 'heal', damage: 0, cooldown: 4, description: 'Drains life from surrounding sea creatures', healPercent: 0.15, drainPercent: 0.5 },
+      { id: 'bone_shield', name: 'Root Armor', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Summons a shell of ancient root', effect: { stat: 'defense', flat: 40, duration: 3 } },
+      { id: 'soul_drain', name: 'Ink Drain', icon: 'crystal', type: 'heal', damage: 0, cooldown: 4, description: 'Drains life from surrounding water creatures', healPercent: 0.15, drainPercent: 0.5 },
       { id: 'raise_dead', name: 'Raise Drowned', icon: 'skull', type: 'buff', damage: 0, cooldown: 7, description: 'Enrages with the fury of drowned souls', effect: { stat: 'damage', multiplier: 1.6, duration: 3 } },
       { id: 'shadow_nova', name: 'Ink Nova', icon: 'skull', type: 'magical', damage: 3.0, cooldown: 5, description: 'Unleashes a wave of abyssal ink' },
-      { id: 'curse_weakness', name: 'Curse of the Deep', icon: 'skull', type: 'magical', damage: 0.5, cooldown: 4, description: 'Curses with crushing ocean pressure', effect: { type: 'dot', damage: 0.10, duration: 4 } },
+      { id: 'curse_weakness', name: 'Curse of the Deep', icon: 'skull', type: 'magical', damage: 0.5, cooldown: 4, description: 'Curses with crushing water pressure', effect: { type: 'dot', damage: 0.10, duration: 4 } },
     ]
   },
   demon_lord: {
@@ -127,7 +127,7 @@ export const enemyTemplates = {
       { id: 'lava_spit', name: 'Magma Jet', icon: 'fire', type: 'magical', damage: 1.6, description: 'Spews superheated volcanic water' },
       { id: 'worm_bite', name: 'Leviathan Bite', icon: 'sword', type: 'physical', damage: 3.0, cooldown: 4, description: 'A crushing bite from massive jaws' },
       { id: 'heat_wave', name: 'Thermal Surge', icon: 'fire', type: 'magical', damage: 2.2, cooldown: 3, description: 'Radiates scorching hydrothermal energy', effect: { type: 'dot', damage: 0.12, duration: 3 } },
-      { id: 'volcanic_slam', name: 'Tidal Slam', icon: 'shield', type: 'physical', damage: 3.5, cooldown: 6, description: 'Slams the seafloor with volcanic fury' },
+      { id: 'volcanic_slam', name: 'Current Slam', icon: 'shield', type: 'physical', damage: 3.5, cooldown: 6, description: 'Slams the lakebed with volcanic fury' },
     ]
   },
   evil_wizard: {
@@ -136,14 +136,14 @@ export const enemyTemplates = {
     xpReward: 350, goldReward: 250, speed: 14,
     isBoss: true,
     abilities: [
-      { id: 'arcane_bolt', name: 'Trench Bolt', icon: 'crystal', type: 'magical', damage: 1.6, description: 'A crackling bolt of deep-sea arcane energy' },
+      { id: 'arcane_bolt', name: 'Trench Bolt', icon: 'crystal', type: 'magical', damage: 1.6, description: 'A crackling bolt of deepwater arcane energy' },
       { id: 'chaos_storm', name: 'Maelstrom', icon: 'chaos', type: 'magical', damage: 3.2, cooldown: 4, description: 'Unleashes a devastating underwater vortex' },
       { id: 'soul_siphon', name: 'Current Siphon', icon: 'crystal', type: 'magical', damage: 1.8, cooldown: 3, description: 'Drains life force through dark currents', drainPercent: 0.6 },
       { id: 'dark_barrier', name: 'Abyssal Barrier', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Erects a barrier of pressurized water', effect: { stat: 'defense', flat: 50, duration: 3 } },
-      { id: 'necrotic_curse', name: 'Brine Curse', icon: 'skull', type: 'magical', damage: 1.0, cooldown: 4, description: 'Curses with corrosive saltwater decay', effect: { type: 'dot', damage: 0.15, duration: 4 } },
-      { id: 'hellfire_rain', name: 'Volcanic Rain', icon: 'fire', type: 'magical', damage: 4.0, cooldown: 6, description: 'Rains superheated vents from the ocean floor' },
-      { id: 'petrify', name: 'Coral Encase', icon: 'shield', type: 'magical', damage: 0.5, cooldown: 5, description: 'Encases a hero in rapidly-growing coral', effect: { type: 'stun', duration: 2 } },
-      { id: 'dark_empowerment', name: 'Abyssal Empowerment', icon: 'fire', type: 'buff', damage: 0, cooldown: 7, description: 'Channels forbidden deep-sea power', effect: { stat: 'damage', multiplier: 2.0, duration: 3 } },
+      { id: 'necrotic_curse', name: 'Brine Curse', icon: 'skull', type: 'magical', damage: 1.0, cooldown: 4, description: 'Curses with corrosive waterborne decay', effect: { type: 'dot', damage: 0.15, duration: 4 } },
+      { id: 'hellfire_rain', name: 'Volcanic Rain', icon: 'fire', type: 'magical', damage: 4.0, cooldown: 6, description: 'Rains superheated vents from the lakebed' },
+      { id: 'petrify', name: 'Root Encase', icon: 'shield', type: 'magical', damage: 0.5, cooldown: 5, description: 'Encases a hero in rapidly-growing root', effect: { type: 'stun', duration: 2 } },
+      { id: 'dark_empowerment', name: 'Abyssal Empowerment', icon: 'fire', type: 'buff', damage: 0, cooldown: 7, description: 'Channels forbidden deepwater power', effect: { stat: 'damage', multiplier: 2.0, duration: 3 } },
       { id: 'shadow_teleport', name: 'Current Warp', icon: 'chaos', type: 'buff', damage: 0, cooldown: 6, description: 'Rides a powerful current to reposition', effect: { stat: 'speed', flat: 20, duration: 2 } },
     ]
   },
@@ -154,9 +154,9 @@ export const enemyTemplates = {
     isBoss: true,
     abilities: [
       { id: 'void_slash', name: 'Trench Slash', icon: 'chaos', type: 'physical', damage: 1.8, description: 'A slash through the crushing depths' },
-      { id: 'annihilate', name: 'Tidal Annihilation', icon: 'bomb', type: 'magical', damage: 3.5, cooldown: 4, description: 'Pure oceanic destruction unleashed' },
+      { id: 'annihilate', name: 'Current Annihilation', icon: 'bomb', type: 'magical', damage: 3.5, cooldown: 4, description: 'Pure aquatic destruction unleashed' },
       { id: 'void_barrier', name: 'Pressure Barrier', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Impenetrable wall of crushing pressure', effect: { stat: 'defense', flat: 60, duration: 3 } },
-      { id: 'reality_tear', name: 'Rift Tide', icon: 'chaos', type: 'magical', damage: 4.5, cooldown: 7, description: 'Tears open the ocean floor, devastating all' },
+      { id: 'reality_tear', name: 'Rift Current', icon: 'chaos', type: 'magical', damage: 4.5, cooldown: 7, description: 'Tears open the lakebed, devastating all' },
       { id: 'void_drain', name: 'Abyssal Drain', icon: 'skull', type: 'heal', damage: 0, cooldown: 5, description: 'Absorbs life force from the crushing deep', healPercent: 0.12 },
       { id: 'oblivion_pulse', name: 'Depth Pulse', icon: 'sparkle', type: 'magical', damage: 2.2, cooldown: 3, description: 'Radiates obliterating pressure waves', effect: { type: 'dot', damage: 0.15, duration: 3 } },
       { id: 'time_stop', name: 'Frozen Current', icon: 'sparkle', type: 'magical', damage: 0.6, cooldown: 6, description: 'Freezes the currents around a hero', effect: { type: 'stun', duration: 2 } },
@@ -164,20 +164,20 @@ export const enemyTemplates = {
     ]
   },
   god_odin: {
-    name: 'Poseidon, Lord of Tides', icon: 'lightning', color: '#0284c7', portrait: '/images/enemies/poseidon.png',
+    name: 'Poseidon, Lord of Currents', icon: 'lightning', color: '#0284c7', portrait: '/images/enemies/poseidon.png',
     baseHealth: 1800, baseDamage: 75, baseDefense: 55, baseMana: 600,
     xpReward: 500, goldReward: 400, speed: 18,
     isBoss: true,
     isGod: true,
     faction: 'crusade',
     abilities: [
-      { id: 'gungnir', name: 'Trident Strike', icon: 'sword', type: 'physical', damage: 2.2, description: 'Hurls the divine trident of the seas' },
-      { id: 'thunderclap', name: 'Storm Surge', icon: 'lightning', type: 'magical', damage: 3.8, cooldown: 4, description: 'Lightning crashes through the ocean depths' },
-      { id: 'divine_shield', name: 'Tidal Shield', icon: 'shield', type: 'buff', damage: 0, cooldown: 6, description: 'An impenetrable barrier of divine water', effect: { stat: 'defense', flat: 80, duration: 3 } },
-      { id: 'wisdom_sight', name: 'Ocean Omniscience', icon: 'crystal', type: 'buff', damage: 0, cooldown: 7, description: 'Sees all through the currents, boosting damage', effect: { stat: 'damage', multiplier: 2.2, duration: 3 } },
-      { id: 'valkyrie_storm', name: 'Nereid Storm', icon: 'crossed_swords', type: 'magical', damage: 4.5, cooldown: 6, description: 'Summons a storm of divine sea warriors' },
+      { id: 'gungnir', name: 'Trident Strike', icon: 'sword', type: 'physical', damage: 2.2, description: 'Hurls the divine trident of the waters' },
+      { id: 'thunderclap', name: 'Storm Surge', icon: 'lightning', type: 'magical', damage: 3.8, cooldown: 4, description: 'Lightning crashes through the dark depths' },
+      { id: 'divine_shield', name: 'Current Shield', icon: 'shield', type: 'buff', damage: 0, cooldown: 6, description: 'An impenetrable barrier of divine water', effect: { stat: 'defense', flat: 80, duration: 3 } },
+      { id: 'wisdom_sight', name: 'Depth Omniscience', icon: 'crystal', type: 'buff', damage: 0, cooldown: 7, description: 'Sees all through the currents, boosting damage', effect: { stat: 'damage', multiplier: 2.2, duration: 3 } },
+      { id: 'valkyrie_storm', name: 'Nereid Storm', icon: 'crossed_swords', type: 'magical', damage: 4.5, cooldown: 6, description: 'Summons a storm of divine water warriors' },
       { id: 'ragnarok', name: 'Deluge', icon: 'fire', type: 'magical', damage: 5.0, cooldown: 8, description: 'Unleashes the great flood upon all' },
-      { id: 'divine_heal', name: 'Tidal Restoration', icon: 'sparkle', type: 'heal', damage: 0, cooldown: 5, description: 'Restores vitality through the healing seas', healPercent: 0.15 },
+      { id: 'divine_heal', name: 'Current Restoration', icon: 'sparkle', type: 'heal', damage: 0, cooldown: 5, description: 'Restores vitality through the healing waters', healPercent: 0.15 },
       { id: 'time_freeze', name: 'Whirlpool Trap', icon: 'sparkle', type: 'magical', damage: 0.8, cooldown: 5, description: 'Traps a hero in a swirling whirlpool', effect: { type: 'stun', duration: 2 } },
     ]
   },
@@ -191,10 +191,10 @@ export const enemyTemplates = {
     abilities: [
       { id: 'blood_rend', name: 'Maw Rend', icon: 'target', type: 'physical', damage: 2.0, description: 'Tears flesh with crushing mandibles' },
       { id: 'soul_devour', name: 'Soul Devour', icon: 'skull', type: 'magical', damage: 3.5, cooldown: 4, description: 'Consumes a hero\'s essence in the whirlpool', drainPercent: 0.5 },
-      { id: 'corruption_aura', name: 'Toxic Tide', icon: 'skull', type: 'magical', damage: 1.5, cooldown: 3, description: 'Radiates poisonous ocean currents', effect: { type: 'dot', damage: 0.18, duration: 4 } },
+      { id: 'corruption_aura', name: 'Toxic Current', icon: 'skull', type: 'magical', damage: 1.5, cooldown: 3, description: 'Radiates poisonous dark currents', effect: { type: 'dot', damage: 0.18, duration: 4 } },
       { id: 'blood_frenzy', name: 'Feeding Frenzy', icon: 'fire', type: 'buff', damage: 0, cooldown: 6, description: 'Enters a blood-mad feeding frenzy', effect: { stat: 'damage', multiplier: 2.5, duration: 3 } },
       { id: 'death_grip', name: 'Whirlpool Grip', icon: 'sword', type: 'magical', damage: 1.2, cooldown: 5, description: 'Grips a hero in an inescapable vortex', effect: { type: 'stun', duration: 2 } },
-      { id: 'apocalypse', name: 'Cataclysm', icon: 'bomb', type: 'magical', damage: 5.5, cooldown: 8, description: 'Brings forth total oceanic annihilation' },
+      { id: 'apocalypse', name: 'Cataclysm', icon: 'bomb', type: 'magical', damage: 5.5, cooldown: 8, description: 'Brings forth total aquatic annihilation' },
       { id: 'vampiric_feast', name: 'Devouring Feast', icon: 'skull', type: 'heal', damage: 0, cooldown: 5, description: 'Feasts on prey to heal wounds', healPercent: 0.18 },
       { id: 'plague_wave', name: 'Blight Wave', icon: 'skull', type: 'magical', damage: 2.8, cooldown: 5, description: 'A wave of toxic blight washes over all' },
     ]
@@ -233,8 +233,8 @@ export const enemyTemplates = {
       { id: 'serpent_coil', name: 'Serpent Coil', icon: 'skull', type: 'physical', damage: 2.4, cooldown: 3, description: 'Her massive purple coils constrict and crush' },
       { id: 'twilight_venom', name: 'Twilight Venom', icon: 'skull', type: 'magical', damage: 1.2, cooldown: 3, description: 'Venomous magic from her serpent hair seeps through the water', effect: { type: 'dot', damage: 0.15, duration: 4 } },
       { id: 'abyssal_tears', name: 'Abyssal Tears', icon: 'crystal', type: 'heal', damage: 0, cooldown: 5, description: 'Weeps cursed pearls that restore her shattered form', healPercent: 0.12 },
-      { id: 'stone_barrier', name: 'Stone Barrier', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Summons a wall of petrified coral to shield herself', effect: { stat: 'defense', flat: 40, duration: 3 } },
-      { id: 'blade_storm', name: 'Crimson Tide', icon: 'sword', type: 'physical', damage: 3.2, cooldown: 6, description: 'A whirlwind of blade strikes stains the water red' },
+      { id: 'stone_barrier', name: 'Stone Barrier', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Summons a wall of petrified root to shield herself', effect: { stat: 'defense', flat: 40, duration: 3 } },
+      { id: 'blade_storm', name: 'Crimson Current', icon: 'sword', type: 'physical', damage: 3.2, cooldown: 6, description: 'A whirlwind of blade strikes stains the water red' },
     ]
   },
   gorgon_siren_2: {
@@ -271,8 +271,8 @@ export const enemyTemplates = {
       { id: 'terror_gaze', name: 'Terror Gaze', icon: 'mind', type: 'magical', damage: 0.8, cooldown: 4, description: 'Glowing yellow eyes paralyze prey with primal fear', effect: { type: 'stun', duration: 1 } },
       { id: 'serpent_strike', name: 'Serpent Strike', icon: 'skull', type: 'physical', damage: 2.0, cooldown: 3, description: 'Six serpentine heads strike with the speed of a riptide' },
       { id: 'toxic_cloud', name: 'Toxic Cloud', icon: 'skull', type: 'magical', damage: 1.0, cooldown: 3, description: 'Breathes a cloud of venomous mist from her corrupted lungs', effect: { type: 'dot', damage: 0.12, duration: 3 } },
-      { id: 'reef_cage', name: 'Reef Cage', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Wraps herself in living coral torn from the reef', effect: { stat: 'defense', flat: 30, duration: 3 } },
-      { id: 'tidal_fury', name: 'Tidal Fury', icon: 'chaos', type: 'physical', damage: 2.8, cooldown: 5, description: 'Beats her wings to create a devastating tidal shockwave' },
+      { id: 'reef_cage', name: 'Root Cage', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Wraps herself in living roots torn from the grove', effect: { stat: 'defense', flat: 30, duration: 3 } },
+      { id: 'tidal_fury', name: 'Current Fury', icon: 'chaos', type: 'physical', damage: 2.8, cooldown: 5, description: 'Beats her wings to create a devastating current shockwave' },
     ]
   },
   god_omni: {
@@ -283,12 +283,12 @@ export const enemyTemplates = {
     isGod: true,
     faction: 'fabled',
     abilities: [
-      { id: 'arcane_blast', name: 'Current Blast', icon: 'sparkle', type: 'magical', damage: 2.0, description: 'A blast of pure ocean arcane energy' },
-      { id: 'fate_weave', name: 'Current Weave', icon: 'chaos', type: 'magical', damage: 3.2, cooldown: 4, description: 'Rewrites the tides to deal massive damage' },
-      { id: 'cosmic_barrier', name: 'Tidal Barrier', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'A barrier woven from bioluminescent light', effect: { stat: 'defense', flat: 70, duration: 3 } },
+      { id: 'arcane_blast', name: 'Current Blast', icon: 'sparkle', type: 'magical', damage: 2.0, description: 'A blast of pure water arcane energy' },
+      { id: 'fate_weave', name: 'Current Weave', icon: 'chaos', type: 'magical', damage: 3.2, cooldown: 4, description: 'Rewrites the currents to deal massive damage' },
+      { id: 'cosmic_barrier', name: 'Current Barrier', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'A barrier woven from bioluminescent light', effect: { stat: 'defense', flat: 70, duration: 3 } },
       { id: 'time_warp', name: 'Current Warp', icon: 'sparkle', type: 'magical', damage: 1.0, cooldown: 5, description: 'Warps the currents around a hero', effect: { type: 'stun', duration: 2 } },
       { id: 'stellar_rain', name: 'Biolume Rain', icon: 'sparkle', type: 'magical', damage: 4.8, cooldown: 6, description: 'Bioluminescent projectiles rain from the depths' },
-      { id: 'genesis', name: 'Genesis Tide', icon: 'sparkle', type: 'magical', damage: 5.5, cooldown: 9, description: 'Unmakes and reshapes the ocean itself' },
+      { id: 'genesis', name: 'Genesis Current', icon: 'sparkle', type: 'magical', damage: 5.5, cooldown: 9, description: 'Unmakes and reshapes the waters' },
       { id: 'cosmic_heal', name: 'Deep Restoration', icon: 'crystal', type: 'heal', damage: 0, cooldown: 5, description: 'Draws healing from the deepest currents', healPercent: 0.14 },
       { id: 'mind_shatter', name: 'Pressure Crush', icon: 'mind', type: 'magical', damage: 2.5, cooldown: 4, description: 'Crushes the mind with abyssal pressure', effect: { type: 'dot', damage: 0.20, duration: 3 } },
     ]
@@ -299,38 +299,38 @@ export const enemyTemplates = {
     xpReward: 175, goldReward: 120, speed: 14,
     isBoss: true,
     abilities: [
-      { id: 'tidal_strike', name: 'Tidal Strike', icon: 'ice', type: 'magical', damage: 1.4, description: 'A crashing wave of water' },
+      { id: 'tidal_strike', name: 'Current Strike', icon: 'ice', type: 'magical', damage: 1.4, description: 'A crashing wave of water' },
       { id: 'torrent', name: 'Torrent', icon: 'ice', type: 'magical', damage: 2.5, cooldown: 3, description: 'A devastating torrent that poisons', effect: { type: 'dot', damage: 0.15, duration: 3 } },
       { id: 'frost_armor', name: 'Frost Armor', icon: 'ice', type: 'buff', damage: 0, cooldown: 5, description: 'Encases in ice armor', effect: { stat: 'defense', flat: 45, duration: 3 } },
       { id: 'tsunami', name: 'Tsunami', icon: 'chaos', type: 'magical', damage: 3.5, cooldown: 6, description: 'A massive wave crashes down on all' },
-      { id: 'healing_tide', name: 'Healing Tide', icon: 'heart', type: 'heal', damage: 0, cooldown: 5, description: 'Heals with the power of the tides', healPercent: 0.18 },
+      { id: 'healing_tide', name: 'Healing Current', icon: 'heart', type: 'heal', damage: 0, cooldown: 5, description: 'Heals with the power of the currents', healPercent: 0.18 },
       { id: 'frozen_prison', name: 'Frozen Prison', icon: 'ice', type: 'magical', damage: 1.0, cooldown: 4, description: 'Freezes a hero solid', effect: { type: 'stun', duration: 1 } },
     ]
   },
   nature_elemental: {
-    name: 'Tide Guardian', icon: 'nature', color: '#f472b6', portrait: '/images/enemies/nature_elemental.png',
+    name: 'Current Guardian', icon: 'nature', color: '#f472b6', portrait: '/images/enemies/nature_elemental.png',
     baseHealth: 600, baseDamage: 44, baseDefense: 42, baseMana: 250,
     xpReward: 175, goldReward: 120, speed: 12,
     isBoss: true,
     abilities: [
-      { id: 'vine_lash', name: 'Coral Lash', icon: 'nature', type: 'physical', damage: 1.3, description: 'Sharp coral tendrils whip out' },
-      { id: 'natures_wrath', name: "Ocean's Wrath", icon: 'nature', type: 'magical', damage: 2.4, cooldown: 3, description: 'The fury of the reef unleashed', effect: { type: 'dot', damage: 0.18, duration: 3 } },
-      { id: 'regenerate', name: 'Reef Regenerate', icon: 'heart', type: 'heal', damage: 0, cooldown: 4, description: 'Regenerates health from coral growth', healPercent: 0.20 },
-      { id: 'earthquake', name: 'Seafloor Quake', icon: 'shield', type: 'physical', damage: 3.5, cooldown: 6, description: 'The ocean floor splits apart, hitting all heroes' },
-      { id: 'thorn_armor', name: 'Coral Armor', icon: 'nature', type: 'buff', damage: 0, cooldown: 5, description: 'Sharp coral reflects damage to attackers', effect: { stat: 'defense', flat: 35, duration: 3 } },
+      { id: 'vine_lash', name: 'Root Lash', icon: 'nature', type: 'physical', damage: 1.3, description: 'Sharp root tendrils whip out' },
+      { id: 'natures_wrath', name: "Water's Wrath", icon: 'nature', type: 'magical', damage: 2.4, cooldown: 3, description: 'The fury of the grove unleashed', effect: { type: 'dot', damage: 0.18, duration: 3 } },
+      { id: 'regenerate', name: 'Grove Regenerate', icon: 'heart', type: 'heal', damage: 0, cooldown: 4, description: 'Regenerates health from root growth', healPercent: 0.20 },
+      { id: 'earthquake', name: 'Lakebed Quake', icon: 'shield', type: 'physical', damage: 3.5, cooldown: 6, description: 'The lakebed splits apart, hitting all heroes' },
+      { id: 'thorn_armor', name: 'Root Armor', icon: 'nature', type: 'buff', damage: 0, cooldown: 5, description: 'Sharp root reflects damage to attackers', effect: { stat: 'defense', flat: 35, duration: 3 } },
       { id: 'root_bind', name: 'Kelp Bind', icon: 'nature', type: 'magical', damage: 0.8, cooldown: 4, description: 'Kelp entangles a hero, stunning them', effect: { type: 'stun', duration: 1 } },
     ]
   },
   grand_shaman: {
-    name: 'Reef Shaman', icon: 'nature', color: '#059669', portrait: '/images/enemies/grand_shaman.png',
+    name: 'Grove Shaman', icon: 'nature', color: '#059669', portrait: '/images/enemies/grand_shaman.png',
     baseHealth: 500, baseDamage: 32, baseDefense: 18, baseMana: 200,
     xpReward: 80, goldReward: 55, speed: 11,
     isBoss: true,
     abilities: [
-      { id: 'nature_bolt', name: 'Coral Bolt', icon: 'nature', type: 'magical', damage: 1.3, description: 'A bolt of concentrated reef energy' },
+      { id: 'nature_bolt', name: 'Root Bolt', icon: 'nature', type: 'magical', damage: 1.3, description: 'A bolt of concentrated grove energy' },
       { id: 'healing_rain', name: 'Healing Current', icon: 'bow', type: 'heal', damage: 0, cooldown: 4, description: 'Calls healing currents to restore vitality', healPercent: 0.18 },
-      { id: 'thorn_burst', name: 'Urchin Burst', icon: 'nature', type: 'magical', damage: 2.2, cooldown: 3, description: 'Sea urchin spines erupt from the seafloor', effect: { type: 'dot', damage: 0.10, duration: 3 } },
-      { id: 'bark_shield', name: 'Coral Shield', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Encases in hardened coral', effect: { stat: 'defense', flat: 30, duration: 3 } },
+      { id: 'thorn_burst', name: 'Urchin Burst', icon: 'nature', type: 'magical', damage: 2.2, cooldown: 3, description: 'Urchin spines erupt from the lakebed', effect: { type: 'dot', damage: 0.10, duration: 3 } },
+      { id: 'bark_shield', name: 'Root Shield', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Encases in hardened root', effect: { stat: 'defense', flat: 30, duration: 3 } },
       { id: 'entangle', name: 'Kelp Snare', icon: 'nature', type: 'magical', damage: 0.6, cooldown: 5, description: 'Kelp tendrils grab and hold a hero', effect: { type: 'stun', duration: 1 } },
     ]
   },
@@ -356,9 +356,9 @@ export const enemyTemplates = {
       { id: 'ice_fang', name: 'Ice Fang', icon: 'sword', type: 'physical', damage: 1.3, description: 'Freezing bite from arctic waters' },
       { id: 'blizzard_breath', name: 'Frost Jet', icon: 'ice', type: 'magical', damage: 2.5, cooldown: 3, description: 'Breathes a devastating jet of freezing water', effect: { type: 'dot', damage: 0.12, duration: 3 } },
       { id: 'ice_armor', name: 'Glacial Shell', icon: 'ice', type: 'buff', damage: 0, cooldown: 5, description: 'Encases in thick glacial armor', effect: { stat: 'defense', flat: 40, duration: 3 } },
-      { id: 'glacial_slam', name: 'Glacial Slam', icon: 'crystal', type: 'physical', damage: 3.0, cooldown: 5, description: 'Slams the seafloor creating ice spikes' },
+      { id: 'glacial_slam', name: 'Glacial Slam', icon: 'crystal', type: 'physical', damage: 3.0, cooldown: 5, description: 'Slams the lakebed creating ice spikes' },
       { id: 'freeze', name: 'Deep Freeze', icon: 'ice', type: 'magical', damage: 0.8, cooldown: 4, description: 'Freezes a hero solid in arctic water', effect: { type: 'stun', duration: 1 } },
-      { id: 'frost_heal', name: 'Frost Regeneration', icon: 'heart', type: 'heal', damage: 0, cooldown: 5, description: 'Absorbs cold ocean water to heal', healPercent: 0.12 },
+      { id: 'frost_heal', name: 'Frost Regeneration', icon: 'heart', type: 'heal', damage: 0, cooldown: 5, description: 'Absorbs cold cold water to heal', healPercent: 0.12 },
     ]
   },
   shadow_beast: {
@@ -371,31 +371,31 @@ export const enemyTemplates = {
       { id: 'dark_pulse', name: 'Dark Current', icon: 'crystal', type: 'magical', damage: 2.4, cooldown: 3, description: 'A pulse of dark energy through the water', effect: { type: 'dot', damage: 0.14, duration: 3 } },
       { id: 'shadow_veil', name: 'Murk Veil', icon: 'chaos', type: 'buff', damage: 0, cooldown: 5, description: 'Wraps in murky shadows increasing defense', effect: { stat: 'defense', flat: 35, duration: 3 } },
       { id: 'devour', name: 'Devour', icon: 'fire', type: 'physical', damage: 2.0, cooldown: 4, description: 'Devours life force from a hero', drainPercent: 0.4 },
-      { id: 'nightmare', name: 'Abyssal Terror', icon: 'skull', type: 'magical', damage: 1.0, cooldown: 5, description: 'Traps a hero in deep-sea terror', effect: { type: 'stun', duration: 1 } },
+      { id: 'nightmare', name: 'Abyssal Terror', icon: 'skull', type: 'magical', damage: 1.0, cooldown: 5, description: 'Traps a hero in deepwater terror', effect: { type: 'stun', duration: 1 } },
       { id: 'shadow_mend', name: 'Shadow Mend', icon: 'skull', type: 'heal', damage: 0, cooldown: 5, description: 'Feeds on darkness to heal', healPercent: 0.14 },
     ]
   },
   forest_guardian: {
-    name: 'Guardian of the Reef', icon: 'nature', color: '#2dd4bf', portrait: '/images/enemies/kelp_giant.png',
+    name: 'Guardian of the Grove', icon: 'nature', color: '#2dd4bf', portrait: '/images/enemies/kelp_giant.png',
     baseHealth: 280, baseDamage: 28, baseDefense: 18, baseMana: 120,
     xpReward: 50, goldReward: 35, speed: 11,
     abilities: [
-      { id: 'nature_strike', name: 'Coral Strike', icon: 'nature', type: 'physical', damage: 1.1, description: 'A coral-armed charge attack' },
-      { id: 'forest_heal', name: 'Reef Heal', icon: 'heart', type: 'heal', damage: 0, cooldown: 4, description: 'Channels the reef to heal wounds', healPercent: 0.15 },
-      { id: 'poison_spore', name: 'Venom Cloud', icon: 'skull', type: 'magical', damage: 0.8, cooldown: 3, description: 'Releases a cloud of sea venom', effect: { type: 'dot', damage: 0.12, duration: 3 } },
+      { id: 'nature_strike', name: 'Root Strike', icon: 'nature', type: 'physical', damage: 1.1, description: 'A root-armed charge attack' },
+      { id: 'forest_heal', name: 'Grove Heal', icon: 'heart', type: 'heal', damage: 0, cooldown: 4, description: 'Channels the grove to heal wounds', healPercent: 0.15 },
+      { id: 'poison_spore', name: 'Venom Cloud', icon: 'skull', type: 'magical', damage: 0.8, cooldown: 3, description: 'Releases a cloud of water venom', effect: { type: 'dot', damage: 0.12, duration: 3 } },
     ]
   },
   corrupted_grove_keeper: {
-    name: 'Corrupted Reef Keeper', icon: 'crystal', color: '#0d9488', portrait: '/images/enemies/kelp_giant.png',
+    name: 'Corrupted Grove Keeper', icon: 'crystal', color: '#0d9488', portrait: '/images/enemies/kelp_giant.png',
     baseHealth: 600, baseDamage: 35, baseDefense: 20, baseMana: 300,
     xpReward: 100, goldReward: 70, speed: 12,
     isBoss: true,
     bossScale: 3.0,
     abilities: [
-      { id: 'corrupted_bolt', name: 'Corrupted Bolt', icon: 'skull', type: 'magical', damage: 1.3, description: 'A bolt of corrupted ocean magic' },
+      { id: 'corrupted_bolt', name: 'Corrupted Bolt', icon: 'skull', type: 'magical', damage: 1.3, description: 'A bolt of corrupted water magic' },
       { id: 'verdant_stun', name: 'Kelp Stun', icon: 'nature', type: 'magical', damage: 0.8, cooldown: 4, description: 'Entangling kelp stuns a hero in place', effect: { type: 'stun', duration: 1 } },
       { id: 'grove_fireball', name: 'Biolume Blast', icon: 'nature', type: 'magical', damage: 2.4, cooldown: 3, description: 'Hurls a massive bioluminescent blast of corrupted energy' },
-      { id: 'resurrect_guardian', name: 'Resurrect Guardian', icon: 'heart', type: 'resurrect', damage: 0, cooldown: 6, description: 'Channels dark ocean magic to resurrect a fallen Guardian', isResurrect: true },
+      { id: 'resurrect_guardian', name: 'Resurrect Guardian', icon: 'heart', type: 'resurrect', damage: 0, cooldown: 6, description: 'Channels dark water magic to resurrect a fallen Guardian', isResurrect: true },
       { id: 'dark_bloom', name: 'Dark Bloom', icon: 'nature', type: 'magical', damage: 1.8, cooldown: 4, description: 'Toxic algae blooms dealing damage and reducing defense', effect: { stat: 'defense', flat: -15, duration: 3 } },
     ]
   },
@@ -406,8 +406,8 @@ export const enemyTemplates = {
     isBoss: true,
     abilities: [
       { id: 'void_strike', name: 'Angler Strike', icon: 'chaos', type: 'physical', damage: 1.5, description: 'A strike with bioluminescent lure energy' },
-      { id: 'reality_rift', name: 'Depth Rift', icon: 'chaos', type: 'magical', damage: 3.0, cooldown: 4, description: 'Tears open a rift in the ocean floor' },
-      { id: 'void_shield', name: 'Angler Shield', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Erects an impenetrable deep-sea barrier', effect: { stat: 'defense', flat: 50, duration: 3 } },
+      { id: 'reality_rift', name: 'Depth Rift', icon: 'chaos', type: 'magical', damage: 3.0, cooldown: 4, description: 'Tears open a rift in the lakebed' },
+      { id: 'void_shield', name: 'Angler Shield', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Erects an impenetrable deepwater barrier', effect: { stat: 'defense', flat: 50, duration: 3 } },
       { id: 'entropy_pulse', name: 'Lure Pulse', icon: 'sparkle', type: 'magical', damage: 2.0, cooldown: 3, description: 'Radiates hypnotic bioluminescent energy', effect: { type: 'dot', damage: 0.14, duration: 3 } },
       { id: 'dimensional_lock', name: 'Depth Lock', icon: 'sparkle', type: 'magical', damage: 0.8, cooldown: 5, description: 'Locks a hero in crushing pressure', effect: { type: 'stun', duration: 2 } },
       { id: 'void_siphon', name: 'Deep Siphon', icon: 'skull', type: 'heal', damage: 0, cooldown: 5, description: 'Siphons energy from the deep to heal', healPercent: 0.13 },
@@ -424,8 +424,8 @@ export const enemyTemplates = {
       { id: 'demon_cleave', name: 'Abyssal Cleave', icon: 'axe', type: 'physical', damage: 2.0, description: 'A massive cleave from the abyss' },
       { id: 'hellfire_eruption', name: 'Vent Eruption', icon: 'fire', type: 'magical', damage: 3.5, cooldown: 4, description: 'Volcanic vents erupt under all heroes' },
       { id: 'demon_roar', name: 'Leviathan Roar', icon: 'skull', type: 'buff', damage: 0, cooldown: 5, description: 'Roars with abyssal fury, boosting damage', effect: { stat: 'damage', multiplier: 2.0, duration: 3 } },
-      { id: 'soul_crush', name: 'Depth Crush', icon: 'skull', type: 'physical', damage: 4.0, cooldown: 6, description: 'Crushes with the weight of the deep ocean' },
-      { id: 'abyssal_drain', name: 'Abyssal Drain', icon: 'skull', type: 'magical', damage: 2.0, cooldown: 4, description: 'Drains life through dark ocean magic', drainPercent: 0.5 },
+      { id: 'soul_crush', name: 'Depth Crush', icon: 'skull', type: 'physical', damage: 4.0, cooldown: 6, description: 'Crushes with the weight of the dark depths' },
+      { id: 'abyssal_drain', name: 'Abyssal Drain', icon: 'skull', type: 'magical', damage: 2.0, cooldown: 4, description: 'Drains life through dark water magic', drainPercent: 0.5 },
       { id: 'infernal_shield', name: 'Hydrothermal Shield', icon: 'shield', type: 'buff', damage: 0, cooldown: 6, description: 'Wraps in superheated vent armor', effect: { stat: 'defense', flat: 55, duration: 3 } },
       { id: 'demon_stun', name: 'Abyssal Gaze', icon: 'crystal', type: 'magical', damage: 1.0, cooldown: 5, description: 'Paralyzes a hero with bioluminescent gaze', effect: { type: 'stun', duration: 2 } },
     ]
@@ -438,13 +438,13 @@ export const enemyTemplates = {
     bossScale: 2.5,
     abilities: [
       { id: 'tentacle_lash', name: 'Tentacle Lash', icon: 'skull', type: 'physical', damage: 1.8, description: 'Lashes out with massive tentacles' },
-      { id: 'madness_wave', name: 'Madness Wave', icon: 'chaos', type: 'magical', damage: 3.0, cooldown: 4, description: 'A wave of deep-sea madness washes over all', effect: { type: 'dot', damage: 0.16, duration: 4 } },
+      { id: 'madness_wave', name: 'Madness Wave', icon: 'chaos', type: 'magical', damage: 3.0, cooldown: 4, description: 'A wave of deepwater madness washes over all', effect: { type: 'dot', damage: 0.16, duration: 4 } },
       { id: 'eldritch_scream', name: 'Abyssal Scream', icon: 'skull', type: 'magical', damage: 1.2, cooldown: 5, description: 'A scream from the depths that stuns with terror', effect: { type: 'stun', duration: 2 } },
       { id: 'void_consumption', name: 'Void Consumption', icon: 'chaos', type: 'magical', damage: 2.5, cooldown: 3, description: 'Consumes a hero with crushing pressure', drainPercent: 0.6 },
       { id: 'cosmic_regeneration', name: 'Deep Regeneration', icon: 'heart', type: 'heal', damage: 0, cooldown: 5, description: 'Regenerates through abyssal energy', healPercent: 0.16 },
-      { id: 'reality_shatter', name: 'Trench Shatter', icon: 'bomb', type: 'magical', damage: 4.5, cooldown: 7, description: 'Shatters the ocean floor itself' },
-      { id: 'abyssal_armor', name: 'Abyssal Armor', icon: 'shield', type: 'buff', damage: 0, cooldown: 6, description: 'Encases in otherworldly deep-sea armor', effect: { stat: 'defense', flat: 60, duration: 3 } },
-      { id: 'mind_flay', name: 'Pressure Flay', icon: 'crystal', type: 'magical', damage: 2.2, cooldown: 4, description: 'Flays the mind with crushing ocean pressure' },
+      { id: 'reality_shatter', name: 'Trench Shatter', icon: 'bomb', type: 'magical', damage: 4.5, cooldown: 7, description: 'Shatters the lakebed itself' },
+      { id: 'abyssal_armor', name: 'Abyssal Armor', icon: 'shield', type: 'buff', damage: 0, cooldown: 6, description: 'Encases in otherworldly deepwater armor', effect: { stat: 'defense', flat: 60, duration: 3 } },
+      { id: 'mind_flay', name: 'Pressure Flay', icon: 'crystal', type: 'magical', damage: 2.2, cooldown: 4, description: 'Flays the mind with crushing water pressure' },
     ]
   },
   frost_titan: {
@@ -454,9 +454,9 @@ export const enemyTemplates = {
     isBoss: true,
     bossScale: 2.0,
     abilities: [
-      { id: 'frost_smash', name: 'Glacial Smash', icon: 'ice', type: 'physical', damage: 2.2, description: 'A devastating icy deep-sea smash' },
+      { id: 'frost_smash', name: 'Glacial Smash', icon: 'ice', type: 'physical', damage: 2.2, description: 'A devastating icy deepwater smash' },
       { id: 'absolute_zero', name: 'Absolute Zero', icon: 'ice', type: 'magical', damage: 3.8, cooldown: 5, description: 'Drops temperature to absolute zero in the deep' },
-      { id: 'ice_prison', name: 'Ice Prison', icon: 'ice', type: 'magical', damage: 1.0, cooldown: 4, description: 'Encases a hero in unbreakable deep-sea ice', effect: { type: 'stun', duration: 2 } },
+      { id: 'ice_prison', name: 'Ice Prison', icon: 'ice', type: 'magical', damage: 1.0, cooldown: 4, description: 'Encases a hero in unbreakable deepwater ice', effect: { type: 'stun', duration: 2 } },
       { id: 'glacial_armor', name: 'Glacial Armor', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Hardens into impenetrable glacial armor', effect: { stat: 'defense', flat: 65, duration: 3 } },
       { id: 'frost_breath', name: 'Frost Current', icon: 'ice', type: 'magical', damage: 2.5, cooldown: 3, description: 'Breathes devastating frozen currents', effect: { type: 'dot', damage: 0.14, duration: 3 } },
       { id: 'permafrost_heal', name: 'Permafrost', icon: 'heart', type: 'heal', damage: 0, cooldown: 6, description: 'Draws power from eternal ice to heal', healPercent: 0.14 },
@@ -538,11 +538,11 @@ export const enemyTemplates = {
     baseHealth: 250, baseDamage: 20, baseDefense: 30, baseMana: 60,
     xpReward: 38, goldReward: 22, speed: 6,
     abilities: [
-      { id: 'stone_fist', name: 'Coral Fist', icon: 'sword', type: 'physical', damage: 1.2, description: 'A heavy fist of living coral crushes down' },
+      { id: 'stone_fist', name: 'Root Fist', icon: 'sword', type: 'physical', damage: 1.2, description: 'A heavy fist of living roots crushes down' },
       { id: 'petrify_gaze', name: 'Hypnotic Gaze', icon: 'crystal', type: 'magical', damage: 0.6, cooldown: 5, description: 'Eyes glow with bioluminescence, stunning a hero', effect: { type: 'stun', duration: 1 } },
-      { id: 'quake_slam', name: 'Reef Slam', icon: 'shield', type: 'physical', damage: 2.0, cooldown: 4, description: 'Slams the reef causing a localized tremor' },
-      { id: 'fortify', name: 'Reef Fortify', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Channels ancient reef magic to harden its body', effect: { stat: 'defense', flat: 40, duration: 3 } },
-      { id: 'crumble_curse', name: 'Erosion Curse', icon: 'skull', type: 'magical', damage: 0.8, cooldown: 4, description: 'Curses a hero with saltwater decay, eroding armor', effect: { type: 'dot', damage: 0.10, duration: 4 } },
+      { id: 'quake_slam', name: 'Root Slam', icon: 'shield', type: 'physical', damage: 2.0, cooldown: 4, description: 'Slams the grove causing a localized tremor' },
+      { id: 'fortify', name: 'Root Fortify', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Channels ancient grove magic to harden its body', effect: { stat: 'defense', flat: 40, duration: 3 } },
+      { id: 'crumble_curse', name: 'Erosion Curse', icon: 'skull', type: 'magical', damage: 0.8, cooldown: 4, description: 'Curses a hero with waterborne decay, eroding armor', effect: { type: 'dot', damage: 0.10, duration: 4 } },
     ]
   },
   jellyfish_swarm: {
@@ -559,13 +559,13 @@ export const enemyTemplates = {
     baseHealth: 130, baseDamage: 20, baseDefense: 12, baseMana: 80,
     xpReward: 25, goldReward: 14, speed: 13,
     abilities: [
-      { id: 'frost_shard', name: 'Ice Shard', icon: 'ice', type: 'magical', damage: 1.1, description: 'Hurls a shard of deep-sea ice' },
+      { id: 'frost_shard', name: 'Ice Shard', icon: 'ice', type: 'magical', damage: 1.1, description: 'Hurls a shard of deepwater ice' },
       { id: 'freeze_touch', name: 'Freezing Touch', icon: 'ice', type: 'magical', damage: 1.6, cooldown: 3, description: 'Flash-freezes on contact', effect: { type: 'dot', damage: 0.10, duration: 3 } },
       { id: 'ice_shield', name: 'Frost Shell', icon: 'shield', type: 'buff', damage: 0, cooldown: 4, description: 'Encases in protective ice', effect: { stat: 'defense', flat: 18, duration: 2 } },
     ]
   },
   crab_warrior: {
-    name: 'Reef Crab', icon: 'shield', color: '#a16207', portrait: '/images/enemies/armored_crab.png',
+    name: 'Grove Crab', icon: 'shield', color: '#a16207', portrait: '/images/enemies/armored_crab.png',
     baseHealth: 110, baseDamage: 16, baseDefense: 18, baseMana: 0,
     xpReward: 16, goldReward: 9, speed: 9,
     abilities: [
@@ -599,8 +599,8 @@ export const enemyTemplates = {
 export const locations = [
   {
     id: 'verdant_plains',
-    name: 'Coral Shallows',
-    description: 'Sunlit waters dance over vibrant coral beds where the first fragment of the shattered Coral Crown was found. Reef bandits and mantis shrimp prowl the shallows, emboldened by the fading light of the old world.',
+    name: 'Shaded Shallows',
+    description: 'Sunlit waters dance over vibrant root beds where the first fragment of the shattered Root Crown was found. Grove bandits and mantis shrimp prowl the shallows, emboldened by the fading light of the old world.',
     levelRange: [1, 3],
     enemies: ['goblin', 'wolf', 'mushroom', 'imp', 'shadow_bat', 'jellyfish_swarm', 'crab_warrior'],
     bgGradient: 'linear-gradient(135deg, #064e3b 0%, #0d9488 50%, #0891b2 100%)',
@@ -636,7 +636,7 @@ export const locations = [
   {
     id: 'mystic_grove',
     name: 'Anemone Garden',
-    description: 'Giant sea anemones pulse with ancient magic, their tendrils weaving spells older than the Coral Crown itself. Ink sorcerers gather here to channel the garden\'s power for dark purposes.',
+    description: 'Giant anemones pulse with ancient magic, their tendrils weaving spells older than the Root Crown itself. Ink sorcerers gather here to channel the garden\'s power for dark purposes.',
     levelRange: [4, 6],
     enemies: ['goblin', 'wolf', 'dark_mage', 'mushroom', 'flying_eye', 'imp'],
     bgGradient: 'linear-gradient(135deg, #0e7490 0%, #06b6d4 50%, #22d3ee 100%)',
@@ -693,7 +693,7 @@ export const locations = [
   {
     id: 'cursed_ruins',
     name: 'Sunken Citadel',
-    description: 'The drowned fortress of an ancient betta kingdom, its coral spires crumbling into the abyss. Abyssal knights and shadow eels patrol these haunted halls, guarding secrets of the shattered Crown.',
+    description: 'The drowned fortress of an ancient betta kingdom, its root spires crumbling into the abyss. Abyssal knights and shadow eels patrol these haunted halls, guarding secrets of the shattered Crown.',
     levelRange: [6, 9],
     enemies: ['skeleton', 'dark_mage', 'skeleton_knight', 'mimic', 'crow_knight', 'dark_knight', 'shadow_warrior'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #020617 100%)',
@@ -712,7 +712,7 @@ export const locations = [
   {
     id: 'crystal_caves',
     name: 'Crystal Grotto',
-    description: 'Glittering caverns of living crystal hum with the resonance of the Coral Crown. Stone crabs and coral priestesses guard these sacred halls, carved by ancient artisans of the deep.',
+    description: 'Glittering caverns of living crystal hum with the resonance of the Root Crown. Stone crabs and root priestesses guard these sacred halls, carved by ancient artisans of the deep.',
     levelRange: [7, 9],
     enemies: ['skeleton', 'goblin', 'orc', 'skeleton_knight', 'mimic', 'stone_guardian', 'water_priestess_mage'],
     bgGradient: 'linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #06b6d4 100%)',
@@ -730,8 +730,8 @@ export const locations = [
   },
   {
     id: 'thornwood_pass',
-    name: 'Tide Stream',
-    description: 'A treacherous channel carved by relentless tidal forces, where powerful currents sweep the unwary into ambushes. Barracuda knights and hammerhead brutes control this vital passage between the shallows and the deep.',
+    name: 'Current Stream',
+    description: 'A treacherous channel carved by relentless current forces, where powerful currents sweep the unwary into ambushes. Barracuda knights and hammerhead brutes control this vital passage between the shallows and the deep.',
     levelRange: [6, 8],
     enemies: ['wolf', 'goblin', 'orc', 'mushroom', 'crow_knight', 'imp'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%)',
@@ -750,7 +750,7 @@ export const locations = [
   {
     id: 'sunken_temple',
     name: 'Shipwreck Hollow',
-    description: 'Shattered hulls of ancient vessels litter the seafloor, and in their shadow lurks Scylla — the first Gorgon Siren, once the gentlest guardian of the shallows. Her six serpentine heads now strike at anything that moves, her bat-like wings churning the water into a frenzy. The Crown fragment she guards pulses with fading light.',
+    description: 'Shattered hulls of ancient vessels litter the lakebed, and in their shadow lurks Scylla — the first Gorgon Siren, once the gentlest guardian of the shallows. Her six serpentine heads now strike at anything that moves, her bat-like wings churning the water into a frenzy. The Crown fragment she guards pulses with fading light.',
     levelRange: [7, 9],
     enemies: ['skeleton', 'dark_mage', 'goblin', 'skeleton_knight', 'flying_eye', 'mimic', 'stone_guardian', 'water_priestess_mage'],
     bgGradient: 'linear-gradient(135deg, #155e75 0%, #164e63 50%, #0e7490 100%)',
@@ -768,8 +768,8 @@ export const locations = [
   },
   {
     id: 'iron_peaks',
-    name: 'Coral Fortress',
-    description: 'A massive fortification of hardened coral where the Abyss King\'s armies have established their first stronghold. The deep current brings organized war parties of abyssal knights and barracuda knights.',
+    name: 'Root Fortress',
+    description: 'A massive fortification of hardened root where the Abyss King\'s armies have established their first stronghold. The deep current brings organized war parties of abyssal knights and barracuda knights.',
     levelRange: [8, 11],
     enemies: ['orc', 'skeleton', 'dark_mage', 'stone_guardian', 'crow_knight', 'dark_knight'],
     bgGradient: 'linear-gradient(135deg, #134e4a 0%, #0f766e 50%, #115e59 100%)',
@@ -788,7 +788,7 @@ export const locations = [
   {
     id: 'blood_canyon',
     name: 'Thermal Vent',
-    description: 'Superheated water erupts from the ocean floor in blinding geysers of mineral-rich fury. The Trench Warlord commands this volcanic stronghold, forging weapons in the scalding vents for the Abyss King\'s armies.',
+    description: 'Superheated water erupts from the lakebed in blinding geysers of mineral-rich fury. The Trench Warlord commands this volcanic stronghold, forging weapons in the scalding vents for the Abyss King\'s armies.',
     levelRange: [9, 12],
     enemies: ['orc', 'skeleton', 'dark_mage', 'crow_knight', 'dark_knight', 'shadow_warrior', 'lava_crab'],
     bgGradient: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #431407 100%)',
@@ -807,7 +807,7 @@ export const locations = [
   {
     id: 'frozen_tundra',
     name: 'Frozen Depths',
-    description: 'Arctic currents have frozen these waters into a silent kingdom of ice, where a mighty Frost Serpent coils in the darkness below. The cold here is ancient, predating even the Coral Crown.',
+    description: 'Arctic currents have frozen these waters into a silent kingdom of ice, where a mighty Frost Serpent coils in the darkness below. The cold here is ancient, predating even the Root Crown.',
     levelRange: [10, 13],
     enemies: ['orc', 'skeleton', 'dark_mage', 'shadow_bat', 'water_priestess_mage', 'ice_elemental', 'frost_jellyfish'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #7dd3fc 50%, #bae6fd 100%)',
@@ -826,7 +826,7 @@ export const locations = [
   {
     id: 'dragon_peaks',
     name: "Leviathan's Wake",
-    description: 'Volcanic peaks scarred by the passage of ancient leviathans, where sea drakes nest among the smoldering rock. A Storm Elemental guards a Crown fragment lodged in the volcanic heart.',
+    description: 'Volcanic peaks scarred by the passage of ancient leviathans, where river drakes nest among the smoldering rock. A Storm Elemental guards a Crown fragment lodged in the volcanic heart.',
     levelRange: [11, 14],
     enemies: ['dragon_whelp', 'orc', 'dark_mage'],
     bgGradient: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #0f766e 100%)',
@@ -845,7 +845,7 @@ export const locations = [
   {
     id: 'ashen_battlefield',
     name: 'Sandy Wastes',
-    description: 'A desolate expanse of ocean floor strewn with the bones and shells of warriors who fell in the First Tide War. Scavengers pick through the remains while stone crabs guard buried relics.',
+    description: 'A desolate expanse of lakebed strewn with the bones and shells of warriors who fell in the First Current War. Scavengers pick through the remains while stone crabs guard buried relics.',
     levelRange: [10, 13],
     enemies: ['orc', 'skeleton', 'dark_mage', 'crow_knight', 'stone_guardian'],
     bgGradient: 'linear-gradient(135deg, #1e3a5f 0%, #475569 50%, #334155 100%)',
@@ -864,7 +864,7 @@ export const locations = [
   {
     id: 'windswept_ridge',
     name: 'Riptide Shelf',
-    description: 'A narrow ridge battered by violent riptides that tear through the water with terrifying force. Sea drakes ride the currents overhead while barracuda knights ambush travelers from crevices below.',
+    description: 'A narrow ridge battered by violent riptides that tear through the water with terrifying force. River drakes ride the currents overhead while barracuda knights ambush travelers from crevices below.',
     levelRange: [11, 14],
     enemies: ['orc', 'dragon_whelp', 'dark_mage', 'crow_knight'],
     bgGradient: 'linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0c4a6e 100%)',
@@ -883,7 +883,7 @@ export const locations = [
   {
     id: 'molten_core',
     name: 'Volcanic Hearth',
-    description: 'Rivers of magma snake beneath the ocean floor, turning the water into a boiling cauldron of fire and steam. Sea drakes are drawn to the volcanic heat, nesting in the molten crevasses.',
+    description: 'Rivers of magma snake beneath the lakebed, turning the water into a boiling cauldron of fire and steam. River drakes are drawn to the volcanic heat, nesting in the molten crevasses.',
     levelRange: [12, 14],
     enemies: ['dragon_whelp', 'orc', 'dark_mage', 'lava_crab'],
     bgGradient: 'linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #7f1d1d 100%)',
@@ -902,7 +902,7 @@ export const locations = [
   {
     id: 'shadow_forest',
     name: 'Mushroom Forest',
-    description: 'Towering fungal growths twist upward from the seafloor, their caps glowing with corrupted bioluminescence. The Corrupted Reef Keeper has turned this once-beautiful forest into a breeding ground for the Abyss King\'s forces.',
+    description: 'Towering fungal growths twist upward from the lakebed, their caps glowing with corrupted bioluminescence. The Corrupted Grove Keeper has turned this once-beautiful forest into a breeding ground for the Abyss King\'s forces.',
     levelRange: [12, 15],
     enemies: ['dark_mage', 'orc', 'skeleton', 'mushroom', 'flying_eye', 'shadow_bat', 'crow_knight'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%)',
@@ -922,7 +922,7 @@ export const locations = [
   {
     id: 'obsidian_wastes',
     name: 'Obsidian Flats',
-    description: 'A blasted wasteland of volcanic glass and black ash where nothing survives but the Abyss King\'s most hardened warriors. Toxic vents belch poisonous clouds across the desolate seafloor.',
+    description: 'A blasted wasteland of volcanic glass and black ash where nothing survives but the Abyss King\'s most hardened warriors. Toxic vents belch poisonous clouds across the desolate lakebed.',
     levelRange: [13, 15],
     enemies: ['orc', 'dark_mage', 'dragon_whelp'],
     bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #020617 100%)',
@@ -941,7 +941,7 @@ export const locations = [
   {
     id: 'ruins_of_ashenmoor',
     name: 'Ruins of the Deep',
-    description: 'The crumbling remains of Abyssia\'s greatest city, destroyed when the Coral Crown shattered. Dark spirits haunt the rubble, and ink sorcerers search the ruins for forbidden knowledge.',
+    description: 'The crumbling remains of Abyssia\'s greatest city, destroyed when the Root Crown shattered. Dark spirits haunt the rubble, and ink sorcerers search the ruins for forbidden knowledge.',
     levelRange: [13, 16],
     enemies: ['skeleton', 'dark_mage', 'orc', 'skeleton_knight', 'mimic', 'stone_guardian'],
     bgGradient: 'linear-gradient(135deg, #164e63 0%, #0e7490 50%, #1e293b 100%)',
@@ -960,7 +960,7 @@ export const locations = [
   {
     id: 'blight_hollow',
     name: 'Blight Hollow',
-    description: 'A festering trench where the Abyss King\'s corruption has poisoned the water itself. Toxic chemicals seep from the seafloor, corroding everything they touch and birthing twisted creatures.',
+    description: 'A festering trench where the Abyss King\'s corruption has poisoned the water itself. Toxic chemicals seep from the lakebed, corroding everything they touch and birthing twisted creatures.',
     levelRange: [14, 16],
     enemies: ['dark_mage', 'skeleton', 'orc', 'mushroom', 'skeleton_knight', 'imp'],
     bgGradient: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #042f2e 100%)',
@@ -979,7 +979,7 @@ export const locations = [
   {
     id: 'shadow_citadel',
     name: 'Shadow Citadel',
-    description: 'A fortress of petrified coral and living shadow, where Medusa — the second Gorgon Siren — weeps cursed pearls from her throne. Her serpent hair senses every disturbance in the water, and her blood-soaked blade has ended a thousand champions. The Crown fragment here is sealed behind walls of stone that were once living fish.',
+    description: 'A fortress of petrified root and living shadow, where Medusa — the second Gorgon Siren — weeps cursed pearls from her throne. Her serpent hair senses every disturbance in the water, and her blood-soaked blade has ended a thousand champions. The Crown fragment here is sealed behind walls of stone that were once living fish.',
     levelRange: [14, 17],
     enemies: ['dark_mage', 'dragon_whelp', 'orc'],
     bgGradient: 'linear-gradient(135deg, #0f172a 0%, #020617 50%, #000000 100%)',
@@ -1017,7 +1017,7 @@ export const locations = [
   {
     id: 'demon_gate',
     name: 'Abyssal Gate',
-    description: 'A massive cavern where the barrier between the ocean and the Abyss grows thin, and monstrous creatures pour through the widening cracks. A Leviathan guards the passage with volcanic fury.',
+    description: 'A massive cavern where the barrier between the waters and the Abyss grows thin, and monstrous creatures pour through the widening cracks. A Leviathan guards the passage with volcanic fury.',
     levelRange: [15, 18],
     enemies: ['dark_mage', 'dragon_whelp', 'orc', 'skeleton_knight', 'crow_knight', 'imp'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #0f172a 100%)',
@@ -1074,7 +1074,7 @@ export const locations = [
   {
     id: 'dreadmaw_canyon',
     name: 'Dreadmaw Rift',
-    description: 'A yawning rift in the ocean floor filled with the bones of ancient leviathans, its walls lined with razor-sharp coral teeth. The rift pulses like a living maw, hungry for those who enter.',
+    description: 'A yawning rift in the lakebed filled with the bones of ancient leviathans, its walls lined with razor-sharp root teeth. The rift pulses like a living maw, hungry for those who enter.',
     levelRange: [17, 19],
     enemies: ['dark_mage', 'orc', 'dragon_whelp', 'crow_knight', 'mimic'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #2e1065 100%)',
@@ -1093,7 +1093,7 @@ export const locations = [
   {
     id: 'void_threshold',
     name: 'Void Threshold',
-    description: 'The edge of the known ocean, where light ends and the Abyss begins. A Void Sentinel stands eternal watch over the passage to the realm beyond, testing all who would challenge the darkness.',
+    description: 'The edge of the known waters, where light ends and the Abyss begins. A Void Sentinel stands eternal watch over the passage to the realm beyond, testing all who would challenge the darkness.',
     levelRange: [17, 19],
     enemies: ['dark_mage', 'dragon_whelp', 'orc'],
     bgGradient: 'linear-gradient(135deg, #020617 0%, #0f172a 50%, #000000 100%)',
@@ -1112,7 +1112,7 @@ export const locations = [
   {
     id: 'corrupted_spire',
     name: 'Corrupted Spire',
-    description: 'A twisted tower of blackened coral that pierces upward from the ocean floor, radiating waves of abyssal corruption. The last Crown fragment pulses faintly within its peak, calling out for rescue.',
+    description: 'A twisted tower of blackened root that pierces upward from the lakebed, radiating waves of abyssal corruption. The last Crown fragment pulses faintly within its peak, calling out for rescue.',
     levelRange: [18, 20],
     enemies: ['dark_mage', 'dragon_whelp', 'orc'],
     bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%)',
@@ -1131,7 +1131,7 @@ export const locations = [
   {
     id: 'void_throne',
     name: 'The Abyss Throne',
-    description: 'In the crushing darkness beyond the deepest trench, the Abyss King sits upon a throne of devoured light. Here, where the ocean\'s heart beats its last, the final battle for the Coral Crown begins.',
+    description: 'In the crushing darkness beyond the deepest trench, the Abyss King sits upon a throne of devoured light. Here, where the waters\'s heart beats its last, the final battle for the Root Crown begins.',
     levelRange: [18, 20],
     enemies: ['dark_mage', 'dragon_whelp', 'orc'],
     bgGradient: 'linear-gradient(135deg, #020617 0%, #0c4a6e 50%, #000000 100%)',
@@ -1149,8 +1149,8 @@ export const locations = [
   },
   {
     id: 'hall_of_odin',
-    name: 'Temple of Tides',
-    description: 'A grand temple of pearl and gold where Poseidon, Lord of Tides, holds dominion over the ocean\'s currents. Only true Crusade champions may enter these hallowed waters and challenge divine authority.',
+    name: 'Temple of Currents',
+    description: 'A grand temple of pearl and gold where Poseidon, Lord of Currents, holds dominion over the waters\'s currents. Only true Crusade champions may enter these hallowed waters and challenge divine authority.',
     levelRange: [20, 20],
     enemies: ['dark_mage', 'orc'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #0c4a6e 100%)',
@@ -1196,7 +1196,7 @@ export const locations = [
   {
     id: 'sanctum_of_omni',
     name: 'Leviathan Sanctum',
-    description: 'A realm beyond mortal comprehension where The Leviathan, Weaver of Currents, reshapes the ocean at will. Only Fabled champions may enter this sanctum and challenge the weaver of destiny itself.',
+    description: 'A realm beyond mortal comprehension where The Leviathan, Weaver of Currents, reshapes the waters at will. Only Fabled champions may enter this sanctum and challenge the weaver of destiny itself.',
     levelRange: [20, 20],
     enemies: ['dark_mage', 'dragon_whelp'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #7c3aed 50%, #1e1b4b 100%)',
@@ -1274,7 +1274,7 @@ export const shieldBlockers = [
     locationId: 'sunken_temple',
     name: 'Temple Gatekeeper',
     condition: { type: 'boss', value: 'dark_knight' },
-    message: 'Defeat the Angler Phantom in Shadow Reef to pass',
+    message: 'Defeat the Angler Phantom in Shadow Grove to pass',
     scale: 2.5,
   },
   {

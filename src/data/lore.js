@@ -2,24 +2,24 @@ export const WORLD_LORE = {
   title: 'The Sunken Kingdom of Abyssia',
   subtitle: 'Where Magic Sleeps in Three Vessels',
 
-  prologue: `In the age before memory, when the ocean was young and currents still sang, three vessels of magic sustained all life beneath the waves. The Betta — fierce, beautiful, and proud — carried the Fire of Will, the spark that drives all creatures to fight, to love, to endure. The Gorgons — ancient serpents of coral and stone — held the Weight of Law, the force that keeps the deep in order and the tides in rhythm. And the Plankton — countless, invisible, everywhere — bore the Light of Unity, the quiet magic that binds every living thing to every other.
+  prologue: `In the age before memory, when the waters were young and currents still sang, three vessels of magic sustained all life beneath the currents. The Betta — fierce, beautiful, and proud — carried the Fire of Will, the spark that drives all creatures to fight, to love, to endure. The Gorgons — ancient serpents of root and stone — held the Weight of Law, the force that keeps the deep in order and the currents in rhythm. And the Plankton — countless, invisible, everywhere — bore the Light of Unity, the quiet magic that binds every living thing to every other.
 
-For eons, the three magics held the ocean in balance. The Betta Warlords built the kingdom of Abyssia atop the Coral Crown, a living reef throne that channeled all three magics into harmony. The Gorgon Sirens kept vigil at the borders of the deep, their petrifying gaze holding the Abyss at bay. And the Plankton drifted through every current, every cave, every drop of water — a living web of light connecting all things.
+For eons, the three magics held the waters in balance. The Betta Warlords built the kingdom of Abyssia atop the Root Crown, a living root throne that channeled all three magics into harmony. The Gorgon Sirens kept vigil at the borders of the deep, their petrifying gaze holding the Abyss at bay. And the Plankton drifted through every current, every cave, every drop of water — a living web of light connecting all things.
 
 Then the Plankton Magic went silent.
 
-No one knows why. No warning, no cataclysm, no final cry. One day the water simply... dimmed. The bioluminescent networks that connected every reef and trench flickered and died. The currents lost their song. Fish that had swum together for millennia scattered in confusion. And in the sudden darkness, something stirred in the Abyss.
+No one knows why. No warning, no cataclysm, no final cry. One day the water simply... dimmed. The bioluminescent networks that connected every grove and trench flickered and died. The currents lost their song. Fish that had swum together for millennia scattered in confusion. And in the sudden darkness, something stirred in the Abyss.
 
-The Coral Crown shattered. The Gorgon Sirens, driven mad by the severed connection, turned hostile — their ancient duty corrupted into blind rage. The Betta Warlords, the last vessels of conscious magic, found themselves alone in a darkening ocean, hunted by the very guardians who once protected them.
+The Root Crown shattered. The Gorgon Sirens, driven mad by the severed connection, turned hostile — their ancient duty corrupted into blind rage. The Betta Warlords, the last vessels of conscious magic, found themselves alone in the darkening waters, hunted by the very guardians who once protected them.
 
-Now you must gather your Warlords, restore the fragments of the Coral Crown, face the maddened Gorgons, and discover why the Plankton Magic fell silent — before the Abyss devours everything.`,
+Now you must gather your Warlords, restore the fragments of the Root Crown, face the maddened Gorgons, and discover why the Plankton Magic fell silent — before the Abyss devours everything.`,
 
   threeVessels: [
     {
       name: 'The Betta — Fire of Will',
       icon: '🔥',
       color: '#ef4444',
-      description: 'The Betta fish carry the oldest conscious magic in the ocean. Each of the eight breeds channels a different aspect of Will — from the Halfmoon\'s protective resolve to the Crowntail\'s fierce ambition. When a Betta Warlord fights, they don\'t just swing a weapon; they burn with the accumulated determination of every ancestor who refused to yield. This is why Betta can learn magic, wield enchanted weapons, and grow stronger through battle — their very nature is to overcome.',
+      description: 'The Betta fish carry the oldest conscious magic in the waters. Each of the eight breeds channels a different aspect of Will — from the Halfmoon\'s protective resolve to the Crowntail\'s fierce ambition. When a Betta Warlord fights, they don\'t just swing a weapon; they burn with the accumulated determination of every ancestor who refused to yield. This is why Betta can learn magic, wield enchanted weapons, and grow stronger through battle — their very nature is to overcome.',
       status: 'Active — You are the last hope',
     },
     {
@@ -33,7 +33,7 @@ Now you must gather your Warlords, restore the fragments of the Coral Crown, fac
       name: 'The Plankton — Light of Unity',
       icon: '✨',
       color: '#22d3ee',
-      description: 'The most mysterious and powerful of the three magics. Plankton are everywhere in the ocean — in every drop of water, every breath, every current. Their magic was the connective tissue of all life, a living network of bioluminescent light that let every creature in the sea feel the heartbeat of every other. When the Plankton Magic went silent, it was as if the ocean itself went blind and deaf. The cause of the silence is the central mystery of the game.',
+      description: 'The most mysterious and powerful of the three magics. Plankton are everywhere in the waters — in every drop of water, every breath, every current. Their magic was the connective tissue of all life, a living network of bioluminescent light that let every creature in the waters feel the heartbeat of every other. When the Plankton Magic went silent, it was as if the waters themselves went blind and deaf. The cause of the silence is the central mystery of the game.',
       status: 'Silent — The great mystery',
     },
   ],
@@ -42,21 +42,21 @@ Now you must gather your Warlords, restore the fragments of the Coral Crown, fac
     {
       id: 'gorgon_siren_3',
       name: 'Scylla, Siren of the Shallows',
-      title: 'The Winged Terror of the Reefs',
+      title: 'The Winged Terror of the Groves',
       color: '#06b6d4',
       portrait: '/images/bosses/gorgon_siren_3_scylla.png',
       sprite: 'gorgon_siren_3',
-      description: 'Once the gentlest of the three Gorgon Sirens, Scylla watched over the coral reefs and shallow waters where young sea creatures took their first breaths. Her gaze would turn only poachers and reef-destroyers to stone, leaving graceful coral statues as warnings. Now maddened, she attacks anything that moves in the upper waters, her six serpentine heads striking with the speed of a riptide. Her enormous bat-like wings churn the water into blinding storms, and her dark-green scales have hardened into living armor.',
-      lore: 'Scylla\'s petrification was always temporary — she would release her victims after they learned respect for the reef. This mercy is now gone. Her wings, once folded in peaceful rest, now beat ceaselessly as she patrols the shallows in blind fury.',
+      description: 'Once the gentlest of the three Gorgon Sirens, Scylla watched over the root groves and shallow waters where young water creatures took their first breaths. Her gaze would turn only poachers and grove-destroyers to stone, leaving graceful stone statues as warnings. Now maddened, she attacks anything that moves in the upper waters, her six serpentine heads striking with the speed of a rapids. Her enormous bat-like wings churn the water into blinding storms, and her dark-green scales have hardened into living armor.',
+      lore: 'Scylla\'s petrification was always temporary — she would release her victims after they learned respect for the grove. This mercy is now gone. Her wings, once folded in peaceful rest, now beat ceaselessly as she patrols the shallows in blind fury.',
       location: 'Shipwreck Hollow',
       locationId: 'sunken_temple',
       level: 9,
       encounterScene: {
         title: 'The Guardian Awakens',
         intro: 'The water darkens as you approach the shattered hulls. A low rumble vibrates through your fins. Then you see her — rising from between the wrecks, wings unfurling like vast sails of shadow. Six serpentine heads weave around her body, each one fixing you with glowing yellow eyes. Scylla, once the gentlest protector of the shallows, now recognizes nothing but enemies.',
-        taunt: '"You dare swim in MY waters? I am the reef. I am the tide. And you... are STONE."',
-        victory: 'As Scylla falls, her wings fold one last time. For a brief moment, her eyes clear — and in them you see not rage, but grief. A fragment of the Coral Crown tumbles from her coils, pulsing with teal light. The reef around you brightens, just slightly, as if remembering what it once was.',
-        defeat: 'Scylla\'s wings beat triumphantly as your vision turns to stone. The last thing you hear is a sound almost like weeping — or perhaps the reef itself, mourning what it has lost.',
+        taunt: '"You dare swim in MY waters? I am the grove. I am the current. And you... are STONE."',
+        victory: 'As Scylla falls, her wings fold one last time. For a brief moment, her eyes clear — and in them you see not rage, but grief. A fragment of the Root Crown tumbles from her coils, pulsing with teal light. The grove around you brightens, just slightly, as if remembering what it once was.',
+        defeat: 'Scylla\'s wings beat triumphantly as your vision turns to stone. The last thing you hear is a sound almost like weeping — or perhaps the grove itself, mourning what it has lost.',
       },
     },
     {
@@ -73,8 +73,8 @@ Now you must gather your Warlords, restore the fragments of the Coral Crown, fac
       level: 17,
       encounterScene: {
         title: 'The Weeping Fortress',
-        intro: 'The Shadow Citadel rises from the ocean floor like a monument to madness. Its walls are not stone — they are fish, warriors, sea creatures, all turned to coral by Medusa\'s gaze, frozen in their final moments of terror. At its heart, she waits on a throne of petrified champions, serpent hair writhing, green eyes burning. In one hand she holds a blade stained with the blood of centuries. In the other, a single abyssal pearl — her own crystallized tear.',
-        taunt: '"I wept for this ocean. I bled for its borders. And when the Light died... I was ALONE. Now you come to my citadel? Then join my walls. Become beautiful. Become FOREVER."',
+        intro: 'The Shadow Citadel rises from the lakebed like a monument to madness. Its walls are not stone — they are fish, warriors, water creatures, all turned to stone by Medusa\'s gaze, frozen in their final moments of terror. At its heart, she waits on a throne of petrified champions, serpent hair writhing, green eyes burning. In one hand she holds a blade stained with the blood of centuries. In the other, a single abyssal pearl — her own crystallized tear.',
+        taunt: '"I wept for these waters. I bled for their borders. And when the Light died... I was ALONE. Now you come to my citadel? Then join my walls. Become beautiful. Become FOREVER."',
         victory: 'Medusa\'s blade clatters to the stone floor. Her serpent hair goes still, one head at a time, like candles being extinguished. She looks at the abyssal pearl in her hand and whispers: "I remember the light. I remember when I could feel... everything." A Crown fragment materializes where her tear falls, glowing violet. The walls of the citadel tremble — and for the first time in ages, one of the petrified fish blinks.',
         defeat: 'Your body hardens under her gaze. As consciousness fades, you hear Medusa\'s voice, broken and ancient: "Another one for my walls. Another friend I couldn\'t save." She places an abyssal pearl where you stood — a memorial no one will ever see.',
       },
@@ -86,16 +86,16 @@ Now you must gather your Warlords, restore the fragments of the Coral Crown, fac
       color: '#c084fc',
       portrait: '/images/bosses/gorgon_siren_2_charybdis.png',
       sprite: 'gorgon_siren_2',
-      description: 'The most fearsome and mysterious of the three Gorgon Sirens. Charybdis rules the deepest trenches where reality itself grows thin, wielding a skull-crowned scepter that channels the Weight of Law in its most terrible form. Her golden-scaled serpent body coils through the purple darkness, and her gaze doesn\'t just petrify — it unmakes, dissolving matter back into raw ocean. She is the only being who was present at the moment the Plankton Magic went silent. What she witnessed in that instant shattered something inside her — and she has spoken only in fragments and riddles ever since.',
+      description: 'The most fearsome and mysterious of the three Gorgon Sirens. Charybdis rules the deepest trenches where reality itself grows thin, wielding a skull-crowned scepter that channels the Weight of Law in its most terrible form. Her golden-scaled serpent body coils through the purple darkness, and her gaze doesn\'t just petrify — it unmakes, dissolving matter back into raw water. She is the only being who was present at the moment the Plankton Magic went silent. What she witnessed in that instant shattered something inside her — and she has spoken only in fragments and riddles ever since.',
       lore: 'Charybdis was always the wisest of the three sisters, the one who understood the Balance most deeply. When the Plankton Magic went silent, she felt every thread of the web snap at once — billions of connections severed in a single heartbeat. The pain drove her to the brink. She built the Devourer\'s Maw around herself, a whirlpool fortress of consumed souls, and waits for someone strong enough to hear what she cannot bring herself to speak aloud.',
       location: "The Devourer's Maw",
       locationId: 'maw_of_madra',
       level: 20,
       encounterScene: {
         title: 'The Truth in the Abyss',
-        intro: 'The descent into the Devourer\'s Maw is a journey through memory. Purple currents show flashes of what was — the ocean alive with Plankton light, three sisters standing guard at the borders of the world. Then the visions darken, and you see it: the moment the Light went out. A ripple of nothing spreading through the water. And at its center, Charybdis, her skull-topped scepter raised, her eyes wide with horror. She turns to face you now, ancient and terrible, her golden scales scarred by centuries of self-inflicted grief.',
-        taunt: '"You want to know why the Light died? I SAW it. I felt every connection break. Every bond. Every thread of life that held this ocean together — GONE in a heartbeat. And do you know what was left? ME. Alone in the dark. So I devoured. I consumed. Because if I couldn\'t feel the Unity... I would feel NOTHING."',
-        victory: 'Charybdis drops her scepter. The skull atop it screams — then goes silent. She sinks to the ocean floor, her massive coils going slack, and for the first time in centuries she speaks clearly: "The Plankton didn\'t die. They chose to withdraw. Something was coming — something that feeds on Unity itself. They severed the web to starve it. But it found another way to feed... through us. Through our rage. Through our grief." She looks at you with eyes that have seen the end of the world. "The Cacodaemon. It is here. It has always been here. And it is so, so hungry." The final Crown fragment rises from the Maw, blazing with purple and gold light.',
+        intro: 'The descent into the Devourer\'s Maw is a journey through memory. Purple currents show flashes of what was — the waters alive with Plankton light, three sisters standing guard at the borders of the world. Then the visions darken, and you see it: the moment the Light went out. A ripple of nothing spreading through the water. And at its center, Charybdis, her skull-topped scepter raised, her eyes wide with horror. She turns to face you now, ancient and terrible, her golden scales scarred by centuries of self-inflicted grief.',
+        taunt: '"You want to know why the Light died? I SAW it. I felt every connection break. Every bond. Every thread of life that held these waters together — GONE in a heartbeat. And do you know what was left? ME. Alone in the dark. So I devoured. I consumed. Because if I couldn\'t feel the Unity... I would feel NOTHING."',
+        victory: 'Charybdis drops her scepter. The skull atop it screams — then goes silent. She sinks to the lakebed, her massive coils going slack, and for the first time in centuries she speaks clearly: "The Plankton didn\'t die. They chose to withdraw. Something was coming — something that feeds on Unity itself. They severed the web to starve it. But it found another way to feed... through us. Through our rage. Through our grief." She looks at you with eyes that have seen the end of the world. "The Cacodaemon. It is here. It has always been here. And it is so, so hungry." The final Crown fragment rises from the Maw, blazing with purple and gold light.',
         defeat: 'The whirlpool closes around you. Charybdis\'s voice echoes as darkness takes you: "You were not ready for the truth. No one ever is. Sleep now. Sleep, and forget what the silence means."',
       },
     },
@@ -105,9 +105,9 @@ Now you must gather your Warlords, restore the fragments of the Coral Crown, fac
 
   gorgonStoryArc: {
     title: 'The Maddened Guardians',
-    description: 'The three Gorgon Sirens once maintained the natural order of the deep — Scylla guarding the shallows, Medusa the twilight borders, and Charybdis the abyss. When the Plankton Magic went silent, the sisters lost their connection to the web of life and to each other. Each was driven mad in her own way: Scylla by fury, Medusa by grief, Charybdis by the terrible truth she witnessed. To restore the Coral Crown and face the Cacodaemon, you must defeat all three — but perhaps, in doing so, you can also set them free.',
+    description: 'The three Gorgon Sirens once maintained the natural order of the deep — Scylla guarding the shallows, Medusa the twilight borders, and Charybdis the abyss. When the Plankton Magic went silent, the sisters lost their connection to the web of life and to each other. Each was driven mad in her own way: Scylla by fury, Medusa by grief, Charybdis by the terrible truth she witnessed. To restore the Root Crown and face the Cacodaemon, you must defeat all three — but perhaps, in doing so, you can also set them free.',
     progression: [
-      { phase: 'The Shallows Darken', level: '7-9', boss: 'Scylla', location: 'Shipwreck Hollow', description: 'Scylla\'s fury has turned the once-peaceful shallows into a killing ground. Coral statues of her victims line the seafloor. You must face her winged wrath to claim the first Crown fragment and prove yourself worthy of the deeper waters.' },
+      { phase: 'The Shallows Darken', level: '7-9', boss: 'Scylla', location: 'Shipwreck Hollow', description: 'Scylla\'s fury has turned the once-peaceful shallows into a killing ground. Stone statues of her victims line the lakebed. You must face her winged wrath to claim the first Crown fragment and prove yourself worthy of the deeper waters.' },
       { phase: 'The Twilight Weeps', level: '14-17', boss: 'Medusa', location: 'Shadow Citadel', description: 'Medusa\'s grief has built a fortress of the petrified dead. Her tears are cursed pearls. Her blade has ended champions for centuries. To reach the second Crown fragment, you must survive her gaze and perhaps remind her of the guardian she once was.' },
       { phase: 'The Abyss Speaks', level: '20', boss: 'Charybdis', location: "The Devourer's Maw", description: 'Charybdis holds the final truth — why the Plankton Magic went silent. But she has hidden it behind madness, grief, and the consuming fury of the Maw. Defeating her doesn\'t just earn a Crown fragment — it reveals the real enemy: the Cacodaemon, the creature that feeds on severed connections, the reason the Plankton withdrew.' },
     ],
@@ -115,20 +115,20 @@ Now you must gather your Warlords, restore the fragments of the Coral Crown, fac
 
   planktonMystery: {
     name: 'The Silence of the Plankton',
-    description: 'The central mystery of Betta Warlords. Why did the Plankton Magic — the Light of Unity that connected every living thing in the ocean — suddenly go silent? Throughout the game, players discover fragments of the truth: ancient inscriptions on the Coral Crown, whispered memories from the Gorgon Sirens, and strange bioluminescent echoes in the deepest trenches that suggest the Plankton didn\'t die — they chose to withdraw.',
+    description: 'The central mystery of Betta Warlords. Why did the Plankton Magic — the Light of Unity that connected every living thing in the waters — suddenly go silent? Throughout the game, players discover fragments of the truth: ancient inscriptions on the Root Crown, whispered memories from the Gorgon Sirens, and strange bioluminescent echoes in the deepest trenches that suggest the Plankton didn\'t die — they chose to withdraw.',
     clues: [
-      'The Coral Crown\'s inscriptions speak of a "Fourth Vessel" that was never meant to awaken.',
+      'The Root Crown\'s inscriptions speak of a "Fourth Vessel" that was never meant to awaken.',
       'Charybdis\'s mad ravings mention "the light that ate itself."',
       'In the deepest part of the Hadal Trench, Plankton still glow — but they spell out a single word in an ancient script.',
-      'The Abyss King isn\'t conquering the ocean — he\'s filling a vacuum the Plankton left behind.',
-      'Each Coral Crown fragment restored causes a brief, blinding flash of Plankton light — as if they\'re watching.',
+      'The Abyss King isn\'t conquering the waters — he\'s filling a vacuum the Plankton left behind.',
+      'Each Root Crown fragment restored causes a brief, blinding flash of Plankton light — as if they\'re watching.',
     ],
   },
 };
 
 export const LOCATION_LORE = {
   verdant_plains: {
-    loreName: 'Coral Shallows',
+    loreName: 'Root Shallows',
     loreQuote: '"Where the first Betta drew breath, the Crown\'s light still lingers."',
     loreTag: 'Birthplace of the Warlords',
     cardArt: 'mission',
@@ -177,7 +177,7 @@ export const LOCATION_LORE = {
     vesselConnection: 'betta',
   },
   thornwood_pass: {
-    loreName: 'Tide Stream',
+    loreName: 'Current Stream',
     loreQuote: '"Powerful currents sweep the unwary into ambushes and glory alike."',
     loreTag: 'The Razor Current',
     cardArt: 'combat',
@@ -191,8 +191,8 @@ export const LOCATION_LORE = {
     vesselConnection: 'gorgon',
   },
   iron_peaks: {
-    loreName: 'Coral Fortress',
-    loreQuote: '"The Abyss King\'s armies harden coral into weapons of war."',
+    loreName: 'Root Fortress',
+    loreQuote: '"The Abyss King\'s armies harden root into weapons of war."',
     loreTag: 'Stronghold of the Deep',
     cardArt: 'combat',
     vesselConnection: 'gorgon',
@@ -220,15 +220,15 @@ export const LOCATION_LORE = {
   },
   ashen_battlefield: {
     loreName: 'Sandy Wastes',
-    loreQuote: '"The bones of the First Tide War lie scattered across the sand."',
+    loreQuote: '"The bones of the First Current War lie scattered across the sand."',
     loreTag: 'Graveyard of Heroes',
     cardArt: 'combat',
     vesselConnection: 'betta',
   },
   windswept_ridge: {
-    loreName: 'Riptide Shelf',
+    loreName: 'Rapids Shelf',
     loreQuote: '"Violent currents test the worthy and destroy the weak."',
-    loreTag: 'Trial of the Tides',
+    loreTag: 'Trial of the Currents',
     cardArt: 'combat',
     vesselConnection: 'betta',
   },
@@ -283,7 +283,7 @@ export const LOCATION_LORE = {
   },
   demon_gate: {
     loreName: 'Abyssal Gate',
-    loreQuote: '"The barrier between ocean and Abyss grows thin and cracks."',
+    loreQuote: '"The barrier between the waters and the Abyss grows thin and cracks."',
     loreTag: 'The Thinning Veil',
     cardArt: 'boss',
     vesselConnection: 'gorgon',
@@ -297,7 +297,7 @@ export const LOCATION_LORE = {
   },
   infernal_forge: {
     loreName: 'Magma Forge',
-    loreQuote: '"Weapons tempered in magma, quenched in cursed brine."',
+    loreQuote: '"Weapons tempered in magma, quenched in cursed waters."',
     loreTag: 'The Dark Armory',
     cardArt: 'combat',
     vesselConnection: 'betta',
@@ -331,8 +331,8 @@ export const LOCATION_LORE = {
     vesselConnection: 'gorgon',
   },
   hall_of_odin: {
-    loreName: 'Temple of Tides',
-    loreQuote: '"Only true champions may challenge the Lord of Tides."',
+    loreName: 'Temple of Currents',
+    loreQuote: '"Only true champions may challenge the Lord of Currents."',
     loreTag: 'Divine Trial — Crusade',
     cardArt: 'boss',
     vesselConnection: 'betta',

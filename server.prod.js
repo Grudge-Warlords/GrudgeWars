@@ -631,12 +631,12 @@ const COMMAND_RESPONSES = {
   },
   lore: {
     title: 'The Three Vessels of Magic',
-    description: '*In the beginning, three currents of magic wove through the deep ocean, each carried by a Vessel chosen by the tides themselves...*',
+    description: '*In the beginning, three currents of magic wove through the deep waters, each carried by a Vessel chosen by the currents themselves...*',
     color: 0x8b5cf6,
     fields: [
       { name: 'Betta — Fire of Will', value: 'The Betta carry the flame of individual will — fierce, proud, and unyielding. Their magic manifests as raw combat power and elemental fury.', inline: false },
-      { name: 'Gorgons — Weight of Law', value: 'The three Gorgon Sirens (Scylla, Medusa, Charybdis) once upheld the laws of the deep. When the Plankton Magic went silent, it shattered the Coral Crown and drove them mad.', inline: false },
-      { name: 'Plankton — Light of Unity', value: 'The smallest creatures carried the greatest magic — unity itself. Their silence is the catalyst for the entire war. The Coral Crown lies shattered, and darkness spreads.', inline: false },
+      { name: 'Gorgons — Weight of Law', value: 'The three Gorgon Sirens (Scylla, Medusa, Charybdis) once upheld the laws of the deep. When the Plankton Magic went silent, it shattered the Root Crown and drove them mad.', inline: false },
+      { name: 'Plankton — Light of Unity', value: 'The smallest creatures carried the greatest magic — unity itself. Their silence is the catalyst for the entire war. The Root Crown lies shattered, and darkness spreads.', inline: false },
     ],
   },
   breeds: {
@@ -659,10 +659,10 @@ const COMMAND_RESPONSES = {
     description: 'Choose your path in the underwater battlefield:',
     color: 0xfbbf24,
     fields: [
-      { name: 'Bruiser', value: 'Front-line tank with heavy melee damage. Skills: Tidal Crash, Iron Shell, Depth Charge.', inline: false },
-      { name: 'Mystic', value: 'Magical caster with healing and elemental spells. Skills: Abyssal Bolt, Coral Mend, Maelstrom.', inline: false },
-      { name: 'Vesselist', value: 'Vessel-magic specialist with buffs and debuffs. Skills: Current Shift, Coral Crown, Deep Link.', inline: false },
-      { name: 'Scraper', value: 'Agile ranged fighter with stealth and precision. Skills: Fin Blade, Shadow Dart, Riptide Barrage.', inline: false },
+      { name: 'Bruiser', value: 'Front-line tank with heavy melee damage. Skills: Current Crash, Iron Shell, Depth Charge.', inline: false },
+      { name: 'Mystic', value: 'Magical caster with healing and elemental spells. Skills: Abyssal Bolt, Root Mend, Maelstrom.', inline: false },
+      { name: 'Vesselist', value: 'Vessel-magic specialist with buffs and debuffs. Skills: Current Shift, Root Crown, Deep Link.', inline: false },
+      { name: 'Scraper', value: 'Agile ranged fighter with stealth and precision. Skills: Fin Blade, Shadow Dart, Rapids Barrage.', inline: false },
     ],
   },
   arena: {
