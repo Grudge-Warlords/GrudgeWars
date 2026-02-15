@@ -117,26 +117,47 @@ export default function HeroCreate() {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         opacity: cinematicFading ? 0 : 1,
         transition: 'opacity 0.8s ease-out',
+        overflow: 'hidden',
       }}>
-        <video
-          ref={videoRef}
-          src="/videos/hero_creation_cinematic.mp4"
-          autoPlay
-          muted
-          playsInline
-          onEnded={finishCinematic}
+        <img
+          src="/videos/beta_intro.gif"
+          alt="Beta Intro"
+          onLoad={() => {
+            setTimeout(finishCinematic, 8000);
+          }}
           onError={finishCinematic}
           style={{
-            width: '120%', height: '120%',
+            width: '100%', height: '100%',
             objectFit: 'cover',
-            position: 'absolute', top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
+            position: 'absolute', top: 0, left: 0,
           }}
         />
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          height: '35%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end',
+          paddingBottom: 60, zIndex: 2,
+        }}>
+          <div className="font-cinzel" style={{
+            color: 'var(--gold)', fontSize: '1.6rem', fontWeight: 700,
+            textShadow: '0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(251,191,36,0.3)',
+            letterSpacing: 3, animation: 'fadeIn 1.5s ease forwards',
+          }}>
+            WELCOME, WARLORD
+          </div>
+          <div style={{
+            color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem',
+            marginTop: 8, letterSpacing: 2,
+            animation: 'fadeIn 2s ease forwards',
+          }}>
+            Your journey begins...
+          </div>
+        </div>
         <button
           onClick={finishCinematic}
           style={{
-            position: 'absolute', bottom: 32, right: 32,
+            position: 'absolute', bottom: 32, right: 32, zIndex: 3,
             background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,215,0,0.4)',
             borderRadius: 8, padding: '8px 20px',
             color: 'var(--gold)', cursor: 'pointer',
