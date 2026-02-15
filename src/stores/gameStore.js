@@ -284,11 +284,13 @@ function chooseAIAction(unit, allUnits) {
   if (enemies.length === 0) return null;
   if (!unit.abilities || unit.abilities.length === 0) return null;
 
-  if (unit.team === 'player' && (unit.classId === 'mage' || unit.classId === 'priest')) {
+  if (unit.team === 'player') {
     const lowAlly = allies.find(a => a.health / a.maxHealth < 0.45);
     const healAbility = unit.abilities.find(a =>
       (a.type === 'heal' || a.type === 'heal_over_time') &&
-      (unit.cooldowns[a.id] || 0) <= 0 && (a.manaCost || 0) <= unit.mana
+      (unit.cooldowns[a.id] || 0) <= 0 &&
+      (a.manaCost || 0) <= unit.mana &&
+      (a.staminaCost || 0) <= unit.stamina
     );
     if (lowAlly && healAbility) {
       return { abilityId: healAbility.id, targetId: lowAlly.id };
@@ -312,11 +314,19 @@ function chooseAIAction(unit, allUnits) {
 
   const attackAbilities = availableAbilities.filter(a => a.type === 'physical' || a.type === 'magical');
   const buffAbilities = availableAbilities.filter(a => a.type === 'buff');
+  const debuffAbilities = availableAbilities.filter(a => a.type === 'debuff');
   const hotAbilities = availableAbilities.filter(a => a.type === 'heal_over_time');
   const healAbilities = availableAbilities.filter(a => a.type === 'heal');
 
-  if (buffAbilities.length > 0 && unit.buffs.length === 0 && Math.random() < 0.3) {
-    return { abilityId: buffAbilities[0].id, targetId: unit.id };
+  const transformAbilities = buffAbilities.filter(a => a.isBearForm || a.isDemonBlade);
+  const regularBuffs = buffAbilities.filter(a => !a.isBearForm && !a.isDemonBlade);
+  if (transformAbilities.length > 0 && !unit.bearForm && !unit.demonBlade && Math.random() < 0.5) {
+    return { abilityId: transformAbilities[0].id, targetId: unit.id };
+  }
+
+  const hasActiveBuff = unit.buffs.some(b => b.stat === 'damage' || b.stat === 'defense' || b.stat === 'evasion');
+  if (regularBuffs.length > 0 && !hasActiveBuff && Math.random() < 0.3) {
+    return { abilityId: regularBuffs[0].id, targetId: unit.id };
   }
 
   const resAbilities = availableAbilities.filter(a => a.type === 'resurrect' || a.isResurrect);
@@ -345,6 +355,16 @@ function chooseAIAction(unit, allUnits) {
 
   if (unit.team === 'player' && hotAbilities.length > 0 && unit.health / unit.maxHealth < 0.5 && Math.random() < 0.5) {
     return { abilityId: hotAbilities[0].id, targetId: unit.id };
+  }
+
+  const focusAbilities = availableAbilities.filter(a => a.type === 'focus' || a.isFocus);
+  if (focusAbilities.length > 0 && (unit.focusStacks || 0) >= 2 && Math.random() < 0.5) {
+    return { abilityId: focusAbilities[0].id, targetId: unit.id };
+  }
+
+  if (debuffAbilities.length > 0 && Math.random() < 0.25) {
+    const enemy = enemies[Math.floor(Math.random() * enemies.length)];
+    return { abilityId: debuffAbilities[0].id, targetId: enemy.id };
   }
 
   const specials = attackAbilities.filter(a => a.cooldown && a.cooldown > 0);
@@ -1414,14 +1434,38 @@ const useGameStore = create(persist((set, get) => ({
     if (!unit || !unit.alive) return;
     const action = chooseAIAction(unit, state.battleUnits);
     if (!action) {
-      const firstAbility = unit.abilities?.[0];
-      if (!firstAbility) return;
+      const cls = classDefinitions[unit.classId];
+      const bearSwapIds = cls?.bearFormAbilities ? Object.keys(cls.bearFormAbilities) : [];
+      const bearReplacementIds = cls?.bearFormAbilities ? Object.values(cls.bearFormAbilities).map(a => a.id) : [];
+      const formFilter = a =>
+        !(unit.bearForm && bearSwapIds.includes(a.id)) &&
+        !(!unit.bearForm && (bearReplacementIds.includes(a.id) || a.type === 'revert_form'));
+      const usableAttacks = (unit.abilities || []).filter(a =>
+        (unit.cooldowns[a.id] || 0) <= 0 &&
+        (a.manaCost || 0) <= unit.mana &&
+        (a.staminaCost || 0) <= unit.stamina &&
+        (a.type === 'physical' || a.type === 'magical') &&
+        formFilter(a)
+      );
+      const usableAny = (unit.abilities || []).filter(a =>
+        (unit.cooldowns[a.id] || 0) <= 0 &&
+        (a.manaCost || 0) <= unit.mana &&
+        (a.staminaCost || 0) <= unit.stamina &&
+        formFilter(a)
+      );
+      const ability = usableAttacks[0] || usableAny[0];
+      if (!ability) { get().skipTurn(); return; }
       const enemies = state.battleUnits.filter(u => u.team === 'enemy' && u.alive && u.health > 0);
       if (enemies.length === 0) return;
       const target = enemies.reduce((lowest, e) => e.health < lowest.health ? e : lowest, enemies[0]);
-      get().useAbility(firstAbility.id, target.id);
+      get().useAbility(ability.id, ability.type === 'heal' || ability.type === 'buff' || ability.type === 'heal_over_time' || ability.type === 'focus' ? unit.id : target.id);
       return;
     }
+    if (action.type === 'move_row') {
+      get().moveRow(action.targetRow === 'front' || action.targetRow === 'battle' ? 'forward' : 'back');
+      return;
+    }
+    if (!action.abilityId) { get().skipTurn(); return; }
     get().useAbility(action.abilityId, action.targetId);
   },
 
@@ -1654,7 +1698,7 @@ const useGameStore = create(persist((set, get) => ({
           attacker.buffs.push({ ...ability.defenseBoost, source: ability.name });
         }
         actionResult.targetId = currentUnitId;
-        log.push(`${attacker.name} transforms into a Demon Swordsman!`);
+        log.push(`${attacker.name} transforms into Leviathan Form!`);
       } else if (ability.effect) {
         attacker.buffs.push({ ...ability.effect, source: ability.name });
         if (ability.defenseBoost) {
