@@ -5,6 +5,7 @@ import SpriteAnimation from './SpriteAnimation';
 import { getRaceClassSprite } from '../data/spriteMap';
 import { setBgm } from '../utils/audioManager';
 import useIsMobile from '../hooks/useIsMobile';
+import LoreTab from './LoreTab';
 
 export default function LobbyScreen() {
   const setScreen = useGameStore(s => s.setScreen);
@@ -162,6 +163,7 @@ export default function LobbyScreen() {
         }}>
           <NavItem essentialIcon="Gamepad" label="PLAY" active={activeTab === 'main'} onClick={() => setActiveTab('main')} isMobile={isMobile} />
           <NavItem essentialIcon="Team" label="CHARACTERS" active={activeTab === 'characters'} onClick={() => setActiveTab('characters')} isMobile={isMobile} />
+          <NavItem essentialIcon="Book" label="LORE" active={activeTab === 'lore'} onClick={() => setActiveTab('lore')} isMobile={isMobile} />
           <NavItem essentialIcon="Briefcase" label="ACCOUNT" active={activeTab === 'account'} onClick={() => setActiveTab('account')} isMobile={isMobile} />
           <NavItem essentialIcon="Cloud" label="DISCORD" active={activeTab === 'discord'} onClick={() => setActiveTab('discord')} isMobile={isMobile} />
           {!isMobile && <div style={{ flex: 1 }} />}
@@ -188,6 +190,9 @@ export default function LobbyScreen() {
           )}
           {activeTab === 'characters' && (
             <CharactersTab heroRoster={heroRoster} panelStyle={panelStyle} />
+          )}
+          {activeTab === 'lore' && (
+            <LoreTab panelStyle={panelStyle} />
           )}
           {activeTab === 'account' && (
             <AccountTab session={session} panelStyle={panelStyle} hasExistingSave={hasExistingSave} />

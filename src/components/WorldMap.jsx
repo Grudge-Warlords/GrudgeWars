@@ -4071,7 +4071,7 @@ export default function WorldMap() {
               <button onClick={async () => {
                 const activeHeroes = heroRoster.filter(h => activeHeroIds.includes(h.id));
                 const token = await encodeGrudaShare(activeHeroes);
-                const url = `/api/play/gruda.html?s=${token}`;
+                const url = `/api/play/grudabeta.html?s=${token}`;
                 window.open(url, '_blank');
               }} style={{
                 background: 'linear-gradient(135deg, rgba(239,68,68,0.2), rgba(251,191,36,0.1))',

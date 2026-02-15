@@ -366,6 +366,39 @@ app.post('/api/discord/webhook/custom', requireAdmin, async (req, res) => {
   }
 });
 
+const arenaRateLimit = new Map();
+app.post('/api/discord/webhook/arena', async (req, res) => {
+  const { content, embeds } = req.body;
+  if (!content && !embeds) return res.status(400).json({ error: 'Content or embeds required' });
+
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
+  const now = Date.now();
+  const lastPost = arenaRateLimit.get(ip) || 0;
+  if (now - lastPost < 30000) {
+    return res.status(429).json({ error: 'Please wait before sharing again' });
+  }
+  arenaRateLimit.set(ip, now);
+
+  try {
+    const payload = {};
+    if (content) payload.content = content.slice(0, 200);
+    if (embeds && Array.isArray(embeds)) {
+      payload.embeds = embeds.slice(0, 1).map(e => ({
+        ...e,
+        title: (e.title || '').slice(0, 100),
+        color: 0xef4444,
+        footer: { text: 'Betta Warlords Arena | Grudge Studios' },
+        timestamp: new Date().toISOString(),
+      }));
+    }
+    await sendWebhookMessage(payload);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Arena webhook error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });
