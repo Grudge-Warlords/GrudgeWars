@@ -623,13 +623,21 @@ export default function MapBottomBar({
         <div style={{
           flex: '0 0 28%',
           display: isMobile ? 'none' : 'flex', flexDirection: 'column',
-          padding: '24px 8px 12px 28px',
+          padding: '6px 8px 12px 28px',
           overflow: 'hidden',
         }}>
           <div style={{
-            padding: '3px 8px 2px',
-            display: 'flex', alignItems: 'center', gap: 5,
+            padding: '0 8px 2px',
+            display: 'flex', alignItems: 'center', gap: 6,
           }}>
+            {(() => {
+              const leader = heroRoster.find(h => h.id === 'player' || activeHeroIds.includes(h.id));
+              return leader ? (
+                <div style={{ width: 36, height: 40, overflow: 'visible', flexShrink: 0 }}>
+                  <SpriteAnimation spriteData={getPlayerSprite(leader.classId, leader.raceId)} animation="idle" scale={0.9} speed={150} />
+                </div>
+              ) : null;
+            })()}
             <span className="font-cinzel" style={{ fontSize: '0.55rem', color: 'rgba(255,215,0,0.5)', fontWeight: 700, letterSpacing: '0.08em' }}>PARTY LOG</span>
           </div>
           <div ref={chatLogRef} style={{

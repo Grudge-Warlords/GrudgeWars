@@ -3693,7 +3693,7 @@ export default function WorldMap() {
           flexWrap: 'wrap', gap: 8, zIndex: MAP_LAYERS.HUD_BUTTONS,
           borderRadius: '0 0 8px 8px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 90 }}>
             <div
               onClick={() => setScreen('account')}
               title="War Council"
@@ -3714,9 +3714,6 @@ export default function WorldMap() {
                 imageRendering: 'pixelated',
                 filter: 'drop-shadow(0 0 4px rgba(255,215,0,0.3))',
               }} />
-            </div>
-            <div style={{ width: 52, height: 56, overflow: 'visible', flexShrink: 0 }}>
-              <SpriteAnimation spriteData={getPlayerSprite(playerClass, playerRace)} animation="idle" scale={1.5} speed={150} />
             </div>
             <div>
               <div className="font-cinzel" style={{ color: 'var(--accent)', fontSize: '0.85rem', fontWeight: 700 }}>{playerName}</div>
