@@ -146,6 +146,8 @@ app.get('/api/discord/invite', async (req, res) => {
 });
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || process.env.DISCORD_GRUDGE_WEBHOOK;
+const DISCORD_WEBHOOK_CHAT = process.env.DISCORD_WEBHOOK_CHAT;
+const CHAT_CHANNEL_ID = '1472457126885462239';
 const ADMIN_TOKEN = process.env.GAME_API_GRUDA;
 
 function requireAdmin(req, res, next) {
@@ -423,6 +425,32 @@ const SLASH_COMMANDS = [
       },
     ],
   },
+  {
+    name: 'chat',
+    description: 'Send a message to the Betta Warlords community chat',
+    options: [
+      {
+        name: 'message',
+        description: 'Your message to the community',
+        type: 3,
+        required: true,
+      },
+      {
+        name: 'topic',
+        description: 'Message topic',
+        type: 3,
+        required: false,
+        choices: [
+          { name: 'General', value: 'general' },
+          { name: 'Strategy & Tips', value: 'strategy' },
+          { name: 'Looking for Party', value: 'lfp' },
+          { name: 'Lore Discussion', value: 'lore' },
+          { name: 'Bug Report', value: 'bug' },
+          { name: 'Suggestion', value: 'suggestion' },
+        ],
+      },
+    ],
+  },
 ];
 
 async function registerSlashCommands() {
@@ -451,6 +479,34 @@ async function registerSlashCommands() {
     console.error('Slash command registration error:', err.message);
   }
 }
+
+async function sendChatWebhook({ content, embeds, username, avatar_url }) {
+  if (!DISCORD_WEBHOOK_CHAT) throw new Error('Chat webhook not configured');
+  const payload = {};
+  if (content) payload.content = content;
+  if (embeds) payload.embeds = embeds;
+  payload.username = username || 'Betta Warlords Chat';
+  payload.avatar_url = avatar_url || 'https://grudgewarlords.com/icons/logo.png';
+  const res = await fetch(DISCORD_WEBHOOK_CHAT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Chat webhook failed (${res.status}): ${err}`);
+  }
+  return true;
+}
+
+const TOPIC_LABELS = {
+  general: { label: 'General', color: 0x22d3ee, emoji: '💬' },
+  strategy: { label: 'Strategy & Tips', color: 0xfbbf24, emoji: '⚔️' },
+  lfp: { label: 'Looking for Party', color: 0x4ade80, emoji: '🎣' },
+  lore: { label: 'Lore Discussion', color: 0x8b5cf6, emoji: '📜' },
+  bug: { label: 'Bug Report', color: 0xef4444, emoji: '🐛' },
+  suggestion: { label: 'Suggestion', color: 0x3b82f6, emoji: '💡' },
+};
 
 async function sendBotMessage(channelId, payload) {
   if (!DISCORD_BOT_TOKEN) throw new Error('Bot token not configured');
@@ -540,7 +596,7 @@ const COMMAND_RESPONSES = {
 };
 
 app.post('/api/discord/interactions', async (req, res) => {
-  const { type, data } = req.body;
+  const { type, data, member } = req.body;
 
   if (type === 1) {
     return res.json({ type: 1 });
@@ -559,6 +615,51 @@ app.post('/api/discord/interactions', async (req, res) => {
         }],
       },
     });
+  }
+
+  if (type === 2 && data?.name === 'chat') {
+    const message = data.options?.find(o => o.name === 'message')?.value || '';
+    const topicKey = data.options?.find(o => o.name === 'topic')?.value || 'general';
+    const topic = TOPIC_LABELS[topicKey] || TOPIC_LABELS.general;
+    const username = member?.user?.global_name || member?.user?.username || 'Warlord';
+    const avatarHash = member?.user?.avatar;
+    const userId = member?.user?.id;
+    const avatarUrl = avatarHash && userId
+      ? `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.png`
+      : null;
+
+    try {
+      await sendChatWebhook({
+        embeds: [{
+          description: message,
+          color: topic.color,
+          author: {
+            name: `${topic.emoji} ${username}`,
+            icon_url: avatarUrl || undefined,
+          },
+          footer: { text: `${topic.label} | Betta Warlords Chat` },
+          timestamp: new Date().toISOString(),
+        }],
+        username: `${username} — Betta Warlords`,
+        avatar_url: avatarUrl || undefined,
+      });
+      return res.json({
+        type: 4,
+        data: {
+          content: `${topic.emoji} Your message was posted to <#${CHAT_CHANNEL_ID}>!`,
+          flags: 64,
+        },
+      });
+    } catch (err) {
+      console.error('Chat command error:', err.message);
+      return res.json({
+        type: 4,
+        data: {
+          content: 'Failed to send message. Please try again later.',
+          flags: 64,
+        },
+      });
+    }
   }
 
   res.json({ type: 4, data: { content: 'Unknown command' } });
