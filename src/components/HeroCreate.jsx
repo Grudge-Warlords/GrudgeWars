@@ -127,8 +127,10 @@ export default function HeroCreate() {
           onEnded={finishCinematic}
           onError={finishCinematic}
           style={{
-            width: '100%', height: '100%',
+            width: '120%', height: '120%',
             objectFit: 'cover',
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
           }}
         />
         <button

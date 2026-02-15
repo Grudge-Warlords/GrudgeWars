@@ -61,7 +61,9 @@ export default function IntroCinematic() {
         onEnded={handleEnd}
         onError={handleEnd}
         style={{
-          width: '100%', height: '100%', objectFit: 'cover',
+          width: '120%', height: '120%', objectFit: 'cover',
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
         }}
       />
 
