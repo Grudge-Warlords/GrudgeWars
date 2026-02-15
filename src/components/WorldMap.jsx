@@ -734,7 +734,7 @@ export default function WorldMap() {
   const [routePoints, setRoutePoints] = useState([]);
   const paintingRouteRef = useRef(false);
   const [roadWidth, setRoadWidth] = useState(2.5);
-  const [showRoads, setShowRoads] = useState(true);
+  const [showRoads, setShowRoads] = useState(false);
   const [editRoutes, setEditRoutes] = useState(() => {
     try {
       const stored = JSON.parse(localStorage.getItem('mapEditRoutes') || '[]');
