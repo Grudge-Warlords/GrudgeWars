@@ -11,7 +11,11 @@ app.use(express.json());
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
+const DISCORD_BOT_TOKEN = process.env.GAME_API_GRUDA;
 const BETA_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID || '1470521372932313283';
+const BOT_CHANNEL_ID = '1472448936735277188';
+const BOT_APP_ID = '1472444305187668009';
+const GUILD_ID = '1335136143112671296';
 const PORT = parseInt(process.env.PORT || '3001', 10);
 
 const pendingStates = new Map();
@@ -403,6 +407,180 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });
 
+const SLASH_COMMANDS = [
+  {
+    name: 'warlords',
+    description: 'Get info about Betta Warlords',
+    options: [
+      {
+        name: 'action',
+        description: 'What info to see',
+        type: 3,
+        required: true,
+        choices: [
+          { name: 'Play - Get the game link', value: 'play' },
+          { name: 'Lore - The Three Vessels story', value: 'lore' },
+          { name: 'Breeds - 8 Betta species info', value: 'breeds' },
+          { name: 'Classes - 4 Warlord classes', value: 'classes' },
+          { name: 'Arena - Arena battle info', value: 'arena' },
+          { name: 'GBuX - Currency & economy', value: 'gbux' },
+        ],
+      },
+    ],
+  },
+];
+
+async function registerSlashCommands() {
+  if (!DISCORD_BOT_TOKEN || !BOT_APP_ID) {
+    console.log('Skipping slash command registration: missing bot token or app ID');
+    return;
+  }
+  try {
+    const url = `https://discord.com/api/v10/applications/${BOT_APP_ID}/guilds/${GUILD_ID}/commands`;
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(SLASH_COMMANDS),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Slash command registration failed:', res.status, err);
+    } else {
+      const data = await res.json();
+      console.log(`Registered ${data.length} slash command(s) for guild ${GUILD_ID}`);
+    }
+  } catch (err) {
+    console.error('Slash command registration error:', err.message);
+  }
+}
+
+async function sendBotMessage(channelId, payload) {
+  if (!DISCORD_BOT_TOKEN) throw new Error('Bot token not configured');
+  const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Bot message failed (${res.status}): ${err}`);
+  }
+  return res.json();
+}
+
+const COMMAND_RESPONSES = {
+  play: {
+    title: 'Play Betta Warlords',
+    description: 'Dive into the underwater world of Betta Warlords — the flagship RPG from Grudge Studios!',
+    color: 0x22d3ee,
+    fields: [
+      { name: 'Play Now', value: '[Launch Game](https://bettawarlords.replit.app)', inline: true },
+      { name: 'Platform', value: 'Web / Mobile PWA', inline: true },
+      { name: 'Price', value: 'Free to Play', inline: true },
+      { name: 'Features', value: '32 unique Warlord combos, tactical battles, world map exploration, AI-powered dialogue, Discord integration', inline: false },
+    ],
+  },
+  lore: {
+    title: 'The Three Vessels of Magic',
+    description: '*In the beginning, three currents of magic wove through the deep ocean, each carried by a Vessel chosen by the tides themselves...*',
+    color: 0x8b5cf6,
+    fields: [
+      { name: 'Betta — Fire of Will', value: 'The Betta carry the flame of individual will — fierce, proud, and unyielding. Their magic manifests as raw combat power and elemental fury.', inline: false },
+      { name: 'Gorgons — Weight of Law', value: 'The three Gorgon Sirens (Scylla, Medusa, Charybdis) once upheld the laws of the deep. When the Plankton Magic went silent, it shattered the Coral Crown and drove them mad.', inline: false },
+      { name: 'Plankton — Light of Unity', value: 'The smallest creatures carried the greatest magic — unity itself. Their silence is the catalyst for the entire war. The Coral Crown lies shattered, and darkness spreads.', inline: false },
+    ],
+  },
+  breeds: {
+    title: 'The 8 Betta Breeds',
+    description: 'Each breed draws from real IBC (International Betta Congress) standards:',
+    color: 0xef4444,
+    fields: [
+      { name: 'Halfmoon', value: '180° tail spread, balanced stats', inline: true },
+      { name: 'Crowntail', value: 'Spiked ray fins, high crit rate', inline: true },
+      { name: 'Plakat', value: 'Short-finned fighters, high STR', inline: true },
+      { name: 'Doubletail', value: 'Split caudal fin, dual-casting', inline: true },
+      { name: 'Giant', value: 'Oversized lineage, raw power', inline: true },
+      { name: 'Dragonscale', value: 'Thick metallic scales, armor', inline: true },
+      { name: 'Butterfly', value: 'Banded fin patterns, evasion', inline: true },
+      { name: 'Cambodian', value: 'Pale body, dark fins, mystic affinity', inline: true },
+    ],
+  },
+  classes: {
+    title: 'The 4 Warlord Classes',
+    description: 'Choose your path in the underwater battlefield:',
+    color: 0xfbbf24,
+    fields: [
+      { name: 'Bruiser', value: 'Front-line tank with heavy melee damage. Skills: Tidal Crash, Iron Shell, Depth Charge.', inline: false },
+      { name: 'Mystic', value: 'Magical caster with healing and elemental spells. Skills: Abyssal Bolt, Coral Mend, Maelstrom.', inline: false },
+      { name: 'Vesselist', value: 'Vessel-magic specialist with buffs and debuffs. Skills: Current Shift, Coral Crown, Deep Link.', inline: false },
+      { name: 'Scraper', value: 'Agile ranged fighter with stealth and precision. Skills: Fin Blade, Shadow Dart, Riptide Barrage.', inline: false },
+    ],
+  },
+  arena: {
+    title: 'The Arena',
+    description: 'Test your War Party in the ancient underwater colosseum!',
+    color: 0xef4444,
+    fields: [
+      { name: 'How It Works', value: 'Challenge arena tiers with your War Party (up to 6 heroes). Face waves of enemies with increasing difficulty.', inline: false },
+      { name: 'Discord Integration', value: 'Arena results are broadcast here! Share your stats and compete with other Warlords.', inline: false },
+      { name: 'Rewards', value: 'Pearls, XP, loot drops, and bragging rights.', inline: false },
+    ],
+  },
+  gbux: {
+    title: 'GBuX — Grudge Studios Currency',
+    description: 'The universal currency across all Grudge Studios titles and AI tools.',
+    color: 0xfbbf24,
+    fields: [
+      { name: 'Earn GBuX', value: 'Play Betta Warlords — the ONLY entry point to early-stage GBuX.', inline: false },
+      { name: 'cNFT Breeding', value: '32 base Warlord types (8 breeds × 4 classes) as compressed NFTs on-chain.', inline: false },
+      { name: 'Grudge Ecosystem', value: 'GBuX connects all Grudge Studios products: games, AI tools, and creator platforms.', inline: false },
+    ],
+  },
+};
+
+app.post('/api/discord/interactions', async (req, res) => {
+  const { type, data } = req.body;
+
+  if (type === 1) {
+    return res.json({ type: 1 });
+  }
+
+  if (type === 2 && data?.name === 'warlords') {
+    const action = data.options?.[0]?.value || 'play';
+    const embed = COMMAND_RESPONSES[action] || COMMAND_RESPONSES.play;
+    return res.json({
+      type: 4,
+      data: {
+        embeds: [{
+          ...embed,
+          footer: { text: 'Betta Warlords | Grudge Studios' },
+          timestamp: new Date().toISOString(),
+        }],
+      },
+    });
+  }
+
+  res.json({ type: 4, data: { content: 'Unknown command' } });
+});
+
+app.post('/api/discord/bot/send', requireAdmin, async (req, res) => {
+  const { content, embeds, channelId } = req.body;
+  if (!content && !embeds) return res.status(400).json({ error: 'Content or embeds required' });
+  try {
+    const result = await sendBotMessage(channelId || BOT_CHANNEL_ID, { content, embeds });
+    res.json({ success: true, messageId: result.id });
+  } catch (err) {
+    console.error('Bot send error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.use(express.static(path.join(__dirname, 'dist'), {
   setHeaders: (res) => {
     res.setHeader('Cache-Control', 'no-cache');
@@ -415,4 +593,5 @@ app.get('/{*splat}', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Betta Warlords production server running on port ${PORT}`);
+  registerSlashCommands();
 });
