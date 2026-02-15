@@ -41,6 +41,15 @@ export default function DiscordAuth() {
         setInvite(data.invite);
         setStatus('success');
         window.history.replaceState({}, '', '/discordauth');
+        if (data.user) {
+          const session = {
+            type: 'discord',
+            username: data.user.globalName || data.user.username,
+            discordUser: data.user,
+            loginTime: Date.now(),
+          };
+          localStorage.setItem('grudge-session', JSON.stringify(session));
+        }
       })
       .catch(err => {
         setError(err.message);
@@ -184,12 +193,15 @@ export default function DiscordAuth() {
             )}
 
             <div style={{ marginTop: 20 }}>
-              <a href="/" style={{
-                color: '#d4a96a', fontSize: '0.85rem', textDecoration: 'none',
-                borderBottom: '1px solid rgba(212,169,106,0.3)',
+              <button onClick={() => { window.location.href = '/'; }} style={{
+                background: 'linear-gradient(135deg, #d4a96a, #b8860b)',
+                border: 'none', borderRadius: 8,
+                padding: '12px 28px', color: '#fff', fontSize: '0.95rem',
+                fontWeight: 700, cursor: 'pointer', textDecoration: 'none',
+                transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(212,169,106,0.4)',
               }}>
-                Return to Game
-              </a>
+                Enter the Game
+              </button>
             </div>
           </div>
         )}

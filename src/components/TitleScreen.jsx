@@ -61,6 +61,10 @@ export default function TitleScreen() {
   }, []);
 
   const handleLogin = (method) => {
+    if (method === 'discord') {
+      handleDiscordLogin();
+      return;
+    }
     const session = {
       type: method,
       username: method === 'guest' ? 'Adventurer' : null,
@@ -68,6 +72,17 @@ export default function TitleScreen() {
     };
     localStorage.setItem('grudge-session', JSON.stringify(session));
     setScreen('intro');
+  };
+
+  const handleDiscordLogin = async () => {
+    try {
+      const res = await fetch('/api/discord/login');
+      const data = await res.json();
+      if (data.state) sessionStorage.setItem('discord_oauth_state', data.state);
+      if (data.url) window.location.href = data.url;
+    } catch (err) {
+      console.error('Discord login failed:', err);
+    }
   };
 
   const handlePuterLogin = async () => {
