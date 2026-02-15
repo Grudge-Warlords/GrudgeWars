@@ -1467,11 +1467,28 @@ export default function BattleScreen() {
     if (phase === 'ai_turn' && introComplete && !aiProcessing.current && !adminPaused) {
       aiProcessing.current = true;
       const timer = setTimeout(() => {
-        processAIAction();
+        try {
+          processAIAction();
+        } catch (e) {
+          console.error('[BattleScreen AI turn]', e);
+          try { advanceTurn(); } catch (_) {}
+        }
         aiProcessing.current = false;
       }, autoBattleEnabled ? 400 : 600);
       return () => { clearTimeout(timer); aiProcessing.current = false; };
     }
+  }, [phase, battleCurrentTurn, introComplete, adminPaused]);
+
+  useEffect(() => {
+    if (!phase || phase === 'victory' || phase === 'defeat' || phase === 'intro' || !introComplete || adminPaused) return;
+    const watchdog = setTimeout(() => {
+      const s = useGameStore.getState();
+      if (s.battleState && s.battleState.phase !== 'victory' && s.battleState.phase !== 'defeat') {
+        console.warn('[Watchdog] Battle stuck for 15s, forcing advanceTurn');
+        try { s.advanceTurn(); } catch (_) {}
+      }
+    }, 15000);
+    return () => clearTimeout(watchdog);
   }, [phase, battleCurrentTurn, introComplete, adminPaused]);
 
   useEffect(() => {
@@ -1569,6 +1586,8 @@ export default function BattleScreen() {
   useEffect(() => {
     if (!lastAction || lastAction === actionProcessed.current) return;
     actionProcessed.current = lastAction;
+
+    try {
 
     const { attackerId, targetId, abilityType, abilityName, abilityId, totalDmg, evaded, blocked, isCrit, healAmt, type, consumableType } = lastAction;
 
@@ -2252,6 +2271,11 @@ export default function BattleScreen() {
       }
       setTimeout(() => setUnitAnims(prev => ({ ...prev, [attackerId]: 'idle' })), 600);
       setTimeout(() => advanceTurn(), 900);
+    }
+
+    } catch (e) {
+      console.error('[BattleScreen lastAction]', e);
+      setTimeout(() => { try { advanceTurn(); } catch (_) {} }, 500);
     }
   }, [lastAction]);
 

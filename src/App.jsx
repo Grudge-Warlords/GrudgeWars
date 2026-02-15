@@ -27,6 +27,7 @@ import CraftingPage from './components/CraftingPage';
 import BackgroundsPage from './components/BackgroundsPage';
 import { InlineIcon } from './data/uiSprites';
 import GameTooltipRenderer from './components/GameTooltip';
+import ErrorBoundary from './components/ErrorBoundary';
 import useRouteSync from './hooks/useRouteSync';
 
 function IntroVideoScreen({ onFinish }) {
@@ -255,18 +256,18 @@ function GameApp() {
   const renderScreen = () => {
     switch (screen) {
       case 'title': return <TitleScreen />;
-      case 'intro': return <IntroCinematic />;
-      case 'lobby': return <LobbyScreen />;
-      case 'create': return <CharacterCreate />;
-      case 'world': return <WorldMap />;
-      case 'location': return <LocationView />;
-      case 'battle': return <BattleScreen />;
-      case 'character': return <CharacterSheet />;
-      case 'skills': return <SkillTreeView />;
-      case 'heroCreate': return <HeroCreate />;
-      case 'account': return <AccountPage />;
-      case 'training': return <TrainingScreen />;
-      case 'scene': return <SceneView />;
+      case 'intro': return <ErrorBoundary name="intro"><IntroCinematic /></ErrorBoundary>;
+      case 'lobby': return <ErrorBoundary name="lobby"><LobbyScreen /></ErrorBoundary>;
+      case 'create': return <ErrorBoundary name="create"><CharacterCreate /></ErrorBoundary>;
+      case 'world': return <ErrorBoundary name="world"><WorldMap /></ErrorBoundary>;
+      case 'location': return <ErrorBoundary name="location"><LocationView /></ErrorBoundary>;
+      case 'battle': return <ErrorBoundary name="battle"><BattleScreen /></ErrorBoundary>;
+      case 'character': return <ErrorBoundary name="character"><CharacterSheet /></ErrorBoundary>;
+      case 'skills': return <ErrorBoundary name="skills"><SkillTreeView /></ErrorBoundary>;
+      case 'heroCreate': return <ErrorBoundary name="heroCreate"><HeroCreate /></ErrorBoundary>;
+      case 'account': return <ErrorBoundary name="account"><AccountPage /></ErrorBoundary>;
+      case 'training': return <ErrorBoundary name="training"><TrainingScreen /></ErrorBoundary>;
+      case 'scene': return <ErrorBoundary name="scene"><SceneView /></ErrorBoundary>;
       default: return <TitleScreen />;
     }
   };

@@ -1254,6 +1254,7 @@ const useGameStore = create(persist((set, get) => ({
   setSelectedTarget: (unitId) => set({ selectedTargetId: unitId }),
 
   advanceTurn: () => {
+    try {
     const state = get();
     if (!state.battleState) return;
     const units = state.battleUnits;
@@ -1356,6 +1357,7 @@ const useGameStore = create(persist((set, get) => ({
       selectedTargetId: selTarget,
       lastAction: null,
     });
+    } catch (e) { console.error('[advanceTurn]', e); }
   },
 
   skipTurn: () => {
@@ -1478,6 +1480,7 @@ const useGameStore = create(persist((set, get) => ({
   },
 
   useAbility: (abilityId, targetIdOverride) => {
+    try {
     const state = get();
     const bs = state.battleState;
     if (!bs || (bs.phase !== 'player_turn' && bs.phase !== 'ai_turn')) return;
@@ -1748,6 +1751,7 @@ const useGameStore = create(persist((set, get) => ({
       battleState: { ...bs, phase: 'animating', turnCount: bs.turnCount + 1 },
       lastAction: actionResult,
     });
+    } catch (e) { console.error('[useAbility]', e); get().advanceTurn(); }
   },
 
   useConsumable: (consumableItemId, targetUnitId) => {
@@ -1906,6 +1910,7 @@ const useGameStore = create(persist((set, get) => ({
   },
 
   processAIAction: () => {
+    try {
     const state = get();
     if (!state.battleState || state.battleState.phase !== 'ai_turn') return;
 
@@ -1952,9 +1957,11 @@ const useGameStore = create(persist((set, get) => ({
     }
 
     get().useAbility(action.abilityId, action.targetId);
+    } catch (e) { console.error('[processAIAction]', e); get().advanceTurn(); }
   },
 
   handleVictory: () => {
+    try {
     const state = get();
     if (state.battleState?.isTraining) {
       get().handleTrainingVictory(state.battleState.trainingRound);
@@ -2300,9 +2307,11 @@ const useGameStore = create(persist((set, get) => ({
         playerStamina: Math.floor(stats.stamina),
       });
     }
+    } catch (e) { console.error('[handleVictory]', e); set({ battleState: { ...(get().battleState || {}), phase: 'victory' }, battleResults: { xpGained: 0, pearlsGained: 0, leveledUp: false, lootDrops: [], enemiesDefeated: 0, flawless: false, xpCurrent: get().xp || 0, xpToNext: get().xpToNext || 100 } }); }
   },
 
   handleDefeat: () => {
+    try {
     const state = get();
     const updatedRoster = state.heroRoster.map(hero => {
       const battleUnit = state.battleUnits.find(u => u.id === hero.id);
@@ -2328,9 +2337,11 @@ const useGameStore = create(persist((set, get) => ({
         xpToNext: state.xpToNext || 100,
       },
     });
+    } catch (e) { console.error('[handleDefeat]', e); set({ battleState: { ...(get().battleState || {}), phase: 'defeat' }, battleResults: { xpGained: 0, pearlsGained: 0, leveledUp: false, lootDrops: [], enemiesDefeated: 0, flawless: false, xpCurrent: get().xp || 0, xpToNext: get().xpToNext || 100 } }); }
   },
 
   returnToWorld: () => {
+    try {
     const state = get();
     const stats = state.getStats();
     const wasBattle = state.battleState !== null;
@@ -2425,6 +2436,7 @@ const useGameStore = create(persist((set, get) => ({
     }
 
     set(updates);
+    } catch (e) { console.error('[returnToWorld]', e); set({ screen: 'world', battleState: null, battleUnits: [], battleTurnOrder: [], battleCurrentTurn: 0, selectedTargetId: null, lastAction: null, pendingLoot: [], battleResults: null, gameMessage: null }); }
   },
 
   restAtInn: (customCost) => {
