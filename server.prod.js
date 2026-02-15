@@ -31,7 +31,7 @@ function getPublicOrigin(req) {
 app.get('/api/discord/login', (req, res) => {
   const origin = getPublicOrigin(req);
   const redirectUri = encodeURIComponent(`${origin}/discordauth`);
-  const scope = encodeURIComponent('identify email guilds.join');
+  const scope = encodeURIComponent('identify guilds guilds.join email');
   const state = crypto.randomBytes(16).toString('hex');
   pendingStates.set(state, Date.now());
   const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${state}`;
