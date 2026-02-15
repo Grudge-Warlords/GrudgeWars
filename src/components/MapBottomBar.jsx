@@ -321,7 +321,7 @@ function CharacterPopup({ onClose, isMobile }) {
   );
 }
 
-const ROW_ICONS = { front: '🛡️', battle: '⚔️', support: '⚡', back: '🏹' };
+const ROW_ICON_NAMES = { front: 'shield', battle: 'sword', support: 'energy', back: 'target' };
 const ROW_COLORS = { front: '#ef4444', battle: '#f59e0b', support: '#6ee7b7', back: '#60a5fa' };
 
 function TacticalRowPanel({ onClose, isMobile }) {
@@ -370,7 +370,7 @@ function TacticalRowPanel({ onClose, isMobile }) {
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h4 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '0.9rem', margin: 0 }}>
-          ⚔️ Tactical Positions
+          <InlineIcon name="sword" size={14} style={{ marginRight: 4 }} /> Tactical Positions
         </h4>
         <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '1.1rem' }}>×</button>
       </div>
@@ -407,7 +407,7 @@ function TacticalRowPanel({ onClose, isMobile }) {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <span style={{ fontSize: '0.85rem' }}>{ROW_ICONS[rowId]}</span>
+              <InlineIcon name={ROW_ICON_NAMES[rowId]} size={16} />
               <span className="font-cinzel" style={{ fontSize: '0.65rem', fontWeight: 700, color: ROW_COLORS[rowId] }}>
                 {rowData.name}
               </span>

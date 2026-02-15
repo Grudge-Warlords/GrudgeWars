@@ -54,7 +54,7 @@ export default function ChapterTracker() {
       <div
         onClick={() => setExpanded(true)}
         style={{
-          position: 'absolute', top: 100, left: 8, zIndex: 900,
+          position: 'absolute', top: 60, left: 8, zIndex: 900,
           background: 'rgba(10,20,40,0.88)', border: `1px solid ${accentColor}40`,
           borderRadius: 8, padding: '6px 12px', cursor: 'pointer',
           backdropFilter: 'blur(4px)', minWidth: 140, maxWidth: 220,
@@ -112,10 +112,10 @@ export default function ChapterTracker() {
       )}
 
       <div style={{
-        position: 'absolute', top: 100, left: 8, zIndex: 900,
+        position: 'absolute', top: 60, left: 8, zIndex: 900,
         background: 'rgba(10,20,40,0.94)', border: `1px solid ${accentColor}50`,
         borderRadius: 10, padding: '10px 14px', backdropFilter: 'blur(6px)',
-        minWidth: 240, maxWidth: 300,
+        minWidth: 240, maxWidth: 300, maxHeight: 'calc(100vh - 80px)', overflowY: 'auto',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

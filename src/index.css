@@ -34,13 +34,18 @@
 html, body, #root {
   width: 100%;
   height: 100%;
+  height: 100dvh;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
   font-family: 'Jost', sans-serif;
   background: #020a18;
   color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
 }
 
 #root {
@@ -53,8 +58,8 @@ body {
 .game-frame {
   width: 100%;
   height: 100%;
-  max-width: 1200px;
-  max-height: 900px;
+  max-width: 1400px;
+  max-height: 100%;
   position: relative;
   border: none;
   overflow: hidden;
@@ -356,23 +361,28 @@ body {
   .ui-bottom-row { flex-wrap: wrap; gap: 2px; }
   .ui-panel-left { width: 100%; height: 80px; order: 2; }
   .ui-panel-center { order: 1; width: 100%; padding: 4px; }
-  .ui-panel-right-wrapper { width: 100%; order: 3; flex-direction: row; }
-  .ui-panel-right { height: auto; }
-  .hotbar-slot { width: 36px; height: 36px; }
+  .ui-panel-right-wrapper { width: 100%; order: 3; flex-direction: row; align-items: center; justify-content: center; gap: 6px; }
+  .ui-panel-right { height: auto; display: none; }
+  .ui-circle-row { margin-bottom: 0; padding-right: 0; }
+  .hotbar-slot { width: 36px; height: 36px; min-width: 36px; }
   .hotbar-label { font-size: 0.35rem; }
   .hotbar-num { font-size: 7px; }
   .circle-btn { width: 28px; height: 28px; }
   .ui-chat-scroll { font-size: 0.7rem; padding: 2px 6px; }
   .game-ui-overlay { padding: 3px; }
   .panel-style::before, .panel-style::after { width: 4px; height: 4px; }
+  .ui-hotbar { flex-wrap: wrap; justify-content: center; }
 }
 
 @media (max-width: 480px) {
   :root { --ui-scale: 0.6; --btn-min: 34px; --font-base: 0.65rem; --font-sm: 0.56rem; --font-xs: 0.48rem; }
-  .hotbar-slot { width: 32px; height: 32px; }
+  .hotbar-slot { width: 32px; height: 32px; min-width: 32px; }
   .hotbar-badge { width: 12px; height: 12px; font-size: 0.35rem; }
   .ui-chat-scroll { font-size: 0.65rem; }
-  .ui-panel-left { height: 70px; }
+  .ui-panel-left { height: 60px; }
+  .ui-hotbar { gap: 2px; }
+  .game-ui-overlay { padding: 2px; padding-bottom: max(2px, env(safe-area-inset-bottom, 0px)); }
+  .ui-popup { bottom: 90px !important; max-height: 55vh !important; }
 }
 
 @media (max-height: 500px) {
