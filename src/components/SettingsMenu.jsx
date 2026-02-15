@@ -223,10 +223,10 @@ export default function SettingsMenu() {
         <div ref={panelRef} style={{
           position: 'fixed', bottom: 'calc(26.2% + 52px)', right: 10, zIndex: 10701,
           pointerEvents: 'auto',
-          width: 300, maxWidth: 'calc(100vw - 20px)', maxHeight: 'calc(100vh - 26.2% - 70px)', overflowY: 'auto',
+          width: 300, maxWidth: 'calc(100vw - 20px)', maxHeight: 'calc(100vh - 26.2% - 70px)', overflowY: 'auto', overflowX: 'hidden',
           backgroundImage: 'url(/images/ui-panel-bg.png)', backgroundSize: 'cover', backgroundPosition: 'center',
           border: '2px solid rgba(110,231,183,0.25)',
-          borderRadius: 14, padding: 0, overflow: 'hidden',
+          borderRadius: 14, padding: 0,
           boxShadow: '0 8px 40px rgba(0,0,0,0.7), 0 0 20px rgba(110,231,183,0.08)',
           animation: 'fadeIn 0.15s ease-out',
           WebkitOverflowScrolling: 'touch',
