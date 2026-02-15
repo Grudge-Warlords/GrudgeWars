@@ -941,6 +941,8 @@ const useGameStore = create(persist((set, get) => ({
       battleCurrentTurn: 0,
       selectedTargetId: enemyUnits[0]?.id || null,
       lastAction: null,
+      pendingLoot: [],
+      battleResults: null,
       battleLog: [`Battle begins! ${enemyUnits.length} enemies appear!`],
       playerHealth: mainUnit.health,
       playerMaxHealth: mainUnit.maxHealth,
@@ -1068,6 +1070,8 @@ const useGameStore = create(persist((set, get) => ({
       battleCurrentTurn: 0,
       selectedTargetId: boss.id,
       lastAction: null,
+      pendingLoot: [],
+      battleResults: null,
       battleLog: [`BOSS BATTLE: ${boss.name} appears with ${addEnemies.length} allies!`],
       playerHealth: mainUnit.health, playerMaxHealth: mainUnit.maxHealth,
       playerMana: mainUnit.mana, playerMaxMana: mainUnit.maxMana,
@@ -1144,6 +1148,8 @@ const useGameStore = create(persist((set, get) => ({
       battleCurrentTurn: 0,
       selectedTargetId: enemyUnits[0]?.id || null,
       lastAction: null,
+      pendingLoot: [],
+      battleResults: null,
       battleLog: [`MISSION: ${mission.title}`, `Round 1/${mission.rounds.length}: ${round.description}`],
       playerHealth: mainUnit.health, playerMaxHealth: mainUnit.maxHealth,
       playerMana: mainUnit.mana, playerMaxMana: mainUnit.maxMana,
@@ -1235,6 +1241,8 @@ const useGameStore = create(persist((set, get) => ({
       battleCurrentTurn: 0,
       selectedTargetId: enemyUnits[0]?.id || null,
       lastAction: null,
+      pendingLoot: [],
+      battleResults: null,
       battleLog: [`ARENA: ${arena.title}`, arena.description],
       playerHealth: mainUnit.health, playerMaxHealth: mainUnit.maxHealth,
       playerMana: mainUnit.mana, playerMaxMana: mainUnit.maxMana,
@@ -2376,6 +2384,10 @@ const useGameStore = create(persist((set, get) => ({
 
     const returnScreen = state.dungeonProgress ? 'scene' : 'world';
 
+    const collectedLoot = state.pendingLoot && state.pendingLoot.length > 0
+      ? [...state.inventory, ...state.pendingLoot]
+      : state.inventory;
+
     const updates = {
       screen: returnScreen,
       battleState: null,
@@ -2393,6 +2405,8 @@ const useGameStore = create(persist((set, get) => ({
       gameMessage: msg,
       floatingTexts: [],
       heroRoster: updatedRoster,
+      pendingLoot: [],
+      inventory: collectedLoot,
     };
 
     if (state.dungeonProgress && !wasDefeat) {
@@ -2850,6 +2864,8 @@ const useGameStore = create(persist((set, get) => ({
       battleCurrentTurn: 0,
       selectedTargetId: enemyUnits[0]?.id || null,
       lastAction: null,
+      pendingLoot: [],
+      battleResults: null,
       battleLog: [round === 1
         ? 'Training Round 1: Defeat the practice dummy! Use abilities 1-5 to attack.'
         : 'Training Round 2: Fight alongside your team! Coordinate your heroes.'],
@@ -2938,7 +2954,7 @@ const useGameStore = create(persist((set, get) => ({
         screen: 'training',
         battleState: null, battleUnits: [], battleTurnOrder: [],
         battleCurrentTurn: 0, selectedTargetId: null, lastAction: null,
-        floatingTexts: [],
+        floatingTexts: [], pendingLoot: [],
         playerHealth: Math.floor(stats.health),
         playerMana: Math.floor(stats.mana),
         playerStamina: Math.floor(stats.stamina),
@@ -2953,7 +2969,7 @@ const useGameStore = create(persist((set, get) => ({
         screen: 'heroCreate',
         battleState: null, battleUnits: [], battleTurnOrder: [],
         battleCurrentTurn: 0, selectedTargetId: null, lastAction: null,
-        floatingTexts: [],
+        floatingTexts: [], pendingLoot: [],
         playerHealth: Math.floor(stats.health),
         playerMana: Math.floor(stats.mana),
         playerStamina: Math.floor(stats.stamina),
