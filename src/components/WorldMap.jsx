@@ -3693,7 +3693,7 @@ export default function WorldMap() {
           flexWrap: 'wrap', gap: 8, zIndex: MAP_LAYERS.HUD_BUTTONS,
           borderRadius: '0 0 8px 8px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 90 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div
               onClick={() => setScreen('account')}
               title="War Council"
