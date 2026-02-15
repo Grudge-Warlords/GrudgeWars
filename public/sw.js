@@ -21,9 +21,10 @@ self.addEventListener('activate', function(e) {
 
 self.addEventListener('fetch', function(e) {
   if (e.request.method !== 'GET') return;
+  if (e.request.url.startsWith('chrome-extension://')) return;
   e.respondWith(
     fetch(e.request).then(function(res) {
-      if (res.ok && res.type === 'basic') {
+      if (res.ok && res.type === 'basic' && res.status !== 206) {
         var clone = res.clone();
         caches.open(CACHE_NAME).then(function(cache) { cache.put(e.request, clone); });
       }

@@ -2238,7 +2238,7 @@ export default function BattleScreen() {
 
         const buffClassId = attacker.classId || 'warrior';
         const buffTargets = target ? [target] : [attacker];
-        const enemies = allUnits.filter(u => u.team !== attacker.team && u.alive);
+        const enemies = battleUnits.filter(u => u.team !== attacker.team && u.alive);
         setBuffScreenFx({
           id: Date.now(),
           classId: buffClassId,
