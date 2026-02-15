@@ -1668,11 +1668,14 @@ const useGameStore = create(persist((set, get) => ({
           set({ battleTurnOrder: newOrder });
         }
       } else {
-        const fallbackTarget = enemies.length > 0 ? enemies[0] : null;
-        if (fallbackTarget) {
-          const result = applyDamage(attacker, fallbackTarget, 1.0, ability, units);
-          actionResult.targetId = fallbackTarget.id;
-          actionResult.damage = result.totalDmg;
+        const enemyFallback = units.find(u => u.team !== attacker.team && u.alive && u.health > 0);
+        if (enemyFallback) {
+          const result = calculateAttackDamage(attacker, enemyFallback, { ...ability, type: 'physical', damage: 1.0 });
+          if (!result.evaded && !result.absorbed) {
+            enemyFallback.health = Math.max(0, enemyFallback.health - result.totalDmg);
+            if (enemyFallback.health <= 0) enemyFallback.alive = false;
+          }
+          actionResult = { ...actionResult, targetId: enemyFallback.id, totalDmg: result.totalDmg, evaded: result.evaded, blocked: result.blocked, isCrit: result.isCrit, absorbed: result.absorbed, abilityType: 'physical' };
           log.push(`${attacker.name} has no allies to resurrect, attacks instead for ${result.totalDmg}!`);
         }
       }
