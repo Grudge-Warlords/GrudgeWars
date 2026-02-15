@@ -59,7 +59,7 @@ export const CHAPTERS = [
     objectives: [
       { id: 'ch4_level9', text: 'Reach level 9 with your party', type: 'reach_level', target: 9, icon: 'chart' },
       { id: 'ch4_gear', text: 'Equip weapons on all party members', type: 'equip_all', target: 3, icon: 'sword' },
-      { id: 'ch4_scylla', text: 'Defeat Scylla, Siren of the Shallows', type: 'defeat_boss', bossId: 'gorgon_scylla', icon: 'skull' },
+      { id: 'ch4_scylla', text: 'Defeat Scylla, Siren of the Shallows', type: 'defeat_boss', bossId: 'gorgon_siren_3', icon: 'skull' },
     ],
     reward: { pearls: 500, xp: 400, item: 'crown_fragment_1' },
     requiredLevel: 8,
@@ -92,7 +92,7 @@ export const CHAPTERS = [
     objectives: [
       { id: 'ch6_shadow', text: 'Reach the Shadow Citadel', type: 'visit_zone', zoneId: 'shadow_citadel', icon: 'skull' },
       { id: 'ch6_level17', text: 'Reach level 17', type: 'reach_level', target: 17, icon: 'chart' },
-      { id: 'ch6_medusa', text: 'Defeat Medusa, Siren of the Mid-Waters', type: 'defeat_boss', bossId: 'gorgon_medusa', icon: 'skull' },
+      { id: 'ch6_medusa', text: 'Defeat Medusa, Siren of the Mid-Waters', type: 'defeat_boss', bossId: 'gorgon_siren_1', icon: 'skull' },
     ],
     reward: { pearls: 800, xp: 700, item: 'crown_fragment_2' },
     requiredLevel: 15,
@@ -124,7 +124,7 @@ export const CHAPTERS = [
     objectives: [
       { id: 'ch8_maw', text: "Enter the Devourer's Maw", type: 'visit_zone', zoneId: 'devourer_maw', icon: 'skull' },
       { id: 'ch8_level20', text: 'Reach level 20', type: 'reach_level', target: 20, icon: 'star' },
-      { id: 'ch8_charybdis', text: 'Defeat Charybdis, Siren of the Abyss', type: 'defeat_boss', bossId: 'gorgon_charybdis', icon: 'skull' },
+      { id: 'ch8_charybdis', text: 'Defeat Charybdis, Siren of the Abyss', type: 'defeat_boss', bossId: 'gorgon_siren_2', icon: 'skull' },
     ],
     reward: { pearls: 2000, xp: 1500, item: 'crown_fragment_3' },
     requiredLevel: 20,

@@ -56,7 +56,7 @@ export const ZONE_QUESTS = {
   ],
   sunken_temple: [
     { id: 'st_q1', name: 'Temple Explorer', description: 'Win 4 battles in the Sunken Temple.', type: QUEST_TYPES.KILL_COUNT, target: 4, rewards: { gold: 110, xp: 80 }, conquerBonus: 15 },
-    { id: 'st_q2', name: 'Shaman\'s Bane', description: 'Defeat the Grand Shaman boss.', type: QUEST_TYPES.BOSS_KILL, target: 'grand_shaman', rewards: { gold: 300, xp: 200 }, conquerBonus: 15 },
+    { id: 'st_q2', name: 'Siren Slayer', description: 'Defeat Scylla, the first Gorgon Siren.', type: QUEST_TYPES.BOSS_KILL, target: 'gorgon_siren_3', rewards: { gold: 300, xp: 200 }, conquerBonus: 15 },
     { id: 'st_q3', name: 'Sacred Ground', description: 'Win a battle without any hero falling.', type: QUEST_TYPES.WIN_FLAWLESS, target: 1, rewards: { gold: 140, xp: 100 }, conquerBonus: 10 },
     { id: 'st_q4', name: 'Temple Purified', description: 'Reach 50% conquer in Sunken Temple.', type: QUEST_TYPES.REACH_CONQUER, target: 50, rewards: { gold: 260, xp: 210 }, conquerBonus: 20 },
   ],

@@ -40,6 +40,9 @@ const bossMapSprites = {
   god_odin: { glow: 'rgba(251,191,36,0.8)', terrain: '/backgrounds/ocean_palace.png', shape: 'godgate', effect: 'lightning', color1: '#fb4', color2: '#a60' },
   god_madra: { glow: 'rgba(220,38,38,0.8)', terrain: '/backgrounds/deep_trench.png', shape: 'godgate', effect: 'lava', color1: '#f33', color2: '#800' },
   god_omni: { glow: 'rgba(167,139,250,0.8)', terrain: '/backgrounds/ocean_palace.png', shape: 'godgate', effect: 'void', color1: '#a8f', color2: '#508' },
+  gorgon_siren_1: { glow: 'rgba(167,139,250,0.8)', terrain: '/backgrounds/deep_trench.png', shape: 'archway', effect: 'souls', color1: '#a8f', color2: '#408' },
+  gorgon_siren_2: { glow: 'rgba(192,132,252,0.8)', terrain: '/backgrounds/deep_trench.png', shape: 'godgate', effect: 'lava', color1: '#c8f', color2: '#608' },
+  gorgon_siren_3: { glow: 'rgba(6,182,212,0.8)', terrain: '/backgrounds/coral_reef.png', shape: 'archway', effect: 'lightning', color1: '#0bd', color2: '#068' },
 };
 
 function MapBubbles({ locationPositions, heroZonePos, activeEvents }) {
