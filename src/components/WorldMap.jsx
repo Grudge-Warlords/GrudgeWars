@@ -782,14 +782,29 @@ export default function WorldMap() {
     };
   }, []);
 
+  const zoomTowardHeroesRef = useRef(null);
+  const zoomTowardHeroes = useCallback((oldZoom, newZoom, currentPos) => {
+    if (newZoom <= oldZoom) return clampCam(currentPos, newZoom);
+    const zonePos = locationPositions[currentZone] || locationPositions.verdant_plains;
+    if (!zonePos) return clampCam(currentPos, newZoom);
+    const heroTarget = { x: -(zonePos.x - 50), y: -(zonePos.y - 50) };
+    const lerpAmt = 0.3;
+    const newPos = {
+      x: currentPos.x + (heroTarget.x - currentPos.x) * lerpAmt,
+      y: currentPos.y + (heroTarget.y - currentPos.y) * lerpAmt,
+    };
+    return clampCam(newPos, newZoom);
+  }, [clampCam, currentZone]);
+  zoomTowardHeroesRef.current = zoomTowardHeroes;
+
   const handleMapWheel = useCallback((e) => {
     e.preventDefault();
     setCamZoom(z => {
       const newZ = Math.max(1, Math.min(5, z + (e.deltaY > 0 ? -0.25 : 0.25)));
-      setCamPos(p => clampCam(p, newZ));
+      setCamPos(p => zoomTowardHeroes(z, newZ, p));
       return newZ;
     });
-  }, [clampCam]);
+  }, [zoomTowardHeroes]);
 
   const screenToMapPercent = useCallback((clientX, clientY) => {
     const el = mapRef.current;
@@ -899,10 +914,7 @@ export default function WorldMap() {
       e.preventDefault();
       setCamZoom(z => {
         const newZ = Math.max(1, Math.min(5, z + (e.deltaY > 0 ? -0.25 : 0.25)));
-        setCamPos(p => {
-          const maxPan = Math.max(0, 50 - 50 / newZ);
-          return { x: Math.max(-maxPan, Math.min(maxPan, p.x)), y: Math.max(-maxPan, Math.min(maxPan, p.y)) };
-        });
+        setCamPos(p => zoomTowardHeroesRef.current(z, newZ, p));
         return newZ;
       });
     };
@@ -4779,7 +4791,7 @@ export default function WorldMap() {
         background: 'rgba(0,0,0,0.7)', borderRadius: 8, padding: '4px 3px',
         backdropFilter: 'blur(4px)', border: '1px solid rgba(255,215,0,0.15)',
       }}>
-        <button onClick={() => { setCamZoom(z => { const nz = Math.min(5, z + 0.5); setCamPos(p => clampCam(p, nz)); return nz; }); }} style={{
+        <button onClick={() => { setCamZoom(z => { const nz = Math.min(5, z + 0.5); setCamPos(p => zoomTowardHeroes(z, nz, p)); return nz; }); }} style={{
           background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#ccc', cursor: 'pointer',
           fontSize: isMobile ? '1rem' : '0.75rem', width: isMobile ? 36 : 24, height: isMobile ? 36 : 24, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>+</button>
