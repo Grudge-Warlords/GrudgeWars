@@ -1314,6 +1314,7 @@ export default function BattleScreen() {
   const [poisonGustFx, setPoisonGustFx] = useState([]);
   const [resurrectFx, setResurrectFx] = useState([]);
   const [bigImpactFx, setBigImpactFx] = useState([]);
+  const [screenShake, setScreenShake] = useState(null);
   const [buffScreenFx, setBuffScreenFx] = useState(null);
   const [showItemsPanel, setShowItemsPanel] = useState(false);
   const [healTargetMode, setHealTargetMode] = useState(null);
@@ -1545,6 +1546,12 @@ export default function BattleScreen() {
     setTimeout(() => setBigImpactFx(prev => prev.filter(s => s.id !== id)), 1200);
   }, []);
 
+  const triggerScreenShake = useCallback((type = 'normal') => {
+    const id = Date.now();
+    setScreenShake({ id, type });
+    setTimeout(() => setScreenShake(null), type === 'big' ? 500 : 300);
+  }, []);
+
   const spawnFollowUpEffects = useCallback((followUp, x, y, filterOverride) => {
     if (!followUp || !Array.isArray(followUp)) return;
     followUp.forEach(fu => {
@@ -1660,7 +1667,7 @@ export default function BattleScreen() {
               setTimeout(() => setHitEffects(prev => prev.filter(e => e.id !== hid)), 800);
               if (hfxR.followUp) spawnFollowUpEffects(hfxR.followUp, target.position.x, bodyY(target), hfxR.filter);
             }
-            if (isCrit) { playCrit(); spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId)); setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); } else { playHurt(); spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId)); if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); }
+            if (isCrit) { playCrit(); triggerScreenShake('big'); spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId)); setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); } else { playHurt(); spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId)); if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); } }
             spawnWeaponContact(target.position.x, bodyY(target), 1);
           } else {
             playDodge();
@@ -1737,6 +1744,7 @@ export default function BattleScreen() {
             }
             if (isCrit) {
               playCrit();
+              triggerScreenShake('big');
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
               setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
               if (target.position) {
@@ -1747,7 +1755,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-              if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
+              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
             }
           } else {
             playDodge();
@@ -1787,6 +1795,7 @@ export default function BattleScreen() {
             }
             if (isCrit) {
               playCrit();
+              triggerScreenShake('big');
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
               setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
               if (target.position) {
@@ -1797,7 +1806,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-              if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
+              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
             }
           } else {
             playDodge();
@@ -1840,6 +1849,7 @@ export default function BattleScreen() {
             }
             if (isCrit) {
               playCrit();
+              triggerScreenShake('big');
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
               setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
               if (target.position) {
@@ -1850,7 +1860,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-              if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
+              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
             }
           } else {
             playDodge();
@@ -1890,6 +1900,7 @@ export default function BattleScreen() {
             }
             if (isCrit) {
               playCrit();
+              triggerScreenShake('big');
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
               setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
               if (target.position) {
@@ -1900,7 +1911,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-              if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
+              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
             }
           } else {
             playDodge();
@@ -1953,6 +1964,7 @@ export default function BattleScreen() {
                 }
                 if (isCrit) {
                   playCrit();
+                  triggerScreenShake('big');
                   spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
                   setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
                   if (target.position) {
@@ -1964,7 +1976,7 @@ export default function BattleScreen() {
                 } else {
                   playHurt();
                   spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-                  if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
+                  if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
                 }
               } else {
                 playDodge();
@@ -2017,6 +2029,7 @@ export default function BattleScreen() {
               }
               if (isCrit) {
                 playCrit();
+                triggerScreenShake('big');
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
                 setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
                 if (target.position) {
@@ -2027,7 +2040,7 @@ export default function BattleScreen() {
               } else {
                 playHurt();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-                if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
+                if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
               }
               if (target.position) spawnWeaponContact(target.position.x, bodyY(target), 2);
             } else {
@@ -2078,6 +2091,7 @@ export default function BattleScreen() {
               }
               if (isCrit) {
                 playCrit();
+                triggerScreenShake('big');
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
                 setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
                 if (target.position) {
@@ -2089,7 +2103,7 @@ export default function BattleScreen() {
               } else {
                 playHurt();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-                if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
+                if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
               }
               if (target.position) spawnWeaponContact(target.position.x, bodyY(target), combo.length);
             } else {
@@ -2122,6 +2136,7 @@ export default function BattleScreen() {
               }
               if (isCrit) {
                 playCrit();
+                triggerScreenShake('big');
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
                 setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
                 if (target.position) {
@@ -2133,7 +2148,7 @@ export default function BattleScreen() {
               } else {
                 playHurt();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-                if (totalDmg > 30) setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200);
+                if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
               }
               if (target.position) spawnWeaponContact(target.position.x, bodyY(target), 1);
             } else {
@@ -2243,19 +2258,19 @@ export default function BattleScreen() {
   const showDamageFloat = useCallback((target, totalDmg, evaded, blocked, isCrit) => {
     if (!target?.position) return;
     const id = Date.now() + Math.random();
-    let text, color;
-    if (evaded) { text = 'DODGE!'; color = '#6ee7b7'; }
-    else if (blocked) { text = `BLOCK ${totalDmg}`; color = '#3b82f6'; }
-    else if (isCrit) { text = `CRIT ${totalDmg}`; color = '#fbbf24'; }
-    else { text = `-${totalDmg}`; color = '#ef4444'; }
-    setFloatingDmg(prev => [...prev, { id, text, color, x: target.position.x, y: bodyY(target) - 8 }]);
-    setTimeout(() => setFloatingDmg(prev => prev.filter(f => f.id !== id)), 1500);
+    let text, color, animType;
+    if (evaded) { text = 'DODGE!'; color = '#6ee7b7'; animType = 'miss'; }
+    else if (blocked) { text = `BLOCK ${totalDmg}`; color = '#3b82f6'; animType = 'normal'; }
+    else if (isCrit) { text = `CRIT ${totalDmg}`; color = '#fbbf24'; animType = 'crit'; }
+    else { text = `-${totalDmg}`; color = '#ef4444'; animType = 'normal'; }
+    setFloatingDmg(prev => [...prev, { id, text, color, animType, x: target.position.x, y: bodyY(target) - 8 }]);
+    setTimeout(() => setFloatingDmg(prev => prev.filter(f => f.id !== id)), animType === 'crit' ? 2000 : 1500);
   }, []);
 
   const showHealFloat = useCallback((target, healAmt) => {
     if (!target?.position) return;
     const id = Date.now() + Math.random();
-    setFloatingDmg(prev => [...prev, { id, text: `+${healAmt}`, color: '#22c55e', x: target.position.x, y: bodyY(target) - 8 }]);
+    setFloatingDmg(prev => [...prev, { id, text: `+${healAmt}`, color: '#22c55e', animType: 'heal', x: target.position.x, y: bodyY(target) - 8 }]);
     setTimeout(() => setFloatingDmg(prev => prev.filter(f => f.id !== id)), 1500);
   }, []);
 
@@ -2441,9 +2456,31 @@ export default function BattleScreen() {
 
       <div style={{
         flex: 1, position: 'relative', zIndex: 1, minHeight: 0, overflow: 'hidden',
+        animation: screenShake ? (screenShake.type === 'big' ? 'screenShakeBig 0.5s ease-out' : 'screenShake 0.3s ease-out') : 'none',
       }}>
         <AmbientParticles />
         <BubbleEmitter />
+
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute', top: '-50%', left: '-20%', width: '140%', height: '200%',
+            background: 'linear-gradient(180deg, rgba(34,211,238,0.06) 0%, transparent 40%, transparent 60%, rgba(6,182,212,0.03) 100%)',
+            animation: 'lightRaySweep 12s ease-in-out infinite',
+          }} />
+          <div style={{
+            position: 'absolute', top: '-30%', right: '-10%', width: '80%', height: '160%',
+            background: 'linear-gradient(200deg, rgba(110,231,183,0.04) 0%, transparent 50%)',
+            animation: 'lightRaySweep2 16s ease-in-out infinite',
+          }} />
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%',
+            background: 'linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 100%)',
+            animation: 'depthFog 8s ease-in-out infinite',
+          }} />
+        </div>
 
         {battleUnits.map((unit, idx) => {
           if (!unit.position) return null;
@@ -2515,14 +2552,21 @@ export default function BattleScreen() {
             }}>
               {isCurrentTurnUnit && unit.alive && (
                 <div style={{
-                  position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
-                  width: 0, height: 0,
-                  borderLeft: '6px solid transparent', borderRight: '6px solid transparent',
-                  borderTop: `8px solid ${unit.team === 'player' ? 'var(--accent)' : 'var(--danger)'}`,
-                  animation: 'pulse 1s infinite',
-                  filter: `drop-shadow(0 0 4px ${unit.team === 'player' ? 'var(--accent)' : 'var(--danger)'})`,
+                  position: 'absolute', top: -6, left: '50%', transform: 'translateX(-50%)',
+                  width: 28, height: 28, borderRadius: '50%',
+                  '--turn-color': unit.team === 'player' ? 'rgba(110,231,183,0.6)' : 'rgba(239,68,68,0.6)',
+                  animation: 'turnGlow 1.5s ease-in-out infinite',
+                  background: `radial-gradient(circle, ${unit.team === 'player' ? 'rgba(110,231,183,0.3)' : 'rgba(239,68,68,0.3)'} 0%, transparent 70%)`,
                   zIndex: 15,
-                }} />
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <div style={{
+                    width: 0, height: 0,
+                    borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
+                    borderTop: `7px solid ${unit.team === 'player' ? 'var(--accent)' : 'var(--danger)'}`,
+                    filter: `drop-shadow(0 0 6px ${unit.team === 'player' ? 'var(--accent)' : 'var(--danger)'})`,
+                  }} />
+                </div>
               )}
 
               {isBearForm && unit.alive && (
@@ -2702,10 +2746,11 @@ export default function BattleScreen() {
                 style={{
                 position: 'absolute', top: footY + 4, left: '50%', transform: 'translateX(-50%)',
                 textAlign: 'center',
-                background: isSelected ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.35)', 
+                background: isSelected ? 'rgba(0,0,0,0.85)' : isCurrentTurnUnit ? 'rgba(0,10,20,0.65)' : 'rgba(0,0,0,0.35)', 
                 borderRadius: 4, padding: '2px 5px',
                 minWidth: 55, zIndex: 20,
-                border: isSelected ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.05)',
+                border: isSelected ? '1px solid var(--accent)' : isCurrentTurnUnit ? `1px solid ${unit.team === 'player' ? 'rgba(110,231,183,0.4)' : 'rgba(239,68,68,0.4)'}` : '1px solid rgba(255,255,255,0.05)',
+                boxShadow: isCurrentTurnUnit ? `0 0 8px ${unit.team === 'player' ? 'rgba(110,231,183,0.2)' : 'rgba(239,68,68,0.2)'}` : 'none',
                 transition: 'all 0.3s ease',
               }}>
                 <div style={{
@@ -2898,11 +2943,21 @@ export default function BattleScreen() {
             position: 'absolute',
             left: `${f.x}%`, top: `${f.y}%`,
             transform: 'translate(-50%, 0)',
-            color: f.color, fontWeight: 800, fontSize: '1rem',
-            textShadow: `0 0 8px ${f.color}, 0 2px 4px rgba(0,0,0,0.8)`,
-            animation: 'floatUp 1.5s ease forwards',
+            color: f.color, fontWeight: 900,
+            fontSize: f.animType === 'crit' ? '1.6rem' : f.animType === 'heal' ? '1.1rem' : f.animType === 'miss' ? '0.85rem' : '1.1rem',
+            textShadow: f.animType === 'crit' 
+              ? `0 0 16px ${f.color}, 0 0 32px ${f.color}, 0 2px 4px rgba(0,0,0,0.9)` 
+              : f.animType === 'heal'
+                ? `0 0 12px ${f.color}, 0 2px 4px rgba(0,0,0,0.8)`
+                : `0 0 8px ${f.color}, 0 2px 4px rgba(0,0,0,0.8)`,
+            animation: f.animType === 'crit' ? 'floatUpCrit 2s ease forwards' 
+              : f.animType === 'heal' ? 'floatUpHeal 1.5s ease forwards'
+              : f.animType === 'miss' ? 'floatUpMiss 1.2s ease forwards'
+              : 'floatUp 1.5s ease forwards',
             pointerEvents: 'none', zIndex: 300,
             fontFamily: "'Cinzel', serif",
+            letterSpacing: f.animType === 'crit' ? '0.1em' : '0',
+            WebkitTextStroke: f.animType === 'crit' ? '1px rgba(0,0,0,0.5)' : 'none',
           }}>
             {f.text}
           </div>
@@ -2919,7 +2974,8 @@ export default function BattleScreen() {
             position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
             textAlign: 'center', animation: 'slideUp 0.5s ease', zIndex: 100,
             backgroundImage: isDefeat ? 'linear-gradient(135deg, rgba(11,16,32,0.95), rgba(30,0,0,0.9))' : 'linear-gradient(135deg, rgba(6,10,24,0.95), rgba(15,25,50,0.95))',
-            backgroundSize: 'cover', backgroundPosition: 'center',
+            backgroundSize: isVictory ? '200% 100%' : 'cover', backgroundPosition: 'center',
+            ...(isVictory ? { animation: 'slideUp 0.5s ease, victoryShine 3s linear infinite' } : {}),
             padding: '20px 32px', borderRadius: 16,
             border: `2px solid ${isVictory ? 'var(--gold)' : 'var(--danger)'}`,
             backdropFilter: 'blur(12px)',
@@ -3718,13 +3774,14 @@ export default function BattleScreen() {
                         backgroundSize: 'cover', imageRendering: 'pixelated',
                         background: disabled ? 'rgba(30,30,40,0.5)' : undefined,
                         backgroundColor: disabled ? 'rgba(30,30,40,0.5)' : 'rgba(60,45,25,0.6)',
-                        border: `2px solid ${disabled ? '#3a3a4a' : '#8b7355'}`,
-                        borderRadius: 4, padding: isMobile ? '6px 8px' : '5px 10px', minWidth: isMobile ? 70 : 90,
+                        border: `2px solid ${disabled ? '#3a3a4a' : '#a0885a'}`,
+                        borderRadius: 8, padding: isMobile ? '6px 8px' : '5px 10px', minWidth: isMobile ? 70 : 90,
                         minHeight: isMobile ? 36 : undefined,
                         color: disabled ? '#555' : '#e8dcc8',
                         cursor: disabled ? 'not-allowed' : 'pointer',
                         transition: 'all 0.2s', textAlign: 'center', opacity: disabled ? 0.5 : 1,
                         position: 'relative',
+                        ...(disabled ? {} : { '--ability-glow': 'rgba(212,169,106,0.3)', animation: 'abilityButtonGlow 3s ease-in-out infinite' }),
                       }}
                       onMouseEnter={e => { showTooltip(`${ability.name}\n${ability.description}${ability.manaCost ? `\nMP Cost: ${ability.manaCost}` : ''}${ability.staminaCost ? `\nSP Cost: ${ability.staminaCost}` : ''}${ability.manaGain ? `\n+${ability.manaGain} MP` : ''}${ability.staminaGain ? `\n+${ability.staminaGain} SP` : ''}${onCd ? `\nCooldown: ${currentUnit.cooldowns[ability.id]} turns` : ''}`, e); if (!disabled) { e.currentTarget.style.borderColor = '#d4a96a'; e.currentTarget.style.transform = 'translateY(-1px)'; }}}
                       onMouseMove={e => updateTooltipPosition(e)}

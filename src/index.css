@@ -456,8 +456,100 @@ body {
 }
 
 @keyframes floatUp {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-60px); }
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  20% { opacity: 1; transform: translateY(-12px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-70px) scale(0.7); }
+}
+
+@keyframes floatUpCrit {
+  0% { opacity: 0; transform: translateY(10px) scale(0.3); }
+  15% { opacity: 1; transform: translateY(-5px) scale(1.8); }
+  30% { opacity: 1; transform: translateY(-15px) scale(1.3); }
+  100% { opacity: 0; transform: translateY(-90px) scale(0.5); }
+}
+
+@keyframes floatUpHeal {
+  0% { opacity: 0; transform: translateY(5px) scale(0.5); }
+  20% { opacity: 1; transform: translateY(-10px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-55px) scale(0.6); }
+}
+
+@keyframes floatUpMiss {
+  0% { opacity: 0.8; transform: translateY(0) translateX(0) rotate(0deg); }
+  50% { opacity: 0.6; transform: translateY(-20px) translateX(15px) rotate(8deg); }
+  100% { opacity: 0; transform: translateY(-50px) translateX(25px) rotate(12deg); }
+}
+
+@keyframes screenShake {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-4px, 2px); }
+  20% { transform: translate(6px, -3px); }
+  30% { transform: translate(-5px, 4px); }
+  40% { transform: translate(4px, -2px); }
+  50% { transform: translate(-3px, 3px); }
+  60% { transform: translate(5px, -1px); }
+  70% { transform: translate(-2px, 2px); }
+  80% { transform: translate(3px, -2px); }
+  90% { transform: translate(-1px, 1px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes screenShakeBig {
+  0% { transform: translate(0, 0); }
+  8% { transform: translate(-8px, 4px); }
+  16% { transform: translate(10px, -6px); }
+  24% { transform: translate(-9px, 7px); }
+  32% { transform: translate(7px, -5px); }
+  40% { transform: translate(-6px, 5px); }
+  48% { transform: translate(8px, -3px); }
+  56% { transform: translate(-4px, 4px); }
+  64% { transform: translate(5px, -4px); }
+  72% { transform: translate(-3px, 2px); }
+  80% { transform: translate(4px, -2px); }
+  88% { transform: translate(-2px, 1px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes lightRaySweep {
+  0% { opacity: 0.03; transform: translateX(-20%) rotate(15deg); }
+  50% { opacity: 0.08; transform: translateX(20%) rotate(15deg); }
+  100% { opacity: 0.03; transform: translateX(-20%) rotate(15deg); }
+}
+
+@keyframes lightRaySweep2 {
+  0% { opacity: 0.04; transform: translateX(15%) rotate(-12deg); }
+  50% { opacity: 0.06; transform: translateX(-15%) rotate(-12deg); }
+  100% { opacity: 0.04; transform: translateX(15%) rotate(-12deg); }
+}
+
+@keyframes underwaterCaustics {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+@keyframes turnGlow {
+  0%, 100% { box-shadow: 0 0 8px var(--turn-color), 0 0 16px var(--turn-color); opacity: 0.7; }
+  50% { box-shadow: 0 0 16px var(--turn-color), 0 0 32px var(--turn-color), 0 0 48px var(--turn-color); opacity: 1; }
+}
+
+@keyframes victoryShine {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes defeatDarken {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes abilityButtonGlow {
+  0%, 100% { box-shadow: 0 0 4px var(--ability-glow), inset 0 0 4px rgba(0,0,0,0.3); }
+  50% { box-shadow: 0 0 10px var(--ability-glow), 0 0 20px var(--ability-glow), inset 0 0 4px rgba(0,0,0,0.3); }
+}
+
+@keyframes depthFog {
+  0%, 100% { opacity: 0.15; transform: translateX(0); }
+  50% { opacity: 0.25; transform: translateX(3%); }
 }
 
 @keyframes atbFill {
