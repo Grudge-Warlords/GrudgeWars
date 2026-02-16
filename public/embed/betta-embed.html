@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Betta Warlords | Grudge Studios</title>
+  <meta name="description" content="Betta Warlords - An underwater freshwater adventure RPG by Grudge Studios. Dive into tactical betta fish combat with 32 unique Warlord combinations." />
+  <meta name="theme-color" content="#06b6d4" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Betta Warlords" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <meta property="og:title" content="Betta Warlords | Grudge Studios" />
+  <meta property="og:description" content="An underwater freshwater adventure RPG. 8 betta breeds, 4 classes, 32 unique Warlords. Made for the Betta community." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://grudgewarlords.com/betta" />
+  <meta property="og:image" content="https://grudgewarlords.com/betta/og-image.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Betta Warlords | Grudge Studios" />
+  <meta name="twitter:description" content="An underwater freshwater adventure RPG. 8 betta breeds, 4 classes, 32 unique Warlords." />
+
+  <link rel="icon" type="image/png" href="https://grudgewarlords.com/betta/logo.png" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #050a18;
+    }
+    #game-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #050a18;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+      font-family: 'Cinzel', serif;
+    }
+    #loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #loading-screen h1 {
+      color: #06b6d4;
+      font-size: 2rem;
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+      margin-bottom: 1.5rem;
+    }
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(6, 182, 212, 0.2);
+      border-top-color: #06b6d4;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    #error-screen {
+      position: fixed;
+      inset: 0;
+      background: #050a18;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      font-family: 'Jost', sans-serif;
+      color: #94a3b8;
+      padding: 2rem;
+      text-align: center;
+    }
+    #error-screen h2 {
+      color: #06b6d4;
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    #error-screen p { margin-bottom: 1.5rem; max-width: 400px; line-height: 1.6; }
+    #error-screen button {
+      background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+      border: none;
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.05em;
+    }
+    #error-screen button:hover { filter: brightness(1.15); }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Jost:wght@400&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <div id="loading-screen">
+    <h1>BETTA WARLORDS</h1>
+    <div class="loader"></div>
+  </div>
+
+  <div id="error-screen">
+    <h2>Connection Lost</h2>
+    <p>Could not reach the Betta Warlords server. Please check your connection and try again.</p>
+    <button onclick="location.reload()">Retry</button>
+  </div>
+
+  <!--
+    IMPORTANT: Replace YOUR_REPLIT_APP_URL below with your published Replit app URL.
+    After publishing on Replit, you'll get a URL like:
+      https://betta-warlords.replit.app
+    or a custom domain you configure.
+  -->
+  <iframe
+    id="game-frame"
+    src="YOUR_REPLIT_APP_URL"
+    allow="autoplay; fullscreen; clipboard-write; web-share"
+    allowfullscreen
+    sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-modals allow-downloads"
+    loading="eager"
+  ></iframe>
+
+  <script>
+    (function() {
+      var frame = document.getElementById('game-frame');
+      var loadingScreen = document.getElementById('loading-screen');
+      var errorScreen = document.getElementById('error-screen');
+      var timeout;
+
+      timeout = setTimeout(function() {
+        loadingScreen.classList.add('hidden');
+        errorScreen.style.display = 'flex';
+      }, 15000);
+
+      frame.addEventListener('load', function() {
+        clearTimeout(timeout);
+        setTimeout(function() {
+          loadingScreen.classList.add('hidden');
+        }, 500);
+      });
+
+      frame.addEventListener('error', function() {
+        clearTimeout(timeout);
+        loadingScreen.classList.add('hidden');
+        errorScreen.style.display = 'flex';
+      });
+    })();
+  </script>
+</body>
+</html>
