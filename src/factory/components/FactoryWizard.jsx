@@ -22,6 +22,7 @@ const PRESET_THEMES = [
   { name: 'Dinosaur Tribes', setting: 'Prehistoric clans of intelligent dinosaurs wielding primal elemental magic', icon: '🦕' },
   { name: 'Pirate Seas', setting: 'Uncharted tropical waters with treasure islands, sea monsters, and cursed ships', icon: '🏴‍☠️' },
   { name: 'Steampunk Machines', setting: 'A clockwork empire of steam-powered mechs, airships, and inventor guilds', icon: '⚙️' },
+  { name: 'Sci Fi Tech Wars', setting: 'A fractured galaxy of rival mega-corporations deploying autonomous war machines, orbital weapon platforms, and nanotech super-soldiers in a ruthless arms race for quantum supremacy', icon: '🤖' },
 ];
 
 const defaultForm = {
