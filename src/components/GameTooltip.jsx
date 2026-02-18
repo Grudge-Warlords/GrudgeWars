@@ -90,7 +90,7 @@ export default function GameTooltipRenderer() {
     const vh = window.innerHeight;
 
     let left = state.x + CURSOR_OFFSET;
-    let top = state.y + CURSOR_OFFSET;
+    let top = state.y - rect.height - CURSOR_OFFSET;
 
     if (left + rect.width + PADDING > vw) {
       left = state.x - rect.width - CURSOR_OFFSET;
@@ -99,11 +99,11 @@ export default function GameTooltipRenderer() {
       left = PADDING;
     }
 
-    if (top + rect.height + PADDING > vh) {
-      top = state.y - rect.height - CURSOR_OFFSET;
-    }
     if (top < PADDING) {
-      top = PADDING;
+      top = state.y + CURSOR_OFFSET;
+    }
+    if (top + rect.height + PADDING > vh) {
+      top = vh - rect.height - PADDING;
     }
 
     const maxW = vw - PADDING * 2;
