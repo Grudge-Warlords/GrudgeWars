@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@discord/embedded-app-sdk": "^2.4.0",
     "@types/serve-static": "^2.2.0",
     "@wwawing/all": "^3.12.24",
     "discord-interactions": "^4.4.0",

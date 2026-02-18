@@ -410,11 +410,53 @@ app.post('/api/discord/webhook/arena', async (req, res) => {
   }
 });
 
+app.post('/api/discord/activity-token', async (req, res) => {
+  const { code } = req.body;
+  if (!code) return res.status(400).json({ error: 'Missing code' });
+
+  try {
+    const origin = getPublicOrigin(req);
+    const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: DISCORD_CLIENT_ID,
+        client_secret: DISCORD_CLIENT_SECRET,
+        grant_type: 'authorization_code',
+        code,
+      }),
+    });
+
+    if (!tokenRes.ok) {
+      const err = await tokenRes.text();
+      console.error('[Activity] Token exchange failed:', err);
+      return res.status(400).json({ error: 'Token exchange failed' });
+    }
+
+    const tokenData = await tokenRes.json();
+
+    const userRes = await fetch('https://discord.com/api/users/@me', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const user = userRes.ok ? await userRes.json() : null;
+
+    res.json({ access_token: tokenData.access_token, user });
+  } catch (err) {
+    console.error('[Activity] Error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });
 
 const SLASH_COMMANDS = [
+  {
+    name: 'play',
+    description: 'Launch Betta Warlords inside Discord!',
+    type: 1,
+  },
   {
     name: 'warlords',
     description: 'Get info about Betta Warlords',
@@ -687,6 +729,12 @@ app.post('/api/discord/interactions', verifyKeyMiddleware(DISCORD_PUBLIC_KEY), a
 
   if (type === InteractionType.PING) {
     return res.json({ type: InteractionResponseType.PONG });
+  }
+
+  if (type === InteractionType.APPLICATION_COMMAND && data?.name === 'play') {
+    return res.json({
+      type: 12,
+    });
   }
 
   if (type === InteractionType.APPLICATION_COMMAND && data?.name === 'warlords') {
