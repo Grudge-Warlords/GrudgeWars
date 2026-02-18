@@ -1479,7 +1479,6 @@ export default function WorldMap() {
     }
 
     if (currentZone === loc.id) {
-      setSelectedLocation(loc.id);
       return;
     }
     const path = findPath(currentZone, loc.id);
