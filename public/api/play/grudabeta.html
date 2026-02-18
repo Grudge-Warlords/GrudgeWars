@@ -3,18 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grudge Warlords - Gruda Arena</title>
-<meta property="og:title" content="Grudge Warlords - Arena Challenge">
-<meta property="og:description" content="Accept the arena challenge! Face warriors in turn-based tactical combat.">
-<meta property="og:image" content="/images/og-gruda.png">
+<title>Gruda Arena Beta - Grudge Warlords</title>
+<meta property="og:title" content="Gruda Arena Beta - Grudge Warlords">
+<meta property="og:description" content="Create warbands, fight in the arena, and track your battle history. Every fight is recorded with a unique ID.">
+<meta property="og:image" content="https://grudgewarlords.com/images/og-gruda.png">
 <meta property="og:image:width" content="1456">
 <meta property="og:image:height" content="816">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://grudgeplatform.com/grudabeta">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Grudge Warlords - Arena Challenge">
-<meta name="twitter:description" content="Accept the arena challenge! Face warriors in turn-based tactical combat.">
-<meta name="twitter:image" content="/images/og-gruda.png">
+<meta name="twitter:title" content="Gruda Arena Beta - Grudge Warlords">
+<meta name="twitter:description" content="Create warbands, fight in the arena, and track your battle history.">
+<meta name="twitter:image" content="https://grudgewarlords.com/images/og-gruda.png">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://js.puter.com/v2/"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0a0f1e;--surface:rgba(14,22,48,0.95);--accent:#6ee7b7;--gold:#fbbf24;--hp:#ef4444;--mana:#6366f1;--stamina:#22c55e;--text:#e2e8f0;--dim:#64748b}
@@ -27,7 +29,9 @@ h1,h2,h3{font-family:'Cinzel',serif}
 .title-bar .title-text{text-align:center}
 .title-bar h1{font-size:1.6rem;background:linear-gradient(135deg,#6ee7b7,#fbbf24,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px}
 .title-bar p{color:var(--dim);font-size:0.75rem;letter-spacing:2px;margin-top:4px}
-.challenge-id{display:inline-block;background:rgba(110,231,183,0.08);border:1px solid rgba(110,231,183,0.2);border-radius:20px;padding:3px 12px;font-size:0.65rem;color:var(--dim);letter-spacing:1px;margin-top:8px}
+.fight-id-badge{display:inline-block;background:rgba(110,231,183,0.08);border:1px solid rgba(110,231,183,0.2);border-radius:20px;padding:4px 14px;font-size:0.7rem;color:var(--accent);letter-spacing:1px;margin-top:8px;cursor:pointer;transition:all 0.3s}
+.fight-id-badge:hover{background:rgba(110,231,183,0.15);border-color:var(--accent)}
+.fight-id-badge .label{color:var(--dim);margin-right:4px}
 .phase{display:none}.phase.active{display:block}
 .hero-cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:16px 0}
 .hero-card{border:1px solid rgba(110,231,183,0.2);border-radius:12px;padding:16px;width:280px;transition:all 0.3s;position:relative;overflow:hidden}
@@ -58,6 +62,7 @@ h1,h2,h3{font-family:'Cinzel',serif}
 .btn-red:hover{background:rgba(239,68,68,0.2)}
 .btn-arena{font-size:1rem;padding:14px 40px;border-width:2px;animation:arenaGlow 2s ease-in-out infinite;position:relative}
 @keyframes arenaGlow{0%,100%{box-shadow:0 0 10px rgba(251,191,36,0.2),0 0 20px rgba(251,191,36,0.1)}50%{box-shadow:0 0 20px rgba(251,191,36,0.5),0 0 40px rgba(251,191,36,0.2)}}
+.btn-sm{padding:6px 14px;font-size:0.7rem}
 .center{text-align:center}
 .mt{margin-top:16px}.mb{margin-bottom:16px}
 .battle-field{position:relative;width:100%;height:340px;background:linear-gradient(180deg,rgba(14,22,48,0.9) 0%,rgba(30,10,60,0.85) 100%);border-radius:12px;border:1px solid rgba(110,231,183,0.1);overflow:hidden;margin:16px 0}
@@ -101,17 +106,48 @@ select{background:rgba(0,0,0,0.3);border:1px solid rgba(110,231,183,0.2);color:v
 .error{color:#f87171;font-size:0.75rem;margin-top:8px}
 .grudge-bar{height:4px;background:rgba(239,68,68,0.15);border-radius:2px;margin:2px 0;overflow:hidden}
 .grudge-fill{height:100%;background:linear-gradient(90deg,#b91c1c,#ef4444,#fbbf24);border-radius:2px;transition:width 0.5s}
+
+.history-panel{background:var(--surface);border:1px solid rgba(110,231,183,0.1);border-radius:12px;padding:16px;margin:16px 0}
+.history-entry{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid rgba(255,255,255,0.05);border-radius:8px;margin:6px 0;transition:all 0.3s;cursor:pointer}
+.history-entry:hover{border-color:rgba(110,231,183,0.2);background:rgba(110,231,183,0.03)}
+.history-entry .h-result{font-family:'Cinzel',serif;font-weight:700;font-size:0.75rem;padding:3px 8px;border-radius:4px;min-width:56px;text-align:center}
+.history-entry .h-result.win{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3)}
+.history-entry .h-result.loss{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
+.history-entry .h-info{flex:1;min-width:0}
+.history-entry .h-heroes{font-size:0.7rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-entry .h-meta{font-size:0.6rem;color:var(--dim);margin-top:2px}
+.history-entry .h-uuid{font-size:0.55rem;color:rgba(110,231,183,0.5);font-family:monospace}
+.no-history{text-align:center;padding:20px;color:var(--dim);font-size:0.8rem;font-style:italic}
+.tab-bar{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.tab-btn{padding:8px 20px;background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);font-family:'Cinzel',serif;font-size:0.8rem;cursor:pointer;transition:all 0.3s;letter-spacing:1px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.save-status{position:fixed;top:16px;right:16px;padding:8px 16px;border-radius:8px;font-size:0.7rem;z-index:100;transition:all 0.5s;opacity:0;transform:translateY(-10px)}
+.save-status.show{opacity:1;transform:translateY(0)}
+.save-status.success{background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.3);color:#4ade80}
+.save-status.error{background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3);color:#f87171}
+.copy-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(110,231,183,0.2);border:1px solid var(--accent);color:var(--accent);padding:8px 20px;border-radius:8px;font-size:0.75rem;z-index:100;opacity:0;transition:all 0.3s}
+.copy-toast.show{opacity:1}
 </style>
 </head>
 <body>
+<div id="saveStatus" class="save-status"></div>
+<div id="copyToast" class="copy-toast">Fight ID copied!</div>
 <div class="container">
 <div class="title-bar">
-<img src="/images/logo.png" alt="Grudge Warlords" class="logo">
+<img src="https://grudgewarlords.com/images/logo.png" alt="Grudge Warlords" class="logo" onerror="this.style.display='none'">
 <div class="title-text">
 <h1>GRUDA ARENA</h1>
-<p>GRUDGE WARLORDS CHALLENGE MODE</p>
+<p>GRUDGE WARLORDS &middot; BETA</p>
 </div>
 </div>
+
+<div class="tab-bar">
+<button class="tab-btn active" onclick="switchTab('fight')">Arena</button>
+<button class="tab-btn" onclick="switchTab('history')">Fight History</button>
+</div>
+
+<div id="tab-fight">
 
 <div id="phase-load" class="phase active">
 <div class="center mb">
@@ -129,10 +165,10 @@ select{background:rgba(0,0,0,0.3);border:1px solid rgba(110,231,183,0.2);color:v
 <div class="center mt" style="padding-top:12px;border-top:1px solid rgba(255,255,255,0.05)">
 <p style="font-size:0.7rem;color:var(--dim);margin-bottom:8px">Or generate a quick demo team:</p>
 <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-<button class="btn" onclick="quickDemo('warrior')">Bruiser Team</button>
-<button class="btn" onclick="quickDemo('mage')">Mystic Team</button>
-<button class="btn" onclick="quickDemo('ranger')">Scraper Team</button>
-<button class="btn" onclick="quickDemo('worge')">Vesselist Team</button>
+<button class="btn btn-sm" onclick="quickDemo('warrior')">Bruiser Team</button>
+<button class="btn btn-sm" onclick="quickDemo('mage')">Mystic Team</button>
+<button class="btn btn-sm" onclick="quickDemo('ranger')">Scraper Team</button>
+<button class="btn btn-sm" onclick="quickDemo('worge')">Vesselist Team</button>
 </div>
 </div>
 </div>
@@ -141,17 +177,18 @@ select{background:rgba(0,0,0,0.3);border:1px solid rgba(110,231,183,0.2);color:v
 <div class="center mb">
 <h2 id="rosterTitle" style="font-size:1rem;color:var(--accent)">Your Warband</h2>
 <p style="font-size:0.7rem;color:var(--dim)">Review your heroes before battle</p>
-<div id="challengeIdBadge" style="display:none"></div>
+<div id="fightIdDisplay" style="margin-top:8px"></div>
 </div>
 <div id="heroCards" class="hero-cards"></div>
 <div class="center mt">
-<button class="btn btn-gold btn-arena" onclick="startBattle()">⚔️ ENTER THE ARENA ⚔️</button>
+<button class="btn btn-gold btn-arena" onclick="startBattle()">ENTER THE ARENA</button>
 <br>
 <button class="btn mt" onclick="showPhase('phase-load')" style="margin-top:12px">BACK</button>
 </div>
 </div>
 
 <div id="phase-battle" class="phase">
+<div id="battleFightId" class="center" style="margin-bottom:4px"></div>
 <div id="battleField" class="battle-field"></div>
 <div id="turnIndicator" class="center" style="font-size:0.7rem;color:var(--gold);margin:4px 0"></div>
 <div id="actionBar" class="action-bar" style="display:none"></div>
@@ -162,7 +199,8 @@ select{background:rgba(0,0,0,0.3);border:1px solid rgba(110,231,183,0.2);color:v
 <div id="phase-victory" class="phase">
 <div class="victory-screen">
 <h2>VICTORY</h2>
-<p style="color:var(--dim);margin-bottom:20px">Your warband has conquered the arena!</p>
+<p style="color:var(--dim);margin-bottom:12px">Your warband has conquered the arena!</p>
+<div id="victoryFightId" style="margin-bottom:12px"></div>
 <div id="victoryStats" style="margin-bottom:20px"></div>
 <button class="btn btn-gold" onclick="resetArena()">FIGHT AGAIN</button>
 <button class="btn mt" style="margin-left:8px" onclick="goHome()">RETURN HOME</button>
@@ -172,11 +210,25 @@ select{background:rgba(0,0,0,0.3);border:1px solid rgba(110,231,183,0.2);color:v
 <div id="phase-defeat" class="phase">
 <div class="defeat-screen">
 <h2>DEFEATED</h2>
-<p style="color:var(--dim);margin-bottom:20px">Your warband has fallen in the arena...</p>
+<p style="color:var(--dim);margin-bottom:12px">Your warband has fallen in the arena...</p>
+<div id="defeatFightId" style="margin-bottom:12px"></div>
 <button class="btn btn-red" onclick="resetArena()">TRY AGAIN</button>
 <button class="btn mt" style="margin-left:8px" onclick="goHome()">RETURN HOME</button>
 </div>
 </div>
+
+</div>
+
+<div id="tab-history" style="display:none">
+<div class="center mb">
+<h2 style="font-size:1.1rem;color:var(--accent);margin-bottom:4px">Fight History</h2>
+<p style="font-size:0.7rem;color:var(--dim)">Your recorded arena battles</p>
+</div>
+<div id="historyList" class="history-panel">
+<div class="no-history">No fights recorded yet. Enter the arena!</div>
+</div>
+</div>
+
 </div>
 
 <script>
@@ -229,23 +281,13 @@ const ENEMY_TEMPLATES = [
   {name:'Void Sorcerer',icon:'🌀',cls:'mage',hp:0.6,dmg:1.5,def:0.5,spd:92},
 ];
 
-const TIER_COLORS = {
-  1: '#9ca3af',
-  2: '#22c55e',
-  3: '#3b82f6',
-  4: '#a855f7',
-  5: '#f59e0b',
-  6: '#ef4444',
-  7: '#ec4899',
-  8: '#f472b6',
-};
+const TIER_COLORS = {1:'#9ca3af',2:'#22c55e',3:'#3b82f6',4:'#a855f7',5:'#f59e0b',6:'#ef4444',7:'#ec4899',8:'#f472b6'};
 const TIER_NAMES = {1:'Common',2:'Uncommon',3:'Rare',4:'Epic',5:'Legendary',6:'Ancient',7:'Divine',8:'Mythic'};
-
 const CLASS_GRADIENTS = {
-  warrior: 'linear-gradient(135deg, rgba(180,30,30,0.3), rgba(80,10,10,0.8))',
-  mage: 'linear-gradient(135deg, rgba(100,40,180,0.3), rgba(40,10,80,0.8))',
-  ranger: 'linear-gradient(135deg, rgba(30,130,50,0.3), rgba(10,60,20,0.8))',
-  worge: 'linear-gradient(135deg, rgba(180,120,20,0.3), rgba(80,50,10,0.8))',
+  warrior:'linear-gradient(135deg, rgba(180,30,30,0.3), rgba(80,10,10,0.8))',
+  mage:'linear-gradient(135deg, rgba(100,40,180,0.3), rgba(40,10,80,0.8))',
+  ranger:'linear-gradient(135deg, rgba(30,130,50,0.3), rgba(10,60,20,0.8))',
+  worge:'linear-gradient(135deg, rgba(180,120,20,0.3), rgba(80,50,10,0.8))',
 };
 
 let gameHeroes = [];
@@ -263,14 +305,145 @@ let stunned = {};
 let grudge = {};
 let floatId = 0;
 
+let currentFightId = null;
+let currentFightRecord = null;
+let fightHistory = [];
+let puterReady = false;
+let turnCount = 0;
+
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+function shortUUID(uuid) {
+  return uuid ? uuid.split('-')[0].toUpperCase() : '---';
+}
+
+async function initPuter() {
+  try {
+    if (typeof puter !== 'undefined' && puter.kv) {
+      puterReady = true;
+      await loadFightHistory();
+    } else {
+      puterReady = false;
+      loadLocalHistory();
+    }
+  } catch(e) {
+    console.warn('Puter KV not available, using localStorage fallback');
+    puterReady = false;
+    loadLocalHistory();
+  }
+}
+
+async function loadFightHistory() {
+  try {
+    if (puterReady) {
+      const raw = await puter.kv.get('gruda_fight_history');
+      if (raw) {
+        fightHistory = JSON.parse(raw);
+      }
+    }
+  } catch(e) {
+    console.warn('Failed to load from Puter KV:', e);
+    loadLocalHistory();
+  }
+}
+
+function loadLocalHistory() {
+  try {
+    const raw = localStorage.getItem('gruda_fight_history');
+    if (raw) fightHistory = JSON.parse(raw);
+  } catch(e) {}
+}
+
+async function saveFightHistory() {
+  const data = JSON.stringify(fightHistory.slice(-50));
+  try {
+    if (puterReady) {
+      await puter.kv.set('gruda_fight_history', data);
+    }
+  } catch(e) {
+    console.warn('Puter save failed:', e);
+  }
+  try {
+    localStorage.setItem('gruda_fight_history', data);
+  } catch(e) {}
+}
+
+async function saveFightRecord(record) {
+  try {
+    if (puterReady) {
+      await puter.kv.set('gruda_fight_' + record.id, JSON.stringify(record));
+    }
+  } catch(e) {
+    console.warn('Fight record save failed:', e);
+  }
+  try {
+    localStorage.setItem('gruda_fight_' + record.id, JSON.stringify(record));
+  } catch(e) {}
+}
+
+function showSaveStatus(msg, type) {
+  const el = document.getElementById('saveStatus');
+  el.textContent = msg;
+  el.className = 'save-status show ' + type;
+  setTimeout(() => el.className = 'save-status', 2500);
+}
+
+function copyFightId(uuid) {
+  navigator.clipboard.writeText(uuid).then(() => {
+    const toast = document.getElementById('copyToast');
+    toast.textContent = 'Fight ID copied: ' + shortUUID(uuid);
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }).catch(() => {});
+}
+
+function renderFightIdBadge(uuid, targetId) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = `<span class="fight-id-badge" onclick="copyFightId('${uuid}')" title="Click to copy full ID"><span class="label">FIGHT</span>${shortUUID(uuid)}</span>`;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (tab === 'fight' ? i === 0 : i === 1)));
+  document.getElementById('tab-fight').style.display = tab === 'fight' ? 'block' : 'none';
+  document.getElementById('tab-history').style.display = tab === 'history' ? 'block' : 'none';
+  if (tab === 'history') renderHistory();
+}
+
+function renderHistory() {
+  const container = document.getElementById('historyList');
+  if (fightHistory.length === 0) {
+    container.innerHTML = '<div class="no-history">No fights recorded yet. Enter the arena!</div>';
+    return;
+  }
+  const sorted = [...fightHistory].reverse();
+  container.innerHTML = sorted.map(f => {
+    const d = new Date(f.timestamp);
+    const timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const heroNames = (f.heroes || []).map(h => h.name).join(', ');
+    const turns = f.turns || '?';
+    return `<div class="history-entry" onclick="copyFightId('${f.id}')">
+      <div class="h-result ${f.result === 'victory' ? 'win' : 'loss'}">${f.result === 'victory' ? 'WIN' : 'LOSS'}</div>
+      <div class="h-info">
+        <div class="h-heroes">${heroNames}</div>
+        <div class="h-meta">${timeStr} &middot; ${turns} turns &middot; vs ${f.enemyCount || '?'} enemies</div>
+        <div class="h-uuid">${f.id}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function decompressFromBase64Url(encoded) {
   let base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
   while (base64.length % 4) base64 += '=';
   const binary = atob(base64);
   const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return new TextDecoder().decode(bytes);
 }
 
@@ -289,14 +462,8 @@ function deserializeEquipment(data) {
   for (const [slot, item] of Object.entries(data)) {
     result[slot] = {
       id: 'imp_' + slot + '_' + Math.random().toString(36).slice(2, 8),
-      name: item.n,
-      icon: item.i,
-      slot: item.s,
-      tier: item.t || 1,
-      stats: item.st || {},
-      weaponType: item.wt || undefined,
-      armorType: item.at || undefined,
-      hand: item.h || undefined,
+      name: item.n, icon: item.i, slot: item.s, tier: item.t || 1,
+      stats: item.st || {}, weaponType: item.wt, armorType: item.at, hand: item.h,
     };
   }
   return result;
@@ -304,15 +471,9 @@ function deserializeEquipment(data) {
 
 function deserializeHero(data) {
   return {
-    name: data.n,
-    raceId: data.r,
-    classId: data.c,
-    level: data.l,
-    attributePoints: data.a,
-    equipment: deserializeEquipment(data.e),
-    unlockedSkills: data.sk || {},
-    abilityLoadout: data.lo || null,
-    premerged: true,
+    name: data.n, raceId: data.r, classId: data.c, level: data.l,
+    attributePoints: data.a, equipment: deserializeEquipment(data.e),
+    unlockedSkills: data.sk || {}, abilityLoadout: data.lo || null, premerged: true,
   };
 }
 
@@ -334,9 +495,8 @@ function calcStats(attrs, level) {
 
 function mergeAttrs(base, race, classAttrs) {
   const r = {};
-  for(const k of ['Strength','Vitality','Endurance','Dexterity','Agility','Intellect','Wisdom','Tactics']) {
+  for(const k of ['Strength','Vitality','Endurance','Dexterity','Agility','Intellect','Wisdom','Tactics'])
     r[k] = (base[k]||0) + (race[k]||0) + (classAttrs[k]||0);
-  }
   return r;
 }
 
@@ -344,11 +504,8 @@ function applyEquipmentStats(stats, equipment) {
   if (!equipment) return stats;
   for (const item of Object.values(equipment)) {
     if (!item || !item.stats) continue;
-    for (const [stat, val] of Object.entries(item.stats)) {
-      if (typeof val === 'number' && stats[stat] !== undefined) {
-        stats[stat] += val;
-      }
-    }
+    for (const [stat, val] of Object.entries(item.stats))
+      if (typeof val === 'number' && stats[stat] !== undefined) stats[stat] += val;
   }
   return stats;
 }
@@ -356,8 +513,7 @@ function applyEquipmentStats(stats, equipment) {
 function parseHeroInput(raw) {
   try {
     if (raw.startsWith('GW2:')) {
-      const token = raw.slice(4);
-      const payload = decodeShareToken(token);
+      const payload = decodeShareToken(raw.slice(4));
       if (!Array.isArray(payload)) throw new Error('Invalid share data');
       return payload.map(deserializeHero);
     }
@@ -375,8 +531,8 @@ function validateHero(h) {
   if (!h.name || typeof h.name !== 'string') throw new Error('Each hero needs a "name"');
   const r = (h.race || h.raceId || '').toLowerCase();
   const c = (h.class || h.classId || '').toLowerCase();
-  if (!RACES[r]) throw new Error(`Unknown race "${r}" for ${h.name}. Use: ${Object.keys(RACES).join(', ')}`);
-  if (!CLASSES[c]) throw new Error(`Unknown class "${c}" for ${h.name}. Use: ${Object.keys(CLASSES).join(', ')}`);
+  if (!RACES[r]) throw new Error(`Unknown race "${r}" for ${h.name}`);
+  if (!CLASSES[c]) throw new Error(`Unknown class "${c}" for ${h.name}`);
   const lvl = Math.max(1, Math.min(20, parseInt(h.level)||1));
   const hasFullAttrs = h.attributePoints != null;
   const baseAttrs = h.attributePoints || h.attrs || h.attributes || {};
@@ -390,27 +546,14 @@ function buildHero(data) {
   const stats = calcStats(finalAttrs, data.level);
   applyEquipmentStats(stats, data.equipment);
   const heroId = 'hero_' + Math.random().toString(36).slice(2,8);
-  if (data.equipment) {
-    heroEquipmentData[heroId] = data.equipment;
-  }
+  if (data.equipment) heroEquipmentData[heroId] = data.equipment;
   return {
-    id: heroId,
-    name: data.name,
-    raceId: data.raceId,
-    classId: data.classId,
-    level: data.level,
-    attrs: finalAttrs,
-    team: 'player',
-    ...stats,
-    maxHealth: Math.floor(stats.health),
-    health: Math.floor(stats.health),
-    maxMana: Math.floor(stats.mana),
-    mana: Math.floor(stats.mana),
-    maxStamina: Math.floor(stats.stamina),
-    stamina: Math.floor(stats.stamina),
-    abilities: cls.abilities,
-    icon: cls.icon,
-    color: cls.color,
+    id: heroId, name: data.name, raceId: data.raceId, classId: data.classId,
+    level: data.level, attrs: finalAttrs, team: 'player',
+    ...stats, maxHealth: Math.floor(stats.health), health: Math.floor(stats.health),
+    maxMana: Math.floor(stats.mana), mana: Math.floor(stats.mana),
+    maxStamina: Math.floor(stats.stamina), stamina: Math.floor(stats.stamina),
+    abilities: cls.abilities, icon: cls.icon, color: cls.color,
   };
 }
 
@@ -426,22 +569,15 @@ function generateEnemies(heroes) {
     const spd = tmpl.spd + avgLevel;
     enemies.push({
       id: 'enemy_' + i + '_' + Math.random().toString(36).slice(2,6),
-      name: tmpl.name,
-      team: 'enemy',
-      classId: tmpl.cls,
-      raceId: null,
-      level: Math.round(avgLevel),
-      icon: tmpl.icon,
-      color: '#f87171',
+      name: tmpl.name, team: 'enemy', classId: tmpl.cls, raceId: null,
+      level: Math.round(avgLevel), icon: tmpl.icon, color: '#f87171',
       health: hp, maxHealth: hp,
       mana: Math.floor(100 * scale), maxMana: Math.floor(100 * scale),
       stamina: Math.floor(80 * scale), maxStamina: Math.floor(80 * scale),
       physicalDamage: Math.floor(12 * tmpl.dmg * scale),
       magicDamage: Math.floor(10 * tmpl.dmg * scale),
       defense: Math.floor(8 * tmpl.def * scale),
-      speed: spd,
-      critChance: 5 + avgLevel * 0.3,
-      dodge: 3 + avgLevel * 0.2,
+      speed: spd, critChance: 5 + avgLevel * 0.3, dodge: 3 + avgLevel * 0.2,
       abilities: eCls.abilities,
     });
   }
@@ -453,6 +589,7 @@ function loadHeroes() {
   const errEl = document.getElementById('loadError');
   errEl.style.display = 'none';
   if (!input) { errEl.textContent = 'Please paste hero data first'; errEl.style.display = 'block'; return; }
+  currentShareHash = null;
   try {
     let data = parseHeroInput(input);
     if (!Array.isArray(data)) data = [data];
@@ -460,6 +597,22 @@ function loadHeroes() {
     if (data.length > 3) data = data.slice(0, 3);
     heroEquipmentData = {};
     gameHeroes = data.map(h => buildHero(validateHero(h)));
+    currentFightId = generateUUID();
+    currentFightRecord = {
+      id: currentFightId,
+      timestamp: Date.now(),
+      heroes: gameHeroes.map(h => ({
+        name: h.name, classId: h.classId, raceId: h.raceId, level: h.level,
+        maxHealth: h.maxHealth, maxMana: h.maxMana, maxStamina: h.maxStamina,
+        physicalDamage: Math.floor(h.physicalDamage), magicDamage: Math.floor(h.magicDamage),
+        defense: Math.floor(h.defense), speed: Math.floor(h.speed),
+      })),
+      inputHash: currentShareHash || null,
+      result: null,
+      turns: 0,
+      enemyCount: 0,
+    };
+    renderFightIdBadge(currentFightId, 'fightIdDisplay');
     showRoster();
   } catch(e) {
     errEl.textContent = e.message;
@@ -475,13 +628,15 @@ function loadFromShareToken(token) {
     if (heroes.length > 3) heroes = heroes.slice(0, 3);
     heroEquipmentData = {};
     gameHeroes = heroes.map(h => buildHero(validateHero(h)));
+    currentFightId = generateUUID();
+    currentFightRecord = {
+      id: currentFightId, timestamp: Date.now(),
+      heroes: gameHeroes.map(h => ({ name: h.name, classId: h.classId, raceId: h.raceId, level: h.level, maxHealth: h.maxHealth })),
+      inputHash: currentShareHash, result: null, turns: 0, enemyCount: 0,
+    };
     const firstName = gameHeroes[0]?.name || 'Unknown';
     document.getElementById('rosterTitle').textContent = `Challenge from ${firstName}'s warband`;
-    if (currentShareHash) {
-      const badge = document.getElementById('challengeIdBadge');
-      badge.innerHTML = `<span class="challenge-id">Challenge ID: ${currentShareHash}</span>`;
-      badge.style.display = 'block';
-    }
+    renderFightIdBadge(currentFightId, 'fightIdDisplay');
     showPhase('phase-roster');
     showRosterCards();
   } catch(e) {
@@ -567,11 +722,20 @@ function startBattle() {
   const enemies = generateEnemies(gameHeroes);
   battleUnits = [...gameHeroes, ...enemies];
   cooldowns = {}; buffs = {}; dots = {}; stunned = {}; grudge = {};
+  turnCount = 0;
   battleUnits.forEach(u => { cooldowns[u.id] = {}; buffs[u.id] = []; dots[u.id] = []; stunned[u.id] = false; grudge[u.id] = u.team === 'player' ? 0 : -1; });
   turnOrder = battleUnits.map(u=>u.id).sort((a,b)=> getUnit(b).speed - getUnit(a).speed);
   currentTurnIdx = 0;
   selectedAbility = null;
   battlePhase = 'playing';
+
+  if (currentFightRecord) {
+    currentFightRecord.enemyCount = enemies.length;
+    currentFightRecord.enemies = enemies.map(e => ({ name: e.name, classId: e.classId, level: e.level, maxHealth: e.maxHealth }));
+    currentFightRecord.battleStarted = Date.now();
+  }
+
+  renderFightIdBadge(currentFightId, 'battleFightId');
   document.getElementById('battleLog').innerHTML = '<div class="entry info">Battle begins!</div>';
   showPhase('phase-battle');
   renderBattleField();
@@ -588,17 +752,8 @@ function renderBattleField() {
   const players = battleUnits.filter(u => u.team === 'player');
   const enemies = battleUnits.filter(u => u.team === 'enemy');
   const currentId = turnOrder[currentTurnIdx];
-
-  players.forEach((u, i) => {
-    const x = 15 + i * 18;
-    const y = 55 + i * 12;
-    field.innerHTML += unitHTML(u, x, y, currentId);
-  });
-  enemies.forEach((u, i) => {
-    const x = 55 + i * 14;
-    const y = 20 + i * 10;
-    field.innerHTML += unitHTML(u, x, y, currentId);
-  });
+  players.forEach((u, i) => { field.innerHTML += unitHTML(u, 15 + i * 18, 55 + i * 12, currentId); });
+  enemies.forEach((u, i) => { field.innerHTML += unitHTML(u, 55 + i * 14, 20 + i * 10, currentId); });
 }
 
 function unitHTML(u, x, y, currentId) {
@@ -637,9 +792,10 @@ function nextTurn() {
   const unit = getUnit(turnOrder[currentTurnIdx]);
   if (!unit) return;
 
+  turnCount++;
   processTurnStart(unit);
   renderBattleField();
-  document.getElementById('turnIndicator').textContent = `${unit.name}'s turn`;
+  document.getElementById('turnIndicator').textContent = `${unit.name}'s turn (Turn ${turnCount})`;
 
   if (stunned[unit.id]) {
     logEntry(`${unit.name} is stunned!`, 'info');
@@ -648,11 +804,8 @@ function nextTurn() {
     return;
   }
 
-  if (unit.team === 'player') {
-    showPlayerActions(unit);
-  } else {
-    setTimeout(() => enemyAI(unit), 600);
-  }
+  if (unit.team === 'player') showPlayerActions(unit);
+  else setTimeout(() => enemyAI(unit), 600);
 }
 
 function processTurnStart(unit) {
@@ -660,7 +813,6 @@ function processTurnStart(unit) {
     unit.mana = Math.min(unit.maxMana, unit.mana + 3);
     unit.stamina = Math.min(unit.maxStamina, unit.stamina + 5);
   }
-
   const newDots = [];
   for (const dot of (dots[unit.id]||[])) {
     const dmg = Math.floor(unit.maxHealth * dot.dmg);
@@ -670,14 +822,12 @@ function processTurnStart(unit) {
     if (dot.dur > 1) newDots.push({...dot, dur: dot.dur - 1});
   }
   dots[unit.id] = newDots;
-
   const newBuffs = [];
   for (const buff of (buffs[unit.id]||[])) {
     if (buff.dur > 1) newBuffs.push({...buff, dur: buff.dur - 1});
     else logEntry(`${unit.name}'s ${buff.name||'buff'} fades`, 'info');
   }
   buffs[unit.id] = newBuffs;
-
   for (const aid in (cooldowns[unit.id]||{})) {
     if (cooldowns[unit.id][aid] > 0) cooldowns[unit.id][aid]--;
   }
@@ -688,7 +838,6 @@ function showPlayerActions(unit) {
   bar.style.display = 'flex';
   bar.innerHTML = '';
   selectedAbility = null;
-
   const abilities = unit.abilities || [];
   abilities.forEach((ab, i) => {
     const onCd = (cooldowns[unit.id]?.[ab.id] || 0) > 0;
@@ -702,7 +851,6 @@ function showPlayerActions(unit) {
     btn.onclick = () => selectAbility(unit, ab, i, bar);
     bar.appendChild(btn);
   });
-
   if (grudge[unit.id] >= 100) {
     const revBtn = document.createElement('button');
     revBtn.className = 'ability-btn';
@@ -713,18 +861,15 @@ function showPlayerActions(unit) {
     revBtn.onclick = () => executeRevenge(unit);
     bar.appendChild(revBtn);
   }
-
   document.getElementById('targetBar').style.display = 'none';
 }
 
 function selectAbility(unit, ab, idx, bar) {
   selectedAbility = ab;
   bar.querySelectorAll('.ability-btn').forEach((b,i) => b.classList.toggle('selected', i === idx));
-
   const targetBar = document.getElementById('targetBar');
   targetBar.style.display = 'flex';
   targetBar.innerHTML = '';
-
   if (ab.target === 'self') {
     executeAbility(unit, ab, unit);
   } else if (ab.target === 'ally') {
@@ -751,11 +896,9 @@ function selectAbility(unit, ab, idx, bar) {
 function executeAbility(attacker, ab, target) {
   document.getElementById('actionBar').style.display = 'none';
   document.getElementById('targetBar').style.display = 'none';
-
   if (ab.manaCost) attacker.mana = Math.max(0, attacker.mana - ab.manaCost);
   if (ab.staminaCost) attacker.stamina = Math.max(0, attacker.stamina - ab.staminaCost);
   if (ab.cd > 0) { if(!cooldowns[attacker.id]) cooldowns[attacker.id]={}; cooldowns[attacker.id][ab.id] = ab.cd; }
-
   if (ab.type === 'heal' && target) {
     const heal = Math.floor(target.maxHealth * (ab.healPct || 0.3));
     target.health = Math.min(target.maxHealth, target.health + heal);
@@ -768,8 +911,7 @@ function executeAbility(attacker, ab, target) {
       logEntry(`${attacker.name} uses ${ab.name}!`, 'info');
     }
   } else if (ab.target === 'all_enemies') {
-    const targets = aliveTeam('enemy');
-    targets.forEach(t => {
+    aliveTeam('enemy').forEach(t => {
       const dmg = calcDamage(attacker, ab, t);
       applyDamage(t, dmg, attacker);
       logEntry(`${attacker.name}'s ${ab.name} hits ${t.name} for ${dmg}`, 'dmg');
@@ -781,12 +923,10 @@ function executeAbility(attacker, ab, target) {
     if (ab.effect?.type === 'stun') { stunned[target.id] = true; logEntry(`${target.name} is stunned!`, 'info'); }
     if (ab.effect?.type === 'dot') { dots[target.id] = dots[target.id]||[]; dots[target.id].push({dmg:ab.effect.dmg,dur:ab.effect.dur}); }
   }
-
-  if (ab.id === ab.id && (ab.manaCost === 0 && ab.staminaCost === 0)) {
+  if (ab.manaCost === 0 && ab.staminaCost === 0) {
     attacker.mana = Math.min(attacker.maxMana, attacker.mana + 5);
     attacker.stamina = Math.min(attacker.maxStamina, attacker.stamina + 5);
   }
-
   renderBattleField();
   setTimeout(() => { currentTurnIdx++; nextTurn(); }, 500);
 }
@@ -825,13 +965,11 @@ function applyDamage(target, dmg, attacker) {
   if (dodged) { logEntry(`${target.name} dodges!`, 'info'); floatDamage(target.id, 'MISS', false); return; }
   target.health = Math.max(0, target.health - dmg);
   floatDamage(target.id, dmg);
-
   if (target.team === 'player' && grudge[target.id] >= 0) {
     const pct = dmg / target.maxHealth * 100;
     const gain = Math.min(30, Math.max(5, Math.floor(pct)));
     grudge[target.id] = Math.min(100, grudge[target.id] + gain);
   }
-
   const el = document.getElementById('unit-' + target.id);
   if (el) { el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 400); }
   if (target.health <= 0) logEntry(`${target.name} has fallen!`, 'info');
@@ -853,14 +991,12 @@ function floatDamage(unitId, val, isHeal) {
 function enemyAI(unit) {
   const targets = aliveTeam('player');
   if (targets.length === 0) { currentTurnIdx++; nextTurn(); return; }
-
   const abilities = unit.abilities || [];
   const usable = abilities.filter(ab => {
     if ((cooldowns[unit.id]?.[ab.id]||0) > 0) return false;
     if (ab.manaCost > unit.mana || ab.staminaCost > unit.stamina) return false;
     return true;
   });
-
   let chosen;
   if (usable.length > 1 && Math.random() > 0.4) {
     const specials = usable.filter(a => a.cd > 0);
@@ -868,13 +1004,10 @@ function enemyAI(unit) {
   } else {
     chosen = usable[0] || abilities[0];
   }
-
   if (!chosen) { currentTurnIdx++; nextTurn(); return; }
-
   if (chosen.manaCost) unit.mana = Math.max(0, unit.mana - chosen.manaCost);
   if (chosen.staminaCost) unit.stamina = Math.max(0, unit.stamina - chosen.staminaCost);
   if (chosen.cd > 0) { if(!cooldowns[unit.id]) cooldowns[unit.id]={}; cooldowns[unit.id][chosen.id] = chosen.cd; }
-
   if (chosen.type === 'heal') {
     const healTarget = aliveTeam('enemy').sort((a,b) => a.health/a.maxHealth - b.health/b.maxHealth)[0];
     if (healTarget) {
@@ -901,22 +1034,50 @@ function enemyAI(unit) {
     if (chosen.effect?.type === 'stun') { stunned[target.id] = true; logEntry(`${target.name} is stunned!`, 'info'); }
     if (chosen.effect?.type === 'dot') { dots[target.id] = dots[target.id]||[]; dots[target.id].push({dmg:chosen.effect.dmg,dur:chosen.effect.dur}); }
   }
-
   unit.mana = Math.min(unit.maxMana, unit.mana + 3);
   unit.stamina = Math.min(unit.maxStamina, unit.stamina + 3);
-
   renderBattleField();
   setTimeout(() => { currentTurnIdx++; nextTurn(); }, 500);
 }
 
-function endBattle(victory) {
+async function endBattle(victory) {
   battlePhase = 'ended';
+
+  if (currentFightRecord) {
+    currentFightRecord.result = victory ? 'victory' : 'defeat';
+    currentFightRecord.turns = turnCount;
+    currentFightRecord.endTime = Date.now();
+    currentFightRecord.duration = currentFightRecord.endTime - (currentFightRecord.battleStarted || currentFightRecord.timestamp);
+    if (victory) {
+      currentFightRecord.survivors = aliveTeam('player').map(h => ({
+        name: h.name, hpRemaining: h.health, hpMax: h.maxHealth,
+        hpPct: Math.ceil(h.health / h.maxHealth * 100),
+      }));
+    }
+
+    fightHistory.push({
+      id: currentFightRecord.id,
+      timestamp: currentFightRecord.timestamp,
+      heroes: currentFightRecord.heroes,
+      enemyCount: currentFightRecord.enemyCount,
+      result: currentFightRecord.result,
+      turns: currentFightRecord.turns,
+      duration: currentFightRecord.duration,
+    });
+
+    await saveFightRecord(currentFightRecord);
+    await saveFightHistory();
+    showSaveStatus('Fight saved: ' + shortUUID(currentFightId), 'success');
+  }
+
   if (victory) {
     const survivors = aliveTeam('player');
     const statsHTML = survivors.map(h => `<div style="font-size:0.8rem;color:var(--dim)">${h.icon} ${h.name} - ${Math.ceil(h.health/h.maxHealth*100)}% HP remaining</div>`).join('');
     document.getElementById('victoryStats').innerHTML = statsHTML;
+    renderFightIdBadge(currentFightId, 'victoryFightId');
     showPhase('phase-victory');
   } else {
+    renderFightIdBadge(currentFightId, 'defeatFightId');
     showPhase('phase-defeat');
   }
 }
@@ -936,16 +1097,56 @@ function resetArena() {
     h.mana = h.maxMana;
     h.stamina = h.maxStamina;
   });
+  currentFightId = generateUUID();
+  currentFightRecord = {
+    id: currentFightId, timestamp: Date.now(),
+    heroes: gameHeroes.map(h => ({ name: h.name, classId: h.classId, raceId: h.raceId, level: h.level, maxHealth: h.maxHealth })),
+    inputHash: currentShareHash, result: null, turns: 0, enemyCount: 0,
+  };
+  renderFightIdBadge(currentFightId, 'fightIdDisplay');
   showRoster();
 }
 
 function goHome() {
-  const origin = window.location.origin;
-  window.location.href = origin;
+  window.location.href = 'https://grudgewarlords.com';
 }
 
-(function init() {
+(async function init() {
+  await initPuter();
+
   const params = new URLSearchParams(window.location.search);
+
+  const fightId = params.get('fight');
+  if (fightId) {
+    let record = null;
+    try {
+      if (puterReady) {
+        const raw = await puter.kv.get('gruda_fight_' + fightId);
+        if (raw) record = JSON.parse(raw);
+      }
+      if (!record) {
+        const raw = localStorage.getItem('gruda_fight_' + fightId);
+        if (raw) record = JSON.parse(raw);
+      }
+    } catch(e) {}
+    if (record) {
+      document.getElementById('rosterTitle').textContent = `Fight Record: ${shortUUID(fightId)}`;
+      const heroSummary = (record.heroes || []).map(h => `${h.name} (Lv${h.level} ${h.classId})`).join(', ');
+      const resultText = record.result === 'victory' ? '<span style="color:#4ade80">VICTORY</span>' : '<span style="color:#f87171">DEFEAT</span>';
+      document.getElementById('heroCards').innerHTML = `
+        <div style="width:100%;text-align:center;padding:20px">
+          <div class="fight-id-badge" onclick="copyFightId('${fightId}')"><span class="label">FIGHT</span>${fightId}</div>
+          <div style="margin-top:12px;font-size:0.85rem;color:var(--text)">${heroSummary}</div>
+          <div style="margin-top:8px;font-size:1.1rem;font-family:'Cinzel',serif">${resultText}</div>
+          <div style="margin-top:4px;font-size:0.7rem;color:var(--dim)">${record.turns} turns &middot; vs ${record.enemyCount} enemies &middot; ${new Date(record.timestamp).toLocaleString()}</div>
+          ${record.survivors ? '<div style="margin-top:8px;font-size:0.7rem;color:var(--dim)">Survivors: ' + record.survivors.map(s => `${s.name} (${s.hpPct}%)`).join(', ') + '</div>' : ''}
+        </div>`;
+      document.getElementById('fightIdDisplay').innerHTML = '';
+      showPhase('phase-roster');
+      return;
+    }
+  }
+
   const shareToken = params.get('s');
   if (shareToken) {
     loadFromShareToken(shareToken);
@@ -954,11 +1155,7 @@ function goHome() {
   const heroData = params.get('heroes');
   if (heroData) {
     document.getElementById('heroInput').value = heroData;
-    try {
-      loadHeroes();
-    } catch(e) {
-      console.error('Auto-load failed:', e);
-    }
+    try { loadHeroes(); } catch(e) { console.error('Auto-load failed:', e); }
   }
 })();
 </script>
