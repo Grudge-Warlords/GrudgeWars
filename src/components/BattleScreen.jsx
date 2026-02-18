@@ -2589,7 +2589,7 @@ export default function BattleScreen() {
           const isCurrentTurnUnit = currentUnit?.id === unit.id;
           const isSelected = selectedTargetId === unit.id;
           const isEnemyClickable = unit.team === 'enemy' && unit.alive && isPlayerTurn;
-          const flipSprite = spriteData?.facesLeft ? unit.team === 'player' : unit.team === 'enemy';
+          const flipSprite = spriteData?.facesLeft ? unit.team === 'enemy' : unit.team === 'player';
           const introDelay = introComplete ? 0 : (idx * 100);
           const baseFrameSize = spriteData?.frameWidth || spriteData?.frameHeight || 100;
           const targetDisplaySize = isMobile ? 110 : 140;
