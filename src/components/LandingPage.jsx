@@ -31,132 +31,217 @@ export default function LandingPage() {
   ];
 
   const stats = [
-    { value: '32+', label: 'Unique Combinations' },
-    { value: '8', label: 'Playable Races' },
-    { value: '4', label: 'Combat Classes' },
-    { value: '∞', label: 'Possible Games' },
+    { value: '32+', label: 'Unique Combinations', color: '#06b6d4' },
+    { value: '8', label: 'Playable Races', color: '#a855f7' },
+    { value: '4', label: 'Combat Classes', color: '#fbbf24' },
+    { value: '∞', label: 'Possible Games', color: '#22c55e' },
   ];
 
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(180deg, #020a18 0%, #0a1628 30%, #0d1f3c 60%, #041225 100%)',
       color: '#e2e8f0',
       fontFamily: "'Jost', sans-serif",
       opacity: loaded ? 1 : 0,
       transition: 'opacity 0.6s ease',
+      background: '#020a18',
     }}>
       <style>{`
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
         @keyframes glow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes particleDrift {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          20% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { transform: translateY(-120px) translateX(30px); opacity: 0; }
+        }
+        @keyframes pulseGlow {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.1); }
+        }
       `}</style>
 
-      <header style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '20px 40px', maxWidth: '1200px', margin: '0 auto',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/images/grudge_logo.png" alt="Grudge Studios" style={{ height: '40px', animation: 'glow 3s ease-in-out infinite' }} />
-          <span style={{ fontFamily: "'Cinzel', serif", fontSize: '18px', fontWeight: '700', color: '#fbbf24' }}>Grudge Studios</span>
-        </div>
-        <nav style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <a href="#features" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>Features</a>
-          <a href="#showcase" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>Showcase</a>
-          <button onClick={() => navigate('/factory')} style={{
-            padding: '8px 20px', borderRadius: '8px', border: '1px solid #06b6d4',
-            background: 'transparent', color: '#06b6d4', cursor: 'pointer', fontSize: '13px', fontWeight: '600',
-          }}>Launch Factory</button>
-        </nav>
-      </header>
-
       <section style={{
-        maxWidth: '1200px', margin: '0 auto', padding: '80px 40px 60px',
-        textAlign: 'center',
+        position: 'relative',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
       }}>
         <div style={{
-          fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '3px',
-          color: '#06b6d4', marginBottom: '20px',
-        }}>Modular RPG Game Engine</div>
-
-        <h1 style={{
-          fontFamily: "'Cinzel', serif", fontSize: 'clamp(36px, 6vw, 72px)', fontWeight: '700',
-          lineHeight: '1.1', marginBottom: '24px',
-          background: 'linear-gradient(135deg, #06b6d4, #a855f7, #fbbf24)',
-          backgroundSize: '200% auto',
-          animation: 'shimmer 4s linear infinite',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-        }}>Game Factory</h1>
-
-        <p style={{
-          fontSize: 'clamp(16px, 2.5vw, 22px)', color: '#94a3b8', maxWidth: '700px', margin: '0 auto 16px',
-          lineHeight: '1.6',
-        }}>
-          Build complete RPG games with AI. Define your theme, races, classes, and world — 
-          the engine generates everything else.
-        </p>
-        <p style={{
-          fontSize: '14px', color: '#64748b', maxWidth: '600px', margin: '0 auto 40px',
-        }}>
-          Powered by Grudge Studios. One engine, infinite worlds.
-        </p>
-
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => navigate('/factory')}
-            onMouseEnter={() => setHovered('create')}
-            onMouseLeave={() => setHovered(null)}
-            style={{
-              padding: '16px 40px', borderRadius: '12px', border: 'none',
-              background: hovered === 'create'
-                ? 'linear-gradient(135deg, #0891b2, #7c3aed)'
-                : 'linear-gradient(135deg, #06b6d4, #a855f7)',
-              color: '#fff', fontSize: '16px', fontWeight: '700', cursor: 'pointer',
-              boxShadow: '0 4px 24px rgba(6, 182, 212, 0.3)',
-              transform: hovered === 'create' ? 'translateY(-2px)' : 'none',
-              transition: 'all 0.3s ease',
-            }}
-          >Create Your Game</button>
-
-          <button
-            onClick={() => navigate('/play')}
-            onMouseEnter={() => setHovered('play')}
-            onMouseLeave={() => setHovered(null)}
-            style={{
-              padding: '16px 40px', borderRadius: '12px',
-              border: '2px solid #fbbf24',
-              background: hovered === 'play' ? 'rgba(251, 191, 36, 0.1)' : 'transparent',
-              color: '#fbbf24', fontSize: '16px', fontWeight: '700', cursor: 'pointer',
-              transform: hovered === 'play' ? 'translateY(-2px)' : 'none',
-              transition: 'all 0.3s ease',
-            }}
-          >Play Betta Warlords</button>
-        </div>
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'url(/images/landing-bg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 0,
+        }} />
 
         <div style={{
-          display: 'flex', gap: '40px', justifyContent: 'center', marginTop: '60px', flexWrap: 'wrap',
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, rgba(2,10,24,0.4) 0%, rgba(2,10,24,0.55) 40%, rgba(2,10,24,0.85) 80%, #020a18 100%)',
+          zIndex: 1,
+        }} />
+
+        <div style={{
+          position: 'absolute',
+          top: '15%', left: '10%',
+          width: '300px', height: '300px',
+          background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)',
+          borderRadius: '50%',
+          animation: 'pulseGlow 6s ease-in-out infinite',
+          zIndex: 1,
+        }} />
+        <div style={{
+          position: 'absolute',
+          top: '30%', right: '8%',
+          width: '250px', height: '250px',
+          background: 'radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%)',
+          borderRadius: '50%',
+          animation: 'pulseGlow 8s ease-in-out infinite 2s',
+          zIndex: 1,
+        }} />
+
+        {[...Array(12)].map((_, i) => (
+          <div key={i} style={{
+            position: 'absolute',
+            width: '3px', height: '3px',
+            borderRadius: '50%',
+            background: i % 3 === 0 ? '#06b6d4' : i % 3 === 1 ? '#a855f7' : '#fbbf24',
+            left: `${8 + (i * 7.5)}%`,
+            bottom: `${10 + (i % 5) * 15}%`,
+            animation: `particleDrift ${4 + (i % 3) * 2}s ease-in-out infinite ${i * 0.6}s`,
+            opacity: 0.6,
+            zIndex: 2,
+          }} />
+        ))}
+
+        <header style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '20px 40px', maxWidth: '1200px', margin: '0 auto', width: '100%',
+          position: 'relative', zIndex: 10,
+          boxSizing: 'border-box',
         }}>
-          {stats.map((s, i) => (
-            <div key={i} style={{ textAlign: 'center' }}>
-              <div style={{
-                fontFamily: "'Cinzel', serif", fontSize: '32px', fontWeight: '700',
-                color: ['#06b6d4', '#a855f7', '#fbbf24', '#22c55e'][i],
-              }}>{s.value}</div>
-              <div style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</div>
-            </div>
-          ))}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img src="/images/grudge_logo.png" alt="Grudge Studios" style={{ height: '40px', animation: 'glow 3s ease-in-out infinite' }} />
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: '18px', fontWeight: '700', color: '#fbbf24' }}>Grudge Studios</span>
+          </div>
+          <nav style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+            <a href="#features" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>Features</a>
+            <a href="#showcase" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>Showcase</a>
+            <button onClick={() => navigate('/factory')} style={{
+              padding: '8px 20px', borderRadius: '8px', border: '1px solid #06b6d4',
+              background: 'transparent', color: '#06b6d4', cursor: 'pointer', fontSize: '13px', fontWeight: '600',
+            }}>Launch Factory</button>
+          </nav>
+        </header>
+
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+          padding: '40px 40px 80px', position: 'relative', zIndex: 10,
+          textAlign: 'center',
+        }}>
+          <div style={{
+            fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '3px',
+            color: '#06b6d4', marginBottom: '20px',
+            animation: 'slideUp 0.6s ease both',
+          }}>Modular RPG Game Engine</div>
+
+          <h1 style={{
+            fontFamily: "'Cinzel', serif", fontSize: 'clamp(40px, 7vw, 80px)', fontWeight: '700',
+            lineHeight: '1.1', marginBottom: '24px',
+            background: 'linear-gradient(135deg, #06b6d4, #a855f7, #fbbf24)',
+            backgroundSize: '200% auto',
+            animation: 'shimmer 4s linear infinite',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            textShadow: 'none',
+            filter: 'drop-shadow(0 0 40px rgba(6,182,212,0.3))',
+          }}>Game Factory</h1>
+
+          <p style={{
+            fontSize: 'clamp(16px, 2.5vw, 22px)', color: '#c8d6e5', maxWidth: '700px', margin: '0 auto 16px',
+            lineHeight: '1.6',
+            animation: 'slideUp 0.6s ease 0.2s both',
+          }}>
+            Build complete RPG games with AI. Define your theme, races, classes, and world — 
+            the engine generates everything else.
+          </p>
+          <p style={{
+            fontSize: '14px', color: '#7c8da5', maxWidth: '600px', margin: '0 auto 40px',
+            animation: 'slideUp 0.6s ease 0.3s both',
+          }}>
+            Powered by Grudge Studios. One engine, infinite worlds.
+          </p>
+
+          <div style={{
+            display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap',
+            animation: 'slideUp 0.6s ease 0.4s both',
+          }}>
+            <button
+              onClick={() => navigate('/factory')}
+              onMouseEnter={() => setHovered('create')}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                padding: '16px 40px', borderRadius: '12px', border: 'none',
+                background: hovered === 'create'
+                  ? 'linear-gradient(135deg, #0891b2, #7c3aed)'
+                  : 'linear-gradient(135deg, #06b6d4, #a855f7)',
+                color: '#fff', fontSize: '16px', fontWeight: '700', cursor: 'pointer',
+                boxShadow: hovered === 'create'
+                  ? '0 8px 40px rgba(6, 182, 212, 0.5)'
+                  : '0 4px 24px rgba(6, 182, 212, 0.3)',
+                transform: hovered === 'create' ? 'translateY(-3px)' : 'none',
+                transition: 'all 0.3s ease',
+              }}
+            >Create Your Game</button>
+
+            <button
+              onClick={() => navigate('/play')}
+              onMouseEnter={() => setHovered('play')}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                padding: '16px 40px', borderRadius: '12px',
+                border: '2px solid #fbbf24',
+                background: hovered === 'play' ? 'rgba(251, 191, 36, 0.15)' : 'rgba(251, 191, 36, 0.05)',
+                color: '#fbbf24', fontSize: '16px', fontWeight: '700', cursor: 'pointer',
+                transform: hovered === 'play' ? 'translateY(-3px)' : 'none',
+                boxShadow: hovered === 'play' ? '0 8px 30px rgba(251, 191, 36, 0.2)' : 'none',
+                transition: 'all 0.3s ease',
+              }}
+            >Play Betta Warlords</button>
+          </div>
+
+          <div style={{
+            display: 'flex', gap: '48px', justifyContent: 'center', marginTop: '60px', flexWrap: 'wrap',
+            animation: 'slideUp 0.6s ease 0.5s both',
+          }}>
+            {stats.map((s, i) => (
+              <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{
+                  fontFamily: "'Cinzel', serif", fontSize: '36px', fontWeight: '700',
+                  color: s.color,
+                  textShadow: `0 0 20px ${s.color}44`,
+                }}>{s.value}</div>
+                <div style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1.5px', marginTop: '4px' }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       <section id="features" style={{
-        maxWidth: '1100px', margin: '0 auto', padding: '60px 40px',
+        maxWidth: '1100px', margin: '0 auto', padding: '80px 40px',
+        position: 'relative',
       }}>
         <h2 style={{
-          fontFamily: "'Cinzel', serif", fontSize: 'clamp(22px, 4vw, 36px)', textAlign: 'center',
+          fontFamily: "'Cinzel', serif", fontSize: 'clamp(24px, 4vw, 38px)', textAlign: 'center',
           marginBottom: '12px', color: '#e2e8f0',
         }}>What You Get</h2>
-        <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '40px', fontSize: '15px' }}>
+        <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '48px', fontSize: '15px' }}>
           Every system is modular, data-driven, and AI-ready
         </p>
 
@@ -166,11 +251,22 @@ export default function LandingPage() {
         }}>
           {features.map((f, i) => (
             <div key={i} style={{
-              background: 'rgba(15, 23, 42, 0.6)', border: '1px solid #1e293b',
+              background: 'rgba(15, 23, 42, 0.7)',
+              border: '1px solid rgba(30, 41, 59, 0.8)',
               borderRadius: '16px', padding: '28px',
-              backdropFilter: 'blur(8px)',
+              backdropFilter: 'blur(12px)',
               animation: `slideUp 0.5s ease ${i * 0.1}s both`,
-            }}>
+              transition: 'border-color 0.3s ease, transform 0.3s ease',
+            }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.8)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
               <div style={{ fontSize: '32px', marginBottom: '12px' }}>{f.icon}</div>
               <h3 style={{ fontFamily: "'Cinzel', serif", fontSize: '16px', marginBottom: '8px', color: '#e2e8f0' }}>{f.title}</h3>
               <p style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.6' }}>{f.desc}</p>
@@ -180,13 +276,13 @@ export default function LandingPage() {
       </section>
 
       <section id="showcase" style={{
-        maxWidth: '1100px', margin: '0 auto', padding: '60px 40px',
+        maxWidth: '1100px', margin: '0 auto', padding: '60px 40px 80px',
       }}>
         <h2 style={{
-          fontFamily: "'Cinzel', serif", fontSize: 'clamp(22px, 4vw, 36px)', textAlign: 'center',
+          fontFamily: "'Cinzel', serif", fontSize: 'clamp(24px, 4vw, 38px)', textAlign: 'center',
           marginBottom: '12px', color: '#e2e8f0',
         }}>Built With Game Factory</h2>
-        <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '40px', fontSize: '15px' }}>
+        <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '48px', fontSize: '15px' }}>
           Our flagship title — proof the engine works
         </p>
 
@@ -195,8 +291,10 @@ export default function LandingPage() {
           onMouseEnter={() => setHovered('betta')}
           onMouseLeave={() => setHovered(null)}
           style={{
-            background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(168, 85, 247, 0.08))',
-            border: hovered === 'betta' ? '2px solid #06b6d4' : '2px solid #1e293b',
+            background: hovered === 'betta'
+              ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(168, 85, 247, 0.12))'
+              : 'linear-gradient(135deg, rgba(6, 182, 212, 0.06), rgba(168, 85, 247, 0.06))',
+            border: hovered === 'betta' ? '2px solid rgba(6, 182, 212, 0.5)' : '2px solid #1e293b',
             borderRadius: '20px', padding: '40px',
             cursor: 'pointer',
             display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', alignItems: 'center',
@@ -226,11 +324,11 @@ export default function LandingPage() {
               tactical multi-hero battles, deep lore driven by the Three Vessels of Magic, 
               and AI-powered hero dialogue. 32 unique Warlord combinations to discover.
             </p>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               {['8 Breeds', '4 Classes', 'Tactical Combat', 'AI Dialogue', 'World Map', 'Lore System'].map(tag => (
                 <span key={tag} style={{
                   padding: '4px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: '600',
-                  background: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', border: '1px solid rgba(6, 182, 212, 0.2)',
+                  background: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', border: '1px solid rgba(6, 182, 212, 0.2)',
                 }}>{tag}</span>
               ))}
             </div>
@@ -242,32 +340,39 @@ export default function LandingPage() {
       </section>
 
       <section style={{
-        maxWidth: '800px', margin: '0 auto', padding: '80px 40px', textAlign: 'center',
+        position: 'relative',
+        padding: '80px 40px',
+        textAlign: 'center',
+        background: 'linear-gradient(180deg, transparent 0%, rgba(6,182,212,0.04) 50%, transparent 100%)',
       }}>
-        <h2 style={{
-          fontFamily: "'Cinzel', serif", fontSize: 'clamp(22px, 4vw, 36px)',
-          marginBottom: '16px', color: '#e2e8f0',
-        }}>Your Turn</h2>
-        <p style={{ fontSize: '16px', color: '#94a3b8', marginBottom: '32px', lineHeight: '1.7' }}>
-          Pick a theme. The AI handles the rest. Medieval knights, space pirates, samurai cats, 
-          sci-fi tech wars — or anything you can imagine.
-        </p>
-        <button
-          onClick={() => navigate('/factory')}
-          onMouseEnter={() => setHovered('cta')}
-          onMouseLeave={() => setHovered(null)}
-          style={{
-            padding: '18px 48px', borderRadius: '14px', border: 'none',
-            background: hovered === 'cta'
-              ? 'linear-gradient(135deg, #0891b2, #7c3aed, #d97706)'
-              : 'linear-gradient(135deg, #06b6d4, #a855f7, #fbbf24)',
-            backgroundSize: '200% auto',
-            color: '#fff', fontSize: '18px', fontWeight: '700', cursor: 'pointer',
-            boxShadow: '0 4px 30px rgba(6, 182, 212, 0.3)',
-            transform: hovered === 'cta' ? 'translateY(-2px) scale(1.02)' : 'none',
-            transition: 'all 0.3s ease',
-          }}
-        >Open Game Factory</button>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <h2 style={{
+            fontFamily: "'Cinzel', serif", fontSize: 'clamp(24px, 4vw, 38px)',
+            marginBottom: '16px', color: '#e2e8f0',
+          }}>Your Turn</h2>
+          <p style={{ fontSize: '16px', color: '#94a3b8', marginBottom: '32px', lineHeight: '1.7' }}>
+            Pick a theme. The AI handles the rest. Medieval knights, space pirates, samurai cats, 
+            sci-fi tech wars — or anything you can imagine.
+          </p>
+          <button
+            onClick={() => navigate('/factory')}
+            onMouseEnter={() => setHovered('cta')}
+            onMouseLeave={() => setHovered(null)}
+            style={{
+              padding: '18px 48px', borderRadius: '14px', border: 'none',
+              background: hovered === 'cta'
+                ? 'linear-gradient(135deg, #0891b2, #7c3aed, #d97706)'
+                : 'linear-gradient(135deg, #06b6d4, #a855f7, #fbbf24)',
+              backgroundSize: '200% auto',
+              color: '#fff', fontSize: '18px', fontWeight: '700', cursor: 'pointer',
+              boxShadow: hovered === 'cta'
+                ? '0 8px 40px rgba(6, 182, 212, 0.4)'
+                : '0 4px 30px rgba(6, 182, 212, 0.2)',
+              transform: hovered === 'cta' ? 'translateY(-3px) scale(1.02)' : 'none',
+              transition: 'all 0.3s ease',
+            }}
+          >Open Game Factory</button>
+        </div>
       </section>
 
       <footer style={{
