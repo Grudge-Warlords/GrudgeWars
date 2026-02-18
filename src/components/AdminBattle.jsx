@@ -82,23 +82,29 @@ const defaultSpriteLayout = {
 };
 
 const defaultActionBar = {
-  leftPanelWidth: 140,
-  rightPanelWidth: 140,
-  playerBarWidth: 128,
+  barHeight: 26.2,
+  leftPct: 22,
+  rightPct: 22,
+  toolbarMaxWidth: 560,
+  toolbarPadH: 10,
+  toolbarPadV: 2,
+  gridCols: 8,
+  gridGap: 3,
+  playerBarWidth: 120,
   playerBarHeight: 5,
-  playerManaWidth: 62,
+  playerManaWidth: 56,
   playerManaHeight: 3,
-  playerStaminaWidth: 62,
+  playerStaminaWidth: 56,
   playerStaminaHeight: 3,
-  playerGrudgeWidth: 128,
+  playerGrudgeWidth: 120,
   playerGrudgeHeight: 3,
-  enemyBarWidth: 128,
+  enemyBarWidth: 120,
   enemyBarHeight: 5,
-  enemyManaWidth: 62,
+  enemyManaWidth: 56,
   enemyManaHeight: 3,
-  enemyStaminaWidth: 62,
+  enemyStaminaWidth: 56,
   enemyStaminaHeight: 3,
-  enemyGrudgeWidth: 128,
+  enemyGrudgeWidth: 120,
   enemyGrudgeHeight: 3,
 };
 
@@ -486,11 +492,25 @@ export default function AdminBattle() {
           {tab === 'actionbar' && (
             <>
               <div style={{ fontSize: '0.65rem', color: '#f59e0b', fontWeight: 700, marginBottom: 6 }}>ACTION BAR LAYOUT</div>
-              <div style={{ fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, marginTop: 4, marginBottom: 4 }}>PANEL WIDTHS</div>
-              <SliderRow label="Left Panel" value={actionBar.leftPanelWidth} min={80} max={250}
-                onChange={v => setActionBar(p => ({ ...p, leftPanelWidth: v }))} suffix="px" />
-              <SliderRow label="Right Panel" value={actionBar.rightPanelWidth} min={80} max={250}
-                onChange={v => setActionBar(p => ({ ...p, rightPanelWidth: v }))} suffix="px" />
+              <div style={{ fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, marginTop: 4, marginBottom: 4 }}>BAR STRUCTURE</div>
+              <SliderRow label="Bar Height" value={actionBar.barHeight} min={15} max={40} step={0.1}
+                onChange={v => setActionBar(p => ({ ...p, barHeight: v }))} suffix="%" />
+              <SliderRow label="Left Col %" value={actionBar.leftPct} min={10} max={35}
+                onChange={v => setActionBar(p => ({ ...p, leftPct: v }))} suffix="%" />
+              <SliderRow label="Right Col %" value={actionBar.rightPct} min={10} max={35}
+                onChange={v => setActionBar(p => ({ ...p, rightPct: v }))} suffix="%" />
+
+              <div style={{ fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, marginTop: 10, marginBottom: 4 }}>TOOLBAR</div>
+              <SliderRow label="Max Width" value={actionBar.toolbarMaxWidth} min={300} max={800}
+                onChange={v => setActionBar(p => ({ ...p, toolbarMaxWidth: v }))} suffix="px" />
+              <SliderRow label="Pad Horiz" value={actionBar.toolbarPadH} min={2} max={20}
+                onChange={v => setActionBar(p => ({ ...p, toolbarPadH: v }))} suffix="%" />
+              <SliderRow label="Pad Vert" value={actionBar.toolbarPadV} min={0} max={10}
+                onChange={v => setActionBar(p => ({ ...p, toolbarPadV: v }))} suffix="px" />
+              <SliderRow label="Grid Cols" value={actionBar.gridCols} min={4} max={12}
+                onChange={v => setActionBar(p => ({ ...p, gridCols: v }))} />
+              <SliderRow label="Grid Gap" value={actionBar.gridGap} min={1} max={8}
+                onChange={v => setActionBar(p => ({ ...p, gridGap: v }))} suffix="px" />
 
               <div style={{ fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, marginTop: 10, marginBottom: 4 }}>PLAYER BARS (LEFT)</div>
               <SliderRow label="HP Width" value={actionBar.playerBarWidth} min={40} max={240}
@@ -654,20 +674,22 @@ export default function AdminBattle() {
           </div>
 
           <div style={{
-            flex: '0 0 auto',
-            borderTop: '2px solid #8b7355',
-            display: 'flex', flexDirection: 'row',
-            background: 'rgba(8,12,24,0.95)',
             position: 'relative',
+            flex: '0 0 auto',
+            height: `${actionBar.barHeight}%`,
+            minHeight: 120,
+            display: 'flex',
+            alignItems: 'stretch',
+            backgroundImage: 'url(/images/ui-bottombar-bg.png)',
+            backgroundSize: '100% 100%',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
           }}>
             <div style={{
-              flex: `0 0 ${actionBar.leftPanelWidth}px`,
-              width: actionBar.leftPanelWidth,
-              padding: '6px 6px',
-              display: 'flex', flexDirection: 'column', gap: 3,
-              justifyContent: 'center',
-              borderRight: '1px solid rgba(255,255,255,0.06)',
-              overflow: 'hidden',
+              flex: `0 0 ${actionBar.leftPct}%`,
+              display: 'flex', flexDirection: 'column',
+              padding: '12px 8px 8px 24px',
+              overflow: 'hidden', justifyContent: 'center', gap: 3,
             }}>
               {playerUnits.map(unit => {
                 const hpPct = Math.round((unit.health / unit.maxHealth) * 100);
@@ -700,50 +722,96 @@ export default function AdminBattle() {
             </div>
 
             <div style={{
-              flex: 1, minWidth: 0, padding: '6px 8px',
-              display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+              flex: '1 1 0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: `${actionBar.toolbarPadV}px 4px 4px`,
+              position: 'relative',
             }}>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
-                {['Attack', 'Defend', 'Skip', 'Items', 'REVENGE'].map((label, i) => (
-                  <div key={label} style={{
-                    background: i === 4 ? 'linear-gradient(135deg, rgba(220,38,38,0.5), rgba(239,68,68,0.3))' : 'rgba(0,0,0,0.4)',
-                    border: `2px solid ${i === 0 ? '#8b4444' : i === 1 ? '#445a8b' : i === 3 ? '#4a7a5a' : i === 4 ? '#ef4444' : '#5c5c6a'}`,
-                    borderRadius: 4, padding: '4px 12px',
-                    color: i === 0 ? '#ef4444' : i === 1 ? '#60a5fa' : i === 3 ? '#86efac' : i === 4 ? '#fca5a5' : 'rgba(180,180,200,0.8)',
-                    fontSize: '0.7rem', fontWeight: 700,
-                  }}>{label}</div>
-                ))}
-              </div>
-              <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
-                {['Slash', 'Shield Bash', 'War Cry', 'Whirlwind', 'Execute'].map((label, i) => (
-                  <div key={label} style={{
-                    background: 'rgba(60,45,25,0.6)',
-                    border: '2px solid #8b7355',
-                    borderRadius: 4, padding: '5px 10px', minWidth: 80,
-                    textAlign: 'center', position: 'relative',
-                  }}>
-                    <div style={{
-                      position: 'absolute', top: -5, left: -5,
-                      background: '#d4a96a', borderRadius: '50%',
-                      width: 16, height: 16, display: 'flex', alignItems: 'center',
-                      justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700,
-                      color: '#2a1a0a',
-                    }}>{i + 1}</div>
-                    <div style={{ fontSize: '0.9rem' }}><InlineIcon name={['crossed_swords', 'shield', 'battle', 'portal', 'skull'][i]} size={14} /></div>
-                    <div style={{ fontWeight: 600, fontSize: '0.6rem', color: '#e8dcc8' }}>{label}</div>
-                  </div>
-                ))}
+              <div style={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: actionBar.toolbarMaxWidth,
+                aspectRatio: '1455 / 526',
+                backgroundImage: 'url(/images/ui-toolbar-bg.png)',
+                backgroundSize: '100% 100%',
+                backgroundRepeat: 'no-repeat',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: `2px ${actionBar.toolbarPadH}% 0`,
+              }}>
+                <div style={{
+                  textAlign: 'center', marginBottom: 2, fontSize: '0.5rem', color: '#a08b6d', lineHeight: 1.2,
+                }}>
+                  <span style={{ color: '#d4a96a', fontWeight: 700 }}>Hero 1</span>
+                  {' · '}
+                  <InlineIcon name="crossed_swords" size={8} />
+                  <span style={{ color: '#c5a059', fontWeight: 600 }}> Battle Line</span>
+                </div>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${actionBar.gridCols}, 1fr)`,
+                  gap: `${actionBar.gridGap}px`,
+                  width: '100%',
+                  alignItems: 'start',
+                }}>
+                  {[
+                    { id: 'attack', label: 'Attack', color: '#ef4444', borderColor: '#8b4444', icon: 'crossed_swords' },
+                    { id: 'defend', label: 'Defend', color: '#60a5fa', borderColor: '#445a8b', icon: 'shield' },
+                    { id: 'forward', label: 'Fwd', color: '#93c5fd', borderColor: '#3b82f6', icon: null, symbol: '\u25B2' },
+                    { id: 'back', label: 'Back', color: '#fcd34d', borderColor: '#f59e0b', icon: null, symbol: '\u25BC' },
+                    { id: 'skip', label: 'Skip', color: 'rgba(180,180,200,0.8)', borderColor: '#5c5c6a', icon: 'hourglass' },
+                    { id: 'items', label: 'Items', color: '#86efac', borderColor: '#4a7a5a', icon: 'crystal' },
+                    { id: 'grudge', label: 'GRUDGE', color: '#fca5a5', borderColor: '#ef4444', icon: 'fire' },
+                  ].map((btn) => (
+                    <div key={btn.id} style={{
+                      background: 'rgba(0,0,0,0.6)',
+                      border: `2px solid ${btn.borderColor}`,
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      gap: 0,
+                      aspectRatio: '1 / 1',
+                      width: '100%',
+                      boxShadow: 'inset 0 0 5px rgba(0,0,0,0.8)',
+                      borderRadius: '5px',
+                    }}>
+                      {btn.symbol ? (
+                        <span style={{ fontSize: '0.7rem', fontWeight: 900, color: btn.color }}>{btn.symbol}</span>
+                      ) : (
+                        <InlineIcon name={btn.icon} size={14} />
+                      )}
+                      <span style={{ fontSize: '0.35rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif", lineHeight: 1, textAlign: 'center' }}>{btn.label}</span>
+                    </div>
+                  ))}
+                  {['Slash', 'Shield Bash', 'War Cry', 'Whirlwind', 'Execute'].map((label, i) => (
+                    <div key={label} style={{
+                      background: 'rgba(0,0,0,0.6)',
+                      border: '2px solid #a0885a',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      gap: 0,
+                      aspectRatio: '1 / 1',
+                      width: '100%',
+                      boxShadow: 'inset 0 0 5px rgba(0,0,0,0.8)',
+                      borderRadius: '5px',
+                      position: 'relative',
+                    }}>
+                      <div style={{
+                        position: 'absolute', top: 1, left: 2,
+                        fontSize: '0.4rem', color: 'rgba(200,200,200,0.5)', fontWeight: 600, fontFamily: "'Cinzel', serif",
+                      }}>{i + 1}</div>
+                      <InlineIcon name={['crossed_swords', 'shield', 'battle', 'portal', 'skull'][i]} size={18} />
+                      <span style={{ fontSize: '0.35rem', color: '#e8dcc8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>{label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
             <div style={{
-              flex: `0 0 ${actionBar.rightPanelWidth}px`,
-              width: actionBar.rightPanelWidth,
-              padding: '6px 6px',
-              display: 'flex', flexDirection: 'column', gap: 3,
-              justifyContent: 'center',
-              borderLeft: '1px solid rgba(255,255,255,0.06)',
-              overflow: 'hidden',
+              flex: `0 0 ${actionBar.rightPct}%`,
+              display: 'flex', flexDirection: 'column',
+              padding: '12px 24px 8px 8px',
+              overflow: 'hidden', justifyContent: 'center', gap: 3,
             }}>
               {enemyUnits.map(unit => {
                 const hpPct = Math.round((unit.health / unit.maxHealth) * 100);
