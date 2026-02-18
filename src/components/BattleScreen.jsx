@@ -300,6 +300,69 @@ function GrowingEffectSprite({ x, y, sprite, filter: filterProp, startScale = 0.
   );
 }
 
+const EXPLOSION_TYPES = {
+  fire: { folder: 'Explosion', prefix: 'Explosion', frames: 10, size: 256 },
+  circle: { folder: 'Circle_explosion', prefix: 'Circle_explosion', frames: 10, size: 256 },
+  blue: { folder: 'Explosion_blue_circle', prefix: 'Explosion_blue_circle', frames: 10, size: 256 },
+  blueOval: { folder: 'Explosion_blue_oval', prefix: 'Explosion_blue_oval', frames: 10, size: 256 },
+  nuclear: { folder: 'Nuclear_explosion', prefix: 'Nuclear_explosion', frames: 10, size: 256 },
+  gas: { folder: 'Explosion_gas', prefix: 'Explosion_gas', frames: 10, size: 256 },
+};
+
+function getExplosionType(abilityType, isCrit, dmg) {
+  if (isCrit && dmg > 40) return 'nuclear';
+  if (isCrit) return 'fire';
+  if (abilityType === 'magical') return Math.random() > 0.5 ? 'blue' : 'blueOval';
+  if (dmg > 30) return 'circle';
+  return Math.random() > 0.5 ? 'fire' : 'gas';
+}
+
+function ExplosionEffect({ x, y, type = 'fire', scale = 1.0, filter: filterProp }) {
+  const [frame, setFrame] = React.useState(0);
+  const config = EXPLOSION_TYPES[type] || EXPLOSION_TYPES.fire;
+  const displaySize = Math.round(180 * scale);
+
+  React.useEffect(() => {
+    let f = 0;
+    const interval = setInterval(() => {
+      f++;
+      if (f >= config.frames) {
+        clearInterval(interval);
+        return;
+      }
+      setFrame(f);
+    }, 60);
+    return () => clearInterval(interval);
+  }, [config.frames]);
+
+  const progress = config.frames > 1 ? frame / (config.frames - 1) : 1;
+
+  return (
+    <div style={{
+      position: 'absolute',
+      left: `${x}%`, top: `calc(${y}% - 30px)`,
+      transform: 'translate(-50%, -50%)',
+      width: displaySize, height: displaySize,
+      zIndex: 265,
+      pointerEvents: 'none',
+      opacity: progress > 0.8 ? Math.max(0, 1 - (progress - 0.8) / 0.2) : 1,
+      mixBlendMode: 'screen',
+    }}>
+      <img
+        src={`/images/effects/explosions/${config.folder}/${config.prefix}${frame + 1}.png`}
+        alt=""
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          imageRendering: 'pixelated',
+          filter: filterProp || 'none',
+        }}
+      />
+    </div>
+  );
+}
+
 function ThunderProjectileSprite() {
   const [frame, setFrame] = React.useState(0);
   const sprite = effectSprites.thunderProjectile2;
@@ -1314,6 +1377,7 @@ export default function BattleScreen() {
   const [poisonGustFx, setPoisonGustFx] = useState([]);
   const [resurrectFx, setResurrectFx] = useState([]);
   const [bigImpactFx, setBigImpactFx] = useState([]);
+  const [explosionFx, setExplosionFx] = useState([]);
   const [screenShake, setScreenShake] = useState(null);
   const [buffScreenFx, setBuffScreenFx] = useState(null);
   const [showItemsPanel, setShowItemsPanel] = useState(false);
@@ -1563,6 +1627,15 @@ export default function BattleScreen() {
     setTimeout(() => setBigImpactFx(prev => prev.filter(s => s.id !== id)), 1200);
   }, []);
 
+  const spawnExplosion = useCallback((x, y, abilityType, isCrit, dmg) => {
+    if (x == null || y == null || !dmg) return;
+    const id = Date.now() + Math.random();
+    const expType = getExplosionType(abilityType, isCrit, dmg);
+    const scale = isCrit ? (dmg > 40 ? 1.5 : 1.2) : (dmg > 30 ? 1.1 : 0.9);
+    setExplosionFx(prev => [...prev, { id, x, y, type: expType, scale }]);
+    setTimeout(() => setExplosionFx(prev => prev.filter(s => s.id !== id)), 700);
+  }, []);
+
   const triggerScreenShake = useCallback((type = 'normal') => {
     const id = Date.now();
     setScreenShake({ id, type });
@@ -1686,7 +1759,7 @@ export default function BattleScreen() {
               setTimeout(() => setHitEffects(prev => prev.filter(e => e.id !== hid)), 800);
               if (hfxR.followUp) spawnFollowUpEffects(hfxR.followUp, target.position.x, bodyY(target), hfxR.filter);
             }
-            if (isCrit) { playCrit(); triggerScreenShake('big'); spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId)); setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); } else { playHurt(); spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId)); if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); } }
+            if (isCrit) { playCrit(); triggerScreenShake('big'); spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId)); setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); spawnExplosion(target?.position?.x, bodyY(target), abilityType, true, totalDmg); } else { playHurt(); spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId)); if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); spawnExplosion(target?.position?.x, bodyY(target), abilityType, false, totalDmg); } }
             spawnWeaponContact(target.position.x, bodyY(target), 1);
           } else {
             playDodge();
@@ -1765,7 +1838,7 @@ export default function BattleScreen() {
               playCrit();
               triggerScreenShake('big');
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
-              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
+              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); spawnExplosion(target?.position?.x, bodyY(target), abilityType, true, totalDmg);
               if (target.position) {
                 const critId = Date.now() + Math.random();
                 setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('spell') }]);
@@ -1774,7 +1847,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
+              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); spawnExplosion(target?.position?.x, bodyY(target), abilityType, false, totalDmg); }
             }
           } else {
             playDodge();
@@ -1816,7 +1889,7 @@ export default function BattleScreen() {
               playCrit();
               triggerScreenShake('big');
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
-              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
+              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); spawnExplosion(target?.position?.x, bodyY(target), abilityType, true, totalDmg);
               if (target.position) {
                 const critId = Date.now() + Math.random();
                 setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('spell') }]);
@@ -1825,7 +1898,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
+              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); spawnExplosion(target?.position?.x, bodyY(target), abilityType, false, totalDmg); }
             }
           } else {
             playDodge();
@@ -1870,7 +1943,7 @@ export default function BattleScreen() {
               playCrit();
               triggerScreenShake('big');
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
-              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
+              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); spawnExplosion(target?.position?.x, bodyY(target), abilityType, true, totalDmg);
               if (target.position) {
                 const critId = Date.now() + Math.random();
                 setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('spell') }]);
@@ -1879,7 +1952,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
+              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); spawnExplosion(target?.position?.x, bodyY(target), abilityType, false, totalDmg); }
             }
           } else {
             playDodge();
@@ -1921,7 +1994,7 @@ export default function BattleScreen() {
               playCrit();
               triggerScreenShake('big');
               spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
-              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
+              setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); spawnExplosion(target?.position?.x, bodyY(target), abilityType, true, totalDmg);
               if (target.position) {
                 const critId = Date.now() + Math.random();
                 setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('spell') }]);
@@ -1930,7 +2003,7 @@ export default function BattleScreen() {
             } else {
               playHurt();
               spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
+              if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); spawnExplosion(target?.position?.x, bodyY(target), abilityType, false, totalDmg); }
             }
           } else {
             playDodge();
@@ -1985,7 +2058,7 @@ export default function BattleScreen() {
                   playCrit();
                   triggerScreenShake('big');
                   spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
-                  setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
+                  setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); spawnExplosion(target?.position?.x, bodyY(target), abilityType, true, totalDmg);
                   if (target.position) {
                     const critType = abilityType === 'magical' ? 'spell' : 'melee';
                     const critId = Date.now() + Math.random();
@@ -1995,7 +2068,7 @@ export default function BattleScreen() {
                 } else {
                   playHurt();
                   spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-                  if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
+                  if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); spawnExplosion(target?.position?.x, bodyY(target), abilityType, false, totalDmg); }
                 }
               } else {
                 playDodge();
@@ -2050,7 +2123,7 @@ export default function BattleScreen() {
                 playCrit();
                 triggerScreenShake('big');
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
-                setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
+                setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); spawnExplosion(target?.position?.x, bodyY(target), abilityType, true, totalDmg);
                 if (target.position) {
                   const critId = Date.now() + Math.random();
                   setCritFx(prev => [...prev, { id: critId, x: target.position.x, y: bodyY(target), ...getRandomCritEffect('melee') }]);
@@ -2059,7 +2132,7 @@ export default function BattleScreen() {
               } else {
                 playHurt();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-                if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
+                if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); spawnExplosion(target?.position?.x, bodyY(target), abilityType, false, totalDmg); }
               }
               if (target.position) spawnWeaponContact(target.position.x, bodyY(target), 2);
             } else {
@@ -2112,7 +2185,7 @@ export default function BattleScreen() {
                 playCrit();
                 triggerScreenShake('big');
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-                setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
+                setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); spawnExplosion(target?.position?.x, bodyY(target), abilityType, true, totalDmg);
                 if (target.position) {
                   const critType = abilityType === 'magical' ? 'spell' : 'melee';
                   const critId = Date.now() + Math.random();
@@ -2122,7 +2195,7 @@ export default function BattleScreen() {
               } else {
                 playHurt();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-                if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
+                if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); spawnExplosion(target?.position?.x, bodyY(target), abilityType, false, totalDmg); }
               }
               if (target.position) spawnWeaponContact(target.position.x, bodyY(target), combo.length);
             } else {
@@ -2157,7 +2230,7 @@ export default function BattleScreen() {
                 playCrit();
                 triggerScreenShake('big');
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'large', getSlashColor(abilityType, abilityName, attacker.classId));
-                setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250);
+                setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'crit'), 250); spawnExplosion(target?.position?.x, bodyY(target), abilityType, true, totalDmg);
                 if (target.position) {
                   const critType = abilityType === 'magical' ? 'spell' : 'melee';
                   const critId = Date.now() + Math.random();
@@ -2167,7 +2240,7 @@ export default function BattleScreen() {
               } else {
                 playHurt();
                 spawnSlashImpact(target?.position?.x, bodyY(target), 'small', getSlashColor(abilityType, abilityName, attacker.classId));
-                if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); }
+                if (totalDmg > 30) { setTimeout(() => spawnBigImpact(target?.position?.x, bodyY(target), 'physical'), 200); triggerScreenShake('normal'); spawnExplosion(target?.position?.x, bodyY(target), abilityType, false, totalDmg); }
               }
               if (target.position) spawnWeaponContact(target.position.x, bodyY(target), 1);
             } else {
@@ -2524,7 +2597,7 @@ export default function BattleScreen() {
           const isBossUnit = unit.team === 'enemy' && unit.isBoss;
           const bossScaleVal = isBossUnit ? (unit.bossScale || 1.6) : 1;
           const isTransformed = isBearForm || unit.demonBlade || unit.eliteForm;
-          const transformScale = isBearForm ? 1.5 : (unit.demonBlade ? 1.4 : (unit.eliteForm ? 1.35 : 1));
+          const transformScale = isBearForm ? 3.0 : (unit.demonBlade ? 2.8 : (unit.eliteForm ? 2.7 : 1));
           const spriteScale = (targetDisplaySize / baseFrameSize) * transformScale * bossScaleVal;
 
           const spriteSize = Math.round(baseFrameSize * spriteScale);
@@ -2918,6 +2991,10 @@ export default function BattleScreen() {
 
         {bigImpactFx.map(fx => (
           <GrowingEffectSprite key={fx.id} x={fx.x} y={fx.y} sprite={fx.sprite} startScale={0.6} endScale={2.0} />
+        ))}
+
+        {explosionFx.map(fx => (
+          <ExplosionEffect key={fx.id} x={fx.x} y={fx.y} type={fx.type} scale={fx.scale} />
         ))}
 
         {dodgeFlashes.map(d => (
