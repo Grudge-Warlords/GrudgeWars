@@ -3078,16 +3078,16 @@ export default function BattleScreen() {
           const loot = r?.lootDrops || [];
           return (
           <div style={{
-            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            position: 'absolute', top: '45%', left: '50%', transform: 'translate(-50%, -50%)',
             textAlign: 'center', animation: 'slideUp 0.5s ease', zIndex: 100,
             backgroundImage: isDefeat ? 'linear-gradient(135deg, rgba(11,16,32,0.95), rgba(30,0,0,0.9))' : 'linear-gradient(135deg, rgba(6,10,24,0.95), rgba(15,25,50,0.95))',
             backgroundSize: isVictory ? '200% 100%' : 'cover', backgroundPosition: 'center',
             ...(isVictory ? { animation: 'slideUp 0.5s ease, victoryShine 3s linear infinite' } : {}),
-            padding: '20px 32px', borderRadius: 16,
+            padding: isMobile ? '14px 20px' : '20px 32px', borderRadius: 16,
             border: `2px solid ${isVictory ? 'var(--gold)' : 'var(--danger)'}`,
             backdropFilter: 'blur(12px)',
             boxShadow: `0 0 40px ${isVictory ? 'rgba(255,215,0,0.2)' : 'rgba(239,68,68,0.2)'}, 0 8px 32px rgba(0,0,0,0.6)`,
-            minWidth: 280, maxWidth: 360,
+            minWidth: 260, maxWidth: 360, maxHeight: '90%', overflowY: 'auto',
           }}>
             {r?.flawless && isVictory && (
               <div style={{
