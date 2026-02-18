@@ -367,6 +367,7 @@ const spriteSheets = {
   'demon-sword': {
     folder: 'demon-sword',
     filter: 'hue-rotate(200deg) saturate(1.3) brightness(1.05)',
+    facesLeft: true,
     frameWidth: 128,
     frameHeight: 64,
     idle: { src: '/sprites/demon-sword/idle.png', frames: 7 },

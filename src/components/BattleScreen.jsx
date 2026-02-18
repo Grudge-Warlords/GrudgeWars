@@ -2591,7 +2591,9 @@ export default function BattleScreen() {
           const isEnemyClickable = unit.team === 'enemy' && unit.alive && isPlayerTurn;
           const flipSprite = spriteData?.facesLeft ? unit.team === 'enemy' : unit.team === 'player';
           const introDelay = introComplete ? 0 : (idx * 100);
-          const baseFrameSize = spriteData?.frameWidth || spriteData?.frameHeight || 100;
+          const baseFrameW = spriteData?.frameWidth || 100;
+          const baseFrameH = spriteData?.frameHeight || baseFrameW;
+          const baseFrameSize = Math.max(baseFrameW, baseFrameH);
           const targetDisplaySize = isMobile ? 110 : 140;
           const isBearForm = unit.classId === 'worge' && unit.bearForm;
           const isBossUnit = unit.team === 'enemy' && unit.isBoss;
@@ -2601,8 +2603,8 @@ export default function BattleScreen() {
           const spriteScale = (targetDisplaySize / baseFrameSize) * transformScale * bossScaleVal;
 
           const normalScale = (targetDisplaySize / baseFrameSize) * bossScaleVal;
-          const normalSize = Math.round(baseFrameSize * normalScale);
-          const spriteSize = Math.round(baseFrameSize * spriteScale);
+          const normalSize = Math.round(baseFrameH * normalScale);
+          const spriteSize = Math.round(baseFrameH * spriteScale);
           const footCrop = 0.82;
           const visibleHeight = Math.round(spriteSize * footCrop);
           const normalVisibleHeight = Math.round(normalSize * footCrop);
@@ -2641,7 +2643,7 @@ export default function BattleScreen() {
                 animation: introComplete ? 'none' : `unitSlideIn 0.6s ease ${introDelay}ms forwards`,
                 zIndex: Math.floor(posY),
                 pointerEvents: (unit.alive && anim !== 'death') ? 'auto' : 'none',
-                width: spriteSize,
+                width: Math.round(baseFrameW * spriteScale),
                 height: footY,
                 overflow: 'visible',
                 outline: 'none',
