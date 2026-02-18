@@ -60,7 +60,7 @@ expertMode = true
 
 [deployment]
 deploymentTarget = "autoscale"
-build = ["npx", "vite", "build"]
+build = ["bash", "-c", "npx vite build"]
 run = ["node", "server.prod.js"]
 publicDir = "dist/public"
 

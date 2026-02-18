@@ -24,7 +24,7 @@ const BETA_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID || '1470521372932313283';
 const BOT_CHANNEL_ID = '1472448936735277188';
 const BOT_APP_ID = '1472444305187668009';
 const GUILD_ID = '1335136143112671296';
-const PORT = parseInt(process.env.PORT || '3001', 10);
+const PORT = parseInt(process.env.PORT || '5000', 10);
 
 const pendingStates = new Map();
 
