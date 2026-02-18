@@ -66,7 +66,7 @@ export default function LandingPage() {
       desc: 'The full GRUDGE Warlords platform experience. Arena PvP with 3v3 tactical battles, ELO rating, AI agent teams, crafting system with 5 professions, island territories, and cNFT character minting on Solana.',
       tags: ['Arena PvP', 'AI Agents', 'Crafting', 'cNFTs', 'ELO Rating', 'Territories'],
       tagColor: '#fbbf24',
-      logo: '/images/grudge_logo.png',
+      logo: '/images/gruda_logo.png',
       action: () => openExternal('https://grudgestudio.com'),
       actionLabel: 'Visit Platform',
       liveUrl: 'https://grudgestudio.com',
@@ -183,7 +183,7 @@ export default function LandingPage() {
             style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
             onClick={() => openExternal('https://grudgestudio.com')}
           >
-            <img src="/images/grudge_logo.png" alt="Grudge Studios" style={{ height: '44px', animation: 'glow 3s ease-in-out infinite' }} />
+            <img src="/images/gruda_logo.png" alt="Grudge Studio" style={{ height: '44px', animation: 'glow 3s ease-in-out infinite' }} />
             <span style={{ fontFamily: "'Cinzel', serif", fontSize: '18px', fontWeight: '700', color: '#fbbf24' }}>Grudge Studio</span>
           </div>
           <nav style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
@@ -469,7 +469,7 @@ export default function LandingPage() {
         maxWidth: '1200px', margin: '0 auto',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '8px' }}>
-          <img src="/images/grudge_logo.png" alt="" style={{ height: '28px', opacity: 0.7 }} />
+          <img src="/images/gruda_logo.png" alt="" style={{ height: '28px', opacity: 0.7 }} />
           <span style={{ fontFamily: "'Cinzel', serif", fontSize: '14px', color: '#fbbf2488' }}>Grudge Studio</span>
         </div>
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', marginBottom: '12px' }}>
