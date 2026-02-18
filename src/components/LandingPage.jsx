@@ -5,20 +5,16 @@ export default function LandingPage() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const root = document.getElementById('root');
-    html.style.overflow = 'auto';
-    html.style.height = 'auto';
-    body.style.overflow = 'auto';
-    body.style.height = 'auto';
-    if (root) { root.style.overflow = 'auto'; root.style.height = 'auto'; root.style.display = 'block'; }
+    const style = document.createElement('style');
+    style.id = 'landing-scroll-fix';
+    style.textContent = `
+      html, body, #root { overflow: auto !important; height: auto !important; overscroll-behavior: auto !important; position: static !important; }
+      body { touch-action: auto !important; }
+      #root { display: block !important; }
+    `;
+    document.head.appendChild(style);
     setLoaded(true);
-    return () => {
-      html.style.overflow = ''; html.style.height = '';
-      body.style.overflow = ''; body.style.height = '';
-      if (root) { root.style.overflow = ''; root.style.height = ''; root.style.display = ''; }
-    };
+    return () => { const el = document.getElementById('landing-scroll-fix'); if (el) el.remove(); };
   }, []);
 
   const navigate = (path) => {

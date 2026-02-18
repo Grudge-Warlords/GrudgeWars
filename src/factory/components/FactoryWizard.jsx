@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { generateGameSpec } from '../generators/specGenerator.js';
+import { generateGameImages } from '../generators/imageGenerator.js';
 import { GamePreview } from './GamePreview.jsx';
 import { AIEditor } from './AIEditor.jsx';
 import { deployToPuter } from '../utils/puterDeploy.js';
@@ -65,30 +66,29 @@ export function FactoryWizard() {
   const [gameSpec, setGameSpec] = useState(null);
   const [showEditor, setShowEditor] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [generatedImages, setGeneratedImages] = useState({});
 
   useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const root = document.getElementById('root');
-    html.style.overflow = 'auto';
-    html.style.height = 'auto';
-    body.style.overflow = 'auto';
-    body.style.height = 'auto';
-    if (root) {
-      root.style.overflow = 'auto';
-      root.style.height = 'auto';
-      root.style.display = 'block';
-    }
-    return () => {
-      html.style.overflow = '';
-      html.style.height = '';
-      body.style.overflow = '';
-      body.style.height = '';
-      if (root) {
-        root.style.overflow = '';
-        root.style.height = '';
-        root.style.display = '';
+    const style = document.createElement('style');
+    style.id = 'factory-scroll-fix';
+    style.textContent = `
+      html, body, #root {
+        overflow: auto !important;
+        height: auto !important;
+        overscroll-behavior: auto !important;
+        position: static !important;
       }
+      body {
+        touch-action: auto !important;
+      }
+      #root {
+        display: block !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      const el = document.getElementById('factory-scroll-fix');
+      if (el) el.remove();
     };
   }, []);
 
@@ -111,7 +111,27 @@ export function FactoryWizard() {
     try {
       const spec = await generateGameSpec(form, (msg) => setProgress(msg));
       setGameSpec(spec);
-      setProgress('Game generated successfully!');
+
+      if (window.puter) {
+        setProgress('Generating AI artwork for your game...');
+        try {
+          const images = await generateGameImages(form, spec, (msg) => setProgress(msg));
+          setGeneratedImages(images);
+          if (Object.keys(images).length > 0) {
+            const updatedSpec = {
+              ...spec,
+              assets: { ...(spec.assets || {}), generatedImages: images },
+            };
+            setGameSpec(updatedSpec);
+          }
+          setProgress('Game and artwork generated successfully!');
+        } catch (imgErr) {
+          console.warn('Image generation failed:', imgErr);
+          setProgress('Game generated! (Image generation unavailable)');
+        }
+      } else {
+        setProgress('Game generated! Open on Puter.com for AI artwork.');
+      }
     } catch (err) {
       setProgress('Error: ' + err.message);
     }
@@ -544,6 +564,45 @@ export function FactoryWizard() {
                 }}>Save to Cloud</button>
               </div>
             )}
+
+            {Object.keys(generatedImages).length > 0 && (
+              <div style={{ marginTop: '30px' }}>
+                <h4 style={{
+                  fontFamily: `'${form.headingFont}', serif`, fontSize: '18px',
+                  color: form.primaryColor, marginBottom: '16px', textAlign: 'center',
+                }}>Generated Artwork</h4>
+                <div style={{
+                  display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: '16px',
+                }}>
+                  {Object.entries(generatedImages).map(([key, src]) => {
+                    const labels = {
+                      background: 'World Background',
+                      battleBg: 'Battle Arena',
+                      cardBg: 'Card Design',
+                      titleBg: 'Title Screen',
+                      mapBg: 'World Map',
+                      bossPortrait: 'Boss Portrait',
+                      characterPortrait: 'Character Portrait',
+                    };
+                    return (
+                      <div key={key} style={{
+                        background: '#0f172a', borderRadius: '12px', overflow: 'hidden',
+                        border: '1px solid #334155',
+                      }}>
+                        <img src={src} alt={labels[key] || key} style={{
+                          width: '100%', height: '200px', objectFit: 'cover', display: 'block',
+                        }} />
+                        <div style={{
+                          padding: '10px 14px', fontSize: '12px', fontWeight: '600',
+                          color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px',
+                        }}>{labels[key] || key}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         );
       default:
@@ -552,7 +611,7 @@ export function FactoryWizard() {
   };
 
   if (showPreview && gameSpec) {
-    return <GamePreview spec={gameSpec} onBack={() => setShowPreview(false)} />;
+    return <GamePreview spec={gameSpec} generatedImages={generatedImages} onBack={() => setShowPreview(false)} />;
   }
 
   if (showEditor && gameSpec) {

@@ -1,24 +1,21 @@
 import React, { useState, useEffect } from 'react';
 
-export function GamePreview({ spec, onBack }) {
+export function GamePreview({ spec, generatedImages = {}, onBack }) {
   const [activeTab, setActiveTab] = useState('overview');
   const palette = spec.meta?.colorPalette || {};
   const fonts = spec.meta?.fonts || {};
+  const images = { ...generatedImages, ...(spec.assets?.generatedImages || {}) };
 
   useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const root = document.getElementById('root');
-    html.style.overflow = 'auto';
-    html.style.height = 'auto';
-    body.style.overflow = 'auto';
-    body.style.height = 'auto';
-    if (root) { root.style.overflow = 'auto'; root.style.height = 'auto'; root.style.display = 'block'; }
-    return () => {
-      html.style.overflow = ''; html.style.height = '';
-      body.style.overflow = ''; body.style.height = '';
-      if (root) { root.style.overflow = ''; root.style.height = ''; root.style.display = ''; }
-    };
+    const style = document.createElement('style');
+    style.id = 'preview-scroll-fix';
+    style.textContent = `
+      html, body, #root { overflow: auto !important; height: auto !important; overscroll-behavior: auto !important; position: static !important; }
+      body { touch-action: auto !important; }
+      #root { display: block !important; }
+    `;
+    document.head.appendChild(style);
+    return () => { const el = document.getElementById('preview-scroll-fix'); if (el) el.remove(); };
   }, []);
 
   const styles = {
@@ -232,6 +229,28 @@ export function GamePreview({ spec, onBack }) {
                 ))}
               </div>
             </div>
+            {Object.keys(images).length > 0 && (
+              <div style={styles.card}>
+                <h3 style={styles.sectionTitle}>AI-Generated Artwork</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
+                  {Object.entries(images).map(([key, src]) => {
+                    const labels = {
+                      background: 'World Background', battleBg: 'Battle Arena', cardBg: 'Card Design',
+                      titleBg: 'Title Screen', mapBg: 'World Map', bossPortrait: 'Boss Portrait',
+                      characterPortrait: 'Character Portrait',
+                    };
+                    return (
+                      <div key={key} style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #334155' }}>
+                        <img src={src} alt={labels[key] || key} style={{ width: '100%', height: '180px', objectFit: 'cover', display: 'block' }} />
+                        <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', background: '#0f172a' }}>
+                          {labels[key] || key}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         );
 
