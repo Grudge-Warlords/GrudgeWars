@@ -2600,10 +2600,14 @@ export default function BattleScreen() {
           const transformScale = isBearForm ? 3.0 : (unit.demonBlade ? 2.8 : (unit.eliteForm ? 2.7 : 1));
           const spriteScale = (targetDisplaySize / baseFrameSize) * transformScale * bossScaleVal;
 
+          const normalScale = (targetDisplaySize / baseFrameSize) * bossScaleVal;
+          const normalSize = Math.round(baseFrameSize * normalScale);
           const spriteSize = Math.round(baseFrameSize * spriteScale);
           const footCrop = 0.82;
           const visibleHeight = Math.round(spriteSize * footCrop);
+          const normalVisibleHeight = Math.round(normalSize * footCrop);
           const footY = visibleHeight;
+          const transformYOffset = isTransformed ? (visibleHeight - normalVisibleHeight) : 0;
 
           const swimDelay = (idx * 0.7 + (unit.position?.column || 0) * 0.4).toFixed(2);
           const swimDuration = (2.5 + (idx % 3) * 0.5).toFixed(2);
@@ -2629,7 +2633,7 @@ export default function BattleScreen() {
               style={{
                 position: 'absolute',
                 left: `${posX}%`,
-                top: `${posY}%`,
+                top: `calc(${posY}% + ${transformYOffset}px)`,
                 transform: 'translate(-50%, -100%)',
                 transition: dash ? 'left 0.3s ease-out, top 0.3s ease-out' : 'left 0.5s ease, top 0.5s ease',
                 cursor: isEnemyClickable ? 'pointer' : 'default',
