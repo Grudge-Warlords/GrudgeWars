@@ -752,55 +752,58 @@ export default function AdminBattle() {
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: `repeat(${actionBar.gridCols}, 1fr)`,
-                  gap: `${actionBar.gridGap}px`,
+                  gap: '2.2%',
                   width: '100%',
-                  alignItems: 'start',
+                  alignItems: 'center',
+                  paddingTop: '3%',
                 }}>
                   {[
-                    { id: 'attack', label: 'Attack', color: '#ef4444', borderColor: '#8b4444', icon: 'crossed_swords' },
-                    { id: 'defend', label: 'Defend', color: '#60a5fa', borderColor: '#445a8b', icon: 'shield' },
-                    { id: 'forward', label: 'Fwd', color: '#93c5fd', borderColor: '#3b82f6', icon: null, symbol: '\u25B2' },
-                    { id: 'back', label: 'Back', color: '#fcd34d', borderColor: '#f59e0b', icon: null, symbol: '\u25BC' },
-                    { id: 'skip', label: 'Skip', color: 'rgba(180,180,200,0.8)', borderColor: '#5c5c6a', icon: 'hourglass' },
-                    { id: 'items', label: 'Items', color: '#86efac', borderColor: '#4a7a5a', icon: 'crystal' },
-                    { id: 'grudge', label: 'GRUDGE', color: '#fca5a5', borderColor: '#ef4444', icon: 'fire' },
+                    { id: 'attack', label: 'Attack', color: '#ef4444', icon: 'crossed_swords' },
+                    { id: 'defend', label: 'Defend', color: '#60a5fa', icon: 'shield' },
+                    { id: 'forward', label: 'Fwd', color: '#93c5fd', icon: null, symbol: '\u25B2' },
+                    { id: 'back', label: 'Back', color: '#fcd34d', icon: null, symbol: '\u25BC' },
+                    { id: 'skip', label: 'Skip', color: 'rgba(180,180,200,0.8)', icon: 'hourglass' },
+                    { id: 'items', label: 'Items', color: '#86efac', icon: 'crystal' },
+                    { id: 'grudge', label: 'GRUDGE', color: '#fca5a5', icon: 'fire' },
                   ].map((btn) => (
-                    <div key={btn.id} style={{
-                      background: 'rgba(0,0,0,0.6)',
-                      border: `2px solid ${btn.borderColor}`,
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                      gap: 0,
-                      aspectRatio: '1 / 1',
-                      width: '100%',
-                      boxShadow: 'inset 0 0 5px rgba(0,0,0,0.8)',
-                      borderRadius: '5px',
-                    }}>
-                      {btn.symbol ? (
-                        <span style={{ fontSize: '0.7rem', fontWeight: 900, color: btn.color }}>{btn.symbol}</span>
-                      ) : (
-                        <InlineIcon name={btn.icon} size={14} />
-                      )}
-                      <span style={{ fontSize: '0.35rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif", lineHeight: 1, textAlign: 'center' }}>{btn.label}</span>
+                    <div key={btn.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                      <div style={{
+                        background: 'rgba(0,0,0,0.6)',
+                        border: '2px solid rgba(197,160,89,0.4)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        aspectRatio: '1 / 1',
+                        width: '100%',
+                        boxShadow: 'inset 0 0 5px rgba(0,0,0,0.8)',
+                        borderRadius: '5px',
+                      }}>
+                        {btn.symbol ? (
+                          <span style={{ fontSize: '0.7rem', fontWeight: 900, color: btn.color }}>{btn.symbol}</span>
+                        ) : (
+                          <InlineIcon name={btn.icon} size={14} />
+                        )}
+                      </div>
+                      <span style={{ fontSize: '0.4rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif", lineHeight: 1, textAlign: 'center' }}>{btn.label}</span>
                     </div>
                   ))}
                   {['Slash', 'Shield Bash', 'War Cry', 'Whirlwind', 'Execute'].map((label, i) => (
-                    <div key={label} style={{
-                      background: 'rgba(0,0,0,0.6)',
-                      border: '2px solid #a0885a',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                      gap: 0,
-                      aspectRatio: '1 / 1',
-                      width: '100%',
-                      boxShadow: 'inset 0 0 5px rgba(0,0,0,0.8)',
-                      borderRadius: '5px',
-                      position: 'relative',
-                    }}>
+                    <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                       <div style={{
-                        position: 'absolute', top: 1, left: 2,
-                        fontSize: '0.4rem', color: 'rgba(200,200,200,0.5)', fontWeight: 600, fontFamily: "'Cinzel', serif",
-                      }}>{i + 1}</div>
-                      <InlineIcon name={['crossed_swords', 'shield', 'battle', 'portal', 'skull'][i]} size={18} />
-                      <span style={{ fontSize: '0.35rem', color: '#e8dcc8', fontWeight: 600, lineHeight: 1, textAlign: 'center' }}>{label}</span>
+                        background: 'rgba(0,0,0,0.6)',
+                        border: '2px solid rgba(197,160,89,0.4)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        aspectRatio: '1 / 1',
+                        width: '100%',
+                        boxShadow: 'inset 0 0 5px rgba(0,0,0,0.8)',
+                        borderRadius: '5px',
+                        position: 'relative',
+                      }}>
+                        <span style={{
+                          position: 'absolute', top: 1, left: 3,
+                          fontSize: '0.4rem', color: 'rgba(200,200,200,0.5)', fontWeight: 600, fontFamily: "'Cinzel', serif",
+                        }}>{i + 1}</span>
+                        <InlineIcon name={['crossed_swords', 'shield', 'battle', 'portal', 'skull'][i]} size={18} />
+                      </div>
+                      <span style={{ fontSize: '0.4rem', color: '#e8dcc8', fontWeight: 600, lineHeight: 1, textAlign: 'center', fontFamily: "'Cinzel', serif", letterSpacing: '0.02em' }}>{label}</span>
                     </div>
                   ))}
                 </div>

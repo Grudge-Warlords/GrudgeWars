@@ -3588,85 +3588,92 @@ export default function BattleScreen() {
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
-                        gap: isMobile ? '2px' : '3px',
+                        gap: isMobile ? '1.5%' : '2.2%',
                         width: '100%',
-                        alignItems: 'start',
+                        alignItems: 'center',
+                        paddingTop: '3%',
                       }}>
                         {actionSlots.map((btn, i) => (
-                          <button key={btn.id} onClick={btn.action}
-                            disabled={btn.disabled}
-                            style={{
-                              background: btn.active ? `rgba(74,222,128,0.3)` : btn.disabled ? 'rgba(30,30,40,0.4)' : 'rgba(0,0,0,0.6)',
-                              border: `2px solid ${btn.active ? '#4ade80' : btn.disabled ? '#333' : `${btn.borderColor}`}`,
-                              padding: 0,
-                              cursor: btn.disabled ? 'not-allowed' : 'pointer',
-                              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                              gap: 0,
-                              transition: 'all 0.15s',
-                              position: 'relative',
-                              animation: btn.pulse ? 'glow 2s infinite' : 'none',
-                              aspectRatio: '1 / 1',
-                              width: '100%',
-                              minWidth: isMobile ? 32 : undefined,
-                              boxShadow: 'inset 0 0 5px rgba(0,0,0,0.8)',
-                              borderRadius: '5px',
-                              opacity: btn.disabled ? 0.4 : 1,
-                            }}
-                            onMouseEnter={e => { showTooltip(btn.label, e); if (!btn.disabled) { e.currentTarget.style.borderColor = '#c5a059'; e.currentTarget.style.transform = 'scale(1.08)'; }}}
-                            onMouseMove={e => updateTooltipPosition(e)}
-                            onMouseLeave={e => { hideTooltip(); if (!btn.disabled) { e.currentTarget.style.borderColor = btn.borderColor; e.currentTarget.style.transform = 'scale(1)'; }}}
-                          >
-                            {btn.iconComp}
-                            {btn.badge && (
-                              <span style={{
-                                position: 'absolute', top: -2, right: -2,
-                                background: '#4ade80', color: '#000', fontSize: '0.4rem',
-                                fontWeight: 800, borderRadius: '50%', width: 12, height: 12,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              }}>{btn.badge}</span>
-                            )}
-                            <span style={{ fontSize: isMobile ? '0.4rem' : '0.35rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif", lineHeight: 1, textAlign: 'center' }}>{btn.label}</span>
-                          </button>
+                          <div key={btn.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                            <button onClick={btn.action}
+                              disabled={btn.disabled}
+                              style={{
+                                background: btn.active ? 'rgba(74,222,128,0.3)' : btn.disabled ? 'rgba(30,30,40,0.4)' : 'rgba(0,0,0,0.6)',
+                                border: `2px solid ${btn.active ? '#4ade80' : btn.disabled ? '#333' : 'rgba(197,160,89,0.4)'}`,
+                                padding: 0,
+                                cursor: btn.disabled ? 'not-allowed' : 'pointer',
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                                gap: 0,
+                                transition: 'all 0.15s',
+                                position: 'relative',
+                                animation: btn.pulse ? 'glow 2s infinite' : 'none',
+                                aspectRatio: '1 / 1',
+                                width: '100%',
+                                minWidth: isMobile ? 36 : undefined,
+                                minHeight: isMobile ? 36 : undefined,
+                                boxShadow: 'inset 0 0 5px rgba(0,0,0,0.8)',
+                                borderRadius: '5px',
+                                opacity: btn.disabled ? 0.4 : 1,
+                              }}
+                              onMouseEnter={e => { showTooltip(btn.label, e); if (!btn.disabled) { e.currentTarget.style.borderColor = '#c5a059'; e.currentTarget.style.transform = 'scale(1.08)'; }}}
+                              onMouseMove={e => updateTooltipPosition(e)}
+                              onMouseLeave={e => { hideTooltip(); if (!btn.disabled) { e.currentTarget.style.borderColor = btn.active ? '#4ade80' : btn.disabled ? '#333' : 'rgba(197,160,89,0.4)'; e.currentTarget.style.transform = 'scale(1)'; }}}
+                            >
+                              {btn.iconComp}
+                              {btn.badge && (
+                                <span style={{
+                                  position: 'absolute', top: -2, right: -2,
+                                  background: '#4ade80', color: '#000', fontSize: '0.4rem',
+                                  fontWeight: 800, borderRadius: '50%', width: 14, height: 14,
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>{btn.badge}</span>
+                              )}
+                            </button>
+                            <span style={{ fontSize: isMobile ? '0.55rem' : '0.4rem', color: btn.color, fontWeight: 600, letterSpacing: '0.02em', fontFamily: "'Cinzel', serif", lineHeight: 1, textAlign: 'center' }}>{btn.label}</span>
+                          </div>
                         ))}
                         {abilitySlots.map(({ ability, idx, onCd, disabled }) => (
-                          <button key={ability.id} onClick={() => !disabled && handleAbility(ability.id)}
-                            style={{
-                              background: disabled ? 'rgba(30,30,40,0.5)' : 'rgba(0,0,0,0.6)',
-                              border: `2px solid ${disabled ? '#3a3a4a' : '#a0885a'}`,
-                              padding: 0,
-                              cursor: disabled ? 'not-allowed' : 'pointer',
-                              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                              gap: 0,
-                              transition: 'all 0.15s',
-                              position: 'relative',
-                              aspectRatio: '1 / 1',
-                              width: '100%',
-                              minWidth: isMobile ? 32 : undefined,
-                              boxShadow: disabled ? 'none' : 'inset 0 0 5px rgba(0,0,0,0.8)',
-                              borderRadius: '5px',
-                              opacity: disabled ? 0.5 : 1,
-                              ...(disabled ? {} : { animation: 'abilityButtonGlow 3s ease-in-out infinite' }),
-                            }}
-                            onMouseEnter={e => { showTooltip(`${ability.name}\n${ability.description}${ability.manaCost ? `\nMP: ${ability.manaCost}` : ''}${ability.staminaCost ? `\nSP: ${ability.staminaCost}` : ''}${ability.manaGain ? `\n+${ability.manaGain} MP` : ''}${ability.staminaGain ? `\n+${ability.staminaGain} SP` : ''}${onCd ? `\nCD: ${currentUnit.cooldowns[ability.id]}` : ''}`, e); if (!disabled) { e.currentTarget.style.borderColor = '#d4a96a'; e.currentTarget.style.transform = 'scale(1.08)'; }}}
-                            onMouseMove={e => updateTooltipPosition(e)}
-                            onMouseLeave={e => { hideTooltip(); if (!disabled) { e.currentTarget.style.borderColor = '#a0885a'; e.currentTarget.style.transform = 'scale(1)'; }}}
-                          >
-                            <div style={{
-                              position: 'absolute', top: 1, left: 2,
-                              fontSize: '0.4rem', color: disabled ? '#555' : 'rgba(200,200,200,0.5)', fontWeight: 600, fontFamily: "'Cinzel', serif",
-                            }}>{idx + 1}</div>
-                            <div style={{ filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.6))' }}><AbilityIcon ability={ability} size={isMobile ? 18 : 22} /></div>
-                            <span style={{ fontSize: isMobile ? '0.38rem' : '0.35rem', color: disabled ? '#555' : '#e8dcc8', fontWeight: 600, lineHeight: 1, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '0 1px' }}>{ability.name}</span>
-                            {ability.manaCost > 0 && <span style={{ fontSize: '0.3rem', color: '#6b9bd2' }}>{ability.manaCost}MP</span>}
-                            {onCd && (
-                              <div style={{
-                                position: 'absolute', top: 1, right: 1,
-                                background: '#8b3030', borderRadius: '50%', border: '1px solid #4a1515',
-                                width: 12, height: 12, display: 'flex', alignItems: 'center',
-                                justifyContent: 'center', fontSize: '0.45rem', fontWeight: 700, color: '#e8c8c8'
-                              }}>{currentUnit.cooldowns[ability.id]}</div>
-                            )}
-                          </button>
+                          <div key={ability.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                            <button onClick={() => !disabled && handleAbility(ability.id)}
+                              style={{
+                                background: disabled ? 'rgba(30,30,40,0.5)' : 'rgba(0,0,0,0.6)',
+                                border: `2px solid ${disabled ? '#3a3a4a' : 'rgba(197,160,89,0.4)'}`,
+                                padding: 0,
+                                cursor: disabled ? 'not-allowed' : 'pointer',
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                                gap: 0,
+                                transition: 'all 0.15s',
+                                position: 'relative',
+                                aspectRatio: '1 / 1',
+                                width: '100%',
+                                minWidth: isMobile ? 36 : undefined,
+                                minHeight: isMobile ? 36 : undefined,
+                                boxShadow: disabled ? 'none' : 'inset 0 0 5px rgba(0,0,0,0.8)',
+                                borderRadius: '5px',
+                                opacity: disabled ? 0.5 : 1,
+                                ...(disabled ? {} : { animation: 'abilityButtonGlow 3s ease-in-out infinite' }),
+                              }}
+                              onMouseEnter={e => { showTooltip(`${ability.name}\n${ability.description}${ability.manaCost ? `\nMP: ${ability.manaCost}` : ''}${ability.staminaCost ? `\nSP: ${ability.staminaCost}` : ''}${ability.manaGain ? `\n+${ability.manaGain} MP` : ''}${ability.staminaGain ? `\n+${ability.staminaGain} SP` : ''}${onCd ? `\nCD: ${currentUnit.cooldowns[ability.id]}` : ''}`, e); if (!disabled) { e.currentTarget.style.borderColor = '#c5a059'; e.currentTarget.style.transform = 'scale(1.08)'; }}}
+                              onMouseMove={e => updateTooltipPosition(e)}
+                              onMouseLeave={e => { hideTooltip(); if (!disabled) { e.currentTarget.style.borderColor = 'rgba(197,160,89,0.4)'; e.currentTarget.style.transform = 'scale(1)'; }}}
+                            >
+                              <span style={{
+                                position: 'absolute', top: 1, left: 3,
+                                fontSize: '0.4rem', color: disabled ? '#555' : 'rgba(200,200,200,0.5)', fontWeight: 600, fontFamily: "'Cinzel', serif",
+                              }}>{idx + 1}</span>
+                              <div style={{ filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.6))' }}><AbilityIcon ability={ability} size={isMobile ? 18 : 22} /></div>
+                              {ability.manaCost > 0 && <span style={{ fontSize: '0.3rem', color: '#6b9bd2' }}>{ability.manaCost}MP</span>}
+                              {onCd && (
+                                <div style={{
+                                  position: 'absolute', top: -2, right: -2,
+                                  background: '#8b3030', borderRadius: '50%', border: '1px solid #4a1515',
+                                  width: 14, height: 14, display: 'flex', alignItems: 'center',
+                                  justifyContent: 'center', fontSize: '0.45rem', fontWeight: 700, color: '#e8c8c8'
+                                }}>{currentUnit.cooldowns[ability.id]}</div>
+                              )}
+                            </button>
+                            <span style={{ fontSize: isMobile ? '0.55rem' : '0.4rem', color: disabled ? '#555' : '#e8dcc8', fontWeight: 600, lineHeight: 1, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Cinzel', serif", letterSpacing: '0.02em' }}>{ability.name}</span>
+                          </div>
                         ))}
                       </div>
                     </>
