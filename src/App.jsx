@@ -29,6 +29,7 @@ import { InlineIcon } from './data/uiSprites';
 import GameTooltipRenderer from './components/GameTooltip';
 import ErrorBoundary from './components/ErrorBoundary';
 import useRouteSync from './hooks/useRouteSync';
+import { FactoryWizard } from './factory/components/FactoryWizard';
 
 function IntroVideoScreen({ onFinish }) {
   const videoRef = useRef(null);
@@ -336,6 +337,7 @@ export default function App() {
   if (path === '/arena') return <ArenaPage />;
   if (path === '/crafting') return <CraftingPage />;
   if (path === '/backgrounds') return <BackgroundsPage />;
+  if (path === '/factory') return <FactoryWizard />;
 
   return <GameApp />;
 }

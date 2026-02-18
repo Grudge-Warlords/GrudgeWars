@@ -41,6 +41,25 @@ Betta Warlords is the first and flagship title of **Grudge Studios**. The game i
 - **Promotional Website:** `public/game-index.html` — standalone landing page with PWA install, Web2/Web3 positioning, cNFT/GBuX/Grudge sections
 - **PWA:** `public/manifest.json` + `public/sw.js` for installable app experience across all platforms
 
+## Game Factory System (NEW)
+The Game Factory is an AI-powered RPG generator that lives alongside Betta Warlords at `/factory`. It abstracts the game's systems into a universal template and lets anyone generate a completely new RPG with a different theme.
+
+**Architecture:**
+- **Schema:** `src/factory/schema/gameTemplate.js` — Universal GameTemplate JSON schema defining races, classes, enemies, equipment, skills, lore, chapters, world map, assets
+- **Reference Spec:** `src/factory/schema/bettaWarlordSpec.js` — Betta Warlords mapped to the template schema as a reference implementation
+- **Form Wizard:** `src/factory/components/FactoryWizard.jsx` — 6-step wizard (Theme, Races, Classes, World/Lore, Art/Style, Generate)
+- **AI Content Generator:** `src/factory/generators/specGenerator.js` — Uses Puter.js free AI (gpt-4o-mini) to generate all game content from form inputs
+- **Game Preview:** `src/factory/components/GamePreview.jsx` — 10-tab preview of generated game data (Overview, Races, Classes, Enemies, Bosses, Lore, Chapters, World Map, Equipment, Raw JSON)
+- **AI Editor:** `src/factory/components/AIEditor.jsx` — Chat-based interface to modify generated game via natural language prompts
+- **Puter Deploy:** `src/factory/utils/puterDeploy.js` — One-click deployment of generated game to Puter.com with built-in AI editor
+
+**Features:**
+- 8 preset themes (Medieval Knights, Space Pirates, Samurai Cats, Cyberpunk, Mushroom Kingdom, Dinosaur Tribes, Pirate Seas, Steampunk)
+- AI generates: races with stat bonuses, classes with abilities, enemies with tiered difficulty, bosses with lore, world map with regions/locations, chapters with objectives, equipment system, skill trees, dialogue templates
+- Real-time color palette customization
+- Download spec as JSON, save to Puter cloud, deploy to Puter site
+- AI editor supports commands like "add a race", "make bosses harder", "change color palette"
+
 ## Agent Skills
 Comprehensive project knowledge is stored in `.agents/skills/betta-warlords-project/SKILL.md`. This covers architecture, game systems, lore, breeds, classes, Grudge Studios relationship, and all technical patterns.
 
