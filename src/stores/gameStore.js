@@ -1491,6 +1491,7 @@ const useGameStore = create(persist((set, get) => ({
     if (!attacker || !attacker.alive) return;
 
     if (attacker.stunned) {
+      attacker.stunned = false;
       const log = [...state.battleLog, `[STUN] ${attacker.name} is stunned and cannot act!`];
       set({
         battleUnits: units,
@@ -1633,8 +1634,12 @@ const useGameStore = create(persist((set, get) => ({
         const lowAlly = units.filter(u => u.team === 'player' && u.alive).sort((a, b) => (a.health / a.maxHealth) - (b.health / b.maxHealth))[0];
         if (lowAlly) healTargetId = lowAlly.id;
       }
+      if (!targetIdOverride && attacker.team === 'enemy') {
+        const lowAlly = units.filter(u => u.team === 'enemy' && u.alive).sort((a, b) => (a.health / a.maxHealth) - (b.health / b.maxHealth))[0];
+        if (lowAlly) healTargetId = lowAlly.id;
+      }
       const healTarget = units.find(u => u.id === healTargetId && u.alive) || attacker;
-      const healAmt = Math.floor(healTarget.maxHealth * ability.healPercent);
+      const healAmt = Math.floor(healTarget.maxHealth * (ability.healPercent || 0.15));
       healTarget.health = Math.min(healTarget.maxHealth, healTarget.health + healAmt);
       actionResult.targetId = healTarget.id;
       actionResult.healAmt = healAmt;
@@ -1647,7 +1652,7 @@ const useGameStore = create(persist((set, get) => ({
       }
 
     } else if (ability.type === 'heal_over_time') {
-      attacker.dots.push({ heal: true, healPercent: ability.healPercent, duration: ability.duration, source: ability.name });
+      attacker.dots.push({ heal: true, healPercent: ability.healPercent || 0.05, duration: ability.duration || 3, source: ability.name });
       actionResult.targetId = currentUnitId;
       log.push(`${attacker.name} uses ${ability.name}!`);
 
@@ -1718,6 +1723,9 @@ const useGameStore = create(persist((set, get) => ({
         if (ability.defenseBoost) {
           attacker.buffs.push({ ...ability.defenseBoost, source: ability.name });
         }
+        actionResult.targetId = currentUnitId;
+        log.push(`${attacker.name} uses ${ability.name}!`);
+      } else {
         actionResult.targetId = currentUnitId;
         log.push(`${attacker.name} uses ${ability.name}!`);
       }

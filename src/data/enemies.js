@@ -594,6 +594,89 @@ export const enemyTemplates = {
       { id: 'eruption_slam', name: 'Eruption Slam', icon: 'fire', type: 'physical', damage: 2.0, cooldown: 4, description: 'Slams the ground causing a mini-eruption', effect: { type: 'dot', damage: 0.12, duration: 2 } },
     ]
   },
+  diver_warrior: {
+    name: 'Sunken Raider', icon: 'sword', color: '#4a7c6f', portrait: '/sprites/enemies/diver_warrior/Idle.png',
+    baseHealth: 160, baseDamage: 24, baseDefense: 18, baseMana: 20,
+    xpReward: 30, goldReward: 18, speed: 11,
+    abilities: [
+      { id: 'dw_slash', name: 'Rusted Slash', icon: 'sword', type: 'physical', damage: 1.2, description: 'A corroded blade cuts through the current' },
+      { id: 'dw_charge', name: 'Dive Charge', icon: 'sword', type: 'physical', damage: 1.8, cooldown: 3, description: 'Charges forward with barnacle-crusted armor' },
+      { id: 'dw_guard', name: 'Sunken Brace', icon: 'shield', type: 'buff', damage: 0, cooldown: 4, description: 'Braces behind corroded plating', effect: { stat: 'defense', flat: 22, duration: 2 } },
+    ]
+  },
+  harpoon_diver: {
+    name: 'Harpoon Hunter', icon: 'sword', color: '#5b8a72', portrait: '/sprites/enemies/harpoon_diver/Idle.png',
+    baseHealth: 130, baseDamage: 28, baseDefense: 12, baseMana: 30,
+    xpReward: 32, goldReward: 20, speed: 13,
+    abilities: [
+      { id: 'hd_harpoon', name: 'Harpoon Thrust', icon: 'sword', type: 'physical', damage: 1.3, description: 'Thrusts a rusted harpoon with deadly precision' },
+      { id: 'hd_snipe', name: 'Deep Shot', icon: 'energy', type: 'physical', damage: 2.2, cooldown: 4, description: 'Fires a harpoon bolt from the murky depths', effect: { type: 'bleed', damage: 0.08, duration: 3 } },
+      { id: 'hd_net', name: 'Tangled Net', icon: 'nature', type: 'magical', damage: 0.6, cooldown: 5, description: 'Throws a weighted net to slow prey', effect: { type: 'stun', duration: 1 } },
+    ]
+  },
+  deep_archer: {
+    name: 'Depth Marksman', icon: 'bow', color: '#6b7f5e', portrait: '/sprites/enemies/deep_archer/Idle.png',
+    baseHealth: 110, baseDamage: 26, baseDefense: 8, baseMana: 40,
+    xpReward: 28, goldReward: 16, speed: 15,
+    abilities: [
+      { id: 'da_arrow', name: 'Brine Arrow', icon: 'bow', type: 'physical', damage: 1.1, description: 'An arrow tipped with crystallized salt' },
+      { id: 'da_volley', name: 'Depth Volley', icon: 'bow', type: 'physical', damage: 1.6, cooldown: 3, description: 'Fires a rapid volley of bone-tipped arrows' },
+      { id: 'da_poison', name: 'Toxin Shot', icon: 'nature', type: 'physical', damage: 1.0, cooldown: 4, description: 'An arrow coated in pufferfish venom', effect: { type: 'poison', damage: 0.10, duration: 3 } },
+    ]
+  },
+  merman: {
+    name: 'Merfolk Scout', icon: 'trident', color: '#2563eb', portrait: '/sprites/enemies/merman/Idle.png',
+    baseHealth: 140, baseDamage: 22, baseDefense: 14, baseMana: 60,
+    xpReward: 28, goldReward: 16, speed: 16,
+    abilities: [
+      { id: 'mr_strike', name: 'Coral Blade', icon: 'sword', type: 'physical', damage: 1.1, description: 'Strikes with a sharpened coral dagger' },
+      { id: 'mr_current', name: 'Riptide Slash', icon: 'ice', type: 'physical', damage: 1.7, cooldown: 3, description: 'Rides the current for a devastating cross-slash' },
+      { id: 'mr_heal', name: 'Tidal Mend', icon: 'heart', type: 'heal', damage: 0, cooldown: 5, description: 'Channels the healing waters to restore vitality', healPercent: 0.12 },
+    ]
+  },
+  siren: {
+    name: 'Deepwater Siren', icon: 'crystal', color: '#7c3aed', portrait: '/sprites/enemies/siren/Idle.png',
+    baseHealth: 120, baseDamage: 18, baseMagicDamage: 30, baseDefense: 10, baseMana: 120,
+    xpReward: 35, goldReward: 22, speed: 14,
+    abilities: [
+      { id: 'sr_song', name: 'Drowning Song', icon: 'crystal', type: 'magical', damage: 1.3, description: 'An enchanting melody that crushes with pressure' },
+      { id: 'sr_charm', name: 'Beguiling Call', icon: 'crystal', type: 'magical', damage: 0.8, cooldown: 4, description: 'A mesmerizing call that confuses the mind', effect: { type: 'confuse', duration: 2 } },
+      { id: 'sr_scream', name: 'Sonic Wail', icon: 'energy', type: 'magical', damage: 2.0, cooldown: 4, description: 'A piercing shriek that shatters armor and will', effect: { type: 'lower_defense', flat: 15, duration: 2 } },
+    ]
+  },
+  deep_angler: {
+    name: 'Lantern Lurker', icon: 'fire', color: '#84cc16', portrait: '/sprites/enemies/deep_angler/Idle.png',
+    baseHealth: 100, baseDamage: 20, baseDefense: 6, baseMana: 40,
+    xpReward: 20, goldReward: 12, speed: 12,
+    abilities: [
+      { id: 'ang_bite', name: 'Lantern Snap', icon: 'fire', type: 'physical', damage: 1.2, description: 'Lunges from the dark with bioluminescent jaws' },
+      { id: 'ang_lure', name: 'Hypnotic Lure', icon: 'crystal', type: 'magical', damage: 0.6, cooldown: 4, description: 'Its glowing lure dazzles and stuns prey', effect: { type: 'stun', duration: 1 } },
+      { id: 'ang_devour', name: 'Abyssal Devour', icon: 'fire', type: 'physical', damage: 2.0, cooldown: 4, description: 'Unhinges its jaw for a massive bite', drainPercent: 0.3 },
+    ]
+  },
+  sea_serpent: {
+    name: 'Lake Leviathan', icon: 'dragon', color: '#059669', portrait: '/sprites/enemies/sea_serpent/Idle.png',
+    baseHealth: 280, baseDamage: 32, baseDefense: 22, baseMana: 80,
+    xpReward: 55, goldReward: 35, speed: 12,
+    isBoss: false,
+    abilities: [
+      { id: 'ss_coil', name: 'Constricting Coil', icon: 'sword', type: 'physical', damage: 1.3, description: 'Wraps its massive body around prey' },
+      { id: 'ss_breath', name: 'Torrent Breath', icon: 'ice', type: 'magical', damage: 1.8, cooldown: 3, description: 'Exhales a pressurized blast of water' },
+      { id: 'ss_thrash', name: 'Lake Thrash', icon: 'sword', type: 'physical', damage: 2.2, cooldown: 4, description: 'Thrashes wildly sending shockwaves through the water', effect: { type: 'stun', duration: 1 } },
+      { id: 'ss_scale', name: 'Ironscale', icon: 'shield', type: 'buff', damage: 0, cooldown: 5, description: 'Hardens its ancient scales', effect: { stat: 'defense', flat: 30, duration: 3 } },
+    ]
+  },
+  merfolk_warrior: {
+    name: 'Merfolk Warden', icon: 'trident', color: '#1d4ed8', portrait: '/sprites/enemies/merfolk_warrior/Idle.png',
+    baseHealth: 200, baseDamage: 28, baseDefense: 20, baseMana: 50,
+    xpReward: 42, goldReward: 26, speed: 13,
+    abilities: [
+      { id: 'mw_trident', name: 'Trident Thrust', icon: 'sword', type: 'physical', damage: 1.2, description: 'A precise three-pronged thrust' },
+      { id: 'mw_spin', name: 'Whirlpool Strike', icon: 'sword', type: 'physical', damage: 1.8, cooldown: 3, description: 'Spins with trident creating a vortex of destruction' },
+      { id: 'mw_rally', name: 'War Tide', icon: 'sparkle', type: 'buff', damage: 0, cooldown: 5, description: 'Rallies with an ancient merfolk war cry', effect: { stat: 'damage', multiplier: 1.4, duration: 3 } },
+      { id: 'mw_javelin', name: 'Coral Javelin', icon: 'energy', type: 'physical', damage: 2.0, cooldown: 4, description: 'Hurls a coral-tipped javelin with devastating force', effect: { type: 'bleed', damage: 0.10, duration: 3 } },
+    ]
+  },
 };
 
 export const locations = [
@@ -620,7 +703,7 @@ export const locations = [
     name: 'Kelp Forest',
     description: 'Towering kelp canopies sway in the currents, casting shifting shadows where predators lie in wait. Whispers among the fronds speak of a Crown fragment hidden deep within the tangled growth.',
     levelRange: [3, 5],
-    enemies: ['wolf', 'goblin', 'skeleton', 'mushroom', 'flying_eye', 'shadow_bat', 'imp', 'jellyfish_swarm', 'crab_warrior'],
+    enemies: ['wolf', 'goblin', 'skeleton', 'mushroom', 'flying_eye', 'shadow_bat', 'imp', 'jellyfish_swarm', 'crab_warrior', 'deep_angler', 'merman'],
     bgGradient: 'linear-gradient(135deg, #042f2e 0%, #134e4a 50%, #0f766e 100%)',
     icon: 'nature',
     unlocked: true,
@@ -638,7 +721,7 @@ export const locations = [
     name: 'Anemone Garden',
     description: 'Giant anemones pulse with ancient magic, their tendrils weaving spells older than the Root Crown itself. Ink sorcerers gather here to channel the garden\'s power for dark purposes.',
     levelRange: [4, 6],
-    enemies: ['goblin', 'wolf', 'dark_mage', 'mushroom', 'flying_eye', 'imp'],
+    enemies: ['goblin', 'wolf', 'dark_mage', 'mushroom', 'flying_eye', 'imp', 'siren', 'deep_angler'],
     bgGradient: 'linear-gradient(135deg, #0e7490 0%, #06b6d4 50%, #22d3ee 100%)',
     icon: 'crystal',
     unlocked: false,
@@ -657,7 +740,7 @@ export const locations = [
     name: 'Biolume Caves',
     description: 'Twisting caverns aglow with bioluminescent life, where eerie echoes ripple through crystal-clear water. Hermit mimics disguise themselves among the glowing walls, luring the unwary deeper.',
     levelRange: [3, 5],
-    enemies: ['goblin', 'skeleton', 'flying_eye', 'shadow_bat', 'mimic'],
+    enemies: ['goblin', 'skeleton', 'flying_eye', 'shadow_bat', 'mimic', 'deep_archer', 'harpoon_diver'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #1e3a5f 50%, #164e63 100%)',
     icon: 'chaos',
     unlocked: false,
@@ -676,7 +759,7 @@ export const locations = [
     name: 'Sargasso Maze',
     description: 'A suffocating labyrinth of sargassum where the drowned drift among rotting fronds. The Abyss King\'s corruption seeps through these waters, raising barnacle warriors from their resting places.',
     levelRange: [5, 7],
-    enemies: ['skeleton', 'dark_mage', 'wolf', 'mushroom', 'flying_eye', 'shadow_bat'],
+    enemies: ['skeleton', 'dark_mage', 'wolf', 'mushroom', 'flying_eye', 'shadow_bat', 'diver_warrior', 'merman'],
     bgGradient: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #0c4a6e 100%)',
     icon: 'skull',
     unlocked: false,
@@ -695,7 +778,7 @@ export const locations = [
     name: 'Sunken Citadel',
     description: 'The drowned fortress of an ancient betta kingdom, its root spires crumbling into the abyss. Abyssal knights and shadow eels patrol these haunted halls, guarding secrets of the shattered Crown.',
     levelRange: [6, 9],
-    enemies: ['skeleton', 'dark_mage', 'skeleton_knight', 'mimic', 'crow_knight', 'dark_knight', 'shadow_warrior'],
+    enemies: ['skeleton', 'dark_mage', 'skeleton_knight', 'mimic', 'crow_knight', 'dark_knight', 'shadow_warrior', 'merfolk_warrior', 'harpoon_diver'],
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #020617 100%)',
     icon: 'skull',
     unlocked: false,
@@ -714,7 +797,7 @@ export const locations = [
     name: 'Crystal Grotto',
     description: 'Glittering caverns of living crystal hum with the resonance of the Root Crown. Stone crabs and root priestesses guard these sacred halls, carved by ancient artisans of the deep.',
     levelRange: [7, 9],
-    enemies: ['skeleton', 'goblin', 'orc', 'skeleton_knight', 'mimic', 'stone_guardian', 'water_priestess_mage'],
+    enemies: ['skeleton', 'goblin', 'orc', 'skeleton_knight', 'mimic', 'stone_guardian', 'water_priestess_mage', 'siren', 'sea_serpent'],
     bgGradient: 'linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #06b6d4 100%)',
     icon: 'crystal',
     unlocked: false,
@@ -733,7 +816,7 @@ export const locations = [
     name: 'Current Stream',
     description: 'A treacherous channel carved by relentless current forces, where powerful currents sweep the unwary into ambushes. Barracuda knights and hammerhead brutes control this vital passage between the shallows and the deep.',
     levelRange: [6, 8],
-    enemies: ['wolf', 'goblin', 'orc', 'mushroom', 'crow_knight', 'imp'],
+    enemies: ['wolf', 'goblin', 'orc', 'mushroom', 'crow_knight', 'imp', 'diver_warrior', 'deep_archer', 'merfolk_warrior'],
     bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%)',
     icon: 'nature',
     unlocked: false,

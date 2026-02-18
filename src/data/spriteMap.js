@@ -1086,6 +1086,42 @@ function craftpixSeaSprite(name, idleFrames = 4, attackFrames = 4, walkFrames = 
   };
 }
 
+const diverWarriorSprite = craftpixSeaSprite('diver_warrior', 4, 6, 6, 6);
+const harpoonDiverSprite = craftpixSeaSprite('harpoon_diver', 4, 6, 6, 6);
+const deepArcherSprite = {
+  folder: 'enemies/deep_archer', frameWidth: 48, frameHeight: 48, swimming: true,
+  idle: { src: '/sprites/enemies/deep_archer/Idle.png', frames: 4 },
+  attack1: { src: '/sprites/enemies/deep_archer/Attack.png', frames: 6 },
+  attack2: { src: '/sprites/enemies/deep_archer/Attack2.png', frames: 6 },
+  hurt: { src: '/sprites/enemies/deep_archer/Hurt.png', frames: 2 },
+  walk: { src: '/sprites/enemies/deep_archer/Walk.png', frames: 6 },
+  death: { src: '/sprites/enemies/deep_archer/Death.png', frames: 6 },
+};
+const mermanSprite = craftpixSeaSprite('merman', 4, 6, 6, 6);
+const sirenSprite = craftpixSeaSprite('siren', 4, 6, 6, 6);
+const deepAnglerSprite = craftpixSeaSprite('deep_angler', 4, 6, 4, 6);
+const seaSerpentSprite = {
+  folder: 'enemies/sea_serpent', frameWidth: 96, frameHeight: 96, swimming: true,
+  idle: { src: '/sprites/enemies/sea_serpent/Idle.png', frames: 4 },
+  attack1: { src: '/sprites/enemies/sea_serpent/Attack1.png', frames: 6 },
+  attack2: { src: '/sprites/enemies/sea_serpent/Attack2.png', frames: 6 },
+  hurt: { src: '/sprites/enemies/sea_serpent/Hurt.png', frames: 2 },
+  walk: { src: '/sprites/enemies/sea_serpent/Walk.png', frames: 6 },
+  death: { src: '/sprites/enemies/sea_serpent/Death.png', frames: 6 },
+  special: { src: '/sprites/enemies/sea_serpent/Special.png', frames: 6 },
+};
+const merfolkWarriorSprite = {
+  folder: 'enemies/merfolk_warrior', frameWidth: 96, frameHeight: 96, swimming: true,
+  idle: { src: '/sprites/enemies/merfolk_warrior/Idle.png', frames: 4 },
+  attack1: { src: '/sprites/enemies/merfolk_warrior/Attack1.png', frames: 6 },
+  attack2: { src: '/sprites/enemies/merfolk_warrior/Attack2.png', frames: 6 },
+  attack3: { src: '/sprites/enemies/merfolk_warrior/Attack3.png', frames: 6 },
+  hurt: { src: '/sprites/enemies/merfolk_warrior/Hurt.png', frames: 2 },
+  walk: { src: '/sprites/enemies/merfolk_warrior/Walk.png', frames: 6 },
+  death: { src: '/sprites/enemies/merfolk_warrior/Death.png', frames: 6 },
+  special: { src: '/sprites/enemies/merfolk_warrior/Special.png', frames: 6 },
+};
+
 const jellyfishPurpleSprite = craftpixSeaSprite('jellyfish_purple', 4, 4, 4, 6);
 const turtleGreenSprite = craftpixSeaSprite('turtle_green', 4, 6, 4, 6);
 const sharkBlueSprite = craftpixSeaSprite('shark_blue', 4, 6, 4, 6);
@@ -1230,6 +1266,14 @@ export const enemySpriteMap = {
   mimic_chest: mimicChestSprite,
   frost_jellyfish: { ...jellyfishNewSprite, filter: 'hue-rotate(180deg) saturate(1.2) brightness(1.3)' },
   lava_crab: { ...crabEnemySprite, filter: 'hue-rotate(350deg) saturate(1.5) brightness(1.1)' },
+  diver_warrior: diverWarriorSprite,
+  harpoon_diver: harpoonDiverSprite,
+  deep_archer: deepArcherSprite,
+  merman: mermanSprite,
+  siren: sirenSprite,
+  deep_angler: deepAnglerSprite,
+  sea_serpent: seaSerpentSprite,
+  merfolk_warrior: merfolkWarriorSprite,
 };
 
 export function getClassBuffClass(classId, variant = 1) {
