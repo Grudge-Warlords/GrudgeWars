@@ -12,7 +12,7 @@ The application is a React 19 frontend developed with Vite, with an Express back
 **UI/UX Decisions:**
 - **Theme:** Underwater freshwater world with betta fish characters, using a color palette of Teal, Cyan, Purple, and Deep Blue.
 - **Typography & Visuals:** Uses Cinzel (headings) and Jost (body) fonts. Features pixel art sprites with smooth bobbing animations, particle and beam effects, a 2D world map with zoom/pan, parallax backgrounds in mini-games, and painterly spell icons. UI elements include an ornate game frame, custom RPG bottom bar, and class-specific buff overlays.
-- **Screen Flow:** Title Screen (freshwater background, "BETTA WARLORDS" branding, Dive In/Discord login) → Intro Cinematic → Game Lobby (root grove city background) → Character Creation → World Map → Location Views → Battle Screens. A farewell screen is displayed on logout.
+- **Screen Flow:** Landing Page (`/` — Game Factory engine showcase with Grudge Studios branding, "Create Your Game" and "Play Betta Warlords" CTAs) → Game Factory (`/factory` — 6-step wizard) OR Betta Warlords (`/play` — Title Screen → Intro Cinematic → Game Lobby → Character Creation → World Map → Location Views → Battle Screens). A farewell screen is displayed on logout.
 - **Mobile Responsiveness:** Fully playable on mobile dimensions (360px-480px+) with optimized components and touch targets.
 
 **Technical Implementations:**

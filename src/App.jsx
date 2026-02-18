@@ -30,6 +30,7 @@ import GameTooltipRenderer from './components/GameTooltip';
 import ErrorBoundary from './components/ErrorBoundary';
 import useRouteSync from './hooks/useRouteSync';
 import { FactoryWizard } from './factory/components/FactoryWizard';
+import LandingPage from './components/LandingPage';
 
 function IntroVideoScreen({ onFinish }) {
   const videoRef = useRef(null);
@@ -338,6 +339,7 @@ export default function App() {
   if (path === '/crafting') return <CraftingPage />;
   if (path === '/backgrounds') return <BackgroundsPage />;
   if (path === '/factory') return <FactoryWizard />;
+  if (path === '/play') return <GameApp />;
 
-  return <GameApp />;
+  return <LandingPage />;
 }
