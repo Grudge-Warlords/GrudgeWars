@@ -1,9 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export function GamePreview({ spec, onBack }) {
   const [activeTab, setActiveTab] = useState('overview');
   const palette = spec.meta?.colorPalette || {};
   const fonts = spec.meta?.fonts || {};
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const root = document.getElementById('root');
+    html.style.overflow = 'auto';
+    html.style.height = 'auto';
+    body.style.overflow = 'auto';
+    body.style.height = 'auto';
+    if (root) { root.style.overflow = 'auto'; root.style.height = 'auto'; root.style.display = 'block'; }
+    return () => {
+      html.style.overflow = ''; html.style.height = '';
+      body.style.overflow = ''; body.style.height = '';
+      if (root) { root.style.overflow = ''; root.style.height = ''; root.style.display = ''; }
+    };
+  }, []);
 
   const styles = {
     container: {
