@@ -24,6 +24,7 @@ const PRESET_THEMES = [
   { name: 'Pirate Seas', setting: 'Uncharted tropical waters with treasure islands, sea monsters, and cursed ships', icon: '🏴‍☠️' },
   { name: 'Steampunk Machines', setting: 'A clockwork empire of steam-powered mechs, airships, and inventor guilds', icon: '⚙️' },
   { name: 'Sci Fi Tech Wars', setting: 'A fractured galaxy of rival mega-corporations deploying autonomous war machines, orbital weapon platforms, and nanotech super-soldiers in a ruthless arms race for quantum supremacy', icon: '🤖' },
+  { name: 'Anime Big 3', setting: 'An epic crossover world merging Dragon Ball Z, One Piece, and Bleach — Saiyans, Pirates, and Soul Reapers clash across dimensions. Ki blasts, Devil Fruits, and Zanpakuto powers collide in an ultimate battle for supremacy across the mortal realm, the Grand Line, and the Soul Society', icon: '🔥' },
 ];
 
 const defaultForm = {
@@ -102,6 +103,7 @@ export function FactoryWizard() {
       theme: preset.name,
       setting: preset.setting,
       gameName: prev.gameName || preset.name + ' Warlords',
+      ...(preset.name === 'Anime Big 3' ? { artStyle: 'anime' } : {}),
     }));
   }, []);
 
