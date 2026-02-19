@@ -4,6 +4,7 @@ import { generateGameImages } from '../generators/imageGenerator.js';
 import { GamePreview } from './GamePreview.jsx';
 import { AIEditor } from './AIEditor.jsx';
 import { deployToPuter } from '../utils/puterDeploy.js';
+import SpriteAIWorker from './SpriteAIWorker.jsx';
 
 const STEPS = [
   { id: 'theme', label: 'Theme & Setting' },
@@ -67,6 +68,7 @@ export function FactoryWizard() {
   const [gameSpec, setGameSpec] = useState(null);
   const [showEditor, setShowEditor] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showSpriteWorker, setShowSpriteWorker] = useState(false);
   const [generatedImages, setGeneratedImages] = useState({});
 
   useEffect(() => {
@@ -612,6 +614,17 @@ export function FactoryWizard() {
     }
   };
 
+  if (showSpriteWorker) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%)', padding: 20 }}>
+        <button onClick={() => setShowSpriteWorker(false)} style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #d4a843', background: 'transparent', color: '#d4a843', cursor: 'pointer', fontSize: 13, marginBottom: 16 }}>
+          ← Back to Factory
+        </button>
+        <SpriteAIWorker />
+      </div>
+    );
+  }
+
   if (showPreview && gameSpec) {
     return <GamePreview spec={gameSpec} generatedImages={generatedImages} onBack={() => setShowPreview(false)} />;
   }
@@ -628,9 +641,14 @@ export function FactoryWizard() {
           50% { width: 80%; }
         }
       `}</style>
-      <div style={styles.header}>
-        <h1 style={styles.title}>Game Factory</h1>
-        <p style={styles.subtitle}>AI-Powered RPG Generator by {form.studioName || 'Grudge Studios'}</p>
+      <div style={{ ...styles.header, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={styles.title}>Game Factory</h1>
+          <p style={styles.subtitle}>AI-Powered RPG Generator by {form.studioName || 'Grudge Studios'}</p>
+        </div>
+        <button onClick={() => setShowSpriteWorker(true)} style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', padding: '8px 16px', background: 'linear-gradient(135deg, #d4a843 0%, #b8860b 100%)', border: 'none', borderRadius: 8, color: '#fff', fontWeight: 'bold', cursor: 'pointer', fontSize: 12, whiteSpace: 'nowrap' }}>
+          🤖 Sprite AI Worker
+        </button>
       </div>
 
       <div style={styles.stepBar}>

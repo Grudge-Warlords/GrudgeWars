@@ -49,7 +49,8 @@ The Game Factory is an AI-powered RPG generator that lives alongside Betta Warlo
 - **Reference Spec:** `src/factory/schema/bettaWarlordSpec.js` — Betta Warlords mapped to the template schema as a reference implementation
 - **Form Wizard:** `src/factory/components/FactoryWizard.jsx` — 6-step wizard (Theme, Races, Classes, World/Lore, Art/Style, Generate)
 - **AI Content Generator:** `src/factory/generators/specGenerator.js` — Uses Puter.js free AI (gpt-4o-mini) to generate all game content from form inputs
-- **Game Preview:** `src/factory/components/GamePreview.jsx` — 10-tab preview of generated game data (Overview, Races, Classes, Enemies, Bosses, Lore, Chapters, World Map, Equipment, Raw JSON)
+- **Game Preview:** `src/factory/components/GamePreview.jsx` — 12-tab preview of generated game data (Overview, Races, Classes, Enemies, Bosses, Lore, Chapters, World Map, Equipment, Play Battle, Sprite Worker, Raw JSON)
+- **Sprite AI Worker:** `src/factory/components/SpriteAIWorker.jsx` — ZIP upload + AI-powered sprite sheet analyzer. Uses JSZip for extraction, Puter.js AI for animation classification, auto-detects frame counts from image dimensions. Features: Groups view (sidebar + detail), Preview viewport (animation playback with controls), Export view (spriteMap-compatible JSON). Accessible from FactoryWizard header button and GamePreview tab.
 - **AI Editor:** `src/factory/components/AIEditor.jsx` — Chat-based interface to modify generated game via natural language prompts
 - **Puter Deploy:** `src/factory/utils/puterDeploy.js` — One-click deployment of generated game to Puter.com with built-in AI editor
 
@@ -72,3 +73,4 @@ Comprehensive project knowledge is stored in `.agents/skills/betta-warlords-proj
 - **Google Fonts:** For Cinzel and Jost fonts.
 - **Web Audio API:** For in-game audio.
 - **Puter.js:** Free AI, cloud saves (KV), and authentication.
+- **JSZip:** ZIP file extraction for Sprite AI Worker.

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import FactoryBattle from './FactoryBattle.jsx';
+import SpriteAIWorker from './SpriteAIWorker.jsx';
 
 export function GamePreview({ spec, generatedImages = {}, onBack }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -197,6 +198,7 @@ export function GamePreview({ spec, generatedImages = {}, onBack }) {
     { id: 'world', label: 'World Map' },
     { id: 'equipment', label: 'Equipment' },
     { id: 'battle', label: '⚔️ Play Battle' },
+    { id: 'sprites', label: '🤖 Sprite Worker' },
     { id: 'raw', label: 'Raw JSON' },
   ];
 
@@ -466,6 +468,9 @@ export function GamePreview({ spec, generatedImages = {}, onBack }) {
         return (
           <FactoryBattle spec={spec} onBack={() => setActiveTab('overview')} />
         );
+
+      case 'sprites':
+        return <SpriteAIWorker />;
 
       case 'raw':
         return (
