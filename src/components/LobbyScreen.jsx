@@ -510,7 +510,7 @@ function DiscordTab({ panelStyle }) {
         </div>
 
         <a
-          href="https://discord.gg/grudgewarlords"
+          href="https://discord.gg/Hq9h3QKDfg"
           target="_blank"
           rel="noopener noreferrer"
           style={{
