@@ -404,8 +404,8 @@ export default function FactoryBattle({ spec, onBack }) {
                 textAlign: 'left', transition: 'all 0.2s',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '18px' }}>{race.icon || '🔷'}</span>
-                  <span style={{ fontSize: '18px' }}>{cls.icon || '⚔️'}</span>
+                  <IconDisplay icon={race.icon} fallback="🔷" size={18} color={race.color} />
+                  <IconDisplay icon={cls.icon} fallback="⚔️" size={18} color={cls.color} />
                   <div>
                     <div style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 700 }}>{race.name}</div>
                     <div style={{ color: cls.color || '#a855f7', fontSize: '11px' }}>{cls.name}</div>
@@ -436,7 +436,7 @@ export default function FactoryBattle({ spec, onBack }) {
                 textAlign: 'left', transition: 'all 0.2s',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '18px' }}>{enemy.icon || '👹'}</span>
+                  <IconDisplay icon={enemy.icon} fallback="👹" size={18} color={enemy.isBoss ? '#fbbf24' : '#ef4444'} />
                   <div>
                     <div style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 700 }}>{enemy.name}</div>
                     <div style={{ color: enemy.isBoss ? '#fbbf24' : '#94a3b8', fontSize: '11px' }}>
@@ -526,8 +526,8 @@ export default function FactoryBattle({ spec, onBack }) {
           <div style={{ flex: '0 0 180px' }}>
             {heroes.map(h => (
               <div key={h.id} style={{ marginBottom: '4px', opacity: h.alive ? 1 : 0.4 }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: h.id === currentUnitId ? (palette.accent || '#fbbf24') : '#93c5fd' }}>
-                  {h.raceIcon} {h.name}
+                <div style={{ fontSize: '11px', fontWeight: 700, color: h.id === currentUnitId ? (palette.accent || '#fbbf24') : '#93c5fd', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <IconDisplay icon={h.raceIcon} fallback="🔷" size={14} color={h.raceColor} /> {h.name}
                 </div>
                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                   <div style={{ flex: 1, height: 6, background: 'rgba(0,0,0,0.5)', borderRadius: 3, overflow: 'hidden' }}>
@@ -623,10 +623,33 @@ export default function FactoryBattle({ spec, onBack }) {
   return renderBattle();
 }
 
+function IconDisplay({ icon, fallback, size = 22, color }) {
+  if (!icon || icon === fallback) {
+    return <span style={{ fontSize: `${size}px` }}>{fallback}</span>;
+  }
+  if (icon.includes('/') || icon.includes('.png') || icon.includes('.jpg') || icon.includes('.svg') || icon.includes('.webp')) {
+    return (
+      <div style={{
+        width: size + 8, height: size + 8, borderRadius: '50%',
+        background: `linear-gradient(135deg, ${color || '#334155'}, ${color || '#1e293b'}88)`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: `${size - 4}px`, fontWeight: 900, color: '#e2e8f0',
+        border: `2px solid ${color || '#334155'}`,
+        textTransform: 'uppercase', flexShrink: 0,
+      }}>
+        {(icon.split('/').pop()?.replace(/\.\w+$/, '') || '?')[0]}
+      </div>
+    );
+  }
+  return <span style={{ fontSize: `${size}px` }}>{icon}</span>;
+}
+
 function UnitCard({ unit, isActive, palette, isTarget, onClick, floats = [] }) {
   const isEnemy = unit.team === 'enemy';
   const hpPct = unit.maxHealth > 0 ? (unit.health / unit.maxHealth) * 100 : 0;
   const hpColor = !unit.alive ? '#555' : hpPct > 60 ? '#22c55e' : hpPct > 30 ? '#f59e0b' : '#ef4444';
+  const unitIcon = isEnemy ? (unit.icon || '👹') : (unit.raceIcon || '🔷');
+  const unitColor = isEnemy ? (unit.isBoss ? '#fbbf24' : '#ef4444') : (unit.raceColor || '#06b6d4');
 
   return (
     <div onClick={onClick} style={{
@@ -647,7 +670,7 @@ function UnitCard({ unit, isActive, palette, isTarget, onClick, floats = [] }) {
         }}>{f.text}</div>
       ))}
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-        <span style={{ fontSize: '22px' }}>{isEnemy ? (unit.icon || '👹') : (unit.raceIcon || '🔷')}</span>
+        <IconDisplay icon={unitIcon} fallback={isEnemy ? '👹' : '🔷'} size={22} color={unitColor} />
         <div>
           <div style={{ fontSize: '12px', fontWeight: 700, color: isActive ? (palette.accent || '#fbbf24') : '#e2e8f0' }}>{unit.name}</div>
           <div style={{ fontSize: '10px', color: isEnemy ? (unit.isBoss ? '#fbbf24' : '#94a3b8') : (unit.classColor || '#a855f7') }}>
