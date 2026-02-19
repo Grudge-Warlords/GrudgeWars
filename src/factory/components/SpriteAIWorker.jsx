@@ -97,7 +97,7 @@ Return ONLY a valid JSON object with this format:
     {
       "folder": "folder_name",
       "entityName": "detected_character_name",
-      "entityType": "hero|enemy|npc|effect",
+      "entityType": "hero|enemy|npc|effect|building|terrain|vehicle|icon",
       "animations": {
         "filename.png": "idle",
         "filename2.png": "attack1"
@@ -524,7 +524,7 @@ export default function SpriteAIWorker() {
                   <div style={styles.sidebarItemMeta}>
                     <span style={{
                       ...styles.typeBadge,
-                      background: g.entityType === 'hero' ? '#2d6a4f' : g.entityType === 'enemy' ? '#6a2d2d' : '#4a3d6a',
+                      background: { hero: '#2d6a4f', enemy: '#6a2d2d', npc: '#4a3d6a', effect: '#6a5a2d', building: '#2d4a6a', terrain: '#3a6a3a', vehicle: '#5a3a6a', icon: '#6a4a2d' }[g.entityType] || '#4a3d6a',
                     }}>
                       {g.entityType}
                     </span>
@@ -554,6 +554,10 @@ export default function SpriteAIWorker() {
                       <option value="enemy">Enemy</option>
                       <option value="npc">NPC</option>
                       <option value="effect">Effect</option>
+                      <option value="building">Building</option>
+                      <option value="terrain">Terrain</option>
+                      <option value="vehicle">Vehicle</option>
+                      <option value="icon">Icon</option>
                     </select>
                   </div>
                   <div style={styles.groupHeaderRight}>
