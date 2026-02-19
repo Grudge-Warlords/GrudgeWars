@@ -33,7 +33,7 @@ The application is a React 19 frontend developed with Vite, with an Express back
 ## Grudge Studios
 Betta Warlords is the first and flagship title of **Grudge Studios**. The game is made FOR the Betta community and runs on Grudge Studios infrastructure.
 - **Auth:** Uses Grudge Studios login systems (Discord OAuth + Puter.js authentication)
-- **GBuX:** Universal currency across all Grudge Studios titles and AI tools, earned through gameplay
+- **GBuX:** Universal currency (Solana SPL token) across all Grudge Studios titles and AI tools. Token-gated access system with 3 pricing tiers ($10/1000, $25/3000, $50/7500 GBuX). Feature costs: AI generation (100), deployment (200), AI editor (50), image generation (75), custom theme (150). Backend service: `src/services/gbuxService.js`. Frontend: `src/services/gbuxClient.js`, `src/factory/components/GBuxAccess.jsx`, `src/factory/components/GBuxPage.jsx` (`/gbux` route). Server-side Crossmint wallets, GRENCH admin wallet for SPL transfers. Auth: Discord userId verification on sensitive routes.
 - **Free AI:** Grudge Studios provides free AI via Puter.js for hero dialogue, battle narration, lore generation, NPC personalities
 - **cNFT Breeding:** Compressed NFT system for on-chain Warlord assets (8 breeds x 4 classes = 32 base types)
 - **Exclusive Gateway:** Betta Warlords is the ONLY entry point to early-stage GBuX, cNFT breeding, and Grudge Studios systems

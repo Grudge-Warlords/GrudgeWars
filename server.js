@@ -1,9 +1,39 @@
 import express from 'express';
 import crypto from 'crypto';
 import { verifyKeyMiddleware, InteractionType, InteractionResponseType } from 'discord-interactions';
+import {
+  createCrossmintWallet,
+  getCrossmintWallet,
+  getGbuxBalance,
+  getAdminBalance,
+  transferGbux,
+  checkFeatureAccess,
+  deductFeatureCost,
+  PRICING,
+  FEATURE_COSTS,
+} from './src/services/gbuxService.js';
 
 const app = express();
 const DISCORD_PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY;
+
+const ALLOWED_ORIGINS = [
+  'http://localhost:5000',
+  'http://127.0.0.1:5000',
+  `https://${process.env.REPLIT_DEV_DOMAIN || ''}`,
+  `https://${(process.env.REPLIT_DOMAINS || '').split(',')[0]}`,
+].filter(o => o && o !== 'https://');
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.some(ao => origin.startsWith(ao))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-Id');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
 
 app.use((req, res, next) => {
   if (req.path === '/api/discord/interactions') {
@@ -812,7 +842,147 @@ app.post('/api/discord/bot/send', requireAdmin, async (req, res) => {
   }
 });
 
+app.get('/api/gbux/pricing', (req, res) => {
+  res.json({ pricing: PRICING, featureCosts: FEATURE_COSTS });
+});
+
+function requireUserId(req, res, next) {
+  const userId = req.body?.userId || req.headers['x-user-id'];
+  if (!userId || typeof userId !== 'string' || userId.length < 10 || userId.length > 25) {
+    return res.status(401).json({ error: 'Valid userId required' });
+  }
+  if (!/^\d+$/.test(userId)) {
+    return res.status(401).json({ error: 'Invalid userId format' });
+  }
+  req.userId = userId;
+  next();
+}
+
+app.post('/api/gbux/wallet/create', requireUserId, async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) return res.status(400).json({ error: 'userId required' });
+  try {
+    const existing = await getCrossmintWallet(userId);
+    if (existing) {
+      const balance = existing.address ? await getGbuxBalance(existing.address) : 0;
+      return res.json({ wallet: existing, balance, existing: true });
+    }
+    const wallet = await createCrossmintWallet(userId);
+    return res.json({ wallet, balance: 0, existing: false });
+  } catch (err) {
+    console.error('[GBuX] Wallet create error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/gbux/wallet/:userId', async (req, res) => {
+  try {
+    const wallet = await getCrossmintWallet(req.params.userId);
+    if (!wallet) return res.status(404).json({ error: 'Wallet not found' });
+    const balance = wallet.address ? await getGbuxBalance(wallet.address) : 0;
+    res.json({ wallet, balance });
+  } catch (err) {
+    console.error('[GBuX] Wallet fetch error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/gbux/balance/:address', async (req, res) => {
+  try {
+    const balance = await getGbuxBalance(req.params.address);
+    res.json({ address: req.params.address, balance });
+  } catch (err) {
+    console.error('[GBuX] Balance error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/gbux/purchase', requireUserId, async (req, res) => {
+  const { userId, packageId, walletAddress } = req.body;
+  if (!userId || !packageId) return res.status(400).json({ error: 'userId and packageId required' });
+
+  const pkg = PRICING[packageId];
+  if (!pkg) return res.status(400).json({ error: 'Invalid package' });
+
+  try {
+    let targetAddress = walletAddress;
+    if (!targetAddress) {
+      let wallet = await getCrossmintWallet(userId);
+      if (!wallet) {
+        wallet = await createCrossmintWallet(userId);
+      }
+      targetAddress = wallet.address;
+    }
+
+    if (!targetAddress) {
+      return res.status(400).json({ error: 'Could not resolve wallet address' });
+    }
+
+    const signature = await transferGbux(targetAddress, pkg.gbuxAmount);
+    const newBalance = await getGbuxBalance(targetAddress);
+
+    res.json({
+      success: true,
+      package: pkg.label,
+      gbuxAmount: pkg.gbuxAmount,
+      signature,
+      walletAddress: targetAddress,
+      newBalance,
+    });
+  } catch (err) {
+    console.error('[GBuX] Purchase error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/gbux/check-access', async (req, res) => {
+  const { walletAddress, feature } = req.body;
+  if (!walletAddress || !feature) return res.status(400).json({ error: 'walletAddress and feature required' });
+  try {
+    const access = await checkFeatureAccess(walletAddress, feature);
+    res.json(access);
+  } catch (err) {
+    console.error('[GBuX] Access check error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/gbux/deduct', requireUserId, async (req, res) => {
+  const { walletAddress, feature } = req.body;
+  if (!walletAddress || !feature) return res.status(400).json({ error: 'walletAddress and feature required' });
+  try {
+    const result = await deductFeatureCost(walletAddress, feature);
+    res.json(result);
+  } catch (err) {
+    console.error('[GBuX] Deduct error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/gbux/admin/balance', requireAdmin, async (req, res) => {
+  try {
+    const balance = await getAdminBalance();
+    res.json(balance);
+  } catch (err) {
+    console.error('[GBuX] Admin balance error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/gbux/transfer', requireAdmin, async (req, res) => {
+  const { recipientAddress, amount } = req.body;
+  if (!recipientAddress || !amount) return res.status(400).json({ error: 'recipientAddress and amount required' });
+  try {
+    const signature = await transferGbux(recipientAddress, amount);
+    res.json({ success: true, signature, amount });
+  } catch (err) {
+    console.error('[GBuX] Transfer error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Discord API server running on port ${PORT}`);
+  console.log('[GBuX] Token service initialized');
   registerSlashCommands();
 });

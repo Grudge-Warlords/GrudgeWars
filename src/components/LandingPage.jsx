@@ -195,6 +195,10 @@ export default function LandingPage() {
               onMouseEnter={e => e.target.style.color = '#e2e8f0'}
               onMouseLeave={e => e.target.style.color = '#94a3b8'}
             >Showcase</a>
+            <a href="/gbux" style={{ color: '#fbbf24', textDecoration: 'none', fontSize: '14px', fontWeight: '600', transition: 'color 0.2s' }}
+              onMouseEnter={e => e.target.style.color = '#f59e0b'}
+              onMouseLeave={e => e.target.style.color = '#fbbf24'}
+            >GBuX</a>
             <button onClick={() => navigate('/factory')} style={{
               padding: '8px 20px', borderRadius: '8px', border: '1px solid #fbbf24',
               background: 'rgba(251, 191, 36, 0.08)', color: '#fbbf24', cursor: 'pointer', fontSize: '13px', fontWeight: '600',
