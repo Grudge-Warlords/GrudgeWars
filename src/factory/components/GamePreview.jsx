@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import FactoryBattle from './FactoryBattle.jsx';
 
 export function GamePreview({ spec, generatedImages = {}, onBack }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -195,6 +196,7 @@ export function GamePreview({ spec, generatedImages = {}, onBack }) {
     { id: 'chapters', label: 'Chapters' },
     { id: 'world', label: 'World Map' },
     { id: 'equipment', label: 'Equipment' },
+    { id: 'battle', label: '⚔️ Play Battle' },
     { id: 'raw', label: 'Raw JSON' },
   ];
 
@@ -458,6 +460,11 @@ export function GamePreview({ spec, generatedImages = {}, onBack }) {
               </div>
             </div>
           </div>
+        );
+
+      case 'battle':
+        return (
+          <FactoryBattle spec={spec} onBack={() => setActiveTab('overview')} />
         );
 
       case 'raw':
