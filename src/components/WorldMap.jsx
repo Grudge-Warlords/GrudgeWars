@@ -2123,7 +2123,7 @@ export default function WorldMap() {
           const activeHeroes = heroRoster.filter(h => activeHeroIds.includes(h.id));
           const fixedScale = 1 / camZoom;
           const battleTarget = 200;
-          const footCrop = 0.82;
+          const footCrop = 1.0;
           const heroSizes = activeHeroes.map(hero => {
             const sd = getPlayerSprite(hero.classId, hero.raceId, hero.namedHeroId);
             const bf = sd?.frameHeight || sd?.frameWidth || 100;
@@ -2218,7 +2218,7 @@ export default function WorldMap() {
           const speakerPositions = {};
           const fixedScale2 = 1 / camZoom;
           const battleTarget2 = 200;
-          const footCrop2 = 0.82;
+          const footCrop2 = 1.0;
           const heroSizes2 = activeHeroes2.map(hero => {
             const sd = getPlayerSprite(hero.classId, hero.raceId, hero.namedHeroId);
             const bf = sd?.frameHeight || sd?.frameWidth || 100;
