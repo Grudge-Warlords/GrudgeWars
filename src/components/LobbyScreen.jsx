@@ -1260,7 +1260,7 @@ function HeroSlideshow() {
     setImpactFlash(0);
     setShowMeleeVfx(false);
 
-    const IDLE_ENTER_COMBOS = ['undead_ranger'];
+    const IDLE_ENTER_COMBOS = [];
     const comboId = `${combo.raceId}_${combo.classId}`;
     const forceIdle = IDLE_ENTER_COMBOS.includes(comboId);
     const enterAnim = forceIdle ? 'idle' : (spriteData?.walk ? 'walk' : (spriteData?.run ? 'run' : 'idle'));
@@ -1306,8 +1306,106 @@ function HeroSlideshow() {
     const attackDuration = attackFrames * 80;
 
     const isArcaneArcher = comboId === 'human_ranger';
+    const isUndeadRanger = comboId === 'undead_ranger';
 
-    if (isArcaneArcher && spriteData?.jump && spriteData?.doublejump && spriteData?.wallslide) {
+    if (isUndeadRanger && spriteData?.jump && spriteData?.doublejump) {
+      addTimer(() => {
+        setAnim('idle');
+        setTextVisible(true);
+        setAuraIntensity(1);
+      }, walkDuration);
+
+      const seqStart = walkDuration + 800;
+      const runStep = 16;
+
+      const runDuration = 500;
+      const runStartX = 22;
+      const runTargetX = 40;
+      addTimer(() => {
+        setAnim('run');
+        let runElapsed = 0;
+        const runInterval = setInterval(() => {
+          runElapsed += runStep;
+          const p = Math.min(runElapsed / runDuration, 1);
+          setSpriteX(runStartX + (runTargetX - runStartX) * p);
+          if (p >= 1) clearInterval(runInterval);
+        }, runStep);
+        intervalRefs.current.push(runInterval);
+      }, seqStart);
+
+      const jumpStart = seqStart + runDuration;
+      const jumpDuration = 400;
+      addTimer(() => {
+        setAnim('jump');
+        let jElapsed = 0;
+        const jInterval = setInterval(() => {
+          jElapsed += runStep;
+          if (jElapsed <= jumpDuration) {
+            const jp = jElapsed / jumpDuration;
+            const arcY = Math.sin(jp * Math.PI) * 100;
+            setSpriteY(arcY);
+            setSpriteX(runTargetX + (50 - runTargetX) * jp);
+          }
+          if (jElapsed >= jumpDuration) clearInterval(jInterval);
+        }, runStep);
+        intervalRefs.current.push(jInterval);
+      }, jumpStart);
+
+      const djStart = jumpStart + jumpDuration;
+      const djDuration = 500;
+      addTimer(() => {
+        setAnim('doublejump');
+        setSpriteRotation(-10);
+        let dElapsed = 0;
+        const dInterval = setInterval(() => {
+          dElapsed += runStep;
+          if (dElapsed <= djDuration) {
+            const dp = dElapsed / djDuration;
+            const arcY = Math.sin(dp * Math.PI) * 180;
+            setSpriteY(arcY);
+            setSpriteX(50 + (62 - 50) * dp);
+          }
+          if (dElapsed >= djDuration) clearInterval(dInterval);
+        }, runStep);
+        intervalRefs.current.push(dInterval);
+      }, djStart);
+
+      const attackStart = djStart + djDuration;
+      addTimer(() => {
+        setSpriteY(0);
+        setSpriteRotation(0);
+        setAnim('attack1');
+        addTimer(() => {
+          setShowVfx(true);
+          setDummyAnim('hurt');
+          setDummyShake(1);
+          setScreenShake(1);
+          setImpactFlash(1);
+          addTimer(() => { setScreenShake(0); setImpactFlash(0); }, 200);
+          addTimer(() => setDummyShake(0), 300);
+          addTimer(() => setDummyAnim('idle'), 400);
+        }, 200);
+      }, attackStart);
+
+      const atkDuration = (spriteData?.attack1?.frames || 7) * 80;
+      addTimer(() => {
+        setAnim('idle');
+        setShowVfx(false);
+        setSpriteX(60);
+      }, attackStart + atkDuration + 100);
+
+      addTimer(() => {
+        setShowBubble(true);
+      }, attackStart + atkDuration + 300);
+
+      addTimer(() => {
+        setPhase('exit');
+        setShowBubble(false);
+        setSpriteY(0);
+        setSpriteRotation(0);
+        addTimer(() => setIndex(prev => (prev + 1) % ALL_COMBOS.length), 600);
+      }, attackStart + atkDuration + 3000);
+    } else if (isArcaneArcher && spriteData?.jump && spriteData?.doublejump && spriteData?.wallslide) {
       addTimer(() => {
         setAnim('idle');
         setTextVisible(true);
