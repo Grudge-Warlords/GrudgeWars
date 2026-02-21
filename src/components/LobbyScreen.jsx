@@ -1578,7 +1578,12 @@ function HeroSlideshow() {
       }, returnStart);
 
       const rangedStart = returnStart + returnDuration + 300;
-      const castAnim = spriteData?.cast ? 'cast' : spriteData?.attack2 ? 'attack2' : chosenAttack;
+      const CAST_OVERRIDES = {
+        human_mage: 'attack1',
+      };
+      const castOverride = CAST_OVERRIDES[comboId];
+      const castAnim = castOverride && spriteData?.[castOverride] ? castOverride
+        : spriteData?.cast ? 'cast' : spriteData?.attack2 ? 'attack2' : chosenAttack;
       const castFrames = Math.min(spriteData?.[castAnim]?.frames || 8, maxFrames);
       const castDuration = castFrames * 80;
       addTimer(() => {
