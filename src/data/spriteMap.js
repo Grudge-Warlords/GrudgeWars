@@ -104,7 +104,7 @@ export const spriteSheets = {
     scale: 0.7,
     idle: { src: '/sprites/human-ranger/idle.png', frames: 8 },
     walk: { src: '/sprites/human-ranger/walk.png', frames: 8 },
-    attack1: { src: '/sprites/human-ranger/attack1.png', frames: 9, frameWidth: 280 },
+    attack1: { src: '/sprites/human-ranger/attack1.png', frames: 14, frameWidth: 180 },
     attack2: { src: '/sprites/human-ranger/attack2.png', frames: 28 },
     hurt: { src: '/sprites/human-ranger/hurt.png', frames: 14 },
     death: { src: '/sprites/human-ranger/death.png', frames: 24 },
