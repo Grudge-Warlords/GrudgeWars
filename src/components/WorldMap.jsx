@@ -2122,7 +2122,7 @@ export default function WorldMap() {
           const zonePos = isPathing ? heroPos : baseZonePos;
           const activeHeroes = heroRoster.filter(h => activeHeroIds.includes(h.id));
           const fixedScale = 1 / camZoom;
-          const battleTarget = 200;
+          const battleTarget = 42;
           const footCrop = 1.0;
           const heroSizes = activeHeroes.map(hero => {
             const sd = getPlayerSprite(hero.classId, hero.raceId, hero.namedHeroId);
@@ -2217,7 +2217,7 @@ export default function WorldMap() {
           const heroSpriteMap = {};
           const speakerPositions = {};
           const fixedScale2 = 1 / camZoom;
-          const battleTarget2 = 200;
+          const battleTarget2 = 42;
           const footCrop2 = 1.0;
           const heroSizes2 = activeHeroes2.map(hero => {
             const sd = getPlayerSprite(hero.classId, hero.raceId, hero.namedHeroId);
