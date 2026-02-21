@@ -1289,6 +1289,7 @@ function HeroSlideshow() {
     const PREFERRED_ATTACKS = {
       human_warrior: 'attack2',
       human_ranger: 'attack1',
+      human_mage: 'attack1',
     };
     const comboKey = `${combo.raceId}_${combo.classId}`;
     const preferredAttack = PREFERRED_ATTACKS[comboKey];

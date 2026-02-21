@@ -1159,7 +1159,7 @@ export const raceClassSpriteMap = {
     warrior: { ...spriteSheets['shadow-warrior'], filter: 'brightness(0.75) saturate(0.5) contrast(1.2)' },
     mage: spriteSheets.necromancer,
     worge: { ...spriteSheets.skeleton, filter: 'sepia(0.3) hue-rotate(270deg) saturate(1.0) brightness(0.85)' },
-    ranger: spriteSheets['undead-ranger'],
+    ranger: { ...spriteSheets['undead-ranger'], filter: 'saturate(0.3) brightness(0.95) contrast(1.1) hue-rotate(160deg)' },
   },
   barbarian: {
     warrior: { ...spriteSheets['barbarian-warrior'], filter: 'brightness(1.1) contrast(1.05) saturate(0.8)', scale: 1.35 },
