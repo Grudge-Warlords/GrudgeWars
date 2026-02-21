@@ -45,14 +45,21 @@ function getItemTooltipContent(item) {
       return `${v > 0 ? '+' : ''}${v} ${label}`;
     });
 
-  return {
-    title: item.name || 'Unknown Item',
-    titleColor: tier.color,
-    lines: [
-      { text: `${tier.name} ${item.slot || ''}`, color: tier.color },
-      ...statLines.map(t => ({ text: t, color: '#d4d4d4' })),
-    ],
-  };
+  const name = item.name || 'Unknown Item';
+  const tierLabel = `${tier.name} ${item.slot || ''}`;
+  return (
+    <div style={{ minWidth: 140 }}>
+      <div style={{ fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: '0.82rem', color: tier.color, letterSpacing: '0.02em', marginBottom: 3 }}>{name}</div>
+      <div style={{ fontSize: '0.7rem', color: tier.color, opacity: 0.8, marginBottom: statLines.length > 0 ? 5 : 0 }}>{tierLabel}</div>
+      {statLines.length > 0 && (
+        <div style={{ borderTop: '1px solid rgba(180,150,90,0.2)', paddingTop: 4 }}>
+          {statLines.map((line, i) => (
+            <div key={i} style={{ fontSize: '0.7rem', color: '#d4cfc4', lineHeight: 1.6 }}>{line}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function EquipSlot({ slotDef, item, onDrop, onUnequip, onHover, heroClassId, dragItem }) {
@@ -87,7 +94,7 @@ function EquipSlot({ slotDef, item, onDrop, onUnequip, onHover, heroClassId, dra
       onMouseEnter={(e) => {
         if (item) {
           const tip = getItemTooltipContent(item);
-          if (tip) showTooltip(e, tip.title, tip.lines, tip.titleColor);
+          if (tip) showTooltip(tip, e);
         }
       }}
       onMouseMove={(e) => item && updateTooltipPosition(e)}
@@ -163,7 +170,7 @@ function InventorySlot({ item, index, onDragStart, onRightClickEquip }) {
       onMouseEnter={(e) => {
         if (item) {
           const tip = getItemTooltipContent(item);
-          if (tip) showTooltip(e, tip.title, tip.lines, tip.titleColor);
+          if (tip) showTooltip(tip, e);
         }
       }}
       onMouseMove={(e) => item && updateTooltipPosition(e)}

@@ -2274,6 +2274,7 @@ export default function WorldMap() {
         })()}
 
         {hoveredNode && (() => {
+          const tipScale = 1 / camZoom;
           if (hoveredNode.type === 'location') {
             const loc = locations.find(l => l.id === hoveredNode.id);
             if (!loc) return null;
@@ -2284,23 +2285,30 @@ export default function WorldMap() {
               <div style={{
                 position: 'absolute',
                 left: `${hoveredNode.x}%`, top: `${hoveredNode.y}%`,
-                transform: 'translate(-50%, -120%)',
-                marginTop: -40,
+                transform: `translate(-50%, -100%) scale(${tipScale})`,
+                transformOrigin: 'center bottom',
+                marginTop: -12,
                 zIndex: MAP_LAYERS.HOVER_INFO, pointerEvents: 'none',
-                background: 'rgba(8,12,28,0.95)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: 8, padding: '8px 12px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.7)',
+                background: 'linear-gradient(160deg, rgba(18,14,10,0.97) 0%, rgba(28,22,16,0.97) 40%, rgba(20,16,12,0.97) 100%)',
+                border: '1px solid rgba(180,150,90,0.5)',
+                borderRadius: 6, padding: '8px 14px',
+                boxShadow: '0 6px 32px rgba(0,0,0,0.85), 0 0 1px rgba(180,150,90,0.4), inset 0 1px 0 rgba(255,215,0,0.06)',
+                backdropFilter: 'blur(8px)',
                 whiteSpace: 'nowrap',
                 animation: 'fadeIn 0.1s ease-out',
+                fontFamily: "'Jost', sans-serif",
               }}>
-                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: 2 }}>{loc.name}</div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+                  background: 'linear-gradient(90deg, transparent 5%, rgba(255,215,0,0.25) 50%, transparent 95%)',
+                }} />
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#f0e4c8', marginBottom: 3, fontFamily: "'Cinzel', serif", letterSpacing: '0.02em' }}>{loc.name}</div>
+                <div style={{ fontSize: 12, color: '#b0a890' }}>
                   Lv.{loc.levelRange[0]}-{loc.levelRange[1]} · {Math.floor(conquer)}% conquered
-                  {conquer >= 100 && <div style={{ color: 'var(--gold)', fontWeight: 700, marginTop: 2 }}>🏆 100% CONQUERED</div>}
+                  {conquer >= 100 && <div style={{ color: 'var(--gold)', fontWeight: 700, marginTop: 2 }}>100% CONQUERED</div>}
                 </div>
-                {hasBoss && <div style={{ fontSize: '0.8rem', color: '#ef4444', marginTop: 2 }}>⚠ Boss Active</div>}
-                {bossDown && <div style={{ fontSize: '0.8rem', color: '#22c55e', marginTop: 2 }}>✅ Boss Defeated</div>}
+                {hasBoss && <div style={{ fontSize: 11, color: '#ef4444', marginTop: 3 }}>Boss Active</div>}
+                {bossDown && <div style={{ fontSize: 11, color: '#22c55e', marginTop: 3 }}>Boss Defeated</div>}
               </div>
             );
           }
@@ -2309,18 +2317,25 @@ export default function WorldMap() {
               <div style={{
                 position: 'absolute',
                 left: `${hoveredNode.x}%`, top: `${hoveredNode.y}%`,
-                transform: 'translate(-50%, -120%)',
-                marginTop: -40,
+                transform: `translate(-50%, -100%) scale(${tipScale})`,
+                transformOrigin: 'center bottom',
+                marginTop: -12,
                 zIndex: MAP_LAYERS.HOVER_INFO, pointerEvents: 'none',
-                background: 'rgba(8,12,28,0.95)',
-                border: '1px solid rgba(74,222,128,0.3)',
-                borderRadius: 8, padding: '8px 12px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.7)',
+                background: 'linear-gradient(160deg, rgba(18,14,10,0.97) 0%, rgba(28,22,16,0.97) 40%, rgba(20,16,12,0.97) 100%)',
+                border: '1px solid rgba(74,222,128,0.4)',
+                borderRadius: 6, padding: '8px 14px',
+                boxShadow: '0 6px 32px rgba(0,0,0,0.85), 0 0 1px rgba(74,222,128,0.3), inset 0 1px 0 rgba(74,222,128,0.06)',
+                backdropFilter: 'blur(8px)',
                 whiteSpace: 'nowrap',
                 animation: 'fadeIn 0.1s ease-out',
+                fontFamily: "'Jost', sans-serif",
               }}>
-                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#4ade80' }}>{hoveredNode.name}</div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>City</div>
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+                  background: 'linear-gradient(90deg, transparent 5%, rgba(74,222,128,0.3) 50%, transparent 95%)',
+                }} />
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#4ade80', fontFamily: "'Cinzel', serif", letterSpacing: '0.02em' }}>{hoveredNode.name}</div>
+                <div style={{ fontSize: 12, color: '#b0a890' }}>City</div>
               </div>
             );
           }
