@@ -105,9 +105,9 @@ export const spriteSheets = {
     idle: { src: '/sprites/human-ranger/idle.png', frames: 8 },
     walk: { src: '/sprites/human-ranger/walk.png', frames: 8 },
     attack1: { src: '/sprites/human-ranger/attack1.png', frames: 9, frameWidth: 280 },
-    attack2: { src: '/sprites/human-ranger/attack2.png', frames: 14, frameWidth: 256 },
-    hurt: { src: '/sprites/human-ranger/hurt.png', frames: 4, frameWidth: 448 },
-    death: { src: '/sprites/human-ranger/death.png', frames: 12, frameWidth: 256 },
+    attack2: { src: '/sprites/human-ranger/attack2.png', frames: 28 },
+    hurt: { src: '/sprites/human-ranger/hurt.png', frames: 14 },
+    death: { src: '/sprites/human-ranger/death.png', frames: 24 },
     jump: { src: '/sprites/human-ranger/jump.png', frames: 12 },
   },
   'barbarian-warrior': {
