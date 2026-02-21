@@ -31,6 +31,9 @@ const ALLOWED_ORIGINS = [
 
 const CSP_FRAME_ANCESTORS = [
   "frame-ancestors 'self'",
+  'https://*.replit.app',
+  'https://*.replit.com',
+  'https://*.replit.dev',
   'https://grudgewarlords.com',
   'https://www.grudgewarlords.com',
   'https://grudgeplatform.com',
@@ -48,13 +51,14 @@ app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', CSP_FRAME_ANCESTORS);
 
   const origin = req.headers.origin || '';
+  const isReplitOrigin = /^https:\/\/.*\.(replit\.app|replit\.com|replit\.dev)$/.test(origin);
   const isPuterOrigin = origin.endsWith('.puter.com') || origin === 'https://puter.com';
-  const isAllowedOrigin = ALLOWED_ORIGINS.includes(origin) || isPuterOrigin;
+  const isAllowedOrigin = ALLOWED_ORIGINS.includes(origin) || isReplitOrigin || isPuterOrigin;
 
   if (origin && isAllowedOrigin) {
     res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Session-Token');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Session-Token, X-Admin-Token');
     res.header('Access-Control-Allow-Credentials', 'true');
     if (req.method === 'OPTIONS') return res.sendStatus(204);
   }
@@ -1209,6 +1213,13 @@ app.get('/favicon.ico', (req, res) => {
   });
 });
 
+app.use('/attached_assets', express.static(path.join(__dirname_server, 'attached_assets'), {
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+  },
+  fallthrough: true,
+}));
+
 if (isProd) {
   app.use('/assets', express.static(path.join(__dirname_server, 'dist', 'assets'), {
     setHeaders: (res) => {
@@ -1217,9 +1228,41 @@ if (isProd) {
     fallthrough: true,
   }));
 
-  app.use(express.static(path.join(__dirname_server, 'dist'), {
+  app.use('/sprites', express.static(path.join(__dirname_server, 'dist', 'sprites'), {
     setHeaders: (res) => {
-      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+    },
+    fallthrough: true,
+  }));
+
+  app.use('/effects', express.static(path.join(__dirname_server, 'dist', 'effects'), {
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+    },
+    fallthrough: true,
+  }));
+
+  app.use('/backgrounds', express.static(path.join(__dirname_server, 'dist', 'backgrounds'), {
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+    },
+    fallthrough: true,
+  }));
+
+  app.use('/icons', express.static(path.join(__dirname_server, 'dist', 'icons'), {
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+    },
+    fallthrough: true,
+  }));
+
+  app.use(express.static(path.join(__dirname_server, 'dist'), {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+      }
     },
     fallthrough: true,
   }));
@@ -1273,3 +1316,11 @@ function gracefulShutdown(signal) {
 
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason);
+});

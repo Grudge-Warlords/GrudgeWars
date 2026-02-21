@@ -27,6 +27,7 @@ import GameTooltipRenderer from './components/GameTooltip';
 import GameContextMenuRenderer from './components/GameContextMenu';
 import { HERO_CREATE_MODAL } from './constants/layers';
 import GameContainer from './components/GameContainer';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const SCREEN_SLUGS = {
   title: '/',
@@ -334,9 +335,11 @@ export default function App() {
   if (path === '/discordauth') return <DiscordAuth />;
 
   return (
-    <GameContainer>
-      <GameApp />
-    </GameContainer>
+    <ErrorBoundary>
+      <GameContainer>
+        <GameApp />
+      </GameContainer>
+    </ErrorBoundary>
   );
 }
 

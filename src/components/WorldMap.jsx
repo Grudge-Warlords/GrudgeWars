@@ -436,11 +436,7 @@ export default function WorldMap() {
   const [upgradeMsg, setUpgradeMsg] = useState(null);
   const [tradeTab, setTradeTab] = useState('buy');
   const [heroPos, setHeroPos] = useState(locationPositions.verdant_plains);
-  const [currentZone, setCurrentZone] = useState(() => {
-    const zone = 'verdant_plains';
-    useGameStore.getState().setHeroStandingZone?.(zone);
-    return zone;
-  });
+  const [currentZone, setCurrentZone] = useState('verdant_plains');
   const [isMoving, setIsMoving] = useState(false);
   const [wanderOffsets, setWanderOffsets] = useState({});
   const mapRef = useRef(null);
@@ -527,6 +523,10 @@ export default function WorldMap() {
   });
   const [draggingLabel, setDraggingLabel] = useState(null);
   const dragLabelStart = useRef(null);
+
+  useEffect(() => {
+    setHeroStandingZone?.('verdant_plains');
+  }, []);
 
   useEffect(() => {
     if (camInitRef.current) return;

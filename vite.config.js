@@ -17,6 +17,16 @@ export default defineConfig({
   appType: 'spa',
   build: {
     outDir: 'dist',
-    chunkSizeWarningLimit: 800,
+    chunkSizeWarningLimit: 1200,
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          state: ['zustand'],
+          motion: ['framer-motion'],
+        },
+      },
+    },
   },
 })
