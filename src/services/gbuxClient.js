@@ -37,6 +37,11 @@ export async function getPricing() {
   return apiCall('/api/gbux/pricing');
 }
 
+export async function getTokenPrice() {
+  const data = await apiCall('/api/gbux/pricing');
+  return data.tokenPrice || null;
+}
+
 export async function createWallet(userId) {
   return apiCall('/api/gbux/wallet/create', {
     method: 'POST',

@@ -9,6 +9,8 @@ import {
   transferGbux,
   checkFeatureAccess,
   deductFeatureCost,
+  getGbuxTokenPrice,
+  getPricingWithLivePrice,
   PRICING,
   FEATURE_COSTS,
 } from './src/services/gbuxService.js';
@@ -842,8 +844,27 @@ app.post('/api/discord/bot/send', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/api/gbux/pricing', (req, res) => {
-  res.json({ pricing: PRICING, featureCosts: FEATURE_COSTS });
+app.get('/api/gbux/pricing', async (req, res) => {
+  try {
+    const tokenPrice = await getGbuxTokenPrice();
+    const livePricing = getPricingWithLivePrice(tokenPrice);
+    res.json({
+      pricing: livePricing,
+      featureCosts: FEATURE_COSTS,
+      tokenPrice: tokenPrice ? {
+        priceUsd: tokenPrice.priceUsd,
+        source: tokenPrice.source,
+        volume24h: tokenPrice.volume24h,
+        liquidity: tokenPrice.liquidity,
+        marketCap: tokenPrice.marketCap,
+        lastUpdated: tokenPrice.lastUpdated,
+      } : null,
+      mintAddress: process.env.GBUX_TOKEN_ADDRESS || null,
+    });
+  } catch (e) {
+    console.error('[GBuX] Pricing endpoint error:', e.message);
+    res.json({ pricing: PRICING, featureCosts: FEATURE_COSTS, tokenPrice: null });
+  }
 });
 
 function requireUserId(req, res, next) {

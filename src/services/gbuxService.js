@@ -3,7 +3,14 @@ import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, cre
 import bs58 from 'bs58';
 
 const RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
-const GBUX_MINT = new PublicKey(process.env.GBUX_TOKEN_ADDRESS);
+let GBUX_MINT = null;
+try {
+  if (process.env.GBUX_TOKEN_ADDRESS) {
+    GBUX_MINT = new PublicKey(process.env.GBUX_TOKEN_ADDRESS);
+  }
+} catch (e) {
+  console.error('[GBuX] Invalid GBUX_TOKEN_ADDRESS:', e.message);
+}
 const GRENCH_PUBKEY = new PublicKey(process.env.GRENCH_WALLET_ADDRESS);
 const CROSSMINT_API_KEY = process.env.CROSSMINT_API_KEY;
 const CROSSMINT_BASE = 'https://www.crossmint.com/api/v1-alpha2';
@@ -56,6 +63,7 @@ const connection = new Connection(RPC_URL, 'confirmed');
 let gbuxDecimals = null;
 async function getGbuxDecimals() {
   if (gbuxDecimals !== null) return gbuxDecimals;
+  if (!GBUX_MINT) return 9;
   try {
     const mint = await getMint(connection, GBUX_MINT);
     gbuxDecimals = mint.decimals;
@@ -223,6 +231,94 @@ export async function deductFeatureCost(walletAddress, feature) {
   }
 
   return { success: true, cost, remaining: balance - cost };
+}
+
+let cachedTokenPrice = null;
+let priceLastFetched = 0;
+const PRICE_CACHE_TTL = 60000;
+
+export async function getGbuxTokenPrice() {
+  const now = Date.now();
+  if (cachedTokenPrice !== null && (now - priceLastFetched) < PRICE_CACHE_TTL) {
+    return cachedTokenPrice;
+  }
+
+  const mintAddress = process.env.GBUX_TOKEN_ADDRESS;
+  if (!mintAddress) {
+    console.warn('[GBuX] No GBUX_TOKEN_ADDRESS set, cannot fetch price');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`);
+    if (res.ok) {
+      const data = await res.json();
+      const pair = data.pairs?.[0];
+      if (pair?.priceUsd) {
+        cachedTokenPrice = {
+          priceUsd: parseFloat(pair.priceUsd),
+          priceNative: parseFloat(pair.priceNative || 0),
+          volume24h: pair.volume?.h24 || 0,
+          liquidity: pair.liquidity?.usd || 0,
+          marketCap: pair.marketCap || 0,
+          pairAddress: pair.pairAddress,
+          dexId: pair.dexId,
+          source: 'dexscreener',
+          lastUpdated: now,
+        };
+        priceLastFetched = now;
+        return cachedTokenPrice;
+      }
+    }
+  } catch (e) {
+    console.warn('[GBuX] DexScreener price fetch failed:', e.message);
+  }
+
+  try {
+    const res = await fetch(`https://price.jup.ag/v6/price?ids=${mintAddress}`);
+    if (res.ok) {
+      const data = await res.json();
+      const priceData = data.data?.[mintAddress];
+      if (priceData?.price) {
+        cachedTokenPrice = {
+          priceUsd: priceData.price,
+          priceNative: 0,
+          volume24h: 0,
+          liquidity: 0,
+          marketCap: 0,
+          pairAddress: null,
+          dexId: 'jupiter',
+          source: 'jupiter',
+          lastUpdated: now,
+        };
+        priceLastFetched = now;
+        return cachedTokenPrice;
+      }
+    }
+  } catch (e) {
+    console.warn('[GBuX] Jupiter price fetch failed:', e.message);
+  }
+
+  priceLastFetched = now;
+  return cachedTokenPrice;
+}
+
+export function getPricingWithLivePrice(tokenPrice) {
+  if (!tokenPrice?.priceUsd || tokenPrice.priceUsd <= 0) {
+    return PRICING;
+  }
+
+  const livePricing = {};
+  for (const [key, pkg] of Object.entries(PRICING)) {
+    const totalCostUsd = pkg.gbuxAmount * tokenPrice.priceUsd;
+    livePricing[key] = {
+      ...pkg,
+      liveUsdPrice: Math.round(totalCostUsd * 100) / 100,
+      tokenPriceUsd: tokenPrice.priceUsd,
+      pricePerGbux: tokenPrice.priceUsd,
+    };
+  }
+  return livePricing;
 }
 
 export { PRICING, FEATURE_COSTS, GBUX_MINT, GRENCH_PUBKEY };

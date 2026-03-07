@@ -11,6 +11,7 @@ export default function GBuxAccess({ userId, onAccessGranted, requiredFeature })
   const [success, setSuccess] = useState(null);
   const [externalWallet, setExternalWallet] = useState('');
   const [useExternal, setUseExternal] = useState(false);
+  const [tokenPrice, setTokenPrice] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -25,7 +26,10 @@ export default function GBuxAccess({ userId, onAccessGranted, requiredFeature })
         userId ? getWallet(userId) : Promise.resolve(null),
       ]);
 
-      if (pricingData.status === 'fulfilled') setPricing(pricingData.value);
+      if (pricingData.status === 'fulfilled') {
+        setPricing(pricingData.value);
+        if (pricingData.value?.tokenPrice) setTokenPrice(pricingData.value.tokenPrice);
+      }
       if (walletData.status === 'fulfilled' && walletData.value) {
         setWallet(walletData.value.wallet);
         setBalance(walletData.value.balance || 0);
@@ -229,6 +233,39 @@ export default function GBuxAccess({ userId, onAccessGranted, requiredFeature })
         </div>
       )}
 
+      {tokenPrice && (
+        <div style={{
+          display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '16px',
+          padding: '10px 16px', borderRadius: '10px', flexWrap: 'wrap',
+          background: 'rgba(251, 191, 36, 0.04)', border: '1px solid rgba(251, 191, 36, 0.1)',
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>GBuX Price</div>
+            <div style={{ fontSize: '16px', color: '#fbbf24', fontWeight: '700' }}>${tokenPrice.priceUsd.toFixed(6)}</div>
+          </div>
+          {tokenPrice.marketCap > 0 && (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>Market Cap</div>
+              <div style={{ fontSize: '14px', color: '#94a3b8', fontWeight: '600' }}>
+                ${tokenPrice.marketCap >= 1000000 ? (tokenPrice.marketCap / 1000000).toFixed(2) + 'M' : tokenPrice.marketCap >= 1000 ? (tokenPrice.marketCap / 1000).toFixed(1) + 'K' : tokenPrice.marketCap.toFixed(0)}
+              </div>
+            </div>
+          )}
+          {tokenPrice.volume24h > 0 && (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>24h Vol</div>
+              <div style={{ fontSize: '14px', color: '#94a3b8', fontWeight: '600' }}>
+                ${tokenPrice.volume24h >= 1000 ? (tokenPrice.volume24h / 1000).toFixed(1) + 'K' : tokenPrice.volume24h.toFixed(0)}
+              </div>
+            </div>
+          )}
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>Source</div>
+            <div style={{ fontSize: '12px', color: '#94a3b8' }}>{tokenPrice.source}</div>
+          </div>
+        </div>
+      )}
+
       {pricing && (
         <div>
           <h3 style={{
@@ -263,10 +300,22 @@ export default function GBuxAccess({ userId, onAccessGranted, requiredFeature })
                   <div style={{
                     fontSize: '32px', fontWeight: '700', color: '#fbbf24',
                     fontFamily: "'Cinzel', serif", marginBottom: '4px',
-                  }}>${pkg.usdPrice}</div>
-                  <div style={{ fontSize: '13px', color: '#f59e0b', marginBottom: '16px' }}>
+                  }}>
+                    {pkg.liveUsdPrice != null ? `$${pkg.liveUsdPrice.toFixed(2)}` : `$${pkg.usdPrice}`}
+                  </div>
+                  {pkg.liveUsdPrice != null && pkg.liveUsdPrice !== pkg.usdPrice && (
+                    <div style={{ fontSize: '11px', color: '#64748b', textDecoration: 'line-through', marginBottom: '2px' }}>
+                      was ${pkg.usdPrice}
+                    </div>
+                  )}
+                  <div style={{ fontSize: '13px', color: '#f59e0b', marginBottom: '4px' }}>
                     {pkg.gbuxAmount.toLocaleString()} GBuX
                   </div>
+                  {pkg.pricePerGbux && (
+                    <div style={{ fontSize: '10px', color: '#64748b', marginBottom: '12px' }}>
+                      ${pkg.pricePerGbux.toFixed(6)} per GBuX
+                    </div>
+                  )}
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
                     {pkg.features.map(f => (
                       <li key={f} style={{
