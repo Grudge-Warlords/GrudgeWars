@@ -198,6 +198,7 @@ export function GamePreview({ spec, generatedImages = {}, onBack }) {
     { id: 'world', label: 'World Map' },
     { id: 'equipment', label: 'Equipment' },
     { id: 'battle', label: '⚔️ Play Battle' },
+    { id: 'grudge', label: '🎮 Grudge Stories' },
     { id: 'sprites', label: '🤖 Sprite Worker' },
     { id: 'raw', label: 'Raw JSON' },
   ];
@@ -467,6 +468,28 @@ export function GamePreview({ spec, generatedImages = {}, onBack }) {
       case 'battle':
         return (
           <FactoryBattle spec={spec} onBack={() => setActiveTab('overview')} />
+        );
+
+      case 'grudge':
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 600 }}>
+            <div style={{ padding: '12px 16px', background: 'rgba(0,0,0,0.3)', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#e0c97f', fontFamily: 'Cinzel, serif', fontSize: 16 }}>Grudge Stories</h3>
+                <p style={{ margin: '4px 0 0', color: '#999', fontSize: 12 }}>Live RPG play testing via grudgewarlord.com</p>
+              </div>
+              <a href="https://grudgewarlord.com" target="_blank" rel="noopener noreferrer" style={{ padding: '6px 14px', background: 'linear-gradient(135deg, #d4a843 0%, #b8860b 100%)', border: 'none', borderRadius: 6, color: '#fff', fontSize: 12, fontWeight: 'bold', textDecoration: 'none', cursor: 'pointer' }}>
+                Open Full Site
+              </a>
+            </div>
+            <iframe
+              src="https://grudgewarlord.com"
+              title="Grudge Stories - RPG Play Testing"
+              style={{ flex: 1, width: '100%', minHeight: 560, border: 'none', borderRadius: '0 0 8px 8px', background: '#0a0f1a' }}
+              allow="fullscreen"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+            />
+          </div>
         );
 
       case 'sprites':
