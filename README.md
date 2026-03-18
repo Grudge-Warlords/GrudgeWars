@@ -121,6 +121,10 @@ Static HTML pages served from `public/`, accessible without login:
 - `/compendium.html` — Game compendium
 - `/hero-codex.html` — Hero codex viewer
 
+### React-Routed Pages
+
+- **[/character](https://grudgewarlords.com/character)** — Character compendium: 6 races, 4 classes with sprite previews and ability breakdowns, 8 attributes, 5 professions, island buildings, arena ranks, and gear overview. Uses ObjectStore icons throughout.
+
 ## Related Projects
 
 - **Grudge Studio** (`public-fawn-nine.vercel.app`) — Marketing/studio site, consumes public API

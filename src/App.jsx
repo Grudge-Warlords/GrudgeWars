@@ -30,6 +30,7 @@ import { HERO_CREATE_MODAL } from './constants/layers';
 import GameContainer from './components/GameContainer';
 import StudioPortal from './components/StudioPortal';
 import CraftingSuitePage from './components/CraftingSuitePage';
+import CharacterPage from './components/CharacterPage';
 import { API_BASE } from './utils/apiBase.js';
 
 const SCREEN_SLUGS = {
@@ -398,6 +399,7 @@ export default function App() {
     return null;
   }
   if (path === '/discordauth') return <DiscordAuth />;
+  if (path === '/character') return <CharacterPage />;
   if (path === '/') return <StudioPortal />;
 
   return (
