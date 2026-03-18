@@ -150,6 +150,26 @@ export async function submitHarvest({ grudgeId, characterId, materialId, quantit
   });
 }
 
+// ── AFK Harvest ──
+
+export async function assignHeroToHarvest({ grudgeId, heroId, buildingType }) {
+  return craftFetch('/harvest/assign', {
+    method: 'POST',
+    body: JSON.stringify({ grudgeId, heroId, buildingType }),
+  });
+}
+
+export async function collectHarvest(grudgeId, heroLevels = {}) {
+  return craftFetch('/harvest/collect', {
+    method: 'POST',
+    body: JSON.stringify({ grudgeId, heroLevels }),
+  });
+}
+
+export async function fetchHarvestState(grudgeId) {
+  return craftFetch(`/harvest/state/${grudgeId}`);
+}
+
 // ── Professions ──
 
 export async function fetchProfessions(grudgeId) {

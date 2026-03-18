@@ -217,6 +217,7 @@ export default function LobbyScreen() {
           <NavItem essentialIcon="Briefcase" label="ACCOUNT" active={activeTab === 'account'} onClick={() => setActiveTab('account')} />
           <NavItem essentialIcon="Cloud" label="DISCORD" active={activeTab === 'discord'} onClick={() => setActiveTab('discord')} />
           <NavItem essentialIcon="File" label="CODEX" active={activeTab === 'codex'} onClick={() => setActiveTab('codex')} />
+          <NavItem essentialIcon="Briefcase" label="CRAFTING" active={false} onClick={() => setScreen('craftingSuite')} />
           <div style={{ flex: 1 }} />
           <NavItem essentialIcon="Trophy" label="CREDITS" active={activeTab === 'credits'} onClick={() => setActiveTab('credits')} />
         </div>
@@ -3329,36 +3330,22 @@ function CreditsTab({ panelStyle }) {
 }
 
 function CraftingSuiteCard({ cardStyle }) {
-  const [launching, setLaunching] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleLaunch = async () => {
-    setLaunching(true);
-    setError(null);
-    const result = await launchCraftingSuite();
-    setLaunching(false);
-    if (!result.success) {
-      setError(result.error);
-      // Clear error after a few seconds
-      setTimeout(() => setError(null), 4000);
-    }
-  };
+  const setScreen = useGameStore(s => s.setScreen);
 
   return (
     <>
       <WarRoomCard
-        onClick={handleLaunch}
+        onClick={() => setScreen('craftingSuite')}
         borderColor="rgba(59,130,246,0.3)"
         hoverBorderColor="rgba(59,130,246,0.6)"
         hoverShadow="0 0 24px rgba(59,130,246,0.2), 0 8px 32px rgba(0,0,0,0.4)"
         bgImage="/backgrounds/crafting_forge.png"
         tagColor="rgba(59,130,246,0.7)"
-        tag={launching ? 'CONNECTING...' : 'CRAFTING'}
+        tag="CRAFTING"
         titleColor="#3b82f6"
         title="Crafting Suite"
-        subtitle={error || 'Inventory, crafting & professions'}
+        subtitle="Inventory, crafting & professions"
         cardStyle={cardStyle}
-        disabled={launching}
       />
     </>
   );

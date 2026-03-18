@@ -33,6 +33,8 @@ export default function IslandSidebar({ selectedBuildingType, onSelectBuilding, 
   const recallHeroFromIsland = useGameStore(s => s.recallHeroFromIsland);
   const assignHeroToBuilding = useGameStore(s => s.assignHeroToBuilding);
   const removeIslandBuilding = useGameStore(s => s.removeIslandBuilding);
+  const setScreen = useGameStore(s => s.setScreen);
+  const afkHarvestAssignments = useGameStore(s => s.afkHarvestAssignments);
 
   const [expandedSection, setExpandedSection] = useState('buildings');
   const [assigningHeroFor, setAssigningHeroFor] = useState(null); // buildingId
@@ -255,6 +257,45 @@ export default function IslandSidebar({ selectedBuildingType, onSelectBuilding, 
           ))}
         </div>
       )}
+
+      {/* AFK Harvest Status */}
+      {Object.keys(afkHarvestAssignments).length > 0 && (
+        <div style={{ padding: 12, borderBottom: '2px solid rgba(255,107,53,0.2)' }}>
+          <div style={{ color: '#ff6b35', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+            🏠 AFK Harvesting ({Object.keys(afkHarvestAssignments).length})
+          </div>
+          {Object.entries(afkHarvestAssignments).map(([heroId, assignment]) => {
+            const hero = heroRoster.find(h => h.id === heroId);
+            const def = BUILDING_DEFS[assignment.buildingType];
+            const elapsed = Math.floor((Date.now() - (assignment.startedAt || Date.now())) / 60000);
+            return (
+              <div key={heroId} style={{
+                background: 'rgba(0,255,136,0.06)', borderRadius: 4, padding: '6px 8px', marginBottom: 4,
+                borderLeft: '3px solid #00ff88',
+              }}>
+                <div style={{ fontSize: 11, color: '#e2e8f0', fontWeight: 600 }}>
+                  {hero?.name || heroId} {def ? `→ ${def.emoji} ${def.label}` : ''}
+                </div>
+                <div style={{ fontSize: 9, color: '#6ee7b3' }}>
+                  {elapsed}m elapsed • {assignment.rates ? Object.entries(assignment.rates).map(([r, v]) => `${v} ${r}/min`).join(', ') : ''}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Open Crafting Suite */}
+      <div style={{ padding: 12, borderBottom: '2px solid rgba(255,107,53,0.2)' }}>
+        <button onClick={() => setScreen('craftingSuite')} style={{
+          width: '100%', padding: '10px 14px', borderRadius: 6, border: '2px solid rgba(212,168,67,0.5)',
+          background: 'linear-gradient(135deg, rgba(212,168,67,0.15), rgba(247,147,30,0.15))',
+          color: '#d4a843', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+          textTransform: 'uppercase', letterSpacing: 1, transition: 'all 0.2s',
+        }}>
+          ⚔️ Open Crafting Suite
+        </button>
+      </div>
 
       {/* Controls hint */}
       <div style={{

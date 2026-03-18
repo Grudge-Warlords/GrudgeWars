@@ -507,6 +507,10 @@ const useGameStore = create(persist((set, get) => ({
   suiteCharacters: [],     // characters from suite DB
   suiteSyncError: null,
 
+  // ── AFK Harvest Assignments (server-persisted) ──
+  afkHarvestAssignments: {},  // { heroId: { buildingType, startedAt, rates } }
+  afkHarvestLastSync: 0,
+
   setScreen: (screen) => set({ screen }),
 
   setPlayerName: (name) => set({ playerName: name }),
@@ -4063,6 +4067,31 @@ const useGameStore = create(persist((set, get) => ({
     return { success: true, total };
   },
 
+  // ── AFK Harvest Actions ──
+
+  setAfkHarvestAssignments: (assignments) => set({ afkHarvestAssignments: assignments || {} }),
+
+  assignAfkHarvest: (heroId, buildingType) => {
+    const state = get();
+    if (state.activeHeroIds.includes(heroId)) return { success: false, reason: 'Hero is in active party' };
+    const RATES = {
+      mine: { ore: 5, stone: 3 }, lumber: { wood: 8 }, herb: { herbs: 6 },
+      kitchen: { food: 10 }, workshop: { crystals: 3 }, farm: { food: 10 },
+    };
+    if (!RATES[buildingType]) return { success: false, reason: 'Invalid building type' };
+    const newAssignments = { ...state.afkHarvestAssignments };
+    newAssignments[heroId] = { buildingType, startedAt: Date.now(), rates: RATES[buildingType] };
+    set({ afkHarvestAssignments: newAssignments });
+    return { success: true };
+  },
+
+  unassignAfkHarvest: (heroId) => {
+    const state = get();
+    const newAssignments = { ...state.afkHarvestAssignments };
+    delete newAssignments[heroId];
+    set({ afkHarvestAssignments: newAssignments });
+  },
+
   resetGame: () => {
     localStorage.removeItem('grudge-warlords-save');
     const zero = { Strength: 0, Vitality: 0, Endurance: 0, Dexterity: 0, Agility: 0, Intellect: 0, Wisdom: 0, Tactics: 0 };
@@ -4143,6 +4172,8 @@ const useGameStore = create(persist((set, get) => ({
       suiteProfessions: {},
       suiteCharacters: [],
       suiteSyncError: null,
+      afkHarvestAssignments: {},
+      afkHarvestLastSync: 0,
       // Reset island state
       islandBuildings: [],
       islandHeroes: [],

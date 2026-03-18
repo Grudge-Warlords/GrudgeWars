@@ -55,6 +55,23 @@ All endpoints live in `api/index.js` as a single Vercel serverless function.
 ### Arena, Profile, Island, Wallet
 See `api/index.js` for full CRUD — arena teams/battles, character management, island ownership, Crossmint wallet integration.
 
+### Crafting Suite (In-App)
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/crafting/harvest/assign` | Assign hero to AFK harvesting building |
+| POST | `/api/crafting/harvest/collect` | Collect accumulated harvest resources |
+| GET  | `/api/crafting/harvest/state/:grudgeId` | Get current AFK harvest state |
+
+The Crafting Suite (`CraftingSuitePage.jsx`) is an in-app screen accessible from the War Room lobby, Camp scene, and Island sidebar. It provides:
+- **Dashboard** — Profession levels, active crafting jobs, recent activity
+- **Crafting Bench** — Recipe browser with tier/type/profession filters, material check, craft animation
+- **Inventory** — Combined suite + local items/resources with search and tier-colored borders
+- **AFK Harvest** — Deploy idle heroes to island buildings for passive resource generation
+- **Item Database** — Browse 3,400+ items from ObjectStore with tooltips
+- **5 Profession Pages** — Miner, Forester, Mystic, Chef, Engineer with XP bars and recipe lists
+
+Icons are resolved through the ObjectStore CDN (`objectStoreIcons.js`) with fallback to emoji. Tooltips use the shared `GameTooltip` system. Tier names and colors sync with `equipment.js` TIERS. Sidebar is mobile-responsive with collapse/expand.
+
 ## Cross-Platform Integration
 
 Grudge Warlords exposes public endpoints consumed by the Grudge Studio site (`public-fawn-nine.vercel.app`) and other Grudge apps.
@@ -92,7 +109,7 @@ The repo also contains VPS deployment scripts (`scripts/`, `deployment/`), Docke
 Centralized in `src/utils/studioUrls.js` with SSO token forwarding:
 
 - **Grudge Builder** (`grudge-builder.vercel.app`) — Character creation, islands, roster management
-- **Crafting Suite** (`warlord-crafting-suite.vercel.app`) — Forging, professions, recipes
+- **Crafting Suite** — Now integrated in-app at `/crafting-suite` route (previously external at `warlord-crafting-suite.vercel.app`)
 - **Object Store** (`molochdagod.github.io/ObjectStore`) — Game assets & sprites CDN
 
 ## Standalone Tool Pages

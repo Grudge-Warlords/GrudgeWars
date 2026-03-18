@@ -283,6 +283,12 @@ export default function HomeIslandScene() {
               color: '#6ee7b3', fontSize: '0.55rem', fontWeight: 700, textAlign: 'center',
               textShadow: '0 1px 3px rgba(0,0,0,0.9)', whiteSpace: 'nowrap',
             }}>{h.hero.name}</div>
+            {/* Harvest activity indicator */}
+            <div style={{
+              width: 6, height: 6, borderRadius: '50%', background: '#00ff88',
+              margin: '2px auto 0', boxShadow: '0 0 6px #00ff88',
+              animation: 'pulse 1.5s ease-in-out infinite',
+            }} />
           </div>
         ))}
 

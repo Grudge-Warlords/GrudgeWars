@@ -29,6 +29,7 @@ import GameContextMenuRenderer from './components/GameContextMenu';
 import { HERO_CREATE_MODAL } from './constants/layers';
 import GameContainer from './components/GameContainer';
 import StudioPortal from './components/StudioPortal';
+import CraftingSuitePage from './components/CraftingSuitePage';
 import { API_BASE } from './utils/apiBase.js';
 
 const SCREEN_SLUGS = {
@@ -45,13 +46,14 @@ const SCREEN_SLUGS = {
   account: '/account',
   training: '/training',
   scene: '/scene',
+  craftingSuite: '/crafting-suite',
 };
 
 const SLUG_TO_SCREEN = Object.fromEntries(
   Object.entries(SCREEN_SLUGS).map(([screen, slug]) => [slug, screen])
 );
 
-const SAFE_ENTRY_SCREENS = ['title', 'lobby', 'create', 'world', 'account', 'training'];
+const SAFE_ENTRY_SCREENS = ['title', 'lobby', 'create', 'world', 'account', 'training', 'craftingSuite'];
 
 function getScreenFromPath(pathname) {
   const screen = SLUG_TO_SCREEN[pathname];
@@ -124,6 +126,7 @@ function GameApp() {
     account: 'Grudge Warlords — Account',
     training: 'Grudge Warlords — Training',
     scene: 'Grudge Warlords — Scene',
+    craftingSuite: 'Grudge Warlords — Crafting Suite',
   };
 
   useEffect(() => {
@@ -247,6 +250,7 @@ function GameApp() {
       case 'account': return <AccountPage />;
       case 'training': return <TrainingScreen />;
       case 'scene': return <SceneView />;
+      case 'craftingSuite': return <CraftingSuitePage />;
       default: return <TitleScreen />;
     }
   };

@@ -134,6 +134,11 @@ export default function CampScene() {
             padding: '4px 12px', color: '#00ff88', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
             backdropFilter: 'blur(4px)', fontFamily: "'LifeCraft', 'Cinzel', serif",
           }}>🏝️ Island</button>
+          <button onClick={() => { exitScene(); useGameStore.getState().setScreen('craftingSuite'); }} style={{
+            background: 'rgba(59,130,246,0.15)', border: '1px solid #3b82f6', borderRadius: 8,
+            padding: '4px 12px', color: '#3b82f6', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
+            backdropFilter: 'blur(4px)', fontFamily: "'LifeCraft', 'Cinzel', serif",
+          }}>⚒️ Crafting</button>
           <button onClick={() => setShowSellPanel(!showSellPanel)} style={{
             background: 'rgba(0,0,0,0.6)', border: '1px solid #fbbf24', borderRadius: 8,
             padding: '4px 12px', color: '#fbbf24', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
