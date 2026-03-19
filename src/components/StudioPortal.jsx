@@ -4,11 +4,16 @@ import GameCard from './portal/GameCard';
 import QuickLinks from './portal/QuickLinks';
 import HeroPreview from './portal/HeroPreview';
 import GrudgeAuthModal from './GrudgeAuthModal';
+import { checkGatewayOnBoot, gatewaySignOut } from '../utils/grudgeGateway.js';
 
 export default function StudioPortal() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
+    // 1. Try gateway token first (auto-hydrates and syncs grudge_session_token)
+    const gwSession = checkGatewayOnBoot();
+    if (gwSession) { setSession(gwSession); return; }
+    // 2. Fallback: existing local session
     try {
       const s = JSON.parse(localStorage.getItem('grudge-session') || 'null');
       if (s && s.type && s.username) setSession(s);
@@ -18,11 +23,7 @@ export default function StudioPortal() {
   const isLoggedIn = session && ['discord', 'grudge', 'puter', 'wallet'].includes(session.type);
 
   const handleSignOut = () => {
-    localStorage.removeItem('grudge-session');
-    localStorage.removeItem('grudge_session_token');
-    localStorage.removeItem('discordUser');
-    localStorage.removeItem('grudge_studio_session');
-    localStorage.removeItem('grudge_studio_user');
+    gatewaySignOut();
     setSession(null);
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE } from '../utils/apiBase.js';
+import { redirectToGateway, isGatewayAuthenticated, GATEWAY_URL } from '../utils/grudgeGateway.js';
 
 // ── SVG icons ────────────────────────────────────────────────────────────────
 const DiscordSvg = ({ size = 18 }) => (
@@ -261,6 +262,11 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     return () => clearTimeout(t);
   }, []);
 
+  // ── Gateway redirect ─────────────────────────────────────────────────────
+  const handleGatewayLogin = () => {
+    redirectToGateway(window.location.href);
+  };
+
   // ── Guest / Quick Play ───────────────────────────────────────────────────
   const handleGuest = () => {
     const session = { type: 'guest', username: 'Adventurer', loginTime: Date.now() };
@@ -419,6 +425,21 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       </div>
       <div style={S.title}>GRUDGE<br /><span style={{ fontSize: '1rem', letterSpacing: 4 }}>WARLORDS</span></div>
       <div style={S.subtitle}>Your Grudge ID is your Gaming Passport</div>
+
+      {/* Gateway Login — primary SSO */}
+      <button
+        style={{
+          ...S.quickPlay,
+          background: 'linear-gradient(135deg, #DB6331, #FAAC47)',
+          color: '#0a0a12',
+          marginBottom: 10,
+        }}
+        onClick={handleGatewayLogin}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(250,172,71,0.4)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(192,57,43,0.4)'; }}
+      >
+        🛡️ SIGN IN WITH GRUDGE ID
+      </button>
 
       {/* Quick Play */}
       <button
