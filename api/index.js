@@ -89,17 +89,37 @@ function extractVpsUser(data) {
 }
 
 async function upsertLocalGameAccount({ grudgeId, username, discordId, walletAddress }) {
+  // Generate a Grudge UUID if none provided (new accounts)
+  const gid = grudgeId || UUID.generate('user', (discordId || walletAddress || username || 'guest') + Date.now());
+
+  // Try upsert by grudge_id first; fall back to discord_id for legacy rows
   const result = await dbQuery(
     `INSERT INTO accounts (grudge_id, username, discord_id, wallet_address, auth_type, last_login)
      VALUES ($1, $2, $3, $4, 'vps', NOW())
      ON CONFLICT (grudge_id) DO UPDATE SET
-       username     = COALESCE(EXCLUDED.username, accounts.username),
-       discord_id   = COALESCE(EXCLUDED.discord_id, accounts.discord_id),
+       username       = COALESCE(EXCLUDED.username, accounts.username),
+       discord_id     = COALESCE(EXCLUDED.discord_id, accounts.discord_id),
        wallet_address = COALESCE(EXCLUDED.wallet_address, accounts.wallet_address),
-       last_login   = NOW(), updated_at = NOW()
+       last_login     = NOW(), updated_at = NOW()
      RETURNING *`,
-    [grudgeId, username || 'Unknown', discordId || null, walletAddress || null]
-  );
+    [gid, username || 'Unknown', discordId || null, walletAddress || null]
+  ).catch(async (err) => {
+    // Fallback: if grudge_id constraint fails (NULL unique issue), upsert by discord_id
+    if (discordId && err.message?.includes('null value')) {
+      return dbQuery(
+        `INSERT INTO accounts (grudge_id, username, discord_id, wallet_address, auth_type, last_login)
+         VALUES ($1, $2, $3, $4, 'vps', NOW())
+         ON CONFLICT (discord_id) DO UPDATE SET
+           grudge_id      = COALESCE(accounts.grudge_id, EXCLUDED.grudge_id),
+           username       = COALESCE(EXCLUDED.username, accounts.username),
+           wallet_address = COALESCE(EXCLUDED.wallet_address, accounts.wallet_address),
+           last_login     = NOW(), updated_at = NOW()
+         RETURNING *`,
+        [gid, username || 'Unknown', discordId, walletAddress || null]
+      );
+    }
+    throw err;
+  });
   return result.rows[0];
 }
 
@@ -241,10 +261,15 @@ async function ensureDB() {
       'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS grudge_username VARCHAR(64)',
       'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS password_hash VARCHAR(256)',
       "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS auth_type VARCHAR(32) DEFAULT 'discord'",
-      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS grudge_id VARCHAR(32)',
+      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS grudge_id VARCHAR(64)',  // Grudge UUID format: USER-YYYYMMDDHHMMSS-XXXXXX-YYYYYYYY
       'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS puter_uuid VARCHAR(128)',
       'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS game_state JSONB',
       'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS game_state_updated_at TIMESTAMPTZ',
+      // Widen existing grudge_id column if it was created as VARCHAR(32)
+      'ALTER TABLE accounts ALTER COLUMN grudge_id TYPE VARCHAR(64)',
+      // Asset/inventory item UUID tracking
+      'ALTER TABLE inventory_items ADD COLUMN IF NOT EXISTS grudge_item_id VARCHAR(64)',
+      'ALTER TABLE crafted_items   ADD COLUMN IF NOT EXISTS grudge_item_id VARCHAR(64)',
     ];
     for (const sql of migrations) await safe(sql, 'migration');
 
