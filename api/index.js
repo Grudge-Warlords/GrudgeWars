@@ -406,6 +406,47 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// ── AUTH: Wallet ───────────────────────────────────────────────────────────
+app.post('/api/auth/wallet', async (req, res) => {
+  try {
+    const { address } = req.body;
+    if (!address || typeof address !== 'string' || address.length < 32) {
+      return res.status(400).json({ error: 'Valid wallet address required' });
+    }
+    const cleanAddr = address.trim().slice(0, 64);
+    const username = `${cleanAddr.slice(0, 4)}…${cleanAddr.slice(-4)}`;
+    const result = await dbQuery(
+      `INSERT INTO accounts (wallet_address, wallet_chain, username, auth_type, last_login)
+       VALUES ($1, 'solana', $2, 'wallet', NOW())
+       ON CONFLICT (wallet_address) DO UPDATE SET last_login = NOW(), updated_at = NOW()
+       RETURNING *`,
+      [cleanAddr, username]
+    ).catch(async () => {
+      // wallet_address column may not have a UNIQUE constraint yet — upsert by grudge_id instead
+      const r2 = await dbQuery(
+        `INSERT INTO accounts (wallet_address, wallet_chain, username, auth_type, last_login)
+         VALUES ($1, 'solana', $2, 'wallet', NOW())
+         ON CONFLICT DO NOTHING RETURNING *`,
+        [cleanAddr, username]
+      );
+      if (r2.rows.length) return r2;
+      return dbQuery(`SELECT * FROM accounts WHERE wallet_address=$1`, [cleanAddr]);
+    });
+    const account = result.rows[0];
+    if (!account) return res.status(500).json({ error: 'Account upsert failed' });
+    const grudgeId = account.grudge_id || null;
+    const sessionToken = createJWT({
+      grudge_id: grudgeId,
+      username: account.username,
+      wallet_address: cleanAddr,
+    });
+    res.json({ success: true, sessionToken, grudgeId, user: { id: account.id, username: account.username, walletAddress: cleanAddr } });
+  } catch (err) {
+    console.error('Wallet auth error:', err.message);
+    res.status(500).json({ error: 'Wallet auth failed' });
+  }
+});
+
 // ── AUTH: Puter (VPS proxy) ─────────────────────────────────────────────────
 app.post('/api/auth/puter', async (req, res) => {
   try {
