@@ -246,11 +246,11 @@ export default function GKOBoxing() {
       @keyframes dmgFloat { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-60px); opacity: 0; } }
       @keyframes actionFloat { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-50px) scale(0.7); opacity: 0; } }
       @keyframes announceSlam { 0% { transform: scale(3); opacity: 0; } 30% { transform: scale(1); opacity: 1; } 80% { opacity: 1; } 100% { transform: scale(0.8) translateY(-20px); opacity: 0; } }
-      @keyframes dodgeTilt {
-        0% { transform: scaleX(var(--fighter-dir, 1)) rotate(0deg); }
-        30% { transform: scaleX(var(--fighter-dir, 1)) rotate(calc(var(--dodge-dir, 1) * -12deg)) translateX(calc(var(--dodge-dir, 1) * 10px)); }
-        70% { transform: scaleX(var(--fighter-dir, 1)) rotate(calc(var(--dodge-dir, 1) * -12deg)) translateX(calc(var(--dodge-dir, 1) * 10px)); }
-        100% { transform: scaleX(var(--fighter-dir, 1)) rotate(0deg); }
+      @keyframes gkoDodgeTilt {
+        0% { transform: rotate(0deg) translateX(0); }
+        30% { transform: rotate(calc(var(--dodge-dir, 1) * -12deg)) translateX(calc(var(--dodge-dir, 1) * 10px)); }
+        70% { transform: rotate(calc(var(--dodge-dir, 1) * -12deg)) translateX(calc(var(--dodge-dir, 1) * 10px)); }
+        100% { transform: rotate(0deg) translateX(0); }
       }
       @keyframes ringRopesBounce { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.02); } }
       @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
@@ -520,31 +520,47 @@ export default function GKOBoxing() {
   }, [playerAttack]);
 
   // ── Render fighter ─────────────────────────────────────────────────────
+  // Both sprites (hero-knight, fantasy-warrior) natively face RIGHT.
+  // Player (left side) faces right toward opponent → no flip.
+  // Opponent (right side) faces left toward player → flip.
+  // We separate the flip into an outer wrapper so dodge/block animations
+  // don't fight with the scaleX flip.
   const renderFighter = (spriteData, anim, x, flip, dodging, blocking, side) => {
     const dodgeDir = side === 'left' ? 1 : -1;
-    const fighterDir = flip ? -1 : 1;
+    // Account for sprites that natively face left (facesLeft: true)
+    const nativeFacesLeft = !!spriteData?.facesLeft;
+    // Player (flip=false): should face right. If sprite nativeFacesLeft, flip it.
+    // Opponent (flip=true): should face left. If sprite nativeFacesLeft, don't flip.
+    const needsFlip = flip ? !nativeFacesLeft : nativeFacesLeft;
     return (
       <div style={{
         position: 'absolute', left: `${x}%`, bottom: '12%',
         transform: 'translateX(-50%)', zIndex: 20,
       }}>
+        {/* Outer: constant flip to face the correct direction */}
         <div style={{
-          '--fighter-dir': fighterDir, '--dodge-dir': dodgeDir,
-          animation: dodging ? `dodgeTilt ${FIGHTER_DEFAULTS.dodgeDuration}ms ease-in-out` : 'none',
-          transformOrigin: 'bottom center',
-          transform: blocking ? `scaleX(${fighterDir}) scaleY(0.92)` : `scaleX(${fighterDir})`,
-          transition: blocking ? 'transform 0.1s' : 'none',
-          filter: blocking ? 'brightness(0.85)' : 'none',
+          transform: needsFlip ? 'scaleX(-1)' : 'none',
+          transformOrigin: 'center bottom',
         }}>
-          <SpriteAnimation
-            spriteData={spriteData}
-            animation={anim}
-            scale={2.5}
-            flip={false}
-            loop={anim === 'idle' || anim === 'walk' || anim === getAnim(spriteData, 'block')}
-            speed={anim === 'idle' ? 140 : anim === 'walk' ? 90 : 80}
-            containerless={false}
-          />
+          {/* Inner: dodge tilt + block crouch (no flip here) */}
+          <div style={{
+            '--dodge-dir': dodgeDir * (needsFlip ? -1 : 1),
+            animation: dodging ? `gkoDodgeTilt ${FIGHTER_DEFAULTS.dodgeDuration}ms ease-in-out` : 'none',
+            transformOrigin: 'bottom center',
+            transform: blocking ? 'scaleY(0.92)' : 'none',
+            transition: blocking ? 'transform 0.1s' : 'none',
+            filter: blocking ? 'brightness(0.85)' : 'none',
+          }}>
+            <SpriteAnimation
+              spriteData={spriteData}
+              animation={anim}
+              scale={2.5}
+              flip={false}
+              loop={anim === 'idle' || anim === 'walk' || anim === getAnim(spriteData, 'block')}
+              speed={anim === 'idle' ? 140 : anim === 'walk' ? 90 : 80}
+              containerless={false}
+            />
+          </div>
         </div>
         <div style={{
           position: 'absolute', bottom: -6, left: '50%', transform: 'translateX(-50%)',
