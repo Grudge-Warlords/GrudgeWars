@@ -83,8 +83,8 @@ function StrengthTraining({ onComplete }) {
   }, [phase, hitNum]);
 
   const scoreHit = (pos) => {
-    if (pos >= 42 && pos <= 58) return { gained: 5, label: 'PERFECT!' };
-    if (pos >= 30 && pos <= 70) return { gained: 3, label: 'GREAT!' };
+    if (pos >= 42 && pos <= 58) return { gained: 2, label: 'PERFECT!' };
+    if (pos >= 30 && pos <= 70) return { gained: 1, label: 'GREAT!' };
     if (pos >= 20 && pos <= 80) return { gained: 1, label: 'OK' };
     return { gained: 0, label: 'MISS!' };
   };
@@ -183,8 +183,8 @@ function StrengthTraining({ onComplete }) {
         )}
         {phase === 'done' && (
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: FONT, fontSize: '1rem', color: totalGained >= 12 ? '#22c55e' : totalGained >= 6 ? '#eab308' : '#ef4444', marginBottom: 8, textShadow: '0 0 10px currentColor' }}>
-              {totalGained >= 12 ? 'DEVASTATING!' : totalGained >= 8 ? 'POWERFUL!' : totalGained >= 4 ? 'DECENT' : 'WEAK...'}
+            <div style={{ fontFamily: FONT, fontSize: '1rem', color: totalGained >= 5 ? '#22c55e' : totalGained >= 3 ? '#eab308' : '#ef4444', marginBottom: 8, textShadow: '0 0 10px currentColor' }}>
+              {totalGained >= 5 ? 'DEVASTATING!' : totalGained >= 3 ? 'POWERFUL!' : totalGained >= 1 ? 'DECENT' : 'WEAK...'}
             </div>
             <div style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#ffd700', marginBottom: 16 }}>
               TOTAL: +{totalGained} STRENGTH
@@ -343,11 +343,14 @@ function SpeedTraining({ onComplete }) {
       {done && (
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, background: 'rgba(0,0,0,0.6)' }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: FONT, fontSize: '1.2rem', color: score >= 8 ? '#22c55e' : score >= 5 ? '#eab308' : '#ef4444', marginBottom: 10, textShadow: '0 0 10px currentColor' }}>
-              {score >= 8 ? 'LIGHTNING FAST!' : score >= 5 ? 'NICE REFLEXES!' : 'KEEP PRACTICING!'}
+            {(() => { const gained = Math.ceil(score / 2); return (<>
+            <div style={{ fontFamily: FONT, fontSize: '1.2rem', color: gained >= 4 ? '#22c55e' : gained >= 2 ? '#eab308' : '#ef4444', marginBottom: 10, textShadow: '0 0 10px currentColor' }}>
+              {gained >= 4 ? 'LIGHTNING FAST!' : gained >= 2 ? 'NICE REFLEXES!' : 'KEEP PRACTICING!'}
             </div>
-            <div style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#ffd700', marginBottom: 20 }}>+{score} SPEED</div>
-            <ActionButton onClick={() => onComplete(score)}>CONTINUE</ActionButton>
+            <div style={{ fontFamily: FONT, fontSize: '0.6rem', color: '#aaa', marginBottom: 4 }}>{score}/10 targets hit</div>
+            <div style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#ffd700', marginBottom: 20 }}>+{gained} SPEED</div>
+            <ActionButton onClick={() => onComplete(gained)}>CONTINUE</ActionButton>
+            </>); })()}
           </div>
         </div>
       )}
@@ -497,11 +500,14 @@ function HealthTraining({ onComplete }) {
       {phase === 'done' && (
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, background: 'rgba(0,0,0,0.6)' }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: FONT, fontSize: '1.2rem', color: score >= 8 ? '#22c55e' : score >= 5 ? '#eab308' : '#ef4444', marginBottom: 10, textShadow: '0 0 10px currentColor' }}>
-              {score >= 8 ? 'IRON CHIN!' : score >= 5 ? 'TOUGH GUY!' : 'GLASS JAW!'}
+            {(() => { const gained = Math.ceil(score / 2); return (<>
+            <div style={{ fontFamily: FONT, fontSize: '1.2rem', color: gained >= 4 ? '#22c55e' : gained >= 2 ? '#eab308' : '#ef4444', marginBottom: 10, textShadow: '0 0 10px currentColor' }}>
+              {gained >= 4 ? 'IRON CHIN!' : gained >= 2 ? 'TOUGH GUY!' : 'GLASS JAW!'}
             </div>
-            <div style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#ffd700', marginBottom: 20 }}>+{score} HEALTH</div>
-            <ActionButton onClick={() => onComplete(score)}>CONTINUE</ActionButton>
+            <div style={{ fontFamily: FONT, fontSize: '0.6rem', color: '#aaa', marginBottom: 4 }}>{score}/10 defended</div>
+            <div style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#ffd700', marginBottom: 20 }}>+{gained} HEALTH</div>
+            <ActionButton onClick={() => onComplete(gained)}>CONTINUE</ActionButton>
+            </>); })()}
           </div>
         </div>
       )}
