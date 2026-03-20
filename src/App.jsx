@@ -31,6 +31,7 @@ import GameContainer from './components/GameContainer';
 import StudioPortal from './components/StudioPortal';
 import CraftingSuitePage from './components/CraftingSuitePage';
 import CharacterPage from './components/CharacterPage';
+import GKOBoxing from './components/GKOBoxing';
 import { API_BASE } from './utils/apiBase.js';
 
 const SCREEN_SLUGS = {
@@ -400,6 +401,7 @@ export default function App() {
   }
   if (path === '/discordauth') return <DiscordAuth />;
   if (path === '/character') return <CharacterPage />;
+  if (path === '/gko-boxing') return <GKOBoxing />;
   if (path === '/') return <StudioPortal />;
 
   return (
