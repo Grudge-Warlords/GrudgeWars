@@ -190,6 +190,41 @@ export function getMaterialIcon(category, tier = 1) {
   return `${OBJECTSTORE_BASE}/icons/materials/${filename}.png`;
 }
 
+// ── 3D Model URL helpers ───────────────────────────────────────────────────────
+
+/**
+ * Get a resource model URL (GLTF preferred, OBJ fallback).
+ * @param {string} modelName - e.g. "Silver_Bars", "Copper_Bar"
+ * @param {string} format - 'gltf' | 'obj' | 'fbx' (default: 'gltf')
+ * @returns {string} Full CDN URL
+ */
+export function getResourceModelUrl(modelName, format = 'gltf') {
+  const ext = format === 'gltf' ? '.gltf' : format === 'obj' ? '.obj' : `.${format}`;
+  return `${OBJECTSTORE_BASE}/KayKit_ResourceBits_1.0_FREE/Assets/${format}/${modelName}${ext}`;
+}
+
+/**
+ * Get a building model URL.
+ * @param {string} modelName - e.g. "castle", "market"
+ * @param {string} format - 'gltf' | 'obj' | 'fbx'
+ * @returns {string} Full CDN URL
+ */
+export function getBuildingModelUrl(modelName, format = 'gltf') {
+  // KayKit Medieval Builder GLB files use .gltf.glb naming convention
+  const ext = format === 'gltf' ? '.gltf.glb' : `.${format}`;
+  const sub = format === 'gltf' ? 'gltf' : format;
+  return `${OBJECTSTORE_BASE}/models/KayKit_MedievalBuilder/objects/${sub}/${modelName}${ext}`;
+}
+
+/**
+ * Get a character model URL (GLB only).
+ * @param {string} characterName - e.g. "Knight", "Barbarian"
+ * @returns {string} Full CDN URL
+ */
+export function getCharacterModelUrl(characterName) {
+  return `${OBJECTSTORE_BASE}/models/characters/kaykit/${characterName}.glb`;
+}
+
 // ── Profession icons ─────────────────────────────────────────────────────────
 const PROFESSION_ICONS = {
   miner:    'professions/miner_profession_game_icon.png',

@@ -1828,6 +1828,58 @@ app.post('/api/studio/resolve-asset/batch', async (req, res) => {
   res.json({ resolved: results, count: Object.values(results).filter(Boolean).length, total: limit });
 });
 
+// ── Studio: 3D Models Catalog ───────────────────────────────────────────
+app.get('/api/studio/models/catalog', async (req, res) => {
+  try {
+    const data = await fetchDataset('models');
+    if (!data) return res.status(404).json({ error: 'Models catalog not available' });
+    const { category, tag, q } = req.query;
+    if (!category && !tag && !q) return res.json(data);
+    // Filter by category
+    let cats = data.categories;
+    if (category) cats = { [category]: cats[category] };
+    // Filter items by tag or search query
+    const filtered = {};
+    for (const [catKey, catData] of Object.entries(cats)) {
+      if (!catData) continue;
+      let items = catData.items || [];
+      if (tag) items = items.filter(i => i.tags?.includes(tag));
+      if (q) {
+        const ql = q.toLowerCase();
+        items = items.filter(i => i.name.toLowerCase().includes(ql) || i.id.includes(ql) || i.tags?.some(t => t.includes(ql)));
+      }
+      if (items.length > 0) filtered[catKey] = { ...catData, items };
+    }
+    res.json({ ...data, categories: filtered });
+  } catch (err) {
+    res.status(502).json({ error: 'Models catalog fetch failed', message: err.message });
+  }
+});
+
+/** GET /api/studio/models/:category/:id — Get a single model entry with resolved URLs */
+app.get('/api/studio/models/:category/:id', async (req, res) => {
+  try {
+    const data = await fetchDataset('models');
+    if (!data) return res.status(404).json({ error: 'Models catalog not available' });
+    const cat = data.categories?.[req.params.category];
+    if (!cat) return res.status(404).json({ error: 'Unknown category', available: Object.keys(data.categories) });
+    const model = cat.items.find(i => i.id === req.params.id);
+    if (!model) return res.status(404).json({ error: 'Model not found' });
+    // Resolve URLs for each available format
+    const urls = {};
+    const extMap = cat.fileExtensions || {};
+    for (const [fmt, basePath] of Object.entries(cat.basePaths)) {
+      const ext = extMap[fmt] || (fmt === 'glb' ? '.glb' : fmt === 'gltf' ? '.gltf' : `.${fmt}`);
+      try {
+        urls[fmt] = await resolveAssetUrl(`${basePath}/${model.file}${ext}`);
+      } catch { urls[fmt] = null; }
+    }
+    res.json({ ...model, category: req.params.category, urls, pack: cat.pack });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Studio: Cache ObjectStore → Puter KV ────────────────────────────────────
 app.post('/api/studio/cache/objectstore', async (req, res) => {
   const { datasets } = req.body; // array of dataset names, or omit for all

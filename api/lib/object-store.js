@@ -17,8 +17,9 @@ export const DATASETS = [
   'skills', 'professions', 'spriteMaps', 'classes', 'races',
   'factions', 'attributes', 'enemies', 'bosses', 'sprites',
   'ai', 'animations', 'controllers', 'ecs', 'factionUnits',
-  'nodeUpgrades', 'rendering', 'terrain', 'tileMaps',
+  'nodeUpgrades', 'rendering', 'terrain', 'tileMaps', 'models',
 ];
+
 
 // ── In-memory TTL cache ─────────────────────────────────────────────────────
 const cache = new Map();
@@ -80,14 +81,29 @@ export async function resolveAssetUrl(assetPath) {
     }
   }
 
-  // 2. Check GitHub Pages (HEAD request to avoid returning a 404 URL)
+  // 2. If requesting OBJ/FBX/DAE, try GLTF/GLB equivalents first (smaller, faster)
+  const ext = cleanPath.match(/\.(obj|fbx|dae)$/i)?.[1]?.toLowerCase();
+  if (ext) {
+    const stem = cleanPath.replace(/\.(obj|fbx|dae)$/i, '');
+    // Try common GLB naming patterns: .glb, .gltf.glb, .gltf
+    const altPaths = [`${stem}.glb`, `${stem}.gltf.glb`, `${stem}.gltf`];
+    for (const altPath of altPaths) {
+      const altUrl = `${OBJECT_STORE_BASE}/${altPath}`;
+      try {
+        const altHead = await fetch(altUrl, { method: 'HEAD' });
+        if (altHead.ok) return altUrl;
+      } catch { /* try next */ }
+    }
+  }
+
+  // 3. Check GitHub Pages for the original path
   const ghUrl = `${OBJECT_STORE_BASE}/${cleanPath}`;
   try {
     const headRes = await fetch(ghUrl, { method: 'HEAD' });
     if (headRes.ok) return ghUrl;
   } catch { /* GitHub Pages unreachable */ }
 
-  // 3. Nothing found — throw so callers can handle gracefully
+  // 4. Nothing found — throw so callers can handle gracefully
   throw new Error(`Asset not found: ${cleanPath} (checked S3 and GitHub Pages)`);
 }
 
