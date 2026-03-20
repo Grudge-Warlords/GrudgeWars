@@ -477,39 +477,119 @@ function HealthTraining({ onComplete }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// PVE ROSTER — 8 fighters with records, stats, AI sim
+// ═══════════════════════════════════════════════════════════════════════
+const INITIAL_ROSTER = [
+  { id: 'raze',    name: 'RAZE',    color: '#3b82f6', difficulty: 1.0,  isPlayer: true,  wins: 0, losses: 0, stats: { strength: 10, speed: 10, health: 10 } },
+  { id: 'iron',    name: 'IRON MAX', color: '#ef4444', difficulty: 1.3,  isPlayer: false, wins: 2, losses: 0, stats: { strength: 18, speed: 12, health: 16 } },
+  { id: 'vex',     name: 'VEX',     color: '#a855f7', difficulty: 1.2,  isPlayer: false, wins: 2, losses: 0, stats: { strength: 14, speed: 16, health: 14 } },
+  { id: 'brick',   name: 'BRICK',   color: '#f97316', difficulty: 0.9,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 16, speed: 10, health: 14 } },
+  { id: 'phantom', name: 'PHANTOM', color: '#22d3ee', difficulty: 1.0,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 12, speed: 18, health: 10 } },
+  { id: 'skull',   name: 'SKULL',   color: '#6b7280', difficulty: 0.85, isPlayer: false, wins: 1, losses: 1, stats: { strength: 14, speed: 12, health: 14 } },
+  { id: 'blaze',   name: 'BLAZE',   color: '#f59e0b', difficulty: 0.8,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 12, speed: 14, health: 12 } },
+  { id: 'rookie',  name: 'ROOKIE',  color: '#48bb78', difficulty: 0.6,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 10, speed: 10, health: 10 } },
+];
+
+function sortStandings(roster) {
+  return [...roster].sort((a, b) => {
+    const aPct = a.wins + a.losses > 0 ? a.wins / (a.wins + a.losses) : 0;
+    const bPct = b.wins + b.losses > 0 ? b.wins / (b.wins + b.losses) : 0;
+    if (b.wins !== a.wins) return b.wins - a.wins;
+    if (bPct !== aPct) return bPct - aPct;
+    return a.losses - b.losses;
+  });
+}
+
+// Sim a fight between two AI fighters. Higher stats + difficulty = higher win chance.
+function simAIFight(a, b) {
+  const aPower = (a.stats.strength + a.stats.speed + a.stats.health) * a.difficulty + Math.random() * 20;
+  const bPower = (b.stats.strength + b.stats.speed + b.stats.health) * b.difficulty + Math.random() * 20;
+  return aPower >= bPower ? a.id : b.id;
+}
+
+// Give AI fighters small random stat gains between rounds (much less than player)
+function aiTrainStats(stats) {
+  const pick = ['strength', 'speed', 'health'][Math.floor(Math.random() * 3)];
+  return { ...stats, [pick]: Math.min(100, stats[pick] + Math.floor(Math.random() * 2) + 1) };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // MAIN CAMPAIGN HUB
 // ═══════════════════════════════════════════════════════════════════════
 export default function GKOCampaign() {
-  const [screen, setScreen] = useState('lobby'); // lobby, training_pick, strength, speed, health, fight, postfight
-  const [stats, setStats] = useState({ strength: 10, speed: 10, health: 10 });
-  const [opponentIdx, setOpponentIdx] = useState(0);
-  const [record, setRecord] = useState({ wins: 0, losses: 0 });
+  const [screen, setScreen] = useState('lobby');
+  const [roster, setRoster] = useState(INITIAL_ROSTER);
+  const [selectedOpponent, setSelectedOpponent] = useState(null);
   const [lastFightResult, setLastFightResult] = useState(null);
+  const [lastSimResults, setLastSimResults] = useState([]);
   const [trainedThisRound, setTrainedThisRound] = useState(false);
+  const [showSimResults, setShowSimResults] = useState(false);
 
-  const currentOpponent = OPPONENTS[opponentIdx] || OPPONENTS[OPPONENTS.length - 1];
-  const campaignComplete = opponentIdx >= OPPONENTS.length;
+  const player = roster.find(f => f.isPlayer);
+  const standings = sortStandings(roster);
+  const playerRank = standings.findIndex(f => f.isPlayer) + 1;
+  const isChampion = playerRank === 1 && player.wins >= 3;
+
+  // Matchmaking: player fights the person directly above them in standings (or anyone below if #1)
+  const getNextOpponent = () => {
+    if (playerRank <= 1) return standings.find(f => !f.isPlayer); // fight #2
+    return standings[playerRank - 2]; // fight the person above
+  };
 
   const handleTrainingComplete = (type, gained) => {
-    setStats(prev => ({ ...prev, [type]: Math.min(100, prev[type] + gained) }));
+    setRoster(prev => prev.map(f => f.isPlayer ? { ...f, stats: { ...f.stats, [type]: Math.min(100, f.stats[type] + gained) } } : f));
     setTrainedThisRound(true);
     setScreen('lobby');
   };
 
-  const handleFightEnd = (result) => {
-    // result: 'win' or 'lose'
-    if (result === 'win') {
-      setRecord(prev => ({ ...prev, wins: prev.wins + 1 }));
-      setOpponentIdx(prev => prev + 1);
-    } else {
-      setRecord(prev => ({ ...prev, losses: prev.losses + 1 }));
+  const simOtherFights = () => {
+    // Pair up non-player fighters for 1-2 simulated bouts
+    const aiRoster = roster.filter(f => !f.isPlayer);
+    const results = [];
+    const shuffled = [...aiRoster].sort(() => Math.random() - 0.5);
+    const pairCount = Math.min(2, Math.floor(shuffled.length / 2));
+    for (let i = 0; i < pairCount; i++) {
+      const a = shuffled[i * 2];
+      const b = shuffled[i * 2 + 1];
+      if (!a || !b) break;
+      const winnerId = simAIFight(a, b);
+      results.push({ a: a.id, b: b.id, winner: winnerId });
     }
+    return results;
+  };
+
+  const applySimResults = (simResults) => {
+    setRoster(prev => {
+      let updated = [...prev];
+      for (const r of simResults) {
+        updated = updated.map(f => {
+          if (f.id === r.winner) return { ...f, wins: f.wins + 1 };
+          if (f.id === r.a || f.id === r.b) return { ...f, losses: f.losses + 1 };
+          return f;
+        });
+      }
+      // AI training: small gains
+      updated = updated.map(f => f.isPlayer ? f : { ...f, stats: aiTrainStats(f.stats) });
+      return updated;
+    });
+  };
+
+  const handleFightEnd = (result) => {
+    const opId = selectedOpponent?.id;
+    setRoster(prev => prev.map(f => {
+      if (f.isPlayer) return { ...f, wins: f.wins + (result === 'win' ? 1 : 0), losses: f.losses + (result === 'lose' ? 1 : 0) };
+      if (f.id === opId) return { ...f, wins: f.wins + (result === 'lose' ? 1 : 0), losses: f.losses + (result === 'win' ? 1 : 0) };
+      return f;
+    }));
+    // Sim other fights while player was fighting
+    const simResults = simOtherFights();
+    applySimResults(simResults);
+    setLastSimResults(simResults);
     setLastFightResult(result);
     setTrainedThisRound(false);
     setScreen('postfight');
   };
 
-  // ── Inject styles ──
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
@@ -530,83 +610,103 @@ export default function GKOCampaign() {
 
   // ── LOBBY ──
   if (screen === 'lobby') {
+    const nextOp = getNextOpponent();
     return (
       <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${ARENA_BG})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.35)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 30%, rgba(255,215,0,0.05) 0%, transparent 60%)' }} />
 
-        <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
-          <h1 style={{ fontFamily: FONT, color: '#ffd700', fontSize: '1.4rem', textShadow: '0 0 20px rgba(255,215,0,0.4), 3px 3px 0 #000', letterSpacing: 4 }}>
-            G.K.O. BOXING
+        <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 0', overflow: 'auto' }}>
+          <h1 style={{ fontFamily: FONT, color: '#ffd700', fontSize: '1.2rem', textShadow: '0 0 20px rgba(255,215,0,0.4), 3px 3px 0 #000', letterSpacing: 4, marginBottom: 10 }}>
+            G.K.O. BOXING — PVE
           </h1>
+          {isChampion && <div style={{ fontFamily: FONT, color: '#ffd700', fontSize: '0.6rem', marginBottom: 8, textShadow: '0 0 12px rgba(255,215,0,0.6)' }}>🏆 UNDERGROUND CHAMPION 🏆</div>}
 
-          {/* Stats + Opponent panels */}
-          <div style={{ display: 'flex', gap: 24, maxWidth: 700, width: '90%' }}>
-            {/* Player stats */}
-            <div style={{ flex: 1, background: panelBg, border: goldBorder, borderRadius: 12, padding: 20 }}>
-              <div style={{ fontFamily: FONT, color: '#ffd700', fontSize: '0.55rem', marginBottom: 12 }}>RAZE — FIGHTER STATS</div>
-              <StatBar label="STRENGTH" value={stats.strength} max={100} color="#ef4444" />
-              <StatBar label="SPEED" value={stats.speed} max={100} color="#3b82f6" />
-              <StatBar label="HEALTH" value={stats.health} max={100} color="#22c55e" />
-              <div style={{ marginTop: 12, fontFamily: FONT, fontSize: '0.4rem', color: '#888' }}>
-                Record: <span style={{ color: '#22c55e' }}>{record.wins}W</span> / <span style={{ color: '#ef4444' }}>{record.losses}L</span>
+          <div style={{ display: 'flex', gap: 16, maxWidth: 900, width: '95%', flex: 1, minHeight: 0 }}>
+            {/* Left: Player stats */}
+            <div style={{ width: 220, background: panelBg, border: goldBorder, borderRadius: 12, padding: 16, flexShrink: 0 }}>
+              <div style={{ fontFamily: FONT, color: '#ffd700', fontSize: '0.5rem', marginBottom: 10 }}>RAZE — #{playerRank}</div>
+              <StatBar label="STRENGTH" value={player.stats.strength} max={100} color="#ef4444" />
+              <StatBar label="SPEED" value={player.stats.speed} max={100} color="#3b82f6" />
+              <StatBar label="HEALTH" value={player.stats.health} max={100} color="#22c55e" />
+              <div style={{ marginTop: 10, fontFamily: FONT, fontSize: '0.4rem', color: '#888' }}>
+                Record: <span style={{ color: '#22c55e' }}>{player.wins}W</span> / <span style={{ color: '#ef4444' }}>{player.losses}L</span>
+              </div>
+              <div style={{ marginTop: 8, fontFamily: FONT, fontSize: '0.35rem', color: '#666' }}>
+                STR: +{Math.max(0, Math.round((player.stats.strength - 10) * 2))}% dmg<br/>
+                SPD: -{Math.max(0, Math.round((player.stats.speed - 10) * 0.5))}% cooldown<br/>
+                HP: +{Math.max(0, (player.stats.health - 10) * 2)} max hp
               </div>
             </div>
 
-            {/* Next opponent */}
-            <div style={{ flex: 1, background: panelBg, border: goldBorder, borderRadius: 12, padding: 20 }}>
-              {campaignComplete ? (
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontFamily: FONT, color: '#ffd700', fontSize: '0.7rem', marginBottom: 10 }}>🏆 CHAMPION 🏆</div>
-                  <div style={{ fontFamily: FONT, color: '#aaa', fontSize: '0.45rem' }}>You conquered the underground!</div>
+            {/* Center: Standings */}
+            <div style={{ flex: 1, background: panelBg, border: goldBorder, borderRadius: 12, padding: 16, overflow: 'auto' }}>
+              <div style={{ fontFamily: FONT, color: '#ffd700', fontSize: '0.5rem', marginBottom: 10 }}>STANDINGS</div>
+              {standings.map((f, i) => (
+                <div key={f.id} style={{
+                  display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px',
+                  background: f.isPlayer ? 'rgba(59,130,246,0.15)' : (i === 0 ? 'rgba(255,215,0,0.08)' : 'transparent'),
+                  border: f.isPlayer ? '1px solid rgba(59,130,246,0.3)' : '1px solid transparent',
+                  borderRadius: 6, marginBottom: 3,
+                }}>
+                  <span style={{ fontFamily: FONT, fontSize: '0.5rem', color: i === 0 ? '#ffd700' : '#888', width: 20, textAlign: 'center' }}>
+                    {i === 0 ? '👑' : `#${i + 1}`}
+                  </span>
+                  <span style={{ fontFamily: FONT, fontSize: '0.45rem', color: f.color, flex: 1, fontWeight: f.isPlayer ? 900 : 400 }}>
+                    {f.name} {f.isPlayer ? '(YOU)' : ''}
+                  </span>
+                  <span style={{ fontFamily: FONT, fontSize: '0.4rem', color: '#22c55e' }}>{f.wins}W</span>
+                  <span style={{ fontFamily: FONT, fontSize: '0.35rem', color: '#666' }}>-</span>
+                  <span style={{ fontFamily: FONT, fontSize: '0.4rem', color: '#ef4444' }}>{f.losses}L</span>
+                  <div style={{ display: 'flex', gap: 2, marginLeft: 6 }}>
+                    <div style={{ width: 16, height: 4, borderRadius: 2, background: '#ef4444', opacity: 0.5 }}><div style={{ height: '100%', width: `${(f.stats.strength / 100) * 100}%`, background: '#ef4444', borderRadius: 2 }} /></div>
+                    <div style={{ width: 16, height: 4, borderRadius: 2, background: '#3b82f6', opacity: 0.5 }}><div style={{ height: '100%', width: `${(f.stats.speed / 100) * 100}%`, background: '#3b82f6', borderRadius: 2 }} /></div>
+                    <div style={{ width: 16, height: 4, borderRadius: 2, background: '#22c55e', opacity: 0.5 }}><div style={{ height: '100%', width: `${(f.stats.health / 100) * 100}%`, background: '#22c55e', borderRadius: 2 }} /></div>
+                  </div>
                 </div>
-              ) : (
+              ))}
+            </div>
+
+            {/* Right: Next fight */}
+            <div style={{ width: 220, background: panelBg, border: goldBorder, borderRadius: 12, padding: 16, flexShrink: 0 }}>
+              {isChampion ? (
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: FONT, fontSize: '0.5rem', color: '#ffd700', marginBottom: 8 }}>CHAMPION</div>
+                  <div style={{ fontFamily: FONT, fontSize: '0.35rem', color: '#aaa', lineHeight: 1.8 }}>You hold the belt. Defend it or start a new career.</div>
+                  <div style={{ marginTop: 16 }}>
+                    <ActionButton onClick={() => { setRoster(INITIAL_ROSTER); setTrainedThisRound(false); setLastSimResults([]); }} color="#666">NEW CAREER</ActionButton>
+                  </div>
+                </div>
+              ) : nextOp ? (
                 <>
-                  <div style={{ fontFamily: FONT, color: '#888', fontSize: '0.45rem', marginBottom: 8 }}>NEXT OPPONENT</div>
-                  <div style={{ fontFamily: FONT, color: currentOpponent.color, fontSize: '0.8rem', marginBottom: 6, textShadow: `0 0 8px ${currentOpponent.color}40` }}>
-                    {currentOpponent.name}
+                  <div style={{ fontFamily: FONT, color: '#888', fontSize: '0.4rem', marginBottom: 6 }}>NEXT FIGHT</div>
+                  <div style={{ fontFamily: FONT, color: nextOp.color, fontSize: '0.6rem', marginBottom: 4 }}>{nextOp.name}</div>
+                  <div style={{ fontFamily: FONT, color: '#888', fontSize: '0.35rem', marginBottom: 4 }}>#{standings.findIndex(f => f.id === nextOp.id) + 1} in standings</div>
+                  <div style={{ fontFamily: FONT, color: '#666', fontSize: '0.35rem', marginBottom: 8 }}>
+                    {nextOp.wins}W - {nextOp.losses}L
                   </div>
-                  <div style={{ fontFamily: FONT, color: '#aaa', fontSize: '0.38rem', lineHeight: 1.8, marginBottom: 12 }}>
-                    {currentOpponent.desc}
-                  </div>
-                  <div style={{ fontFamily: FONT, fontSize: '0.35rem', color: '#666' }}>
-                    Difficulty: {'🔴'.repeat(Math.ceil(currentOpponent.difficulty * 3))}{'⚫'.repeat(5 - Math.ceil(currentOpponent.difficulty * 3))}
-                  </div>
-                  {/* Ladder progress */}
-                  <div style={{ display: 'flex', gap: 4, marginTop: 12 }}>
-                    {OPPONENTS.map((op, i) => (
-                      <div key={i} style={{
-                        flex: 1, height: 6, borderRadius: 3,
-                        background: i < opponentIdx ? '#22c55e' : i === opponentIdx ? op.color : '#333',
-                        opacity: i <= opponentIdx ? 1 : 0.4,
-                      }} />
-                    ))}
-                  </div>
+                  <StatBar label="STR" value={nextOp.stats.strength} max={100} color="#ef4444" />
+                  <StatBar label="SPD" value={nextOp.stats.speed} max={100} color="#3b82f6" />
+                  <StatBar label="HP" value={nextOp.stats.health} max={100} color="#22c55e" />
                 </>
-              )}
+              ) : null}
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div style={{ display: 'flex', gap: 16 }}>
-            {!campaignComplete && (
+          {/* Buttons */}
+          <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+            {!isChampion && (
               <>
                 <ActionButton onClick={() => setScreen('training_pick')} color="#3b82f6" disabled={trainedThisRound}>
                   {trainedThisRound ? 'TRAINED ✓' : '🏋️ TRAINING'}
                 </ActionButton>
-                <ActionButton onClick={() => setScreen('fight')} color="#ef4444">
-                  🥊 FIGHT {currentOpponent.name}
+                <ActionButton onClick={() => { setSelectedOpponent(getNextOpponent()); setScreen('fight'); }} color="#ef4444" disabled={!getNextOpponent()}>
+                  🥊 FIGHT
                 </ActionButton>
               </>
             )}
-            {campaignComplete && (
-              <ActionButton onClick={() => { setOpponentIdx(0); setRecord({ wins: 0, losses: 0 }); setStats({ strength: 10, speed: 10, health: 10 }); setTrainedThisRound(false); }}>
-                NEW CAREER
-              </ActionButton>
-            )}
           </div>
-
-          <a href="/" style={{ fontFamily: FONT, fontSize: '0.4rem', color: '#666', textDecoration: 'none', padding: '4px 10px', background: 'rgba(0,0,0,0.5)', borderRadius: 4, border: '1px solid #333' }}>← BACK</a>
+          <a href="/" style={{ fontFamily: FONT, fontSize: '0.4rem', color: '#666', textDecoration: 'none', padding: '4px 10px', background: 'rgba(0,0,0,0.5)', borderRadius: 4, border: '1px solid #333', marginTop: 8 }}>← BACK</a>
         </div>
       </div>
     );
@@ -615,9 +715,9 @@ export default function GKOCampaign() {
   // ── TRAINING PICK ──
   if (screen === 'training_pick') {
     const options = [
-      { key: 'strength', label: 'STRENGTH', desc: 'Punch the bag! Time your release.', icon: '💪', color: '#ef4444', stat: stats.strength },
-      { key: 'speed', label: 'SPEED', desc: 'Smash falling targets before they land.', icon: '⚡', color: '#3b82f6', stat: stats.speed },
-      { key: 'health', label: 'HEALTH', desc: 'Dodge & block incoming jabs.', icon: '❤️', color: '#22c55e', stat: stats.health },
+      { key: 'strength', label: 'STRENGTH', desc: 'Punch the bag! Time your release.', icon: '💪', color: '#ef4444', stat: player.stats.strength },
+      { key: 'speed', label: 'SPEED', desc: 'Smash falling targets before they land.', icon: '⚡', color: '#3b82f6', stat: player.stats.speed },
+      { key: 'health', label: 'HEALTH', desc: 'Dodge & block incoming jabs.', icon: '❤️', color: '#22c55e', stat: player.stats.health },
     ];
     return (
       <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
@@ -651,10 +751,10 @@ export default function GKOCampaign() {
   if (screen === 'health') return <HealthTraining onComplete={(g) => handleTrainingComplete('health', g)} />;
 
   // ── FIGHT ──
-  if (screen === 'fight') {
+  if (screen === 'fight' && selectedOpponent) {
     return <GKOBoxing
-      playerStats={stats}
-      opponentConfig={currentOpponent}
+      playerStats={player.stats}
+      opponentConfig={selectedOpponent}
       onFightEnd={handleFightEnd}
     />;
   }
@@ -662,21 +762,40 @@ export default function GKOCampaign() {
   // ── POST-FIGHT ──
   if (screen === 'postfight') {
     const won = lastFightResult === 'win';
+    const newStandings = sortStandings(roster);
+    const newRank = newStandings.findIndex(f => f.isPlayer) + 1;
     return (
       <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${ARENA_BG})`, backgroundSize: 'cover', filter: 'brightness(0.3)' }} />
-        <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-          <div style={{ fontFamily: FONT, fontSize: '2rem', color: won ? '#22c55e' : '#ef4444', textShadow: `0 0 20px ${won ? '#22c55e' : '#ef4444'}66`, letterSpacing: 4 }}>
+        <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+          <div style={{ fontFamily: FONT, fontSize: '1.8rem', color: won ? '#22c55e' : '#ef4444', textShadow: `0 0 20px ${won ? '#22c55e' : '#ef4444'}66`, letterSpacing: 4 }}>
             {won ? 'VICTORY!' : 'DEFEAT'}
           </div>
           <div style={{ fontFamily: FONT, fontSize: '0.5rem', color: '#aaa' }}>
-            {won ? `You defeated ${OPPONENTS[opponentIdx - 1]?.name || 'the opponent'}!` : `${currentOpponent.name} got the better of you.`}
+            {won ? `You defeated ${selectedOpponent?.name}!` : `${selectedOpponent?.name} got the better of you.`}
           </div>
-          {won && opponentIdx < OPPONENTS.length && (
-            <div style={{ fontFamily: FONT, fontSize: '0.45rem', color: '#ffd700', background: 'rgba(255,215,0,0.1)', padding: '6px 14px', borderRadius: 6, border: '1px solid rgba(255,215,0,0.2)' }}>
-              Next: {OPPONENTS[opponentIdx].name}
+          <div style={{ fontFamily: FONT, fontSize: '0.55rem', color: '#ffd700', marginTop: 4 }}>
+            Your Rank: #{newRank}
+          </div>
+
+          {/* Sim results */}
+          {lastSimResults.length > 0 && (
+            <div style={{ background: panelBg, border: goldBorder, borderRadius: 8, padding: '10px 16px', marginTop: 8 }}>
+              <div style={{ fontFamily: FONT, fontSize: '0.4rem', color: '#888', marginBottom: 6 }}>OTHER RESULTS:</div>
+              {lastSimResults.map((r, i) => {
+                const a = roster.find(f => f.id === r.a);
+                const b = roster.find(f => f.id === r.b);
+                const w = roster.find(f => f.id === r.winner);
+                return (
+                  <div key={i} style={{ fontFamily: FONT, fontSize: '0.38rem', color: '#aaa', marginBottom: 3 }}>
+                    <span style={{ color: a?.color }}>{a?.name}</span> vs <span style={{ color: b?.color }}>{b?.name}</span>
+                    {' → '}<span style={{ color: w?.color }}>{w?.name} WINS</span>
+                  </div>
+                );
+              })}
             </div>
           )}
+
           <ActionButton onClick={() => setScreen('lobby')}>CONTINUE</ActionButton>
         </div>
       </div>
