@@ -5,6 +5,7 @@ import { skillTrees } from '../data/skillTrees';
 import { attributeDefinitions } from '../data/attributes';
 import { InlineIcon } from '../data/uiSprites';
 import SpriteAnimation from './SpriteAnimation';
+import { getPlayerSprite } from '../data/spriteMap';
 
 export default function TrainingScreen() {
   const trainingPhase = useGameStore(s => s.trainingPhase);
@@ -89,10 +90,10 @@ export default function TrainingScreen() {
           {mainHero && (
             <div style={{ display: 'flex', justifyContent: 'center', margin: '15px 0' }}>
               <SpriteAnimation
-                classId={mainHero.classId}
-                raceId={mainHero.raceId}
+                spriteData={getPlayerSprite(mainHero.classId, mainHero.raceId, mainHero.namedHeroId)}
                 animation="idle"
                 scale={4}
+                containerless={false}
               />
             </div>
           )}
@@ -481,7 +482,7 @@ export default function TrainingScreen() {
           <div style={{ display: 'flex', justifyContent: 'center', gap: 15, margin: '15px 0' }}>
             {heroRoster.map(h => (
               <div key={h.id} style={{ textAlign: 'center' }}>
-                <SpriteAnimation classId={h.classId} raceId={h.raceId} animation="idle" scale={3} />
+                <SpriteAnimation spriteData={getPlayerSprite(h.classId, h.raceId, h.namedHeroId)} animation="idle" scale={3} containerless={false} />
                 <div style={{ color: 'var(--text-dim)', fontSize: '0.75rem', marginTop: 4 }}>{h.name}</div>
               </div>
             ))}
