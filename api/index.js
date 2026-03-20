@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import pg from 'pg';
 
 // ── Grudge Studio modules ───────────────────────────────────────────────────
-import { DATASETS, fetchDataset, searchAll, getCacheStats, clearCache, puterKvManifest } from './lib/object-store.js';
+import { DATASETS, fetchDataset, searchAll, getCacheStats, clearCache, puterKvManifest, resolveAssetUrl } from './lib/object-store.js';
 import * as UUID from './lib/uuid-service.js';
 import { listAgents, getAgentInfo, queryAgent } from './lib/ai-agents.js';
 import * as Puter from './lib/puter-service.js';
@@ -1794,6 +1794,38 @@ app.post('/api/studio/archive/restore', requireSession, async (req, res) => {
     console.error('[Archive] Restore error:', err);
     res.status(500).json({ error: err.message });
   }
+});
+
+// ── Studio: Resolve Asset URL (S3 → GitHub fallback) ────────────────────────
+app.get('/api/studio/resolve-asset', async (req, res) => {
+  const { path: assetPath } = req.query;
+  if (!assetPath) return res.status(400).json({ error: 'path query parameter required' });
+  try {
+    const url = await resolveAssetUrl(assetPath);
+    // Allow client to redirect or fetch the resolved URL
+    if (req.query.redirect === 'true') {
+      return res.redirect(302, url);
+    }
+    res.json({ path: assetPath, url, source: url.includes('s3') || url.includes('amazonaws') || url.includes('railway') ? 's3' : 'github' });
+  } catch (err) {
+    res.status(404).json({ error: 'Asset not found', path: assetPath, message: err.message });
+  }
+});
+
+/** GET /api/studio/resolve-asset/batch — Resolve multiple asset paths at once */
+app.post('/api/studio/resolve-asset/batch', async (req, res) => {
+  const { paths } = req.body;
+  if (!Array.isArray(paths) || paths.length === 0) return res.status(400).json({ error: 'paths array required' });
+  const results = {};
+  const limit = Math.min(paths.length, 50);
+  for (let i = 0; i < limit; i++) {
+    try {
+      results[paths[i]] = await resolveAssetUrl(paths[i]);
+    } catch {
+      results[paths[i]] = null;
+    }
+  }
+  res.json({ resolved: results, count: Object.values(results).filter(Boolean).length, total: limit });
 });
 
 // ── Studio: Cache ObjectStore → Puter KV ────────────────────────────────────

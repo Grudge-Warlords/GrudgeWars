@@ -59,17 +59,36 @@ export async function fetchDataset(name) {
   }
 }
 
-/** Resolve a binary asset URL — returns S3 presigned URL or GitHub Pages URL */
+/** Resolve a binary asset URL — returns S3 presigned URL or GitHub Pages URL.
+ *  Checks S3 first, then validates the GitHub Pages URL exists (HEAD request).
+ *  Throws if the asset is not found in either location.
+ */
 export async function resolveAssetUrl(assetPath) {
-  // Try S3 first
+  // Normalise slashes
+  const cleanPath = assetPath.replace(/^\/+/, '');
+
+  // 1. Try S3/R2 bucket first (fastest for migrated assets)
   if (S3.isConfigured()) {
-    try {
-      await S3.head(assetPath);
-      return await S3.presignedDownloadUrl(assetPath);
-    } catch { /* not in S3 */ }
+    // Try multiple key patterns (direct path + models/ prefix)
+    const keysToTry = [cleanPath];
+    if (!cleanPath.startsWith('models/')) keysToTry.push(`models/${cleanPath}`);
+    for (const key of keysToTry) {
+      try {
+        await S3.head(key);
+        return await S3.presignedDownloadUrl(key);
+      } catch { /* not at this key */ }
+    }
   }
-  // Fallback to GitHub Pages
-  return `${OBJECT_STORE_BASE}/${assetPath}`;
+
+  // 2. Check GitHub Pages (HEAD request to avoid returning a 404 URL)
+  const ghUrl = `${OBJECT_STORE_BASE}/${cleanPath}`;
+  try {
+    const headRes = await fetch(ghUrl, { method: 'HEAD' });
+    if (headRes.ok) return ghUrl;
+  } catch { /* GitHub Pages unreachable */ }
+
+  // 3. Nothing found — throw so callers can handle gracefully
+  throw new Error(`Asset not found: ${cleanPath} (checked S3 and GitHub Pages)`);
 }
 
 // ── Cross-resource search ───────────────────────────────────────────────────
