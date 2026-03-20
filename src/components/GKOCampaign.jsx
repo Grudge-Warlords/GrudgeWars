@@ -51,12 +51,15 @@ function ActionButton({ children, onClick, color = '#ffd700', disabled }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// STRENGTH TRAINING — Sandbag Punch Slider
+// STRENGTH TRAINING — 3-Hit Sandbag Punch Slider
 // ═══════════════════════════════════════════════════════════════════════
 function StrengthTraining({ onComplete }) {
-  const [phase, setPhase] = useState('ready'); // ready, charging, result
-  const [sliderPos, setSliderPos] = useState(0); // 0-100
-  const [result, setResult] = useState(null);
+  const MAX_HITS = 3;
+  const [hitNum, setHitNum] = useState(0); // 0, 1, 2
+  const [phase, setPhase] = useState('ready'); // ready, charging, hitResult, done
+  const [sliderPos, setSliderPos] = useState(0);
+  const [hitResults, setHitResults] = useState([]); // [{gained, label}]
+  const [sliderSpeed, setSliderSpeed] = useState(2.5);
   const intervalRef = useRef(null);
   const dirRef = useRef(1);
   const posRef = useRef(0);
@@ -64,40 +67,56 @@ function StrengthTraining({ onComplete }) {
 
   useEffect(() => { containerRef.current?.focus(); }, [phase]);
 
+  // Slider speeds up each hit
   useEffect(() => {
     if (phase !== 'charging') { if (intervalRef.current) clearInterval(intervalRef.current); return; }
+    const speed = 2.5 + hitNum * 0.8; // gets faster each hit
     posRef.current = 0;
     dirRef.current = 1;
     intervalRef.current = setInterval(() => {
-      posRef.current += dirRef.current * 2.5;
+      posRef.current += dirRef.current * speed;
       if (posRef.current >= 100) { posRef.current = 100; dirRef.current = -1; }
       if (posRef.current <= 0) { posRef.current = 0; dirRef.current = 1; }
       setSliderPos(posRef.current);
     }, 20);
     return () => clearInterval(intervalRef.current);
-  }, [phase]);
+  }, [phase, hitNum]);
+
+  const scoreHit = (pos) => {
+    if (pos >= 42 && pos <= 58) return { gained: 5, label: 'PERFECT!' };
+    if (pos >= 30 && pos <= 70) return { gained: 3, label: 'GREAT!' };
+    if (pos >= 20 && pos <= 80) return { gained: 1, label: 'OK' };
+    return { gained: 0, label: 'MISS!' };
+  };
 
   const handleKey = useCallback((e) => {
     if (e.key.toLowerCase() !== 'j') return;
     if (phase === 'ready') { setPhase('charging'); return; }
     if (phase === 'charging') {
       clearInterval(intervalRef.current);
-      const pos = posRef.current;
-      // Green zone: 40-60, Yellow: 25-40 and 60-75, Red: rest
-      let gained = 0;
-      if (pos >= 42 && pos <= 58) gained = 5;
-      else if (pos >= 30 && pos <= 70) gained = 3;
-      else if (pos >= 20 && pos <= 80) gained = 1;
-      setResult({ pos, gained });
-      setPhase('result');
+      const result = scoreHit(posRef.current);
+      setHitResults(prev => [...prev, result]);
+      if (hitNum + 1 >= MAX_HITS) {
+        setPhase('done');
+      } else {
+        setPhase('hitResult');
+        // Auto-advance to next hit after brief pause
+        setTimeout(() => {
+          setHitNum(prev => prev + 1);
+          setPhase('charging');
+        }, 800);
+      }
     }
-  }, [phase]);
+  }, [phase, hitNum]);
 
   const getZoneColor = (pos) => {
     if (pos >= 42 && pos <= 58) return '#22c55e';
     if (pos >= 30 && pos <= 70) return '#eab308';
     return '#ef4444';
   };
+
+  const totalGained = hitResults.reduce((s, r) => s + r.gained, 0);
+  const lastHit = hitResults[hitResults.length - 1];
 
   return (
     <div ref={containerRef} tabIndex={0} onKeyDown={handleKey} style={{
@@ -107,18 +126,27 @@ function StrengthTraining({ onComplete }) {
     }}>
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)' }} />
       <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: 500, width: '90%' }}>
-        <h2 style={{ fontFamily: FONT, color: '#ffd700', fontSize: '1rem', marginBottom: 20, textShadow: '0 0 10px rgba(255,215,0,0.5)' }}>
+        <h2 style={{ fontFamily: FONT, color: '#ffd700', fontSize: '1rem', marginBottom: 8, textShadow: '0 0 10px rgba(255,215,0,0.5)' }}>
           STRENGTH TRAINING
         </h2>
 
-        {/* Punching bag visual */}
-        <div style={{ fontSize: '4rem', marginBottom: 20, filter: phase === 'result' && result?.gained >= 3 ? 'hue-rotate(90deg)' : 'none', transition: 'filter 0.3s' }}>
-          🥊
+        {/* Hit counter */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
+          {[...Array(MAX_HITS)].map((_, i) => (
+            <div key={i} style={{
+              width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: i < hitResults.length ? (hitResults[i].gained >= 3 ? '#22c55e' : hitResults[i].gained >= 1 ? '#eab308' : '#ef4444') : i === hitNum && phase !== 'done' ? 'rgba(255,215,0,0.3)' : '#222',
+              border: i === hitNum && phase !== 'done' ? '2px solid #ffd700' : '1px solid #444',
+              fontFamily: FONT, fontSize: '0.4rem', color: '#fff',
+            }}>{i < hitResults.length ? `+${hitResults[i].gained}` : i + 1}</div>
+          ))}
         </div>
 
+        {/* Punching bag */}
+        <div style={{ fontSize: '4rem', marginBottom: 16, transition: 'transform 0.1s', transform: lastHit && phase === 'hitResult' ? 'translateX(20px) rotate(10deg)' : 'none' }}>🥊</div>
+
         {/* Slider */}
-        <div style={{ position: 'relative', width: '100%', height: 40, background: '#1a1a2e', border: '2px solid #444', borderRadius: 6, overflow: 'hidden', marginBottom: 20 }}>
-          {/* Color zones */}
+        <div style={{ position: 'relative', width: '100%', height: 40, background: '#1a1a2e', border: '2px solid #444', borderRadius: 6, overflow: 'hidden', marginBottom: 16 }}>
           <div style={{ position: 'absolute', inset: 0, display: 'flex' }}>
             <div style={{ width: '20%', background: 'rgba(239,68,68,0.3)' }} />
             <div style={{ width: '10%', background: 'rgba(234,179,8,0.3)' }} />
@@ -128,9 +156,7 @@ function StrengthTraining({ onComplete }) {
             <div style={{ width: '10%', background: 'rgba(234,179,8,0.3)' }} />
             <div style={{ width: '20%', background: 'rgba(239,68,68,0.3)' }} />
           </div>
-          {/* Target line */}
           <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 2, background: '#ffd700', opacity: 0.6, transform: 'translateX(-50%)' }} />
-          {/* Needle */}
           <div style={{
             position: 'absolute', left: `${sliderPos}%`, top: 2, bottom: 2, width: 6,
             background: getZoneColor(sliderPos), borderRadius: 3, transform: 'translateX(-50%)',
@@ -138,25 +164,32 @@ function StrengthTraining({ onComplete }) {
           }} />
         </div>
 
+        {/* Last hit flash */}
+        {phase === 'hitResult' && lastHit && (
+          <div style={{ fontFamily: FONT, fontSize: '0.8rem', color: lastHit.gained >= 3 ? '#22c55e' : lastHit.gained >= 1 ? '#eab308' : '#ef4444', textShadow: '0 0 10px currentColor', animation: 'actionFloat 0.8s ease-out forwards' }}>
+            {lastHit.label} +{lastHit.gained}
+          </div>
+        )}
+
         {phase === 'ready' && (
           <div style={{ color: '#aaa', fontFamily: FONT, fontSize: '0.5rem' }}>
-            Hold <span style={{ color: '#ffd700' }}>J</span> to start — release on the <span style={{ color: '#22c55e' }}>GREEN</span> zone!
+            Press <span style={{ color: '#ffd700' }}>J</span> to start — 3 punches! Hit the <span style={{ color: '#22c55e' }}>GREEN</span> zone!
           </div>
         )}
         {phase === 'charging' && (
           <div style={{ color: '#ff8c00', fontFamily: FONT, fontSize: '0.5rem', animation: 'timerPulse 0.5s infinite' }}>
-            Release <span style={{ color: '#ffd700' }}>J</span> NOW!
+            HIT {hitNum + 1}/{MAX_HITS} — Press <span style={{ color: '#ffd700' }}>J</span>!
           </div>
         )}
-        {phase === 'result' && result && (
+        {phase === 'done' && (
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: FONT, fontSize: '1.2rem', color: result.gained >= 3 ? '#22c55e' : result.gained >= 1 ? '#eab308' : '#ef4444', marginBottom: 10, textShadow: '0 0 10px currentColor' }}>
-              {result.gained >= 5 ? 'PERFECT!' : result.gained >= 3 ? 'GREAT!' : result.gained >= 1 ? 'OK' : 'MISS!'}
+            <div style={{ fontFamily: FONT, fontSize: '1rem', color: totalGained >= 12 ? '#22c55e' : totalGained >= 6 ? '#eab308' : '#ef4444', marginBottom: 8, textShadow: '0 0 10px currentColor' }}>
+              {totalGained >= 12 ? 'DEVASTATING!' : totalGained >= 8 ? 'POWERFUL!' : totalGained >= 4 ? 'DECENT' : 'WEAK...'}
             </div>
-            <div style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#ffd700', marginBottom: 20 }}>
-              +{result.gained} STRENGTH
+            <div style={{ fontFamily: FONT, fontSize: '0.7rem', color: '#ffd700', marginBottom: 16 }}>
+              TOTAL: +{totalGained} STRENGTH
             </div>
-            <ActionButton onClick={() => onComplete(result.gained)}>CONTINUE</ActionButton>
+            <ActionButton onClick={() => onComplete(totalGained)}>CONTINUE</ActionButton>
           </div>
         )}
       </div>
@@ -479,15 +512,16 @@ function HealthTraining({ onComplete }) {
 // ═══════════════════════════════════════════════════════════════════════
 // PVE ROSTER — 8 fighters with records, stats, AI sim
 // ═══════════════════════════════════════════════════════════════════════
+// Each fighter gets a unique CSS filter to recolor the same base sprite
 const INITIAL_ROSTER = [
-  { id: 'raze',    name: 'RAZE',    color: '#3b82f6', difficulty: 1.0,  isPlayer: true,  wins: 0, losses: 0, stats: { strength: 10, speed: 10, health: 10 } },
-  { id: 'iron',    name: 'IRON MAX', color: '#ef4444', difficulty: 1.3,  isPlayer: false, wins: 2, losses: 0, stats: { strength: 18, speed: 12, health: 16 } },
-  { id: 'vex',     name: 'VEX',     color: '#a855f7', difficulty: 1.2,  isPlayer: false, wins: 2, losses: 0, stats: { strength: 14, speed: 16, health: 14 } },
-  { id: 'brick',   name: 'BRICK',   color: '#f97316', difficulty: 0.9,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 16, speed: 10, health: 14 } },
-  { id: 'phantom', name: 'PHANTOM', color: '#22d3ee', difficulty: 1.0,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 12, speed: 18, health: 10 } },
-  { id: 'skull',   name: 'SKULL',   color: '#6b7280', difficulty: 0.85, isPlayer: false, wins: 1, losses: 1, stats: { strength: 14, speed: 12, health: 14 } },
-  { id: 'blaze',   name: 'BLAZE',   color: '#f59e0b', difficulty: 0.8,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 12, speed: 14, health: 12 } },
-  { id: 'rookie',  name: 'ROOKIE',  color: '#48bb78', difficulty: 0.6,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 10, speed: 10, health: 10 } },
+  { id: 'raze',    name: 'RAZE',    color: '#3b82f6', filter: 'none',                                         difficulty: 1.0,  isPlayer: true,  wins: 0, losses: 0, stats: { strength: 10, speed: 10, health: 10 } },
+  { id: 'iron',    name: 'IRON MAX', color: '#ef4444', filter: 'hue-rotate(-30deg) saturate(1.6) brightness(1.1)', difficulty: 1.3,  isPlayer: false, wins: 2, losses: 0, stats: { strength: 18, speed: 12, health: 16 } },
+  { id: 'vex',     name: 'VEX',     color: '#a855f7', filter: 'hue-rotate(240deg) saturate(1.4) brightness(1.05)',difficulty: 1.2,  isPlayer: false, wins: 2, losses: 0, stats: { strength: 14, speed: 16, health: 14 } },
+  { id: 'brick',   name: 'BRICK',   color: '#f97316', filter: 'hue-rotate(30deg) saturate(1.8) brightness(0.95)', difficulty: 0.9,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 16, speed: 10, health: 14 } },
+  { id: 'phantom', name: 'PHANTOM', color: '#22d3ee', filter: 'hue-rotate(160deg) saturate(1.3) brightness(1.2)', difficulty: 1.0,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 12, speed: 18, health: 10 } },
+  { id: 'skull',   name: 'SKULL',   color: '#6b7280', filter: 'saturate(0.3) brightness(0.8) contrast(1.3)',     difficulty: 0.85, isPlayer: false, wins: 1, losses: 1, stats: { strength: 14, speed: 12, health: 14 } },
+  { id: 'blaze',   name: 'BLAZE',   color: '#f59e0b', filter: 'hue-rotate(60deg) saturate(2.0) brightness(1.15)', difficulty: 0.8,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 12, speed: 14, health: 12 } },
+  { id: 'rookie',  name: 'ROOKIE',  color: '#48bb78', filter: 'hue-rotate(100deg) saturate(1.2) brightness(1.1)', difficulty: 0.6,  isPlayer: false, wins: 1, losses: 1, stats: { strength: 10, speed: 10, health: 10 } },
 ];
 
 function sortStandings(roster) {

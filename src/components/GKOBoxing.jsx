@@ -696,11 +696,15 @@ export default function GKOBoxing({ playerStats, opponentConfig, onFightEnd }) {
     if (key === 'shift') { setPlayerBlocking(false); setPlayerAnim(prev => prev === getAnim(playerSprite, 'block') ? 'idle' : prev); }
   }, [playerSprite, getAnim]);
 
-  // ── Render fighter ─────────────────────────────────────────────────
-  const renderFighter = (sprite, anim, x, flip, dodging, blocking, stunned, side) => {
+  // ── Render fighter ─────────────────────────────────────────────────────
+  const renderFighter = (sprite, anim, x, flip, dodging, blocking, stunned, side, colorFilter) => {
     const nativeFacesLeft = !!sprite?.facesLeft;
     const needsFlip = flip ? !nativeFacesLeft : nativeFacesLeft;
     const dodgeDir = side === 'left' ? 1 : -1;
+    // Build combined filter: base color + state overlays
+    const baseFilter = colorFilter && colorFilter !== 'none' ? colorFilter : '';
+    const stateFilter = blocking ? 'brightness(0.85)' : stunned ? 'brightness(1.3) saturate(0.5)' : '';
+    const combinedFilter = [baseFilter, stateFilter].filter(Boolean).join(' ') || 'none';
     return (
       <div style={{ position: 'absolute', left: `${x}%`, bottom: '12%', transform: 'translateX(-50%)', zIndex: 20 }}>
         <div style={{ transform: needsFlip ? 'scaleX(-1)' : 'none', transformOrigin: 'center bottom' }}>
@@ -710,7 +714,7 @@ export default function GKOBoxing({ playerStats, opponentConfig, onFightEnd }) {
             transformOrigin: 'bottom center',
             transform: blocking ? 'scaleY(0.92)' : 'none',
             transition: blocking ? 'transform 0.1s' : 'none',
-            filter: blocking ? 'brightness(0.85)' : stunned ? 'brightness(1.3) saturate(0.5)' : 'none',
+            filter: combinedFilter,
           }}>
             <SpriteAnimation
               spriteData={sprite}
@@ -775,8 +779,8 @@ export default function GKOBoxing({ playerStats, opponentConfig, onFightEnd }) {
         )}
 
         {/* Fighters */}
-        {renderFighter(playerSprite, playerAnim, playerX, false, playerDodging, playerBlocking, playerStunned, 'left')}
-        {renderFighter(opponentSprite, opAnim, opX, true, opDodging, opBlocking, opStunned, 'right')}
+        {renderFighter(playerSprite, playerAnim, playerX, false, playerDodging, playerBlocking, playerStunned, 'left', null)}
+        {renderFighter(opponentSprite, opAnim, opX, true, opDodging, opBlocking, opStunned, 'right', opponentConfig?.filter)}
 
         <FloatingTexts items={floats} />
 
