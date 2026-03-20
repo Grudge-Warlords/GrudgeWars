@@ -2474,12 +2474,33 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
     setDiscordLoading(false);
   };
 
+  const loadPuterSdk = () => new Promise((resolve, reject) => {
+    if (window.puter?.auth) { resolve(); return; }
+    if (document.querySelector('script[src*="puter.com"]')) {
+      const poll = setInterval(() => { if (window.puter?.auth) { clearInterval(poll); resolve(); } }, 100);
+      setTimeout(() => { clearInterval(poll); resolve(); }, 8000);
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = 'https://js.puter.com/v2/';
+    s.onload = () => {
+      const poll = setInterval(() => { if (window.puter?.auth) { clearInterval(poll); resolve(); } }, 100);
+      setTimeout(() => { clearInterval(poll); resolve(); }, 3000);
+    };
+    s.onerror = () => reject(new Error('Puter SDK load failed'));
+    document.head.appendChild(s);
+  });
+
   const handlePuterLogin = async () => {
-    if (!window.puter) return;
     setPuterLoading(true);
     try {
-      await window.puter.auth.signIn();
+      await loadPuterSdk();
+      if (!window.puter?.auth) throw new Error('Puter SDK unavailable');
+      if (!window.puter.auth.isSignedIn?.()) {
+        await window.puter.auth.signIn();
+      }
       const user = await window.puter.auth.getUser();
+      if (!user?.username) throw new Error('No Puter user');
       setPuterUser(user);
       // Auth with backend to get/create Grudge ID
       let grudgeId = null;
@@ -2490,16 +2511,21 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
           body: JSON.stringify({ puterUsername: user.username, puterUuid: user.uuid || null }),
         });
         const data = await r.json();
-        if (data.sessionToken) localStorage.setItem('grudge_session_token', data.sessionToken);
-        grudgeId = data.user?.grudgeId || null;
+        const tok = data.sessionToken || data.token || null;
+        if (tok) { localStorage.setItem('grudge_session_token', tok); localStorage.setItem('grudge_auth_token', tok); }
+        grudgeId = data.grudgeId || data.user?.grudgeId || null;
       } catch {}
       const s = JSON.parse(localStorage.getItem('grudge-session') || '{}');
-      s.type = 'puter';
-      s.puterUsername = user.username;
+      s.type = 'puter'; s.username = user.username; s.puterUsername = user.username;
       if (grudgeId) s.grudgeId = grudgeId;
       s.loginTime = Date.now();
       localStorage.setItem('grudge-session', JSON.stringify(s));
-    } catch {}
+    } catch (err) {
+      const msg = err.message || '';
+      if (!msg.toLowerCase().includes('cancel') && !msg.toLowerCase().includes('closed')) {
+        console.warn('[Puter] Login failed:', msg);
+      }
+    }
     setPuterLoading(false);
   };
 

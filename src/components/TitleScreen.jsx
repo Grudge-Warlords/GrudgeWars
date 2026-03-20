@@ -183,7 +183,23 @@ export default function TitleScreen() {
   const [formLoading, setFormLoading] = useState(false);
   const [cloudRestore, setCloudRestore] = useState(null); // { data, source }
   const [returningSession, setReturningSession] = useState(null); // any existing valid session
-  const hasPuter = typeof window !== 'undefined' && !!window.puter;
+  // Puter SDK loaded on-demand — button is always available
+  const loadPuterSdk = () => new Promise((resolve, reject) => {
+    if (window.puter?.auth) { resolve(); return; }
+    if (document.querySelector('script[src*="puter.com"]')) {
+      const poll = setInterval(() => { if (window.puter?.auth) { clearInterval(poll); resolve(); } }, 100);
+      setTimeout(() => { clearInterval(poll); resolve(); }, 8000);
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = 'https://js.puter.com/v2/';
+    s.onload = () => {
+      const poll = setInterval(() => { if (window.puter?.auth) { clearInterval(poll); resolve(); } }, 100);
+      setTimeout(() => { clearInterval(poll); resolve(); }, 3000);
+    };
+    s.onerror = () => reject(new Error('Failed to load Puter SDK'));
+    document.head.appendChild(s);
+  });
 
   const toggleMute = () => {
     const next = !muted;
@@ -323,21 +339,30 @@ export default function TitleScreen() {
     setShowLoginForm(true);
   };
 
-  // Separate Puter login (only shown when Puter SDK is available)
+  // Puter login — loads SDK on demand, always available
   const handlePuterLogin = async () => {
-    if (!window.puter) return;
     setPuterLoading(true);
     try {
+      await loadPuterSdk();
+      if (!window.puter?.auth) throw new Error('Puter SDK unavailable');
       if (puterUser) {
         await completePuterAuth(puterUser);
         setPuterLoading(false);
         return;
       }
-      await window.puter.auth.signIn();
+      if (!window.puter.auth.isSignedIn?.()) {
+        await window.puter.auth.signIn();
+      }
       const user = await window.puter.auth.getUser();
+      if (!user?.username) throw new Error('No Puter user');
       setPuterUser(user);
       await completePuterAuth(user);
-    } catch {}
+    } catch (err) {
+      const msg = err.message || '';
+      if (!msg.toLowerCase().includes('cancel') && !msg.toLowerCase().includes('closed')) {
+        console.warn('[Puter] Sign-in failed:', msg);
+      }
+    }
     setPuterLoading(false);
   };
 
@@ -576,28 +601,26 @@ export default function TitleScreen() {
             delay={returningSession ? 0.2 : 0.45}
           />
 
-          {/* Puter login — only show when Puter SDK is available */}
-          {hasPuter && (
-            <LoginButton
-              label={puterUser ? `ENTER AS ${puterUser.username.toUpperCase()}` : 'LOGIN WITH PUTER'}
-              sublabel={puterUser ? 'Puter account connected' : 'Puter cloud account'}
-              onClick={handlePuterLogin}
-              variant="default"
-              active={!!puterUser}
-              disabled={puterLoading}
-              icon={
-                <div style={{
-                  width: 22, height: 22, borderRadius: 4,
-                  background: puterUser ? 'linear-gradient(135deg, #10b981, #34d399)' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.65rem', fontWeight: 800, color: '#fff',
-                }}>
-                  {puterUser ? '\u2713' : 'P'}
-                </div>
-              }
-              delay={returningSession ? 0.3 : 0.5}
-            />
-          )}
+          {/* Puter login — always shown, SDK loads on demand */}
+          <LoginButton
+            label={puterUser ? `ENTER AS ${puterUser.username.toUpperCase()}` : (puterLoading ? 'LOADING PUTER…' : 'LOGIN WITH PUTER')}
+            sublabel={puterUser ? 'Puter account connected' : 'Puter cloud account'}
+            onClick={handlePuterLogin}
+            variant="default"
+            active={!!puterUser}
+            disabled={puterLoading}
+            icon={
+              <div style={{
+                width: 22, height: 22, borderRadius: 4,
+                background: puterUser ? 'linear-gradient(135deg, #10b981, #34d399)' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '0.65rem', fontWeight: 800, color: '#fff',
+              }}>
+                {puterUser ? '\u2713' : 'P'}
+              </div>
+            }
+            delay={returningSession ? 0.3 : 0.5}
+          />
 
           <LoginButton
             label="PLAY AS GUEST"

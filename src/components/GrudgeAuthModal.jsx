@@ -253,14 +253,31 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
   const [phoneCode, setPhoneCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [puterAvailable, setPuterAvailable] = useState(false);
+  const [puterLoading, setPuterLoading] = useState(false);
 
-  useEffect(() => {
-    const check = () => setPuterAvailable(!!(window.puter?.auth));
-    check();
-    const t = setTimeout(check, 1500);
-    return () => clearTimeout(t);
-  }, []);
+  // Dynamically load Puter SDK on demand — never require it at page load
+  const loadPuterSdk = () => new Promise((resolve, reject) => {
+    if (window.puter?.auth) { resolve(); return; }
+    if (document.querySelector('script[src*="puter.com"]')) {
+      // Already injected — wait for it
+      const poll = setInterval(() => {
+        if (window.puter?.auth) { clearInterval(poll); resolve(); }
+      }, 100);
+      setTimeout(() => { clearInterval(poll); reject(new Error('Puter SDK timeout')); }, 8000);
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = 'https://js.puter.com/v2/';
+    s.onload = () => {
+      // Give SDK time to fully initialize
+      const poll = setInterval(() => {
+        if (window.puter?.auth) { clearInterval(poll); resolve(); }
+      }, 100);
+      setTimeout(() => { clearInterval(poll); resolve(); }, 3000);
+    };
+    s.onerror = () => reject(new Error('Failed to load Puter SDK'));
+    document.head.appendChild(s);
+  });
 
   // ── Gateway redirect ─────────────────────────────────────────────────────
   const handleGatewayLogin = () => {
@@ -275,16 +292,24 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     else window.location.href = '/play';
   };
 
-  // ── Puter ────────────────────────────────────────────────────────────────
+  // ── Puter ───────────────────────────────────────────────────────────────
   const handlePuter = async () => {
-    if (!window.puter?.auth) return;
-    setLoading(true); setError('');
+    setPuterLoading(true); setError('');
     try {
-      if (!window.puter.auth.isSignedIn()) {
+      // Load SDK on demand if not already present
+      await loadPuterSdk();
+      if (!window.puter?.auth) throw new Error('Puter SDK unavailable');
+
+      // signIn() opens the Puter auth popup (login OR create account)
+      if (!window.puter.auth.isSignedIn?.()) {
         await window.puter.auth.signIn();
       }
       const user = await window.puter.auth.getUser();
+      if (!user?.username) throw new Error('No Puter user returned');
+
+      // Link Puter identity → Grudge account (creates one if new)
       let grudgeId = null;
+      let sessionToken = null;
       try {
         const r = await fetch(`${API_BASE}/api/auth/puter`, {
           method: 'POST',
@@ -292,17 +317,28 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
           body: JSON.stringify({ puterUsername: user.username, puterUuid: user.uuid || null }),
         });
         const data = await r.json();
-        if (data.sessionToken) localStorage.setItem('grudge_session_token', data.sessionToken);
-        grudgeId = data.user?.grudgeId || null;
+        sessionToken = data.sessionToken || data.token || null;
+        grudgeId = data.grudgeId || data.user?.grudgeId || null;
       } catch {}
-      const session = { type: 'puter', username: user.username, grudgeId, loginTime: Date.now() };
+
+      if (sessionToken) {
+        localStorage.setItem('grudge_session_token', sessionToken);
+        localStorage.setItem('grudge_auth_token', sessionToken);
+      }
+      const session = {
+        type: 'puter', username: user.username,
+        grudgeId, loginTime: Date.now(),
+      };
       localStorage.setItem('grudge-session', JSON.stringify(session));
       if (onSuccess) onSuccess(session);
       else window.location.href = '/play';
     } catch (err) {
-      setError('Puter sign-in cancelled or failed.');
+      const msg = err.message || '';
+      if (!msg.toLowerCase().includes('cancel') && !msg.toLowerCase().includes('closed')) {
+        setError('Puter sign-in failed. Allow popups and try again.');
+      }
     }
-    setLoading(false);
+    setPuterLoading(false);
   };
 
   // ── Phantom Wallet ───────────────────────────────────────────────────────
@@ -496,20 +532,20 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
           Discord
         </button>
 
-        {/* Puter */}
+        {/* Puter — always enabled, loads SDK on demand */}
         <button
-          style={S.iconBtn(puterAvailable ? '#a78bfa' : '#555', false)}
+          style={S.iconBtn('#a78bfa', false)}
           onClick={handlePuter}
-          disabled={loading || !puterAvailable}
-          title={puterAvailable ? 'Sign in with Puter' : 'Puter not available'}
-          onMouseEnter={e => puterAvailable && iconBtnHover(e, '#a78bfa')}
+          disabled={loading || puterLoading}
+          title="Sign in with Puter"
+          onMouseEnter={e => iconBtnHover(e, '#a78bfa')}
           onMouseLeave={e => iconBtnLeave(e, '#a78bfa', false)}
         >
-          <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 8v4m0 4h.01"/>
-          </svg>
-          Puter
+          {puterLoading
+            ? <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+            : <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+          }
+          {puterLoading ? 'Loading…' : 'Puter'}
         </button>
       </div>
 
