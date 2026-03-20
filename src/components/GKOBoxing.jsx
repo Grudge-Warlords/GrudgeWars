@@ -227,12 +227,26 @@ function FloatingTexts({ items }) {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════
 
-export default function GKOBoxing() {
+const ARENA_BG = '/sprites/arena-pack/3 Background/Night/BackgroundNight.png';
+
+export default function GKOBoxing({ playerStats, opponentConfig, onFightEnd }) {
   // Resolve sprites (try boxer, fall back to RPG)
   const playerSprite = useFighterSprite(BOXER_RAZE, FALLBACK_PLAYER);
   const opponentSprite = useFighterSprite(BOXER_VEX, FALLBACK_OPPONENT);
 
-  const [playerHp, setPlayerHp] = useState(100);
+  // Scale stats from campaign (defaults for standalone play)
+  const str = playerStats?.strength || 10;
+  const spd = playerStats?.speed || 10;
+  const hp = playerStats?.health || 10;
+  const dmgMult = 1 + (str - 10) * 0.02; // +2% damage per STR above 10
+  const spdMult = 1 - (spd - 10) * 0.005; // -0.5% cooldown per SPD above 10
+  const maxHp = Math.round(100 + (hp - 10) * 2); // +2 HP per health point above 10
+  const aiDiff = opponentConfig?.difficulty || 1.0;
+  const opMaxHp = Math.round(100 * aiDiff);
+  const onFightEndRef = useRef(onFightEnd);
+  onFightEndRef.current = onFightEnd;
+
+  const [playerHp, setPlayerHp] = useState(maxHp);
   const [playerStamina, setPlayerStamina] = useState(100);
   const [playerAnim, setPlayerAnim] = useState('idle');
   const [playerX, setPlayerX] = useState(25);
@@ -241,7 +255,7 @@ export default function GKOBoxing() {
   const [playerStunned, setPlayerStunned] = useState(false);
   const [playerSpecialCd, setPlayerSpecialCd] = useState(0);
 
-  const [opHp, setOpHp] = useState(100);
+  const [opHp, setOpHp] = useState(opMaxHp);
   const [opStamina, setOpStamina] = useState(100);
   const [opAnim, setOpAnim] = useState('idle');
   const [opX, setOpX] = useState(65);
@@ -398,19 +412,21 @@ export default function GKOBoxing() {
     const resolvedAnim = getAnim(playerSprite, moveDef.anim);
     setPlayerAnim(resolvedAnim);
 
+    const scaledDmg = Math.round(damage * dmgMult);
+    const scaledCd = Math.round(cd * Math.max(0.5, spdMult));
+
     if (finisher) {
       spawnFloat(finisher.label, pxRef.current, '#ff8c00', '50%', '0.7rem');
       if (finisher.effect === 'sweep') {
-        // Assisted motion: lunge forward during hit
         const startX = pxRef.current;
         setPlayerX(prev => clamp(prev + 8, 5, 85));
-        setTimeout(() => setPlayerX(startX), cd * 0.6);
+        setTimeout(() => setPlayerX(startX), scaledCd * 0.6);
       }
     }
 
-    setTimeout(() => dealDamageToOpponent(damage, finisher?.label || moveKey.toUpperCase(), weight), cd * moveDef.hitFrame);
-    setTimeout(() => { if (gpRef.current === 'fight') setPlayerAnim('idle'); pcRef.current = false; }, cd);
-  }, [playerStamina, playerSprite, getAnim, dealDamageToOpponent, spawnFloat]);
+    setTimeout(() => dealDamageToOpponent(scaledDmg, finisher?.label || moveKey.toUpperCase(), weight), scaledCd * moveDef.hitFrame);
+    setTimeout(() => { if (gpRef.current === 'fight') setPlayerAnim('idle'); pcRef.current = false; }, Math.round(FIGHTER_DEFAULTS.attackCooldown[attackType] * Math.max(0.5, spdMult)));
+  }, [playerStamina, dealDamageToOpponent, dmgMult, spdMult]);
 
   // ── Special ability ────────────────────────────────────────────────
   const executeSpecial = useCallback(() => {
@@ -536,8 +552,10 @@ export default function GKOBoxing() {
         ocRef.current = true;
         setOpStamina(prev => Math.max(0, prev - move.stamina));
         setOpAnim(getAnim(opponentSprite, move.anim));
-        setTimeout(() => dealDamageToPlayer(move.damage, move.damage >= 12 ? 'heavy' : 'medium'), move.cooldown * move.hitFrame);
-        setTimeout(() => { if (gpRef.current === 'fight') setOpAnim('idle'); ocRef.current = false; }, move.cooldown);
+    const aiDmg = Math.round(move.damage * aiDiff);
+        const aiCd = Math.round(move.cooldown / aiDiff);
+        setTimeout(() => dealDamageToPlayer(aiDmg, aiDmg >= 12 ? 'heavy' : 'medium'), aiCd * move.hitFrame);
+        setTimeout(() => { if (gpRef.current === 'fight') setOpAnim('idle'); ocRef.current = false; }, aiCd);
       }
       aiRef.current = setTimeout(aiTick, AI_CONFIG.attackMin + Math.random() * (AI_CONFIG.attackMax - AI_CONFIG.attackMin));
     }
@@ -624,11 +642,15 @@ export default function GKOBoxing() {
     if (gamePhase !== 'roundEnd') return;
     const pw = playerWins, ow = opWins, need = Math.ceil(MAX_ROUNDS / 2);
     const tid = setTimeout(() => {
-      if (pw >= need) { setAnnouncement('YOU WIN!'); setGamePhase('matchEnd'); }
-      else if (ow >= need) { setAnnouncement('YOU LOSE!'); setGamePhase('matchEnd'); }
-      else {
+      if (pw >= need) {
+        setAnnouncement('YOU WIN!'); setGamePhase('matchEnd');
+        if (onFightEndRef.current) setTimeout(() => onFightEndRef.current('win'), 2000);
+      } else if (ow >= need) {
+        setAnnouncement('YOU LOSE!'); setGamePhase('matchEnd');
+        if (onFightEndRef.current) setTimeout(() => onFightEndRef.current('lose'), 2000);
+      } else {
         setRound(prev => prev + 1);
-        setPlayerHp(100); setOpHp(100); setPlayerStamina(100); setOpStamina(100);
+        setPlayerHp(maxHp); setOpHp(opMaxHp); setPlayerStamina(100); setOpStamina(100);
         setPlayerAnim('idle'); setOpAnim('idle'); setPlayerStunned(false); setOpStunned(false);
         setTimer(ROUND_TIME); setPlayerX(25); setOpX(65);
         setPlayerSpecialCd(0); setOpSpecialCd(0);
@@ -647,7 +669,7 @@ export default function GKOBoxing() {
   }, [gamePhase]);
 
   const restartMatch = useCallback(() => {
-    setRound(1); setTimer(ROUND_TIME); setPlayerHp(100); setOpHp(100);
+    setRound(1); setTimer(ROUND_TIME); setPlayerHp(maxHp); setOpHp(opMaxHp);
     setPlayerStamina(100); setOpStamina(100); setPlayerAnim('idle'); setOpAnim('idle');
     setPlayerWins(0); setOpWins(0); setPlayerX(25); setOpX(65);
     setPlayerStunned(false); setOpStunned(false); setPlayerSpecialCd(0); setOpSpecialCd(0);
@@ -718,7 +740,7 @@ export default function GKOBoxing() {
   return (
     <div ref={containerRef} tabIndex={0} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} onContextMenu={e => e.preventDefault()}
       style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden', cursor: 'crosshair', outline: 'none', userSelect: 'none' }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/backgrounds/colosseum_arena.jpg)', backgroundSize: 'cover', backgroundPosition: 'center bottom', filter: 'brightness(0.45) saturate(0.7)' }} />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${ARENA_BG})`, backgroundSize: 'cover', backgroundPosition: 'center bottom', filter: 'brightness(0.45) saturate(0.7)' }} />
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1, background: 'radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.7) 100%)' }} />
 
       <div style={{ width: '100%', height: '100%', position: 'relative', animation: screenShake ? 'gkoShake 0.3s ease-out' : 'none' }}>
@@ -731,13 +753,13 @@ export default function GKOBoxing() {
         {/* HUD */}
         <div style={{ position: 'absolute', top: 10, left: 10, right: 10, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
           <div style={{ width: '38%' }}>
-            <HealthBar current={playerHp} max={100} label="RAZE" color="#3b82f6" side="left" />
+        <HealthBar current={playerHp} max={maxHp} label="RAZE" color="#3b82f6" side="left" />
             <StaminaBar current={playerStamina} max={100} side="left" />
             <SpecialCooldownBar cooldownPct={(playerSpecialCd / SPECIALS.raze.cooldown) * 100} name={SPECIALS.raze.name} />
           </div>
           <RoundDisplay round={round} timer={timer} playerWins={playerWins} opponentWins={opWins} />
           <div style={{ width: '38%' }}>
-            <HealthBar current={opHp} max={100} label="VEX" color="#e53e3e" side="right" />
+        <HealthBar current={opHp} max={opMaxHp} label={opponentConfig?.name || 'VEX'} color="#e53e3e" side="right" />
             <StaminaBar current={opStamina} max={100} side="right" />
             <SpecialCooldownBar cooldownPct={(opSpecialCd / SPECIALS.vex.cooldown) * 100} name={SPECIALS.vex.name} />
           </div>
