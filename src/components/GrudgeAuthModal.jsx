@@ -296,15 +296,20 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
   const handlePuter = async () => {
     setPuterLoading(true); setError('');
     try {
-      // Load SDK on demand if not already present
+      // SDK embedded in index.html — should be ready; fall back to dynamic load
       await loadPuterSdk();
       if (!window.puter?.auth) throw new Error('Puter SDK unavailable');
 
-      // signIn() opens the Puter auth popup (login OR create account)
-      if (!window.puter.auth.isSignedIn?.()) {
-        await window.puter.auth.signIn();
-      }
-      const user = await window.puter.auth.getUser();
+      // If already logged into puter.com via browser session, signIn() returns
+      // immediately with the token — no popup shown.
+      // If NOT logged in, it opens puter.com/action/sign-in popup.
+      // The popup shows both SIGN IN and CREATE ACCOUNT tabs — choose SIGN IN
+      // if you already have a Puter account.
+      const signInResult = await window.puter.auth.signIn();
+
+      // After signIn() resolves, puter.authToken is set; now get user
+      let user = null;
+      try { user = await window.puter.auth.getUser(); } catch {}
       if (!user?.username) throw new Error('No Puter user returned');
 
       // Link Puter identity → Grudge account (creates one if new)
@@ -333,9 +338,13 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       if (onSuccess) onSuccess(session);
       else window.location.href = '/play';
     } catch (err) {
-      const msg = err.message || '';
-      if (!msg.toLowerCase().includes('cancel') && !msg.toLowerCase().includes('closed')) {
-        setError('Puter sign-in failed. Allow popups and try again.');
+      const msg = (err?.msg || err?.message || '').toLowerCase();
+      if (msg.includes('auth_window_closed') || msg.includes('closed') || msg.includes('cancel')) {
+        // User dismissed the Puter popup — no error shown
+      } else if (msg.includes('popup')) {
+        setError('Allow popups for this site, then try Puter again.');
+      } else {
+        setError('Puter sign-in failed. If you have an account, use the Sign In tab in the Puter popup.');
       }
     }
     setPuterLoading(false);
