@@ -425,8 +425,8 @@ export default function GKOBoxing({ playerStats, opponentConfig, onFightEnd }) {
     }
 
     setTimeout(() => dealDamageToOpponent(scaledDmg, finisher?.label || moveKey.toUpperCase(), weight), scaledCd * moveDef.hitFrame);
-    setTimeout(() => { if (gpRef.current === 'fight') setPlayerAnim('idle'); pcRef.current = false; }, Math.round(FIGHTER_DEFAULTS.attackCooldown[attackType] * Math.max(0.5, spdMult)));
-  }, [playerStamina, dealDamageToOpponent, dmgMult, spdMult]);
+    setTimeout(() => { if (gpRef.current === 'fight') setPlayerAnim('idle'); pcRef.current = false; }, scaledCd);
+  }, [playerStamina, dealDamageToOpponent, dmgMult, spdMult, getAnim, playerSprite, spawnFloat]);
 
   // ── Special ability ────────────────────────────────────────────────
   const executeSpecial = useCallback(() => {
@@ -552,7 +552,7 @@ export default function GKOBoxing({ playerStats, opponentConfig, onFightEnd }) {
         ocRef.current = true;
         setOpStamina(prev => Math.max(0, prev - move.stamina));
         setOpAnim(getAnim(opponentSprite, move.anim));
-    const aiDmg = Math.round(move.damage * aiDiff);
+        const aiDmg = Math.round(move.damage * aiDiff);
         const aiCd = Math.round(move.cooldown / aiDiff);
         setTimeout(() => dealDamageToPlayer(aiDmg, aiDmg >= 12 ? 'heavy' : 'medium'), aiCd * move.hitFrame);
         setTimeout(() => { if (gpRef.current === 'fight') setOpAnim('idle'); ocRef.current = false; }, aiCd);
@@ -721,7 +721,7 @@ export default function GKOBoxing({ playerStats, opponentConfig, onFightEnd }) {
               animation={getAnim(sprite, anim)}
               scale={3}
               flip={false}
-              loop={['idle', 'walk', 'block', 'stun', 'win'].includes(anim)}
+              loop={['idle', 'walk', 'block', 'stun', 'win', 'hurt'].includes(anim) || anim === getAnim(sprite, 'block')}
               speed={anim === 'idle' ? 140 : anim === 'walk' ? 90 : anim === 'stun' ? 200 : 80}
               containerless={false}
             />
@@ -757,13 +757,13 @@ export default function GKOBoxing({ playerStats, opponentConfig, onFightEnd }) {
         {/* HUD */}
         <div style={{ position: 'absolute', top: 10, left: 10, right: 10, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
           <div style={{ width: '38%' }}>
-        <HealthBar current={playerHp} max={maxHp} label="RAZE" color="#3b82f6" side="left" />
+            <HealthBar current={playerHp} max={maxHp} label="RAZE" color="#3b82f6" side="left" />
             <StaminaBar current={playerStamina} max={100} side="left" />
             <SpecialCooldownBar cooldownPct={(playerSpecialCd / SPECIALS.raze.cooldown) * 100} name={SPECIALS.raze.name} />
           </div>
           <RoundDisplay round={round} timer={timer} playerWins={playerWins} opponentWins={opWins} />
           <div style={{ width: '38%' }}>
-        <HealthBar current={opHp} max={opMaxHp} label={opponentConfig?.name || 'VEX'} color="#e53e3e" side="right" />
+            <HealthBar current={opHp} max={opMaxHp} label={opponentConfig?.name || 'VEX'} color="#e53e3e" side="right" />
             <StaminaBar current={opStamina} max={100} side="right" />
             <SpecialCooldownBar cooldownPct={(opSpecialCd / SPECIALS.vex.cooldown) * 100} name={SPECIALS.vex.name} />
           </div>
@@ -790,7 +790,7 @@ export default function GKOBoxing({ playerStats, opponentConfig, onFightEnd }) {
           </div>
         )}
 
-        {gamePhase === 'matchEnd' && (
+        {gamePhase === 'matchEnd' && !onFightEndRef.current && (
           <div style={{ position: 'absolute', bottom: '20%', left: '50%', transform: 'translateX(-50%)', zIndex: 200 }}>
             <button onClick={restartMatch} style={{ background: 'linear-gradient(135deg, #ffd700, #ff8c00)', border: '2px solid #fff', borderRadius: 8, padding: '12px 32px', cursor: 'pointer', fontFamily: "'Press Start 2P', monospace", fontSize: '0.7rem', color: '#000', letterSpacing: 2, boxShadow: '0 4px 20px rgba(255,215,0,0.4)' }}>REMATCH (ENTER)</button>
           </div>
