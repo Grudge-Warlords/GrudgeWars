@@ -291,3 +291,65 @@ export function getUIIcon(name) {
   const relative = UI_ICONS[name];
   return relative ? `${OBJECTSTORE_BASE}/icons/${relative}` : null;
 }
+
+// ── GrudgeUUID Sprite Manifest Integration ───────────────────────────────────
+// Sprite manifest from warlord-crafting-suite with UUIDs and sheet metadata.
+// Load once, then use getSpriteByUuid() or getSpriteBySlug() for lookups.
+
+let _spriteManifest = null;
+let _uuidIndex = null;
+let _slugIndex = null;
+
+/**
+ * Initialize the sprite manifest for UUID-based lookups.
+ * @param {Array} sprites - Array of sprite entries from manifest.json
+ */
+export function initSpriteManifest(sprites) {
+  _spriteManifest = sprites;
+  _uuidIndex = new Map();
+  _slugIndex = new Map();
+  for (const s of sprites) {
+    if (s.grudgeUuid) _uuidIndex.set(s.grudgeUuid, s);
+    if (s.id) _slugIndex.set(s.id, s);
+  }
+}
+
+/**
+ * Get a sprite entry by its GrudgeUUID.
+ * @param {string} uuid - e.g. "ANIM-20260320073512-000001-569789E6"
+ * @returns {Object|null} Sprite entry with path, sheetMeta, dimensions
+ */
+export function getSpriteByUuid(uuid) {
+  return _uuidIndex?.get(uuid) || null;
+}
+
+/**
+ * Get a sprite entry by its slug ID.
+ * @param {string} id - e.g. "boar-idle-with-shadow"
+ * @returns {Object|null} Sprite entry
+ */
+export function getSpriteBySlug(id) {
+  return _slugIndex?.get(id) || null;
+}
+
+/**
+ * Get all sprites in a category.
+ * @param {string} category - e.g. "animal", "weapon", "armor"
+ * @returns {Array} Matching sprite entries
+ */
+export function getSpritesByCategory(category) {
+  if (!_spriteManifest) return [];
+  return _spriteManifest.filter(s => s.category === category);
+}
+
+/**
+ * Get the full ObjectStore or local URL for a sprite entry.
+ * @param {Object} sprite - Sprite entry from manifest
+ * @param {boolean} useCDN - If true, return ObjectStore CDN URL
+ * @returns {string} Full URL
+ */
+export function getSpriteUrl(sprite, useCDN = false) {
+  if (!sprite) return '';
+  if (useCDN) return `${OBJECTSTORE_BASE}${sprite.path}`;
+  return sprite.path;
+}
