@@ -34,6 +34,34 @@ import CharacterPage from './components/CharacterPage';
 import GKOCampaign from './components/GKOCampaign';
 import { API_BASE } from './utils/apiBase.js';
 
+// ── Auth Bridge: receive tokens from parent GDevelop frame ──────────
+// When embedded in GDevelop Assistant via iframe, the parent sends
+// { type: 'grudge:auth', token, grudgeId, username } via postMessage.
+// We store it so all API calls can use it.
+if (typeof window !== 'undefined') {
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'grudge:auth' && e.data.token) {
+      localStorage.setItem('grudge_auth_token', e.data.token);
+      if (e.data.grudgeId) localStorage.setItem('grudge_id', e.data.grudgeId);
+      if (e.data.username) localStorage.setItem('grudge_username', e.data.username);
+      // Also store in grudge-session format for backward compat
+      try {
+        const existing = JSON.parse(localStorage.getItem('grudge-session') || '{}');
+        localStorage.setItem('grudge-session', JSON.stringify({
+          ...existing,
+          type: 'grudge',
+          grudgeId: e.data.grudgeId || existing.grudgeId,
+          username: e.data.username || existing.username,
+        }));
+      } catch {}
+    }
+  });
+  // Request auth from parent if we're in an iframe
+  if (window.parent !== window) {
+    try { window.parent.postMessage({ type: 'grudge:requestAuth' }, '*'); } catch {}
+  }
+}
+
 const SCREEN_SLUGS = {
   title: '/play',
   intro: '/intro',
