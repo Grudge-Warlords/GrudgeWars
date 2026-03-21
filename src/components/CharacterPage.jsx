@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import PortalHeader from './portal/PortalHeader';
 import SpriteAnimation from './SpriteAnimation';
 import { raceDefinitions, raceList } from '../data/races';
@@ -17,7 +17,7 @@ import {
 } from '../data/objectStoreIcons';
 import { BUILDER_URL } from '../utils/studioUrls';
 
-// ── Shared style constants (matches StudioPortal) ──
+// â”€â”€ Shared style constants (matches StudioPortal) â”€â”€
 const GOLD = '#d4a96a';
 const GOLD_BRIGHT = '#FAAC47';
 const GOLD_GRADIENT = 'linear-gradient(90deg, #DB6331, #FAAC47, #FFE0A0, #FAAC47, #DB6331)';
@@ -26,25 +26,25 @@ const PANEL = 'rgba(255,255,255,0.02)';
 const BORDER = 'rgba(212,169,106,0.15)';
 const MUTED = 'rgba(255,255,255,0.4)';
 
-// ── Data ──
+// â”€â”€ Data â”€â”€
 const CLASSES = Object.entries(classDefinitions).map(([id, def]) => ({ id, ...def }));
 
 const PROFESSIONS = [
-  { key: 'Miner',    color: '#ef4444', role: 'Metal · Weapons · Armor',       desc: 'Extract ore and stone from the depths. Smelt ingots and forge deadly weapons and armor.' },
-  { key: 'Forester', color: '#22c55e', role: 'Wood · Bows · Leather',         desc: 'Harvest timber and tan hides. Craft bows, crossbows, and leather armor.' },
-  { key: 'Mystic',   color: '#a78bfa', role: 'Cloth · Staves · Enchants',     desc: 'Gather arcane dust and weave cloth. Create staves, tomes, and enchanted gear.' },
-  { key: 'Chef',     color: '#f59e0b', role: 'Food · Potions · Buffs',        desc: 'Cook hearty meals and brew potions that grant powerful combat buffs.' },
-  { key: 'Engineer', color: '#60a5fa', role: 'Guns · Crossbows · Traps',      desc: 'Assemble precision mechanisms. Build firearms, crossbows, and tactical traps.' },
+  { key: 'Miner',    color: '#ef4444', role: 'Metal Â· Weapons Â· Armor',       desc: 'Extract ore and stone from the depths. Smelt ingots and forge deadly weapons and armor.' },
+  { key: 'Forester', color: '#22c55e', role: 'Wood Â· Bows Â· Leather',         desc: 'Harvest timber and tan hides. Craft bows, crossbows, and leather armor.' },
+  { key: 'Mystic',   color: '#a78bfa', role: 'Cloth Â· Staves Â· Enchants',     desc: 'Gather arcane dust and weave cloth. Create staves, tomes, and enchanted gear.' },
+  { key: 'Chef',     color: '#f59e0b', role: 'Food Â· Potions Â· Buffs',        desc: 'Cook hearty meals and brew potions that grant powerful combat buffs.' },
+  { key: 'Engineer', color: '#60a5fa', role: 'Guns Â· Crossbows Â· Traps',      desc: 'Assemble precision mechanisms. Build firearms, crossbows, and tactical traps.' },
 ];
 
 const BUILDINGS = [
-  { type: 'camp',     emoji: '⛺', label: 'Camp',        desc: 'Claim your island and establish a foothold.' },
-  { type: 'mine',     emoji: '⛏️', label: 'Mine',        desc: 'Produces ore and stone passively.' },
-  { type: 'lumber',   emoji: '🪓', label: 'Lumber Mill', desc: 'Produces wood from the surrounding forest.' },
-  { type: 'herb',     emoji: '🌿', label: 'Herb Garden', desc: 'Grows herbs for potions and enchanting.' },
-  { type: 'kitchen',  emoji: '🍳', label: 'Kitchen',     desc: 'Cooks food to keep your heroes fed.' },
-  { type: 'workshop', emoji: '🔧', label: 'Workshop',    desc: 'Produces crystals and refined parts.' },
-  { type: 'farm',     emoji: '🌾', label: 'Farm',        desc: 'Grows crops for sustenance and trade.' },
+  { type: 'camp',     emoji: 'â›º', label: 'Camp',        desc: 'Claim your island and establish a foothold.' },
+  { type: 'mine',     emoji: 'â›ï¸', label: 'Mine',        desc: 'Produces ore and stone passively.' },
+  { type: 'lumber',   emoji: 'ðŸª“', label: 'Lumber Mill', desc: 'Produces wood from the surrounding forest.' },
+  { type: 'herb',     emoji: 'ðŸŒ¿', label: 'Herb Garden', desc: 'Grows herbs for potions and enchanting.' },
+  { type: 'kitchen',  emoji: 'ðŸ³', label: 'Kitchen',     desc: 'Cooks food to keep your heroes fed.' },
+  { type: 'workshop', emoji: 'ðŸ”§', label: 'Workshop',    desc: 'Produces crystals and refined parts.' },
+  { type: 'farm',     emoji: 'ðŸŒ¾', label: 'Farm',        desc: 'Grows crops for sustenance and trade.' },
 ];
 
 const RANK_TIERS = [
@@ -56,7 +56,7 @@ const RANK_TIERS = [
   { name: 'Legend',   wins: '50+', color: '#f59e0b' },
 ];
 
-// ── Reusable sub-components ──
+// â”€â”€ Reusable sub-components â”€â”€
 
 function SectionHeading({ children, sub }) {
   return (
@@ -131,7 +131,7 @@ function CtaButton({ href, children, primary, style }) {
   );
 }
 
-// ── Section: Races ──
+// â”€â”€ Section: Races â”€â”€
 
 function RacesSection() {
   return (
@@ -177,7 +177,7 @@ function RacesSection() {
   );
 }
 
-// ── Section: Classes ──
+// â”€â”€ Section: Classes â”€â”€
 
 function ClassCard({ cls }) {
   const sprite = getPlayerSprite(cls.id);
@@ -261,7 +261,7 @@ function ClassesSection() {
   );
 }
 
-// ── Section: Attributes ──
+// â”€â”€ Section: Attributes â”€â”€
 
 function AttributesSection() {
   const attrs = Object.entries(attributeDefinitions);
@@ -287,7 +287,7 @@ function AttributesSection() {
   );
 }
 
-// ── Section: Crafting & Professions ──
+// â”€â”€ Section: Crafting & Professions â”€â”€
 
 function CraftingSection() {
   return (
@@ -302,7 +302,7 @@ function CraftingSection() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
                 {iconUrl
                   ? <IconImg src={iconUrl} size={40} />
-                  : <span style={{ fontSize: 28 }}>⚒️</span>}
+                  : <span style={{ fontSize: 28 }}>âš’ï¸</span>}
                 <div>
                   <div style={{ fontFamily: "'Cinzel', serif", fontSize: '1rem', color: prof.color, fontWeight: 700 }}>
                     {prof.key}
@@ -347,7 +347,7 @@ function CraftingSection() {
   );
 }
 
-// ── Section: Home Island & AFK Harvesting ──
+// â”€â”€ Section: Home Island & AFK Harvesting â”€â”€
 
 function IslandSection() {
   return (
@@ -360,7 +360,7 @@ function IslandSection() {
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 250 }}>
               <div style={{ fontFamily: "'Cinzel', serif", fontSize: '1.1rem', color: '#ff6b35', fontWeight: 700, marginBottom: 8 }}>
-                🏝️ Your Personal Island
+                ðŸï¸ Your Personal Island
               </div>
               <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, marginBottom: 14 }}>
                 Every player gets a procedurally-generated island with beaches, grasslands, forests, and mountains.
@@ -410,7 +410,7 @@ function InfoPill({ label, value, color }) {
   );
 }
 
-// ── Section: Gameplay / Arena ──
+// â”€â”€ Section: Gameplay / Arena â”€â”€
 
 function GameplaySection() {
   return (
@@ -421,10 +421,10 @@ function GameplaySection() {
         {/* Combat */}
         <Card accent="#ef4444">
           <div style={{ fontFamily: "'Cinzel', serif", fontSize: '1rem', color: '#ef4444', fontWeight: 700, marginBottom: 8 }}>
-            ⚔️ Turn-Based Combat
+            âš”ï¸ Turn-Based Combat
           </div>
           <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
-            Build a party of up to 3 heroes. Each class plays differently — Warriors tank and cleave,
+            Build a party of up to 3 heroes. Each class plays differently â€” Warriors tank and cleave,
             Mage Priests heal and nuke, Rangers deal precision damage, and Worges shapeshift and summon.
           </div>
           {/* Class sprite row */}
@@ -446,7 +446,7 @@ function GameplaySection() {
         {/* Arena */}
         <Card accent="#3b82f6">
           <div style={{ fontFamily: "'Cinzel', serif", fontSize: '1rem', color: '#3b82f6', fontWeight: 700, marginBottom: 8 }}>
-            🏆 Ranked Arena
+            ðŸ† Ranked Arena
           </div>
           <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: 12 }}>
             Submit your team to the arena and climb the leaderboard. AI controls your defenders when
@@ -467,7 +467,7 @@ function GameplaySection() {
         {/* Equipment */}
         <Card accent="#FAAC47">
           <div style={{ fontFamily: "'Cinzel', serif", fontSize: '1rem', color: '#FAAC47', fontWeight: 700, marginBottom: 8 }}>
-            🛡️ Equipment & Loot
+            ðŸ›¡ï¸ Equipment & Loot
           </div>
           <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: 12 }}>
             Equip weapons, armor, and relics across 12 gear slots. Gear ranges from Crude (T0)
@@ -490,7 +490,7 @@ function GameplaySection() {
   );
 }
 
-// ── Footer CTAs ──
+// â”€â”€ Footer CTAs â”€â”€
 
 function FooterCTAs() {
   return (
@@ -498,7 +498,7 @@ function FooterCTAs() {
       <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 28 }}>
         <CtaButton href="/play" primary>PLAY NOW</CtaButton>
         <CtaButton href={BUILDER_URL + '/character'}>BUILD A CHARACTER</CtaButton>
-        <CtaButton href="https://discord.gg/KmAC5aXs84">JOIN DISCORD</CtaButton>
+        <CtaButton href="https://discord.gg/FtGtmxmwkh">JOIN DISCORD</CtaButton>
       </div>
       <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.2)' }}>
         &copy; 2026 Grudge Studio &mdash; All Rights Reserved
@@ -507,9 +507,9 @@ function FooterCTAs() {
   );
 }
 
-// ══════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAIN CHARACTER PAGE
-// ══════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export default function CharacterPage() {
   const [session, setSession] = useState(null);
@@ -585,3 +585,4 @@ export default function CharacterPage() {
     </div>
   );
 }
+

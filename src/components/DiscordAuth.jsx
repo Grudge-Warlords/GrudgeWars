@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { API_BASE } from '../utils/apiBase.js';
 
 export default function DiscordAuth() {
@@ -17,7 +17,7 @@ export default function DiscordAuth() {
       return;
     }
 
-    // State is now verified server-side via HMAC signature — clear stale client state
+    // State is now verified server-side via HMAC signature â€” clear stale client state
     sessionStorage.removeItem('discord_oauth_state');
 
     setStatus('exchanging');
@@ -185,7 +185,7 @@ export default function DiscordAuth() {
             </div>
 
             {!guildJoined && (
-              <a href="https://discord.gg/KmAC5aXs84" target="_blank" rel="noopener noreferrer" style={{
+              <a href="https://discord.gg/FtGtmxmwkh" target="_blank" rel="noopener noreferrer" style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 background: '#5865F2', border: 'none', borderRadius: 8,
                 padding: '12px 28px', color: '#fff', fontSize: '0.95rem',
@@ -247,3 +247,4 @@ export default function DiscordAuth() {
     </div>
   );
 }
+

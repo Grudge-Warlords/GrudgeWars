@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import useGameStore from '../stores/gameStore';
 import { InlineIcon, EssentialIcon } from '../data/uiSprites';
 import SpriteAnimation from './SpriteAnimation';
@@ -670,12 +670,12 @@ const FACTION_MAP = {
   undead: { name: 'Legion', god: 'Madra', color: '#ef4444', icon: '/icons/pack/factions/legion-emblem.png' },
   elf: { name: 'Fabled', god: 'The Omni', color: '#22d3ee', icon: '/icons/pack/factions/fabled-emblem.png' },
   dwarf: { name: 'Fabled', god: 'The Omni', color: '#22d3ee', icon: '/icons/pack/factions/fabled-emblem.png' },
-  pirates: { name: 'Pirates', god: 'None — Neutral Mercenaries', color: '#d4a017', icon: '/factions/faction_pirates.png' },
+  pirates: { name: 'Pirates', god: 'None â€” Neutral Mercenaries', color: '#d4a017', icon: '/factions/faction_pirates.png' },
 };
 
 const HERO_SLOGANS = {
   human_warrior: "My blade is the will of the Crusade.",
-  human_mage: "Knowledge and faith — both are my weapons.",
+  human_mage: "Knowledge and faith â€” both are my weapons.",
   human_worge: "The storm within answers to no one.",
   human_ranger: "One shot. One kill. Honor demands precision.",
   orc_warrior: "Blood and iron! I fear nothing!",
@@ -683,7 +683,7 @@ const HERO_SLOGANS = {
   orc_worge: "The beast within hungers for war!",
   orc_ranger: "My arrows carry the Legion's fury.",
   elf_warrior: "Centuries of discipline forged this blade.",
-  elf_mage: "The arcane speaks — I merely translate.",
+  elf_mage: "The arcane speaks â€” I merely translate.",
   elf_worge: "Nature's wrath takes many forms.",
   elf_ranger: "The wind guides every arrow I loose.",
   undead_warrior: "Death could not stop me. Neither will you.",
@@ -692,7 +692,7 @@ const HERO_SLOGANS = {
   undead_ranger: "The dead have perfect aim.",
   barbarian_warrior: "RAAAAGH! Come face me, coward!",
   barbarian_mage: "Primal fury needs no fancy spells!",
-  barbarian_worge: "Two beasts in one body — twice the carnage!",
+  barbarian_worge: "Two beasts in one body â€” twice the carnage!",
   barbarian_ranger: "I hunt what others fear to face.",
   dwarf_warrior: "Forged in mountain stone. Unbreakable.",
   dwarf_mage: "Rune magic runs deeper than any ley line.",
@@ -701,10 +701,10 @@ const HERO_SLOGANS = {
 };
 
 const LORE_QUOTES = {
-  warrior: "Forged in the crucible of the Grudge Wars — blades drawn, shields raised.",
+  warrior: "Forged in the crucible of the Grudge Wars â€” blades drawn, shields raised.",
   mage: "Channeling ancient ley lines and forgotten gods since the first grudge was spoken.",
-  worge: "Walking between worlds — scholar in mortal guise, predator unleashed.",
-  ranger: "Silent as shadow, deadly as the wind — masters of the killing blow.",
+  worge: "Walking between worlds â€” scholar in mortal guise, predator unleashed.",
+  ranger: "Silent as shadow, deadly as the wind â€” masters of the killing blow.",
 };
 
 function SlideshowVFXSprite({ effectKey, displaySize = 280, style }) {
@@ -2104,17 +2104,17 @@ function HeroSlideshow() {
               </div>
               <div>X: <span style={{ color: '#6f6' }}>{editorX}</span> | Y: <span style={{ color: '#6f6' }}>{editorY}</span> | Scale: <span style={{ color: '#6f6' }}>{editorScale.toFixed(2)}</span></div>
               <div style={{ color: '#FAAC47', marginTop: 2, fontSize: '0.65rem' }}>
-                Final → X: {spriteXOffset + editorX} | Y: {spriteYOffset + editorY} | Scale: {((scaleOverride || 1) * editorScale).toFixed(2)}
+                Final â†’ X: {spriteXOffset + editorX} | Y: {spriteYOffset + editorY} | Scale: {((scaleOverride || 1) * editorScale).toFixed(2)}
               </div>
             </>
           ) : editorTarget === 'transform' ? (
             <>
               <div style={{ color: '#4fc3f7', fontWeight: 700, fontSize: '0.7rem' }}>
-                {combo.raceId}_{combo.classId} → {activeForm?.label || 'base'}
+                {combo.raceId}_{combo.classId} â†’ {activeForm?.label || 'base'}
               </div>
               <div>X: <span style={{ color: '#6f6' }}>{transformEditorX}</span> | Y: <span style={{ color: '#6f6' }}>{transformEditorY}</span> | Scale: <span style={{ color: '#6f6' }}>{transformEditorScale.toFixed(2)}</span></div>
               <div style={{ color: '#4fc3f7', marginTop: 2, fontSize: '0.65rem' }}>
-                Saved → X: {savedTransformOverride?.offsetX || 0} | Y: {savedTransformOverride?.offsetY || 0} | Scale: {(savedTransformOverride?.scale || 1).toFixed(2)}
+                Saved â†’ X: {savedTransformOverride?.offsetX || 0} | Y: {savedTransformOverride?.offsetY || 0} | Scale: {(savedTransformOverride?.scale || 1).toFixed(2)}
               </div>
             </>
           ) : (
@@ -2124,7 +2124,7 @@ function HeroSlideshow() {
               </div>
               <div>X: <span style={{ color: '#6f6' }}>{dummyEditorX}</span> | Y: <span style={{ color: '#6f6' }}>{dummyEditorY}</span> | Scale: <span style={{ color: '#6f6' }}>{dummyEditorScale.toFixed(2)}</span></div>
               <div style={{ color: '#c084fc', marginTop: 2, fontSize: '0.65rem' }}>
-                Final → X: {dummyPos.x + dummyEditorX} | Y: {dummyPos.y + dummyEditorY} | Scale: {((dummyPos.scale || 5) * dummyEditorScale).toFixed(2)}
+                Final â†’ X: {dummyPos.x + dummyEditorX} | Y: {dummyPos.y + dummyEditorY} | Scale: {((dummyPos.scale || 5) * dummyEditorScale).toFixed(2)}
               </div>
             </>
           )}
@@ -2141,7 +2141,7 @@ function HeroSlideshow() {
               color: '#22c55e', fontWeight: 700, marginTop: 4, fontSize: '0.8rem',
               animation: 'ssFadeIn 0.3s ease',
             }}>
-              SAVED {editorTarget === 'dummy' ? 'DUMMY' : editorTarget === 'transform' ? `${comboKey} → ${activeForm?.label}` : comboKey}
+              SAVED {editorTarget === 'dummy' ? 'DUMMY' : editorTarget === 'transform' ? `${comboKey} â†’ ${activeForm?.label}` : comboKey}
             </div>
           )}
           {editorTarget === 'hero' && savedPos && !editorSaved && (
@@ -2713,7 +2713,7 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
               </div>
               <div style={{ fontSize: '0.65rem', color: 'var(--muted)', marginTop: 2 }}>
                 {isPuterConnected
-                  ? `Signed in as ${puterUser?.username || session.puterUsername || 'User'} — tap to sign out`
+                  ? `Signed in as ${puterUser?.username || session.puterUsername || 'User'} â€” tap to sign out`
                   : 'Free cloud account, no API keys needed'}
               </div>
             </div>
@@ -2771,7 +2771,7 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
                 transition: 'all 0.2s ease',
               }}
             >
-              {syncStatus === 'syncing' ? 'Syncing...' : syncStatus === 'synced' ? 'Synced ✓' : 'Sync Now'}
+              {syncStatus === 'syncing' ? 'Syncing...' : syncStatus === 'synced' ? 'Synced âœ“' : 'Sync Now'}
             </button>
           </div>
           <div style={{ color: 'var(--muted)', fontSize: '0.65rem', opacity: 0.6 }}>
@@ -2809,7 +2809,7 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
                   <div style={{ flex: 1 }}>
                     <div style={{ color: '#e2e8f0', fontSize: '0.8rem', fontWeight: 600 }}>{c.name}</div>
                     <div style={{ color: 'var(--muted)', fontSize: '0.6rem' }}>
-                      {c.raceId} {c.classId} {c.profession ? `• ${c.profession}` : ''}
+                      {c.raceId} {c.classId} {c.profession ? `â€¢ ${c.profession}` : ''}
                     </div>
                   </div>
                   {alreadyImported ? (
@@ -2839,7 +2839,7 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {status === 'done' ? 'Imported ✓' : status === 'duplicate' ? 'Already In' : status === 'importing' ? '...' : 'Import Hero'}
+                      {status === 'done' ? 'Imported âœ“' : status === 'duplicate' ? 'Already In' : status === 'importing' ? '...' : 'Import Hero'}
                     </button>
                   )}
                 </div>
@@ -3077,7 +3077,7 @@ function DiscordTab({ panelStyle }) {
         </div>
 
         <a
-          href="https://discord.gg/KmAC5aXs84"
+          href="https://discord.gg/FtGtmxmwkh"
           target="_blank"
           rel="noopener noreferrer"
           style={{
@@ -3325,7 +3325,7 @@ function CreditsTab({ panelStyle }) {
         {divider}
         {sectionHeader('Special Thanks')}
         <CreditEntry title="The Grudge Warlords Community" role="Beta testers, feedback & bug reports" />
-        <CreditEntry title="Discord Community" role="discord.gg/KmAC5aXs84" />
+        <CreditEntry title="Discord Community" role="discord.gg/FtGtmxmwkh" />
       </div>
 
       <div style={{
@@ -3428,3 +3428,4 @@ function LobbyButton({ label, onClick, primary, icon }) {
     </button>
   );
 }
+

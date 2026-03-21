@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 const LINKS = [
   { label: 'Character Builder', desc: 'Create & manage characters', href: 'https://grudge-builder.vercel.app/character', color: '#DB6331' },
@@ -7,7 +7,7 @@ const LINKS = [
   { label: 'Arena', desc: 'Ranked PvP battles', href: '/play#arena', color: '#3b82f6' },
   { label: 'Compendium', desc: 'Game data reference', href: '/compendium.html', color: '#a78bfa' },
   { label: 'Hero Codex', desc: 'All 26 playable heroes', href: '/hero-codex.html', color: '#f97316' },
-  { label: 'Discord', desc: 'Join the community', href: 'https://discord.gg/KmAC5aXs84', color: '#5865F2', external: true },
+  { label: 'Discord', desc: 'Join the community', href: 'https://discord.gg/FtGtmxmwkh', color: '#5865F2', external: true },
 ];
 
 function LinkCard({ link }) {
@@ -74,3 +74,4 @@ export default function QuickLinks() {
     </div>
   );
 }
+
