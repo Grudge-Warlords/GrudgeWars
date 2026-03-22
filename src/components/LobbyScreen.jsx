@@ -281,12 +281,13 @@ function NavItem({ essentialIcon, label, active, onClick }) {
       }}
     >
       <img
-        src={active ? '/ui/wood_light.png' : '/ui/wood_dark.png'}
+        src={active ? '/ui/wood_plank_light.png' : '/ui/wood_plank_dark.png'}
         alt=""
         style={{
           display: 'block', width: '100%', height: 94,
           objectFit: 'fill',
           pointerEvents: 'none',
+          borderRadius: 6,
         }}
       />
       <span style={{

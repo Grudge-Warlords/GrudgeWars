@@ -11,6 +11,16 @@ import { getIconPlacement } from '../utils/uiLayoutConfig';
 
 const PANEL_BG = '/ui/inventory-panel-bg.png';
 
+// Race-specific equipment background images
+const RACE_EQUIP_BG = {
+  human: '/images/races/human_equip_bg.png',
+  barbarian: '/images/races/barbarian_equip_bg.png',
+  dwarf: '/images/races/dwarf_equip_bg.png',
+  elf: '/images/races/elf_equip_bg.png',
+  orc: '/images/races/orc_equip_bg.png',
+  undead: '/images/races/undead_equip_bg.png',
+};
+
 const SLOT_MAP = [
   { key: 'helmet', label: 'Head', icon: 'helm', gridArea: 'head' },
   { key: 'armor', label: 'Chest', icon: 'armor', gridArea: 'chest' },
@@ -264,17 +274,18 @@ export default function InventoryModal({ heroId, onClose, compact = false }) {
       }}
       onDragOver={(e) => e.preventDefault()}
     >
-      {/* Background image layer */}
+      {/* Background image layer — race-specific if available */}
       <img
-        src={PANEL_BG}
+        src={RACE_EQUIP_BG[hero.raceId] || PANEL_BG}
         alt=""
         style={{
           position: 'absolute', inset: 0,
           width: '100%', height: '100%',
           objectFit: 'cover',
           pointerEvents: 'none',
-          imageRendering: 'pixelated',
+          imageRendering: hero.raceId ? 'auto' : 'pixelated',
           zIndex: 0,
+          opacity: hero.raceId ? 0.85 : 1,
         }}
       />
 
