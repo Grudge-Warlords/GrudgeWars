@@ -49,7 +49,7 @@
       "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://gdevelop-assistant.vercel.app https://*.vercel.app" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://gdevelop-assistant.vercel.app https://*.vercel.app https://*.puter.site https://*.puter.com https://puter.com" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
