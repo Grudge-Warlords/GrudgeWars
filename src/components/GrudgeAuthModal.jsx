@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { API_BASE } from '../utils/apiBase.js';
 import { redirectToGateway, isGatewayAuthenticated, GATEWAY_URL } from '../utils/grudgeGateway.js';
 
+const VPS_AUTH = 'https://id.grudge-studio.com';
+
 // ── SVG icons ────────────────────────────────────────────────────────────────
 const DiscordSvg = ({ size = 18 }) => (
   <svg width={size} height={Math.round(size * 0.77)} viewBox="0 0 71 55" fill="currentColor">
@@ -393,21 +395,64 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     setLoading(false);
   };
 
-  // ── Discord ──────────────────────────────────────────────────────────────
-  const handleDiscord = async () => {
-    setLoading(true); setError('');
+  // ── Discord (direct VPS OAuth redirect) ─────────────────────────────────────────
+  const handleDiscord = () => {
+    window.location.href = `${VPS_AUTH}/auth/discord?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
+  };
+
+  // ── Google OAuth (direct VPS redirect) ───────────────────────────────────────
+  const handleGoogle = () => {
+    window.location.href = `${VPS_AUTH}/auth/google?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
+  };
+
+  // ── GitHub OAuth (direct VPS redirect) ───────────────────────────────────────
+  const handleGithub = () => {
+    window.location.href = `${VPS_AUTH}/auth/github?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
+  };
+
+  // ── Phone Auth (Twilio SMS via VPS) ─────────────────────────────────────────
+  const [phoneSent, setPhoneSent] = useState(false);
+  const [phoneLoading, setPhoneLoading] = useState(false);
+
+  const handlePhoneSend = async () => {
+    if (!phone) { setError('Enter phone number'); return; }
+    setPhoneLoading(true); setError('');
     try {
-      const res = await fetch(`${API_BASE}/api/discord/login`);
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setError('Could not get Discord login URL. Try again.');
-      }
-    } catch {
-      setError('Discord server unreachable. Try again.');
-    }
-    setLoading(false);
+      const r = await fetch(`${VPS_AUTH}/auth/phone-send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+      const d = await r.json();
+      if (r.ok) { setPhoneSent(true); }
+      else { setError(d.error || 'Failed to send code'); }
+    } catch { setError('Could not reach auth server'); }
+    setPhoneLoading(false);
+  };
+
+  const handlePhoneVerify = async () => {
+    if (!phone || !phoneCode) { setError('Enter phone and code'); return; }
+    setPhoneLoading(true); setError('');
+    try {
+      const r = await fetch(`${VPS_AUTH}/auth/phone-verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code: phoneCode }),
+      });
+      const d = await r.json();
+      if (r.ok && d.token) {
+        localStorage.setItem('grudge_session_token', d.token);
+        localStorage.setItem('grudge_auth_token', d.token);
+        const session = {
+          type: 'phone', username: d.user?.username || 'Phone User',
+          grudgeId: d.grudgeId || d.user?.grudgeId, loginTime: Date.now(),
+        };
+        localStorage.setItem('grudge-session', JSON.stringify(session));
+        if (onSuccess) onSuccess(session);
+        else window.location.href = '/play';
+      } else { setError(d.error || 'Verification failed'); }
+    } catch { setError('Could not reach auth server'); }
+    setPhoneLoading(false);
   };
 
   // ── Grudge ID form ───────────────────────────────────────────────────────
@@ -561,22 +606,24 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       {/* Wide grid: Google, GitHub */}
       <div style={S.wideGrid}>
         <button
-          style={S.wideBtn('#4285F4', true)}
-          disabled
-          title="Coming soon"
+          style={S.wideBtn('#4285F4', false)}
+          onClick={handleGoogle}
+          title="Sign in with Google"
+          onMouseEnter={e => { e.currentTarget.style.borderColor = '#4285F466'; e.currentTarget.style.color = '#4285F4'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; }}
         >
           <GoogleSvg size={16} />
           Google
-          <span style={S.soonBadge}>SOON</span>
         </button>
         <button
-          style={S.wideBtn('#fff', true)}
-          disabled
-          title="Coming soon"
+          style={S.wideBtn('#fff', false)}
+          onClick={handleGithub}
+          title="Sign in with GitHub"
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; e.currentTarget.style.color = '#fff'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; }}
         >
           <GithubSvg size={16} />
           GitHub
-          <span style={S.soonBadge}>SOON</span>
         </button>
       </div>
 
@@ -681,19 +728,32 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       </div>
 
       {/* Phone row */}
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <input
-          style={{ ...S.input, flex: 1, opacity: 0.4, cursor: 'not-allowed' }}
+          style={{ ...S.input, flex: 1, minWidth: 140 }}
           type="tel"
-          placeholder="Phone Number (coming soon)"
-          disabled
+          placeholder="+1 555 000 0000"
+          value={phone}
+          onChange={e => setPhone(e.target.value)}
+          onFocus={e => { e.currentTarget.style.borderColor = 'rgba(16,185,129,0.5)'; }}
+          onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
         />
+        {phoneSent && (
+          <input
+            style={{ ...S.input, flex: '0 0 90px' }}
+            type="text"
+            placeholder="Code"
+            value={phoneCode}
+            onChange={e => setPhoneCode(e.target.value)}
+          />
+        )}
         <button
-          style={{ ...S.wideBtn('#10b981', true), padding: '10px 14px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 6 }}
-          disabled
+          style={{ ...S.wideBtn('#10b981', false), padding: '10px 14px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 6 }}
+          onClick={phoneSent ? handlePhoneVerify : handlePhoneSend}
+          disabled={phoneLoading}
         >
           <PhoneSvg size={14} />
-          Send Code
+          {phoneLoading ? '...' : phoneSent ? 'Verify' : 'Send Code'}
         </button>
       </div>
 

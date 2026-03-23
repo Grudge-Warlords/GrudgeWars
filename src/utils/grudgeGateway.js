@@ -1,7 +1,7 @@
 /**
  * grudgeGateway.js
  * Universal Grudge Auth Gateway client utility.
- * Gateway URL: https://auth-gateway-otb8qmmyd-grudgenexus.vercel.app
+ * Gateway URL: https://id.grudge-studio.com (Grudge Identity API)
  *
  * After auth, the gateway stores in localStorage:
  *   grudge_auth_token   – JWT
@@ -10,7 +10,7 @@
  *   grudge_username     – display name
  */
 
-export const GATEWAY_URL = 'https://auth-gateway-otb8qmmyd-grudgenexus.vercel.app';
+export const GATEWAY_URL = 'https://id.grudge-studio.com';
 
 // ── Read gateway keys ─────────────────────────────────────────────────────────
 export function getGatewayToken() {
@@ -35,7 +35,10 @@ export function isGatewayAuthenticated() {
 // ── Redirect to gateway ───────────────────────────────────────────────────────
 export function redirectToGateway(returnUrl) {
   const ret = returnUrl || window.location.href;
-  window.location.href = `${GATEWAY_URL}?return=${encodeURIComponent(ret)}`;
+  // Use SSO check — id.grudge-studio.com reads the grudge_sso cookie and
+  // redirects back with ?sso_token= if valid, or ?sso_required=true if not.
+  // If sso_required, bounce to the client portal login page.
+  window.location.href = `${GATEWAY_URL}/auth/sso-check?return=${encodeURIComponent(ret)}`;
 }
 
 // ── Map gateway session → grudge-wars local session format ────────────────────
@@ -80,12 +83,13 @@ export function gatewaySignOut() {
  * If not, and `autoRedirect` is true, redirect to gateway immediately.
  */
 export function checkGatewayOnBoot({ autoRedirect = false } = {}) {
-  // Also check URL params — gateway may have just redirected back
+  // Check URL params — VPS OAuth callbacks return ?token=&grudge_id=&provider=
+  // Also support legacy ?grudge_token= and SSO ?sso_token= params.
   const params = new URLSearchParams(window.location.search);
-  const returnedToken = params.get('grudge_token');
+  const returnedToken = params.get('token') || params.get('sso_token') || params.get('grudge_token');
   if (returnedToken) {
     localStorage.setItem('grudge_auth_token', returnedToken);
-    const username = params.get('grudge_username') || 'Player';
+    const username = params.get('grudge_username') || params.get('username') || 'Player';
     const userId = params.get('grudge_user_id') || '';
     const grudgeId = params.get('grudge_id') || '';
     if (username) localStorage.setItem('grudge_username', username);
@@ -93,7 +97,7 @@ export function checkGatewayOnBoot({ autoRedirect = false } = {}) {
     if (grudgeId) localStorage.setItem('grudge_id', grudgeId);
     // Clean URL
     const url = new URL(window.location.href);
-    ['grudge_token', 'grudge_username', 'grudge_user_id', 'grudge_id'].forEach(k => url.searchParams.delete(k));
+    ['token', 'sso_token', 'grudge_token', 'grudge_username', 'grudge_user_id', 'grudge_id', 'provider', 'username', 'displayName', 'isNew', 'sso_required'].forEach(k => url.searchParams.delete(k));
     window.history.replaceState({}, '', url.toString());
   }
 

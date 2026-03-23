@@ -556,41 +556,50 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// ── AUTH: Wallet ───────────────────────────────────────────────────────────
+// ── AUTH: Wallet (VPS proxy + local fallback) ─────────────────────────────────────
 app.post('/api/auth/wallet', async (req, res) => {
   try {
-    const { address } = req.body;
-    if (!address || typeof address !== 'string' || address.length < 32) {
+    const { address, wallet_address, web3auth_token } = req.body;
+    const cleanAddr = (wallet_address || address || '').trim().slice(0, 64);
+    if (!cleanAddr || cleanAddr.length < 32) {
       return res.status(400).json({ error: 'Valid wallet address required' });
     }
-    const cleanAddr = address.trim().slice(0, 64);
-    const username = `${cleanAddr.slice(0, 4)}…${cleanAddr.slice(-4)}`;
-    const result = await dbQuery(
-      `INSERT INTO accounts (wallet_address, wallet_chain, username, auth_type, last_login)
-       VALUES ($1, 'solana', $2, 'wallet', NOW())
-       ON CONFLICT (wallet_address) DO UPDATE SET last_login = NOW(), updated_at = NOW()
-       RETURNING *`,
-      [cleanAddr, username]
-    ).catch(async () => {
-      // wallet_address column may not have a UNIQUE constraint yet — upsert by grudge_id instead
-      const r2 = await dbQuery(
+
+    // Try VPS first
+    const vps = await vpsPost('/auth/wallet', { wallet_address: cleanAddr, web3auth_token });
+    if (vps.ok) {
+      const u = extractVpsUser(vps.data);
+      await upsertLocalGameAccount({ ...u, walletAddress: cleanAddr });
+      return res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId, authSource: 'vps' });
+    }
+
+    // VPS down — local fallback
+    if (vps.vpsDown) {
+      console.log(`[Auth] VPS down — handling wallet auth locally for '${cleanAddr.slice(0,8)}...'`);
+      const username = `${cleanAddr.slice(0, 4)}…${cleanAddr.slice(-4)}`;
+      const result = await dbQuery(
         `INSERT INTO accounts (wallet_address, wallet_chain, username, auth_type, last_login)
          VALUES ($1, 'solana', $2, 'wallet', NOW())
-         ON CONFLICT DO NOTHING RETURNING *`,
+         ON CONFLICT (wallet_address) DO UPDATE SET last_login = NOW(), updated_at = NOW()
+         RETURNING *`,
         [cleanAddr, username]
-      );
-      if (r2.rows.length) return r2;
-      return dbQuery(`SELECT * FROM accounts WHERE wallet_address=$1`, [cleanAddr]);
-    });
-    const account = result.rows[0];
-    if (!account) return res.status(500).json({ error: 'Account upsert failed' });
-    const grudgeId = account.grudge_id || null;
-    const sessionToken = createJWT({
-      grudge_id: grudgeId,
-      username: account.username,
-      wallet_address: cleanAddr,
-    });
-    res.json({ success: true, sessionToken, grudgeId, user: { id: account.id, username: account.username, walletAddress: cleanAddr } });
+      ).catch(async () => {
+        const r2 = await dbQuery(
+          `INSERT INTO accounts (wallet_address, wallet_chain, username, auth_type, last_login)
+           VALUES ($1, 'solana', $2, 'wallet', NOW())
+           ON CONFLICT DO NOTHING RETURNING *`,
+          [cleanAddr, username]
+        );
+        if (r2.rows.length) return r2;
+        return dbQuery(`SELECT * FROM accounts WHERE wallet_address=$1`, [cleanAddr]);
+      });
+      const account = result.rows[0];
+      if (!account) return res.status(500).json({ error: 'Account upsert failed' });
+      const sessionToken = createJWT({ grudge_id: account.grudge_id, username: account.username, wallet_address: cleanAddr });
+      return res.json({ success: true, sessionToken, token: sessionToken, grudgeId: account.grudge_id, user: { id: account.id, username: account.username, walletAddress: cleanAddr }, authSource: 'local' });
+    }
+
+    return res.status(vps.status).json(vps.data);
   } catch (err) {
     console.error('Wallet auth error:', err.message);
     res.status(500).json({ error: 'Wallet auth failed' });
