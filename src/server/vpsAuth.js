@@ -1,28 +1,86 @@
 /**
  * VPS Auth Helper — proxies all auth to id.grudge-studio.com
  * GrudgeWars game data stays in Neon; auth lives on VPS.
+ * Includes circuit breaker + retry for resilience.
  */
 import { query } from './db.js';
 
 const VPS_AUTH_URL = process.env.VPS_AUTH_URL || 'https://id.grudge-studio.com';
+const VPS_TIMEOUT_MS = 5000;
+const VPS_MAX_RETRIES = 1;
 
-// ── Generic VPS POST helper ─────────────────────────────────────────────────
+// ── Circuit breaker ─────────────────────────────────────────────────────
+const circuitBreaker = {
+  failures: 0,
+  threshold: 3,
+  resetMs: 60_000,
+  lastFailure: 0,
+  isOpen() {
+    if (this.failures < this.threshold) return false;
+    if (Date.now() - this.lastFailure > this.resetMs) {
+      this.failures = 0;
+      return false;
+    }
+    return true;
+  },
+  recordFailure() {
+    this.failures++;
+    this.lastFailure = Date.now();
+    if (this.failures >= this.threshold) {
+      console.warn(`[vpsAuth] Circuit breaker OPEN — VPS disabled for ${this.resetMs / 1000}s`);
+    }
+  },
+  recordSuccess() { this.failures = 0; },
+};
+
+// ── Resilient VPS POST helper ──────────────────────────────────────────────
 async function vpsPost(path, body = {}) {
-  const res = await fetch(`${VPS_AUTH_URL}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json().catch(() => ({}));
-  return { status: res.status, ok: res.ok, data };
+  if (circuitBreaker.isOpen()) {
+    return { status: 503, ok: false, data: { error: 'VPS auth temporarily unavailable' }, vpsDown: true };
+  }
+  for (let attempt = 0; attempt <= VPS_MAX_RETRIES; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), VPS_TIMEOUT_MS);
+      const res = await fetch(`${VPS_AUTH_URL}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      const data = await res.json().catch(() => ({}));
+      circuitBreaker.recordSuccess();
+      return { status: res.status, ok: res.ok, data, vpsDown: false };
+    } catch (err) {
+      console.warn(`[vpsAuth] ${path} attempt ${attempt + 1} failed: ${err.name === 'AbortError' ? 'timeout' : err.message}`);
+      if (attempt >= VPS_MAX_RETRIES) {
+        circuitBreaker.recordFailure();
+        return { status: 503, ok: false, data: { error: 'VPS auth unreachable' }, vpsDown: true };
+      }
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
 }
 
 async function vpsGet(path, token) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(`${VPS_AUTH_URL}${path}`, { headers });
-  const data = await res.json().catch(() => ({}));
-  return { status: res.status, ok: res.ok, data };
+  if (circuitBreaker.isOpen()) {
+    return { status: 503, ok: false, data: {}, vpsDown: true };
+  }
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), VPS_TIMEOUT_MS);
+    const res = await fetch(`${VPS_AUTH_URL}${path}`, { headers, signal: controller.signal });
+    clearTimeout(timeout);
+    const data = await res.json().catch(() => ({}));
+    circuitBreaker.recordSuccess();
+    return { status: res.status, ok: res.ok, data, vpsDown: false };
+  } catch (err) {
+    circuitBreaker.recordFailure();
+    return { status: 503, ok: false, data: {}, vpsDown: true };
+  }
 }
 
 // ── Auth proxy functions ────────────────────────────────────────────────────

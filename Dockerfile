@@ -23,7 +23,10 @@ FROM node:20-alpine AS production
 WORKDIR /app
 
 # Install runtime dependencies
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash curl
+
+# Create non-root user for security
+RUN addgroup -S grudge && adduser -S grudge -G grudge
 
 # Copy from base stage
 COPY --from=base /app/node_modules ./node_modules
@@ -31,11 +34,14 @@ COPY --from=base /app/node_modules ./node_modules
 # Copy application files
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p logs builds
+# Create necessary directories and set ownership
+RUN mkdir -p logs builds && chown -R grudge:grudge /app
 
 # Set environment to production
 ENV NODE_ENV=production
+
+# Switch to non-root user
+USER grudge
 
 # Expose ports for game server
 EXPOSE 3000 7777

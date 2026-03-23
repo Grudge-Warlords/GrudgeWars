@@ -528,6 +528,100 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });
 
+// ── Game Server Registry ────────────────────────────────────────────────────
+// In-memory state for active game servers (Unity headless, Colyseus, etc.)
+// Heartbeats from server containers keep this alive
+const activeGameServers = new Map();
+const HEARTBEAT_TIMEOUT_MS = 90_000; // mark offline after 90s with no heartbeat
+
+// Heartbeat endpoint — called by Unity entrypoint every 30s
+app.post('/api/servers/unity/heartbeat', (req, res) => {
+  const { name, region, port, status, maxPlayers, currentPlayers, tickRate, startedAt } = req.body;
+  const serverId = `unity-${port || 7777}`;
+  const now = Date.now();
+
+  activeGameServers.set(serverId, {
+    id: serverId,
+    name: name || 'Grudge Warlords Dedicated',
+    type: 'unity-dedicated',
+    region: region || 'us-east-1',
+    port: port || 7777,
+    status: status || 'online',
+    maxPlayers: maxPlayers || 100,
+    currentPlayers: currentPlayers || 0,
+    tickRate: tickRate || 30,
+    startedAt: startedAt || new Date().toISOString(),
+    lastHeartbeat: new Date(now).toISOString(),
+    lastHeartbeatMs: now,
+  });
+
+  console.log(`[GameServer] Heartbeat from ${serverId}: ${status} (${currentPlayers || 0}/${maxPlayers || 100} players)`);
+  res.json({ success: true, serverId });
+});
+
+// Unity server status — for clients to check before connecting
+app.get('/api/servers/unity/status', (req, res) => {
+  const serverId = `unity-${req.query.port || 7777}`;
+  const server = activeGameServers.get(serverId);
+  if (!server) {
+    return res.json({ status: 'offline', serverId, message: 'No heartbeat received' });
+  }
+  // Check if heartbeat is stale
+  const stale = (Date.now() - server.lastHeartbeatMs) > HEARTBEAT_TIMEOUT_MS;
+  res.json({
+    ...server,
+    status: stale ? 'offline' : server.status,
+    stale,
+  });
+});
+
+// Full server listing — all active game servers for matchmaking / lobby
+app.get('/api/servers', (req, res) => {
+  const now = Date.now();
+  const servers = [];
+
+  for (const [id, srv] of activeGameServers) {
+    const stale = (now - srv.lastHeartbeatMs) > HEARTBEAT_TIMEOUT_MS;
+    servers.push({
+      ...srv,
+      status: stale ? 'offline' : srv.status,
+      stale,
+    });
+  }
+
+  // Also include Colyseus if configured
+  const colyseusUrl = process.env.COLYSEUS_SERVER_URL;
+  if (colyseusUrl) {
+    servers.push({
+      id: 'colyseus-lobbies',
+      name: 'Grudge Lobbies (Colyseus)',
+      type: 'colyseus',
+      url: colyseusUrl,
+      wsUrl: colyseusUrl.replace('https://', 'wss://').replace('http://', 'ws://'),
+      status: 'configured',
+      rooms: ['lobby', 'island', 'arena', 'dungeon'],
+    });
+  }
+
+  res.json({
+    success: true,
+    servers,
+    count: servers.length,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Cleanup stale servers every 60s
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, srv] of activeGameServers) {
+    if ((now - srv.lastHeartbeatMs) > HEARTBEAT_TIMEOUT_MS * 3) {
+      console.log(`[GameServer] Removing stale server: ${id}`);
+      activeGameServers.delete(id);
+    }
+  }
+}, 60_000);
+
 const ALLOWED_RETURN_ORIGINS = [...ALLOWED_ORIGINS];
 
 app.get('/api/external/login', (req, res) => {

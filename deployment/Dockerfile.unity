@@ -1,0 +1,46 @@
+# Grudge Warlords — Headless Unity Game Server
+# Runs the Linux dedicated server build with a health-check sidecar
+
+FROM ubuntu:22.04
+
+# Runtime deps for Unity headless server
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r grudge && useradd -r -g grudge -m grudge
+
+WORKDIR /server
+
+# Copy the headless Unity build
+COPY builds/server/ /server/
+
+# Copy the entrypoint wrapper
+COPY deployment/unity-entrypoint.sh /server/entrypoint.sh
+RUN chmod +x /server/entrypoint.sh \
+    && chmod +x /server/GrudgeWarlordsServer 2>/dev/null || true \
+    && chown -R grudge:grudge /server
+
+USER grudge
+
+# Game traffic port (TCP + UDP)
+EXPOSE 7777/tcp
+EXPOSE 7777/udp
+# Health check sidecar HTTP port
+EXPOSE 7780/tcp
+
+ENV UNITY_SERVER_PORT=7777
+ENV UNITY_MAX_PLAYERS=100
+ENV UNITY_TICK_RATE=30
+ENV UNITY_LOG_FILE=/server/logs/unity.log
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
+  CMD curl -sf http://localhost:7780/health || exit 1
+
+ENTRYPOINT ["/server/entrypoint.sh"]

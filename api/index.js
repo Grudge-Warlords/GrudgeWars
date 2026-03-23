@@ -65,17 +65,71 @@ function verifyJWT(token) {
   } catch { return null; }
 }
 
-// ── VPS Auth ────────────────────────────────────────────────────────────────
+// ── VPS Auth with Circuit Breaker + Retry ───────────────────────────────────
 const VPS_AUTH_URL = process.env.VPS_AUTH_URL || 'https://id.grudge-studio.com';
+const VPS_TIMEOUT_MS = 5000;
+const VPS_MAX_RETRIES = 1;
+
+// Circuit breaker state — trips after repeated VPS failures
+const circuitBreaker = {
+  failures: 0,
+  threshold: 3,         // trip after 3 consecutive failures
+  resetMs: 60_000,      // try again after 60s
+  lastFailure: 0,
+  isOpen() {
+    if (this.failures < this.threshold) return false;
+    // Auto-reset after cooldown
+    if (Date.now() - this.lastFailure > this.resetMs) {
+      console.log('[Auth] Circuit breaker reset — retrying VPS');
+      this.failures = 0;
+      return false;
+    }
+    return true;
+  },
+  recordFailure() {
+    this.failures++;
+    this.lastFailure = Date.now();
+    if (this.failures >= this.threshold) {
+      console.warn(`[Auth] Circuit breaker OPEN — VPS auth disabled for ${this.resetMs / 1000}s`);
+    }
+  },
+  recordSuccess() {
+    if (this.failures > 0) console.log('[Auth] VPS recovered — circuit breaker reset');
+    this.failures = 0;
+  },
+};
 
 async function vpsPost(path, body = {}) {
-  const res = await fetch(`${VPS_AUTH_URL}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json().catch(() => ({}));
-  return { status: res.status, ok: res.ok, data };
+  // Short-circuit if breaker is open
+  if (circuitBreaker.isOpen()) {
+    return { status: 503, ok: false, data: { error: 'VPS auth temporarily unavailable' }, vpsDown: true };
+  }
+
+  for (let attempt = 0; attempt <= VPS_MAX_RETRIES; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), VPS_TIMEOUT_MS);
+      const res = await fetch(`${VPS_AUTH_URL}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      const data = await res.json().catch(() => ({}));
+      circuitBreaker.recordSuccess();
+      return { status: res.status, ok: res.ok, data, vpsDown: false };
+    } catch (err) {
+      const isLast = attempt >= VPS_MAX_RETRIES;
+      console.warn(`[Auth] VPS ${path} attempt ${attempt + 1} failed: ${err.name === 'AbortError' ? 'timeout' : err.message}`);
+      if (isLast) {
+        circuitBreaker.recordFailure();
+        return { status: 503, ok: false, data: { error: 'VPS auth unreachable' }, vpsDown: true };
+      }
+      // Brief pause before retry
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
 }
 
 function extractVpsUser(data) {
@@ -86,6 +140,36 @@ function extractVpsUser(data) {
     discordId: user.discordId || user.discord_id || null,
     walletAddress: user.walletAddress || user.wallet_address || null,
   };
+}
+
+// ── Local auth fallback (password hashing) ──────────────────────────────────
+// Simple SHA-256 hash for local fallback when VPS is down.
+// NOT bcrypt — but allows players to log in during outages.
+// Accounts created locally will re-sync with VPS when it recovers.
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password + JWT_SECRET()).digest('hex');
+}
+
+async function localLogin(username, password) {
+  const hash = hashPassword(password);
+  const result = await dbQuery(
+    `SELECT * FROM accounts WHERE username = $1 AND password_hash = $2 AND auth_type = 'local'`,
+    [username, hash]
+  ).catch(() => ({ rows: [] }));
+  return result.rows[0] || null;
+}
+
+async function localRegister(username, password, email) {
+  const hash = hashPassword(password);
+  const grudgeId = UUID.generate('user', username + Date.now());
+  const result = await dbQuery(
+    `INSERT INTO accounts (grudge_id, username, password_hash, email, auth_type, last_login)
+     VALUES ($1, $2, $3, $4, 'local', NOW())
+     ON CONFLICT (username) DO NOTHING
+     RETURNING *`,
+    [grudgeId, username, hash, email || null]
+  ).catch(() => ({ rows: [] }));
+  return result.rows[0] || null;
 }
 
 async function upsertLocalGameAccount({ grudgeId, username, discordId, walletAddress }) {
@@ -276,6 +360,7 @@ async function ensureDB() {
     // ── Unique constraints (may already exist) ────────────────────────────
     await safe(`CREATE UNIQUE INDEX IF NOT EXISTS idx_accounts_grudge_id ON accounts(grudge_id) WHERE grudge_id IS NOT NULL`, 'grudge_id unique');
     await safe(`CREATE UNIQUE INDEX IF NOT EXISTS idx_accounts_grudge_username ON accounts(grudge_username) WHERE grudge_username IS NOT NULL`, 'grudge_username unique');
+    await safe(`CREATE UNIQUE INDEX IF NOT EXISTS idx_accounts_username_unique ON accounts(username) WHERE auth_type = 'local'`, 'username unique for local auth');
 
     _dbInitialized = true;
     console.log('[DB] Schema initialized successfully');
@@ -401,33 +486,73 @@ function requireAuth(req, res, next) {
   next();
 }
 
-// ── AUTH: Register (VPS proxy) ──────────────────────────────────────────────
+// ── AUTH: Register (VPS proxy + local fallback) ─────────────────────────────
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { username, password, email } = req.body;
+    if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
+
+    // Try VPS first
     const vps = await vpsPost('/auth/register', { username, password, email });
-    if (!vps.ok) return res.status(vps.status).json(vps.data);
-    const u = extractVpsUser(vps.data);
-    await upsertLocalGameAccount(u);
-    res.status(vps.status).json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId });
+    if (vps.ok) {
+      const u = extractVpsUser(vps.data);
+      await upsertLocalGameAccount(u);
+      return res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId, authSource: 'vps' });
+    }
+
+    // If VPS is down (not just a 400/401), fall back to local registration
+    if (vps.vpsDown) {
+      console.log(`[Auth] VPS down — registering '${username}' locally`);
+      const account = await localRegister(username, password, email);
+      if (!account) return res.status(409).json({ error: 'Username already taken' });
+      const token = createJWT({ grudge_id: account.grudge_id, username: account.username, accountId: account.id });
+      return res.json({ success: true, sessionToken: token, token, user: { id: account.id, username: account.username }, grudgeId: account.grudge_id, authSource: 'local' });
+    }
+
+    // VPS returned an error (400, 409, etc.) — forward it
+    return res.status(vps.status).json(vps.data);
   } catch (err) {
     console.error('Register error:', err.message);
-    res.status(502).json({ error: 'Auth service unavailable' });
+    res.status(500).json({ error: 'Registration failed' });
   }
 });
 
-// ── AUTH: Login (VPS proxy) ─────────────────────────────────────────────────
+// ── AUTH: Login (VPS proxy + local fallback) ────────────────────────────────
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
+    if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
+
+    // Try VPS first
     const vps = await vpsPost('/auth/login', { username, password });
-    if (!vps.ok) return res.status(vps.status).json(vps.data);
-    const u = extractVpsUser(vps.data);
-    await upsertLocalGameAccount(u);
-    res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId });
+    if (vps.ok) {
+      const u = extractVpsUser(vps.data);
+      await upsertLocalGameAccount(u);
+      return res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId, authSource: 'vps' });
+    }
+
+    // If VPS is down, try local login
+    if (vps.vpsDown) {
+      console.log(`[Auth] VPS down — attempting local login for '${username}'`);
+      const account = await localLogin(username, password);
+      if (account) {
+        const token = createJWT({ grudge_id: account.grudge_id, username: account.username, accountId: account.id });
+        return res.json({ success: true, sessionToken: token, token, user: { id: account.id, username: account.username }, grudgeId: account.grudge_id, authSource: 'local' });
+      }
+      // Also try matching by username in DB (for accounts that were created via VPS but have no local password)
+      const existing = await dbQuery('SELECT * FROM accounts WHERE username = $1', [username]).catch(() => ({ rows: [] }));
+      if (existing.rows[0]) {
+        // User exists but has no local password — can't verify without VPS
+        return res.status(503).json({ error: 'Auth server temporarily unavailable. Please try again in a moment.', retryAfter: 60 });
+      }
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    // VPS returned a real error (wrong password, etc.)
+    return res.status(vps.status).json(vps.data);
   } catch (err) {
     console.error('Login error:', err.message);
-    res.status(502).json({ error: 'Auth service unavailable' });
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 
@@ -472,39 +597,72 @@ app.post('/api/auth/wallet', async (req, res) => {
   }
 });
 
-// ── AUTH: Puter (VPS proxy) ─────────────────────────────────────────────────
+// ── AUTH: Puter (VPS proxy + local fallback) ──────────────────────────────
 app.post('/api/auth/puter', async (req, res) => {
   try {
     const { puterUsername, puterUuid } = req.body;
+    if (!puterUsername && !puterUuid) return res.status(400).json({ error: 'Puter credentials required' });
+
+    // Try VPS first
     const vps = await vpsPost('/auth/puter', { puterUuid, puterUsername });
-    if (!vps.ok) return res.status(vps.status).json(vps.data);
-    const u = extractVpsUser(vps.data);
-    await upsertLocalGameAccount(u);
-    res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId });
+    if (vps.ok) {
+      const u = extractVpsUser(vps.data);
+      await upsertLocalGameAccount(u);
+      return res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId, authSource: 'vps' });
+    }
+
+    // If VPS is down, create/upsert locally with puter UUID
+    if (vps.vpsDown) {
+      console.log(`[Auth] VPS down — handling Puter auth locally for '${puterUsername}'`);
+      const grudgeId = UUID.generate('user', (puterUuid || puterUsername) + Date.now());
+      const account = await upsertLocalGameAccount({ grudgeId, username: puterUsername || 'PuterUser', puterId: puterUuid });
+      if (!account) return res.status(500).json({ error: 'Account creation failed' });
+      const token = createJWT({ grudge_id: account.grudge_id, username: account.username, accountId: account.id, puter_uuid: puterUuid });
+      return res.json({ success: true, sessionToken: token, token, user: { id: account.id, username: account.username }, grudgeId: account.grudge_id, authSource: 'local' });
+    }
+
+    return res.status(vps.status).json(vps.data);
   } catch (err) {
     console.error('Puter auth error:', err.message);
-    res.status(502).json({ error: 'Auth service unavailable' });
+    res.status(500).json({ error: 'Puter auth failed' });
   }
 });
 
-// ── AUTH: Verify (VPS proxy) ────────────────────────────────────────────────
+// ── AUTH: Verify (local-first, VPS fallback) ──────────────────────────────
 app.post('/api/auth/verify', async (req, res) => {
   const { sessionToken } = req.body;
   if (!sessionToken) return res.status(400).json({ error: 'sessionToken required' });
+
+  // Always try local JWT verification first (instant, no network)
   const payload = verifyJWT(sessionToken);
   if (payload) {
-    return res.json({ valid: true, grudgeId: payload.grudgeId || payload.grudge_id, discordId: payload.discordId || payload.discord_id, username: payload.username });
+    return res.json({ valid: true, grudgeId: payload.grudgeId || payload.grudge_id, discordId: payload.discordId || payload.discord_id, username: payload.username, authSource: 'local' });
   }
-  try {
-    const vps = await vpsPost('/auth/verify', { token: sessionToken });
-    if (vps.ok && vps.data.valid) {
-      const p = vps.data.payload || vps.data;
-      return res.json({ valid: true, grudgeId: p.grudge_id, username: p.username, discordId: p.discord_id });
-    }
-    return res.status(401).json({ valid: false, error: 'Invalid or expired token' });
-  } catch {
-    return res.status(401).json({ valid: false, error: 'Invalid or expired session' });
+
+  // If local fails, try VPS (token may have been issued by VPS with different secret)
+  const vps = await vpsPost('/auth/verify', { token: sessionToken });
+  if (vps.ok && vps.data.valid) {
+    const p = vps.data.payload || vps.data;
+    return res.json({ valid: true, grudgeId: p.grudge_id, username: p.username, discordId: p.discord_id, authSource: 'vps' });
   }
+
+  // Both failed
+  return res.status(401).json({ valid: false, error: vps.vpsDown ? 'Auth server temporarily unavailable' : 'Invalid or expired token' });
+});
+
+// ── AUTH: Health / VPS status ──────────────────────────────────────────
+app.get('/api/auth/status', (req, res) => {
+  res.json({
+    vpsUrl: VPS_AUTH_URL,
+    circuitBreaker: {
+      open: circuitBreaker.isOpen(),
+      failures: circuitBreaker.failures,
+      threshold: circuitBreaker.threshold,
+      lastFailure: circuitBreaker.lastFailure ? new Date(circuitBreaker.lastFailure).toISOString() : null,
+    },
+    localFallback: true,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // ── Discord OAuth ───────────────────────────────────────────────────────────
