@@ -694,13 +694,24 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <a href="/" style={{
-          color: '#ffd700', textDecoration: 'none', fontWeight: 600, fontSize: '0.7rem',
-          padding: '4px 12px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)',
-          borderRadius: 6, flexShrink: 0,
-        }}>
-          Back to Game
-        </a>
+        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+          <a href="https://the-engine-grudgenexus.vercel.app" target="_blank" rel="noopener noreferrer" style={{
+            color: '#0a0a12', textDecoration: 'none', fontWeight: 700, fontSize: '0.7rem',
+            padding: '5px 14px', background: 'linear-gradient(135deg, #DB6331, #FAAC47)',
+            border: 'none', borderRadius: 6,
+            display: 'flex', alignItems: 'center', gap: 5,
+            boxShadow: '0 2px 10px rgba(219,99,49,0.3)',
+          }}>
+            🎮 Open Engine
+          </a>
+          <a href="/" style={{
+            color: '#ffd700', textDecoration: 'none', fontWeight: 600, fontSize: '0.7rem',
+            padding: '4px 12px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)',
+            borderRadius: 6,
+          }}>
+            Back to Game
+          </a>
+        </div>
       </div>
 
       {isEditorTab ? (
