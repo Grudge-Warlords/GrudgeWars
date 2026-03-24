@@ -59,10 +59,10 @@ export async function pushSave(gameState) {
   try {
     const headers = {
       'Content-Type': 'application/json',
-      'X-Session-Token': sessionToken,
+      'Authorization': `Bearer ${sessionToken}`,
     };
 
-    // Add Puter token if available
+    // Add Puter token if available (for dual-save to Puter KV)
     const puterToken = await getPuterToken();
     if (puterToken) headers['X-Puter-Token'] = puterToken;
 
@@ -101,7 +101,7 @@ export async function pullSave() {
   try {
     const headers = {
       'Content-Type': 'application/json',
-      'X-Session-Token': sessionToken,
+      'Authorization': `Bearer ${sessionToken}`,
     };
 
     const puterToken = await getPuterToken();
