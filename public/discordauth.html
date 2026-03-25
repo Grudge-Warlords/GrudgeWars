@@ -85,9 +85,11 @@ h1,h2,h3{font-family:'Cinzel',serif}
 .guild-status{margin-top:10px;font-size:12px;padding:6px 10px;border-radius:4px;display:none}
 .guild-status.joined{display:block;background:rgba(76,175,80,0.15);color:#4caf50}
 .guild-status.failed{display:block;background:rgba(233,69,96,0.1);color:var(--dim)}
-</style>
+
+#hero-video{position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1;opacity:0.15;pointer-events:none}</style>
 </head>
 <body>
+<video id="hero-video" autoplay muted loop playsinline preload="auto"><source src="/hero-scroll.mp4" type="video/mp4"></video>
 
 <div class="login-container">
   <div class="login-card">
