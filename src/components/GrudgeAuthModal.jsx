@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE } from '../utils/apiBase.js';
-import { redirectToGateway, isGatewayAuthenticated, GATEWAY_URL } from '../utils/grudgeGateway.js';
 
 const VPS_AUTH = 'https://id.grudge-studio.com';
 
@@ -247,7 +246,7 @@ const S = {
 // ── Component ────────────────────────────────────────────────────────────────
 export default function GrudgeAuthModal({ onSuccess, inline = false }) {
   const [tab, setTab] = useState('login'); // 'login' | 'register'
-  const [activeProvider, setActiveProvider] = useState(null); // null | 'grudge'
+  const [showForm, setShowForm] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
@@ -255,13 +254,12 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
   const [phoneCode, setPhoneCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [puterLoading, setPuterLoading] = useState(false);
+  const [grudgeIdLoading, setGrudgeIdLoading] = useState(false);
 
   // Dynamically load Puter SDK on demand — never require it at page load
   const loadPuterSdk = () => new Promise((resolve, reject) => {
     if (window.puter?.auth) { resolve(); return; }
     if (document.querySelector('script[src*="puter.com"]')) {
-      // Already injected — wait for it
       const poll = setInterval(() => {
         if (window.puter?.auth) { clearInterval(poll); resolve(); }
       }, 100);
@@ -271,7 +269,6 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     const s = document.createElement('script');
     s.src = 'https://js.puter.com/v2/';
     s.onload = () => {
-      // Give SDK time to fully initialize
       const poll = setInterval(() => {
         if (window.puter?.auth) { clearInterval(poll); resolve(); }
       }, 100);
@@ -281,11 +278,6 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     document.head.appendChild(s);
   });
 
-  // ── Gateway redirect ─────────────────────────────────────────────────────
-  const handleGatewayLogin = () => {
-    redirectToGateway(window.location.href);
-  };
-
   // ── Guest / Quick Play ───────────────────────────────────────────────────
   const handleGuest = () => {
     const session = { type: 'guest', username: 'Adventurer', loginTime: Date.now() };
@@ -294,22 +286,16 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     else window.location.href = '/play';
   };
 
-  // ── Puter ───────────────────────────────────────────────────────────────
-  const handlePuter = async () => {
-    setPuterLoading(true); setError('');
+  // ── GRUDGE ID (= Puter Auth) ────────────────────────────────────────────
+  // Grudge ID IS Puter auth. One button, one flow.
+  const handleGrudgeId = async () => {
+    setGrudgeIdLoading(true); setError('');
     try {
-      // SDK embedded in index.html — should be ready; fall back to dynamic load
       await loadPuterSdk();
       if (!window.puter?.auth) throw new Error('Puter SDK unavailable');
 
-      // If already logged into puter.com via browser session, signIn() returns
-      // immediately with the token — no popup shown.
-      // If NOT logged in, it opens puter.com/action/sign-in popup.
-      // The popup shows both SIGN IN and CREATE ACCOUNT tabs — choose SIGN IN
-      // if you already have a Puter account.
-      const signInResult = await window.puter.auth.signIn();
+      await window.puter.auth.signIn();
 
-      // After signIn() resolves, puter.authToken is set; now get user
       let user = null;
       try { user = await window.puter.auth.getUser(); } catch {}
       if (!user?.username) throw new Error('No Puter user returned');
@@ -342,14 +328,14 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     } catch (err) {
       const msg = (err?.msg || err?.message || '').toLowerCase();
       if (msg.includes('auth_window_closed') || msg.includes('closed') || msg.includes('cancel')) {
-        // User dismissed the Puter popup — no error shown
+        // User dismissed — no error
       } else if (msg.includes('popup')) {
-        setError('Allow popups for this site, then try Puter again.');
+        setError('Allow popups for this site, then try again.');
       } else {
-        setError('Puter sign-in failed. If you have an account, use the Sign In tab in the Puter popup.');
+        setError('Sign-in failed. Try again or use another method.');
       }
     }
-    setPuterLoading(false);
+    setGrudgeIdLoading(false);
   };
 
   // ── Phantom Wallet ───────────────────────────────────────────────────────
@@ -363,7 +349,6 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     try {
       const { publicKey } = await provider.connect();
       const address = publicKey.toString();
-      // Try to link to server; if unavailable, create local wallet session
       let sessionToken = null;
       let grudgeId = null;
       try {
@@ -395,17 +380,17 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     setLoading(false);
   };
 
-  // ── Discord (direct VPS OAuth redirect) ─────────────────────────────────────────
+  // ── Discord OAuth (VPS redirect) ────────────────────────────────────────
   const handleDiscord = () => {
     window.location.href = `${VPS_AUTH}/auth/discord?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
   };
 
-  // ── Google OAuth (direct VPS redirect) ───────────────────────────────────────
+  // ── Google OAuth (VPS redirect) ─────────────────────────────────────────
   const handleGoogle = () => {
     window.location.href = `${VPS_AUTH}/auth/google?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
   };
 
-  // ── GitHub OAuth (direct VPS redirect) ───────────────────────────────────────
+  // ── GitHub OAuth (VPS redirect) ─────────────────────────────────────────
   const handleGithub = () => {
     window.location.href = `${VPS_AUTH}/auth/github?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
   };
@@ -484,20 +469,15 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     setLoading(false);
   };
 
-  const toggleProvider = (p) => {
-    setActiveProvider(prev => prev === p ? null : p);
-    setError('');
-  };
-
   const iconBtnHover = (e, color) => {
     e.currentTarget.style.background = `${color}18`;
     e.currentTarget.style.borderColor = `${color}55`;
     e.currentTarget.style.color = color;
   };
-  const iconBtnLeave = (e, color, active) => {
-    e.currentTarget.style.background = active ? `${color}22` : 'rgba(255,255,255,0.03)';
-    e.currentTarget.style.borderColor = active ? `${color}66` : 'rgba(255,255,255,0.08)';
-    e.currentTarget.style.color = active ? color : 'rgba(255,255,255,0.5)';
+  const iconBtnLeave = (e, color) => {
+    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+    e.currentTarget.style.color = 'rgba(255,255,255,0.5)';
   };
 
   return (
@@ -516,7 +496,7 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       <div style={S.title}>GRUDGE<br /><span style={{ fontSize: '1rem', letterSpacing: 4 }}>WARLORDS</span></div>
       <div style={S.subtitle}>Your Grudge ID is your Gaming Passport</div>
 
-      {/* Gateway Login — primary SSO */}
+      {/* PRIMARY: Sign in with Grudge ID (= Puter Auth) */}
       <button
         style={{
           ...S.quickPlay,
@@ -524,11 +504,12 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
           color: '#0a0a12',
           marginBottom: 10,
         }}
-        onClick={handleGatewayLogin}
+        onClick={handleGrudgeId}
+        disabled={grudgeIdLoading}
         onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(250,172,71,0.4)'; }}
         onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(192,57,43,0.4)'; }}
       >
-        🛡️ SIGN IN WITH GRUDGE ID
+        {grudgeIdLoading ? '⏳ CONNECTING...' : '🛡️ SIGN IN WITH GRUDGE ID'}
       </button>
 
       {/* Quick Play */}
@@ -541,184 +522,102 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
         🎮 QUICK PLAY
       </button>
 
-      {/* 4-icon grid: Wallet, Grudge, Discord, Puter */}
-      <div style={S.iconGrid}>
-        {/* Wallet */}
-        <button
-          style={S.iconBtn('#f59e0b', false)}
-          onClick={handleWallet}
-          disabled={loading}
-          title="Phantom Wallet"
-          onMouseEnter={e => iconBtnHover(e, '#f59e0b')}
-          onMouseLeave={e => iconBtnLeave(e, '#f59e0b', false)}
-        >
-          <WalletSvg size={20} />
-          Wallet
-        </button>
-
-        {/* Grudge */}
-        <button
-          style={S.iconBtn('#FAAC47', activeProvider === 'grudge')}
-          onClick={() => toggleProvider('grudge')}
-          title="Grudge ID"
-          onMouseEnter={e => iconBtnHover(e, '#FAAC47')}
-          onMouseLeave={e => iconBtnLeave(e, '#FAAC47', activeProvider === 'grudge')}
-        >
-          <img
-            src="/sprites/ui/grudge_logo.png"
-            alt="G"
-            style={{ width: 20, height: 20, objectFit: 'contain', filter: activeProvider === 'grudge' ? 'none' : 'grayscale(0.4)' }}
-            onError={e => { e.currentTarget.style.display = 'none'; }}
-          />
-          Grudge
-        </button>
-
-        {/* Discord */}
+      {/* 3-icon grid: Discord, Google, GitHub */}
+      <div style={{ ...S.iconGrid, gridTemplateColumns: '1fr 1fr 1fr', marginBottom: 8 }}>
         <button
           style={S.iconBtn('#7289da', false)}
           onClick={handleDiscord}
           disabled={loading}
           title="Discord"
           onMouseEnter={e => iconBtnHover(e, '#7289da')}
-          onMouseLeave={e => iconBtnLeave(e, '#7289da', false)}
+          onMouseLeave={e => iconBtnLeave(e, '#7289da')}
         >
           <DiscordSvg size={20} />
           Discord
         </button>
-
-        {/* Puter — always enabled, loads SDK on demand */}
         <button
-          style={S.iconBtn('#a78bfa', false)}
-          onClick={handlePuter}
-          disabled={loading || puterLoading}
-          title="Sign in with Puter"
-          onMouseEnter={e => iconBtnHover(e, '#a78bfa')}
-          onMouseLeave={e => iconBtnLeave(e, '#a78bfa', false)}
-        >
-          {puterLoading
-            ? <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
-            : <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
-          }
-          {puterLoading ? 'Loading…' : 'Puter'}
-        </button>
-      </div>
-
-      {/* Wide grid: Google, GitHub */}
-      <div style={S.wideGrid}>
-        <button
-          style={S.wideBtn('#4285F4', false)}
+          style={S.iconBtn('#4285F4', false)}
           onClick={handleGoogle}
-          title="Sign in with Google"
-          onMouseEnter={e => { e.currentTarget.style.borderColor = '#4285F466'; e.currentTarget.style.color = '#4285F4'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; }}
+          title="Google"
+          onMouseEnter={e => iconBtnHover(e, '#4285F4')}
+          onMouseLeave={e => iconBtnLeave(e, '#4285F4')}
         >
-          <GoogleSvg size={16} />
+          <GoogleSvg size={20} />
           Google
         </button>
         <button
-          style={S.wideBtn('#fff', false)}
+          style={S.iconBtn('#fff', false)}
           onClick={handleGithub}
-          title="Sign in with GitHub"
-          onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; e.currentTarget.style.color = '#fff'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; }}
+          title="GitHub"
+          onMouseEnter={e => iconBtnHover(e, '#fff')}
+          onMouseLeave={e => iconBtnLeave(e, '#fff')}
         >
-          <GithubSvg size={16} />
+          <GithubSvg size={20} />
           GitHub
         </button>
       </div>
 
+      {/* Wallet */}
+      <button
+        style={{ ...S.wideBtn('#f59e0b', false), width: '100%', marginBottom: 8 }}
+        onClick={handleWallet}
+        disabled={loading}
+        title="Phantom Wallet"
+        onMouseEnter={e => { e.currentTarget.style.borderColor = '#f59e0b66'; e.currentTarget.style.color = '#f59e0b'; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; }}
+      >
+        <WalletSvg size={16} />
+        Connect Wallet
+      </button>
+
+      {error && <div style={S.error}>{error}</div>}
+
       {/* Divider */}
       <div style={S.divider}>
         <div style={S.divLine} />
-        OR CONTINUE WITH
+        OR USE ACCOUNT
         <div style={S.divLine} />
       </div>
 
-      {/* Grudge form — shown when Grudge provider active */}
-      {activeProvider === 'grudge' && (
-        <form onSubmit={handleGrudgeSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={S.tabRow}>
-            <button type="button" style={S.tab(tab === 'login')} onClick={() => { setTab('login'); setError(''); }}>LOGIN</button>
-            <button type="button" style={S.tab(tab === 'register')} onClick={() => { setTab('register'); setError(''); }}>REGISTER</button>
-          </div>
+      {/* Username/Password form */}
+      <form onSubmit={handleGrudgeSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={S.tabRow}>
+          <button type="button" style={S.tab(tab === 'login')} onClick={() => { setTab('login'); setError(''); }}>LOGIN</button>
+          <button type="button" style={S.tab(tab === 'register')} onClick={() => { setTab('register'); setError(''); }}>REGISTER</button>
+        </div>
+        <input
+          style={S.input}
+          type="text"
+          placeholder="Username / Email / Grudge ID"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          autoComplete="username"
+          onFocus={e => { e.currentTarget.style.borderColor = 'rgba(250,172,71,0.5)'; }}
+          onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+        />
+        <div style={{ position: 'relative' }}>
           <input
-            style={S.input}
-            type="text"
-            placeholder="Username / Email / Grudge ID"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            autoComplete={tab === 'register' ? 'username' : 'username'}
+            style={{ ...S.input, paddingRight: 40 }}
+            type={showPass ? 'text' : 'password'}
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            autoComplete={tab === 'register' ? 'new-password' : 'current-password'}
             onFocus={e => { e.currentTarget.style.borderColor = 'rgba(250,172,71,0.5)'; }}
             onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
           />
-          <div style={{ position: 'relative' }}>
-            <input
-              style={{ ...S.input, paddingRight: 40 }}
-              type={showPass ? 'text' : 'password'}
-              placeholder="Password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              autoComplete={tab === 'register' ? 'new-password' : 'current-password'}
-              onFocus={e => { e.currentTarget.style.borderColor = 'rgba(250,172,71,0.5)'; }}
-              onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPass(p => !p)}
-              style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', padding: 2 }}
-            >
-              <EyeSvg size={15} open={showPass} />
-            </button>
-          </div>
-          {error && <div style={S.error}>{error}</div>}
-          <button type="submit" style={S.signInBtn(loading)} disabled={loading}>
-            {loading ? 'Connecting…' : tab === 'register' ? 'CREATE ACCOUNT' : 'SIGN IN'}
+          <button
+            type="button"
+            onClick={() => setShowPass(p => !p)}
+            style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', padding: 2 }}
+          >
+            <EyeSvg size={15} open={showPass} />
           </button>
-        </form>
-      )}
-
-      {/* Default form (non-Grudge) — login/register shortcut */}
-      {activeProvider !== 'grudge' && (
-        <form onSubmit={handleGrudgeSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={S.tabRow}>
-            <button type="button" style={S.tab(tab === 'login')} onClick={() => { setTab('login'); setActiveProvider('grudge'); setError(''); }}>LOGIN</button>
-            <button type="button" style={S.tab(tab === 'register')} onClick={() => { setTab('register'); setActiveProvider('grudge'); setError(''); }}>REGISTER</button>
-          </div>
-          <input
-            style={S.input}
-            type="text"
-            placeholder="Username / Email / Grudge ID"
-            value={username}
-            onChange={e => { setUsername(e.target.value); setActiveProvider('grudge'); }}
-            autoComplete="username"
-            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(250,172,71,0.5)'; setActiveProvider('grudge'); }}
-            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
-          />
-          <div style={{ position: 'relative' }}>
-            <input
-              style={{ ...S.input, paddingRight: 40 }}
-              type={showPass ? 'text' : 'password'}
-              placeholder="Password"
-              value={password}
-              onChange={e => { setPassword(e.target.value); setActiveProvider('grudge'); }}
-              autoComplete="current-password"
-              onFocus={e => { e.currentTarget.style.borderColor = 'rgba(250,172,71,0.5)'; setActiveProvider('grudge'); }}
-              onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPass(p => !p)}
-              style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', padding: 2 }}
-            >
-              <EyeSvg size={15} open={showPass} />
-            </button>
-          </div>
-          {error && <div style={S.error}>{error}</div>}
-          <button type="submit" style={S.signInBtn(loading)} disabled={loading}>
-            {loading ? 'Connecting…' : tab === 'register' ? 'CREATE ACCOUNT' : 'SIGN IN'}
-          </button>
-        </form>
-      )}
+        </div>
+        <button type="submit" style={S.signInBtn(loading)} disabled={loading}>
+          {loading ? 'Connecting…' : tab === 'register' ? 'CREATE ACCOUNT' : 'SIGN IN'}
+        </button>
+      </form>
 
       {/* Phone divider */}
       <div style={{ ...S.divider, margin: '14px 0 10px' }}>

@@ -334,13 +334,8 @@ export default function TitleScreen() {
     setScreen('intro');
   };
 
-  // "LOGIN WITH GRUDGE" always opens the username/password form
-  const handleGrudgeLogin = () => {
-    setShowLoginForm(true);
-  };
-
-  // Puter login — loads SDK on demand, always available
-  const handlePuterLogin = async () => {
+  // "LOGIN WITH GRUDGE" = Puter auth (Grudge ID IS Puter)
+  const handleGrudgeLogin = async () => {
     setPuterLoading(true);
     try {
       await loadPuterSdk();
@@ -383,16 +378,11 @@ export default function TitleScreen() {
     setFormLoading(false);
   };
 
-  const handleDiscordLogin = async () => {
+  // Discord — route through VPS directly (avoids needing DISCORD_CLIENT_ID env var on Vercel)
+  const VPS_AUTH = 'https://id.grudge-studio.com';
+  const handleDiscordLogin = () => {
     setDiscordLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/discord/login`);
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch {}
-    setDiscordLoading(false);
+    window.location.href = `${VPS_AUTH}/auth/discord?redirect_uri=${encodeURIComponent(window.location.origin + '/play')}`;
   };
 
   const handleSignOut = () => {
@@ -529,25 +519,43 @@ export default function TitleScreen() {
             </div>
           )}
 
+          <LoginButton
+            label={puterLoading ? 'CONNECTING...' : 'LOGIN WITH GRUDGE'}
+            sublabel={'Sign in or create your Grudge ID'}
+            onClick={handleGrudgeLogin}
+            variant="grudge"
+            disabled={puterLoading}
+            icon={
+              <div style={{
+                width: 24, height: 24, borderRadius: 4,
+                background: 'linear-gradient(135deg, #DB6331, #FAAC47)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                overflow: 'hidden',
+              }}>
+                <img src="/sprites/ui/grudge_logo.png" alt="G" style={{ width: 20, height: 20, objectFit: 'contain' }} />
+              </div>
+            }
+            delay={returningSession ? 0.1 : 0.3}
+          />
+
+          <LoginButton
+            label={'LOGIN WITH DISCORD'}
+            sublabel={'Sync community & leaderboards'}
+            onClick={handleDiscordLogin}
+            variant="discord"
+            disabled={discordLoading}
+            icon={<DiscordSvg size={22} color={'#7289da'} />}
+            delay={returningSession ? 0.2 : 0.45}
+          />
+
+          {/* Username/password fallback */}
           {!showLoginForm ? (
             <LoginButton
-              label={'LOGIN WITH GRUDGE'}
-              sublabel={'Username & password'}
-              onClick={handleGrudgeLogin}
-              variant="grudge"
-              icon={
-                <div style={{
-                  width: 24, height: 24, borderRadius: 4,
-                  background: 'linear-gradient(135deg, #DB6331, #FAAC47)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.75rem', fontWeight: 800, color: '#fff',
-                  fontFamily: "'Jost', sans-serif",
-                  overflow: 'hidden',
-                }}>
-                  <img src="/sprites/ui/grudge_logo.png" alt="G" style={{ width: 20, height: 20, objectFit: 'contain' }} />
-                </div>
-              }
-              delay={returningSession ? 0.1 : 0.3}
+              label="USE USERNAME & PASSWORD"
+              sublabel="Grudge account login"
+              onClick={() => setShowLoginForm(true)}
+              variant="default"
+              delay={returningSession ? 0.25 : 0.5}
             />
           ) : (
             <form onSubmit={handleFormSubmit} style={{
@@ -557,7 +565,7 @@ export default function TitleScreen() {
               animation: 'slideUp 0.3s ease both',
             }}>
               <div style={{ fontFamily: "'LifeCraft', 'Cinzel', serif", fontSize: '1.1rem', color: 'var(--accent)', letterSpacing: 2, textAlign: 'center', marginBottom: 4 }}>
-                {isRegister ? 'CREATE GRUDGE ID' : 'GRUDGE LOGIN'}
+                {isRegister ? 'CREATE ACCOUNT' : 'SIGN IN'}
               </div>
               <input
                 type="text" placeholder="Username" value={formUsername}
@@ -590,37 +598,6 @@ export default function TitleScreen() {
               </div>
             </form>
           )}
-
-          <LoginButton
-            label={'LOGIN WITH DISCORD'}
-            sublabel={'Sync community & leaderboards'}
-            onClick={handleDiscordLogin}
-            variant="discord"
-            disabled={discordLoading}
-            icon={<DiscordSvg size={22} color={'#7289da'} />}
-            delay={returningSession ? 0.2 : 0.45}
-          />
-
-          {/* Puter login — always shown, SDK loads on demand */}
-          <LoginButton
-            label={puterUser ? `ENTER AS ${puterUser.username.toUpperCase()}` : (puterLoading ? 'LOADING PUTER…' : 'LOGIN WITH PUTER')}
-            sublabel={puterUser ? 'Puter account connected' : 'Puter cloud account'}
-            onClick={handlePuterLogin}
-            variant="default"
-            active={!!puterUser}
-            disabled={puterLoading}
-            icon={
-              <div style={{
-                width: 22, height: 22, borderRadius: 4,
-                background: puterUser ? 'linear-gradient(135deg, #10b981, #34d399)' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '0.65rem', fontWeight: 800, color: '#fff',
-              }}>
-                {puterUser ? '\u2713' : 'P'}
-              </div>
-            }
-            delay={returningSession ? 0.3 : 0.5}
-          />
 
           <LoginButton
             label="PLAY AS GUEST"
