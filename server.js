@@ -16,6 +16,58 @@ import {
   healthCheck as puterHealthCheck, deployLogAppend,
 } from './api/lib/puter-service.js';
 import { proxyToBackend, verifyToken as verifyBackendToken, ALLOWED_ORIGINS as PROXY_ORIGINS } from './src/server/backendProxy.js';
+
+// ── Phase 6: In-memory rate limiter ──────────────────────────────────────────────
+const _rateBuckets = new Map(); // key -> { count, resetAt }
+
+function rateLimiter(maxPerMin) {
+  return (req, res, next) => {
+    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+    const key = `${maxPerMin}:${ip}:${req.path.split('/')[2] || 'root'}`;
+    const now = Date.now();
+    const bucket = _rateBuckets.get(key);
+    if (!bucket || now > bucket.resetAt) {
+      _rateBuckets.set(key, { count: 1, resetAt: now + 60_000 });
+      return next();
+    }
+    if (bucket.count >= maxPerMin) {
+      const retryAfter = Math.ceil((bucket.resetAt - now) / 1000);
+      res.setHeader('Retry-After', retryAfter);
+      return res.status(429).json({ error: 'Too many requests — please slow down', retryAfter });
+    }
+    bucket.count++;
+    next();
+  };
+}
+
+// Purge stale buckets every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of _rateBuckets) { if (now > v.resetAt) _rateBuckets.delete(k); }
+}, 5 * 60_000);
+
+// ── Phase 6: Character creation validators ─────────────────────────────────────
+const VALID_CLASSES = new Set(['warrior', 'mage', 'ranger', 'worge']);
+const VALID_RACES   = new Set(['human', 'elf', 'dwarf', 'orc', 'undead', 'barbarian', 'goblin']);
+const NAME_REGEX    = /^[a-zA-Z0-9 '-]{1,30}$/;
+const MAX_CHARACTERS = 15;
+
+function validateCharacterBody(body) {
+  const { name, classId, raceId } = body || {};
+  if (!name || !NAME_REGEX.test(name))
+    return 'name must be 1-30 characters (letters, numbers, spaces, hyphens, apostrophes)';
+  if (!VALID_CLASSES.has(classId))
+    return `classId must be one of: ${[...VALID_CLASSES].join(', ')}`;
+  if (!VALID_RACES.has(raceId))
+    return `raceId must be one of: ${[...VALID_RACES].join(', ')}`;
+  return null;
+}
+
+// ── Phase 6: Audit logger ────────────────────────────────────────────────────────
+function auditLog(action, grudgeId, detail) {
+  console.log(`[AUDIT] ${new Date().toISOString()} | ${action} | ${grudgeId || 'unknown'} | ${JSON.stringify(detail)}`);
+  // Future: proxyToBackend('/api/audit', ...) to persist to backend
+}
 import * as S3 from './api/lib/s3.js';
 
 const __filename_server = fileURLToPath(import.meta.url);
@@ -158,7 +210,8 @@ function getPublicOrigin(req) {
   return `${proto}://${host || `localhost:${PORT}`}`;
 }
 
-app.get('/api/discord/login', (req, res) => {
+// Auth routes: rate-limited
+app.get('/api/discord/login', rateLimiter(10), (req, res) => {
   const redirectUrl = req.query.redirect_uri || null;
   const origin = getPublicOrigin(req);
   const redirectUri = redirectUrl || `${origin}/discordauth`;
@@ -2160,20 +2213,45 @@ async function requireUserAuth(req, res, next) {
 }
 
 // ── Characters ────────────────────────────────────────────────────────────
-app.get('/api/characters', requireUserAuth, (req, res) =>
+app.get('/api/characters', requireUserAuth, rateLimiter(60), (req, res) =>
   proxyToBackend('/api/characters', req, res, { passQuery: true }));
 
-app.post('/api/characters', requireUserAuth, (req, res) =>
-  proxyToBackend('/api/characters', req, res));
+// Character creation: validate body + enforce slot cap
+app.post('/api/characters', requireUserAuth, rateLimiter(20), async (req, res) => {
+  const validationError = validateCharacterBody(req.body);
+  if (validationError) return res.status(400).json({ error: validationError });
+
+  // Enforce 15-character slot cap
+  try {
+    const upstream = await fetch(`${process.env.GRUDGE_API_URL || 'https://api.grudge-studio.com'}/api/characters`, {
+      headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (upstream.ok) {
+      const data = await upstream.json();
+      const count = (data.characters || []).length;
+      if (count >= MAX_CHARACTERS) {
+        return res.status(400).json({
+          error: `Character limit reached (${MAX_CHARACTERS} max). Delete a character to create a new one.`,
+          count, max: MAX_CHARACTERS,
+        });
+      }
+    }
+  } catch { /* best-effort — let backend handle it if check fails */ }
+
+  return proxyToBackend('/api/characters', req, res);
+});
 
 app.get('/api/characters/:id', requireUserAuth, (req, res) =>
   proxyToBackend(`/api/characters/${req.params.id}`, req, res));
 
-app.patch('/api/characters/:id', requireUserAuth, (req, res) =>
+app.patch('/api/characters/:id', requireUserAuth, rateLimiter(20), (req, res) =>
   proxyToBackend(`/api/characters/${req.params.id}`, req, res));
 
-app.delete('/api/characters/:id', requireUserAuth, (req, res) =>
-  proxyToBackend(`/api/characters/${req.params.id}`, req, res));
+app.delete('/api/characters/:id', requireUserAuth, async (req, res) => {
+  auditLog('character.delete', req.grudgeUser?.grudgeId, { characterId: req.params.id });
+  return proxyToBackend(`/api/characters/${req.params.id}`, req, res);
+});
 
 // ── Inventory ────────────────────────────────────────────────────────────
 app.get('/api/characters/:id/inventory', requireUserAuth, (req, res) =>
@@ -2203,8 +2281,11 @@ app.post('/api/studio/sync/pull', requireUserAuth, (req, res) =>
 app.get('/api/economy/balance', requireUserAuth, (req, res) =>
   proxyToBackend('/api/economy/balance', req, res));
 
-app.post('/api/economy/transfer', requireUserAuth, (req, res) =>
-  proxyToBackend('/api/economy/transfer', req, res));
+app.post('/api/economy/transfer', requireUserAuth, rateLimiter(5), (req, res) => {
+  const { toAddress, amount, currency } = req.body || {};
+  auditLog('economy.transfer', req.grudgeUser?.grudgeId, { toAddress, amount, currency });
+  return proxyToBackend('/api/economy/transfer', req, res);
+});
 
 // ── Crafting (public recipes, gated craft action) ───────────────────────────
 app.get('/api/crafting/recipes', (req, res) =>
@@ -2332,11 +2413,29 @@ app.use((err, req, res, next) => {
 });
 
 (async () => {
-  const connected = await testConnection();
-  if (connected) await initDatabase();
-  // Test suite DB connection (crafting/inventory integration)
-  await testSuiteConnection();
-  await startBot(new Map(), []);
+  // Legacy Neon DB connections — wrap gracefully.
+  // These may fail if Neon is decommissioned; engine routes still work.
+  try {
+    const connected = await testConnection();
+    if (connected) {
+      await initDatabase();
+      console.log('[Server] Legacy DB connected');
+    } else {
+      console.warn('[Server] Legacy DB not available — engine routes still operational via api.grudge-studio.com');
+    }
+  } catch (err) {
+    console.warn('[Server] Legacy DB init failed (non-fatal):', err.message);
+  }
+  try {
+    await testSuiteConnection();
+  } catch (err) {
+    console.warn('[Server] Suite DB init failed (non-fatal):', err.message);
+  }
+  try {
+    await startBot(new Map(), []);
+  } catch (err) {
+    console.warn('[Server] Discord bot init failed (non-fatal):', err.message);
+  }
 })();
 
 const server = app.listen(PORT, '0.0.0.0', () => {
