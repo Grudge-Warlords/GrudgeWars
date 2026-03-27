@@ -6,7 +6,7 @@
  * the canonical Vercel backend.
  */
 
-const CANONICAL_API = 'https://grudgewarlords.com';
+const CANONICAL_API = 'https://api.grudge-studio.com';
 
 function resolveApiBase() {
   if (typeof window === 'undefined') return '';

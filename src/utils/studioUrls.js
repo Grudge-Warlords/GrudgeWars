@@ -15,23 +15,16 @@ export const OBJECT_STORE_URL = 'https://molochdagod.github.io/ObjectStore';
 // Grudge Wars API — backend for asset resolution, game data, accounts
 export const GRUDGE_API_URL = window.location.origin.includes('localhost')
   ? '' // Same origin in dev
-  : 'https://grudgewarlords.com';
+  : 'https://api.grudge-studio.com';
 
 /**
- * Open a Grudge Builder page, optionally forwarding the current session token
- * so the user stays logged in across apps.
+ * Open a Grudge Builder page.
+ * Cross-app SSO is handled by id.grudge-studio.com — no token in URL.
  */
 export function openBuilder(path = '/', { newTab = false } = {}) {
   const url = new URL(path, BUILDER_URL);
-
-  // Forward session token for cross-domain SSO
-  const token = localStorage.getItem('grudge_session_token');
-  if (token) {
-    url.searchParams.set('sso_token', token);
-  }
-
   if (newTab) {
-    window.open(url.toString(), '_blank', 'noopener');
+    window.open(url.toString(), '_blank', 'noopener noreferrer');
   } else {
     window.location.href = url.toString();
   }

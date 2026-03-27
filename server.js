@@ -15,6 +15,7 @@ import {
   syncPush, syncPull, kvGet, kvSet, kvList, prefsGet, prefsSet,
   healthCheck as puterHealthCheck, deployLogAppend,
 } from './api/lib/puter-service.js';
+import { proxyToBackend, verifyToken as verifyBackendToken, ALLOWED_ORIGINS as PROXY_ORIGINS } from './src/server/backendProxy.js';
 import * as S3 from './api/lib/s3.js';
 
 const __filename_server = fileURLToPath(import.meta.url);
@@ -25,20 +26,13 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : (isProd ? 5000 
 
 const app = express();
 
+// CORS allowlist — single truth for server.js.
+// Full list with circuit breaker is in src/server/backendProxy.js (PROXY_ORIGINS).
 const ALLOWED_ORIGINS = [
-  'https://grudgewarlords.com',
-  'https://www.grudgewarlords.com',
-  'https://gdevelop-assistant.vercel.app',
-  'https://grudgeplatform.com',
-  'https://www.grudgeplatform.com',
-  'https://molochdagod.github.io',
-  'https://warlord-crafting-suite.vercel.app',
-  'https://grudgestudio.com',
-  'https://www.grudgestudio.com',
+  ...PROXY_ORIGINS,
+  // Extra server-specific origins
   'https://grudge-platform.vercel.app',
   'https://public-fawn-nine.vercel.app',
-  'https://grudge-crafting.puter.site',
-  'https://grudge-studio-app.puter.site',
 ];
 
 const CSP_FRAME_ANCESTORS = [
@@ -80,8 +74,10 @@ const BETA_CHANNEL_ID = process.env.DISCORD_BETA_CHANNEL_ID || '1394826401311625
 
 const pendingStates = new Map();
 
-// ── JWT Auth ────────────────────────────────────────────────────────────────
-const JWT_SECRET = () => process.env.JWT_SECRET || process.env.GAME_API_GRUDA || 'grudge-default-secret';
+// ── JWT Auth ────────────────────────────────────────────────────────────────────────────
+const _jwtSecret = process.env.JWT_SECRET || process.env.GAME_API_GRUDA;
+if (!_jwtSecret) throw new Error('JWT_SECRET or GAME_API_GRUDA environment variable is required');
+const JWT_SECRET = () => _jwtSecret;
 
 function base64url(buf) {
   return Buffer.from(buf).toString('base64url');
@@ -693,16 +689,24 @@ app.get('/api/external/callback', async (req, res) => {
     });
 
     const returnOrigin = new URL(returnUrl).origin;
-    const loginData = { sessionToken: jwt, user: { id: user.id, accountId: account.id, username: user.username, avatar: user.avatar, email: user.email, grudgeId } };
+    const loginData = { token: jwt, user: { id: user.id, accountId: account.id, username: user.username, avatar: user.avatar, email: user.email, grudgeId } };
     res.send(`<!DOCTYPE html><html><head><title>Grudge Login</title></head><body>
 <script>
   try {
-    var data = ${JSON.stringify(loginData)};
-    localStorage.setItem('grudge_studio_session', data.sessionToken);
-    localStorage.setItem('grudge_studio_user', JSON.stringify(data.user));
-    localStorage.setItem('grudge_session_token', data.sessionToken);
+    var d = ${JSON.stringify(loginData)};
+    // Canonical keys — matches grudge-platform and grudge-sdk.js
+    localStorage.setItem('grudge_auth_token', d.token);
+    localStorage.setItem('grudge_id', d.user.grudgeId || '');
+    localStorage.setItem('grudge_username', d.user.username || '');
+    localStorage.setItem('grudge_user_id', d.user.accountId || '');
+    localStorage.setItem('grudge-session', JSON.stringify({
+      type: 'discord', grudgeId: d.user.grudgeId,
+      username: d.user.username, loginTime: Date.now()
+    }));
+    // Legacy keys — kept for backward compat during transition
+    localStorage.setItem('grudge_session_token', d.token);
     if (window.opener) {
-      window.opener.postMessage({ type: 'grudge_login', data: data }, ${JSON.stringify(returnOrigin)});
+      window.opener.postMessage({ type: 'grudge:auth', token: d.token, grudgeId: d.user.grudgeId, username: d.user.username }, ${JSON.stringify(returnOrigin)});
       window.close();
     } else {
       window.location.href = ${JSON.stringify(returnUrl)};
@@ -2135,6 +2139,176 @@ registerDbRoutes(app);
 registerWalletRoutes(app, requireSession);
 registerCraftingRoutes(app);
 console.log('[Server] Crafting routes registered');
+
+// ────────────────────────────────────────────────────────────────────
+// GRUDGE ENGINE ROUTES
+// All routes below proxy to api.grudge-studio.com via backendProxy.
+// requireUserAuth verifies grudge_auth_token via id.grudge-studio.com.
+// ────────────────────────────────────────────────────────────────────
+
+// Auth middleware — verifies Bearer token against id.grudge-studio.com
+async function requireUserAuth(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  const token = auth.slice(7);
+  const user = await verifyBackendToken(token);
+  if (!user) return res.status(401).json({ error: 'Invalid or expired token' });
+  req.grudgeUser = user;
+  next();
+}
+
+// ── Characters ────────────────────────────────────────────────────────────
+app.get('/api/characters', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/characters', req, res, { passQuery: true }));
+
+app.post('/api/characters', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/characters', req, res));
+
+app.get('/api/characters/:id', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}`, req, res));
+
+app.patch('/api/characters/:id', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}`, req, res));
+
+app.delete('/api/characters/:id', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}`, req, res));
+
+// ── Inventory ────────────────────────────────────────────────────────────
+app.get('/api/characters/:id/inventory', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}/inventory`, req, res, { passQuery: true }));
+
+app.post('/api/characters/:id/inventory', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}/inventory`, req, res));
+
+app.patch('/api/inventory/:itemId', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/inventory/${req.params.itemId}`, req, res));
+
+app.delete('/api/inventory/:itemId', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/inventory/${req.params.itemId}`, req, res));
+
+// Equip / unequip — atomic slot operation
+app.post('/api/characters/:id/equip', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}/equip`, req, res));
+
+// ── Cloud sync ───────────────────────────────────────────────────────────
+app.post('/api/studio/sync/push', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/studio/sync/push', req, res));
+
+app.post('/api/studio/sync/pull', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/studio/sync/pull', req, res));
+
+// ── Economy ───────────────────────────────────────────────────────────────
+app.get('/api/economy/balance', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/economy/balance', req, res));
+
+app.post('/api/economy/transfer', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/economy/transfer', req, res));
+
+// ── Crafting (public recipes, gated craft action) ───────────────────────────
+app.get('/api/crafting/recipes', (req, res) =>
+  proxyToBackend('/api/crafting/recipes', req, res, { passQuery: true }));
+
+app.get('/api/crafting/professions/:grudgeId', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/crafting/professions/${req.params.grudgeId}`, req, res));
+
+app.post('/api/crafting/craft', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/crafting/craft', req, res));
+
+// ── Missions ──────────────────────────────────────────────────────────────
+app.get('/api/missions', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/missions', req, res));
+
+app.post('/api/missions/:id/complete', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/missions/${req.params.id}/complete`, req, res));
+
+// ── Battle Engine — server-authoritative session state ────────────────────
+// In-memory battle sessions. Each session is keyed by a battle ID.
+// This is the foundation for server-authoritative combat.
+const battleSessions = new Map();
+
+app.post('/api/battle/start', requireUserAuth, (req, res) => {
+  const { characters, mode, opponentId } = req.body;
+  if (!characters || !Array.isArray(characters) || characters.length === 0) {
+    return res.status(400).json({ error: 'characters array required' });
+  }
+  const battleId = crypto.randomBytes(16).toString('hex');
+  const session = {
+    battleId,
+    grudgeId: req.grudgeUser.grudgeId,
+    mode: mode || 'pve',
+    opponentId: opponentId || null,
+    characters,
+    actions: [],
+    state: 'active',
+    startedAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  battleSessions.set(battleId, session);
+  console.log(`[Battle] Started ${battleId} for ${req.grudgeUser.grudgeId} (${mode || 'pve'})`);
+  res.json({ success: true, battleId, state: 'active' });
+});
+
+app.post('/api/battle/:battleId/action', requireUserAuth, (req, res) => {
+  const session = battleSessions.get(req.params.battleId);
+  if (!session) return res.status(404).json({ error: 'Battle session not found' });
+  if (session.grudgeId !== req.grudgeUser.grudgeId) {
+    return res.status(403).json({ error: 'Not your battle session' });
+  }
+  if (session.state !== 'active') {
+    return res.status(400).json({ error: 'Battle is not active' });
+  }
+  const { action, actorId, targetId, abilityId } = req.body;
+  if (!action || !actorId) return res.status(400).json({ error: 'action and actorId required' });
+
+  const record = { action, actorId, targetId, abilityId, ts: Date.now() };
+  session.actions.push(record);
+  session.updatedAt = Date.now();
+
+  res.json({ success: true, battleId: session.battleId, action: record, actionCount: session.actions.length });
+});
+
+app.post('/api/battle/:battleId/end', requireUserAuth, async (req, res) => {
+  const session = battleSessions.get(req.params.battleId);
+  if (!session) return res.status(404).json({ error: 'Battle session not found' });
+  if (session.grudgeId !== req.grudgeUser.grudgeId) {
+    return res.status(403).json({ error: 'Not your battle session' });
+  }
+  const { result, rewards } = req.body; // result: 'win' | 'loss' | 'draw'
+  session.state = 'ended';
+  session.result = result || 'unknown';
+  session.rewards = rewards || null;
+  session.endedAt = Date.now();
+
+  // Persist result to backend (fire-and-forget)
+  proxyToBackend('/api/battles/record', req, { status: () => ({ json: () => {} }), setHeader: () => {} }, {
+    method: 'POST',
+    extraHeaders: { 'X-Battle-Id': session.battleId },
+  }).catch(() => {});
+
+  console.log(`[Battle] Ended ${session.battleId}: ${result}`);
+
+  // Clean up after 5 minutes
+  setTimeout(() => battleSessions.delete(session.battleId), 5 * 60 * 1000);
+
+  res.json({
+    success: true, battleId: session.battleId,
+    result: session.result, durationMs: session.endedAt - session.startedAt,
+    actionCount: session.actions.length,
+  });
+});
+
+app.get('/api/battle/:battleId', requireUserAuth, (req, res) => {
+  const session = battleSessions.get(req.params.battleId);
+  if (!session) return res.status(404).json({ error: 'Battle session not found' });
+  if (session.grudgeId !== req.grudgeUser.grudgeId) {
+    return res.status(403).json({ error: 'Not your battle session' });
+  }
+  res.json(session);
+});
+
+console.log('[Server] Grudge Engine routes registered (characters, inventory, sync, economy, battle)');
 
 if (isProd) {
   const htmlPages = ['compendium', 'arena', 'discordauth', 'hero-codex'];

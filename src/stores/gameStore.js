@@ -15,6 +15,7 @@ import { adminConfig } from '../utils/adminConfig';
 import { TOTEM_DEFINITIONS, COMPANION_DEFINITIONS, namedHeroes } from '../data/spriteMap';
 import { schedulePush, isLoggedIn as cloudIsLoggedIn } from '../services/cloudSync';
 import { API_BASE } from '../utils/apiBase.js';
+import grudgeApi from '../services/grudgeApi.js';
 
 function floorTo2(n) { return Math.floor(n * 100) / 100; }
 
@@ -511,6 +512,13 @@ const useGameStore = create(persist((set, get) => ({
   afkHarvestAssignments: {},  // { heroId: { buildingType, startedAt, rates } }
   afkHarvestLastSync: 0,
 
+  // ── Backend Account State ──
+  // These are populated by loadAccountData() after login.
+  // They are NOT persisted locally — always fetched from the backend.
+  backendSynced: false,
+  accountBalance: null,       // { gold, gbux, walletAddress }
+  lastBackendSync: 0,
+
   setScreen: (screen) => set({ screen }),
 
   setPlayerName: (name) => set({ playerName: name }),
@@ -662,6 +670,10 @@ const useGameStore = create(persist((set, get) => ({
       equipment: equip,
       abilityLoadout: hero.abilityLoadout || getDefaultLoadout(hero.classId, equip?.weapon?.weaponType),
     };
+    // Persist to backend (non-blocking, offline-safe)
+    if (!heroWithSkills.backendId && !heroWithSkills.source) {
+      setTimeout(() => get().createHeroOnBackend(heroWithSkills.id), 500);
+    }
     const newRoster = [...state.heroRoster, heroWithSkills];
     const newActiveIds = state.activeHeroIds.length < 3
       ? [...state.activeHeroIds, heroWithSkills.id]
@@ -772,23 +784,150 @@ const useGameStore = create(persist((set, get) => ({
 
   syncWcsHeroes: () => {
     const state = get();
-    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('grudge_session_token') : null;
-    if (!token) return;
+    if (!grudgeApi.isAuthenticated()) return;
     const wcsHeroes = state.heroRoster.filter(h => h.source === 'wcs' && h.wcsCharacterId);
     if (wcsHeroes.length === 0) return;
     wcsHeroes.forEach(hero => {
-      fetch(`/api/studio/character/${hero.wcsCharacterId}/sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Session-Token': token },
-        body: JSON.stringify({
-          level: hero.level,
-          attributes: hero.attributePoints,
-          currentHealth: hero.currentHealth,
-          currentMana: hero.currentMana,
-          currentStamina: hero.currentStamina,
-        }),
+      grudgeApi.characters.patch(hero.wcsCharacterId, {
+        level: hero.level,
+        attributePoints: hero.attributePoints,
+        currentHealth: hero.currentHealth,
+        currentMana: hero.currentMana,
+        currentStamina: hero.currentStamina,
       }).catch(() => {});
     });
+  },
+
+  /**
+   * Load account data from the backend on auth/login.
+   * Fetches character roster and economy balance, merges backend characters
+   * into heroRoster (without overwriting local-only heroes).
+   */
+  loadAccountData: async () => {
+    if (!grudgeApi.isAuthenticated()) return;
+    try {
+      // Fetch characters and economy in parallel
+      const [charResult, balResult] = await Promise.allSettled([
+        grudgeApi.characters.list(),
+        grudgeApi.economy.balance(),
+      ]);
+
+      const state = get();
+      let updates = { backendSynced: true, lastBackendSync: Date.now() };
+
+      if (charResult.status === 'fulfilled') {
+        const backendChars = (charResult.value?.characters || []);
+        // Merge: update existing heroes by backendId, add new ones not in local roster
+        const localIds = new Set(state.heroRoster.map(h => h.backendId).filter(Boolean));
+        const newFromBackend = backendChars
+          .filter(bc => !localIds.has(bc.id))
+          .map(bc => ({
+            id: `backend_${bc.id}`,
+            backendId: bc.id,
+            name: bc.name,
+            classId: bc.classId,
+            raceId: bc.raceId,
+            level: bc.level || 1,
+            xp: bc.xp || 0,
+            attributePoints: bc.attributePoints || {},
+            unspentPoints: bc.unspentPoints || 0,
+            skillPoints: bc.skillPoints || 0,
+            unlockedSkills: bc.unlockedSkills || {},
+            equipment: bc.equipment || {},
+            currentHealth: bc.currentHealth || 100,
+            currentMana: bc.currentMana || 50,
+            currentStamina: bc.currentStamina || 100,
+            abilityLoadout: bc.abilityLoadout || null,
+            source: 'backend',
+          }));
+
+        // Update existing heroes that have backendIds
+        const updatedRoster = state.heroRoster.map(hero => {
+          if (!hero.backendId) return hero;
+          const bc = backendChars.find(c => c.id === hero.backendId);
+          if (!bc) return hero;
+          return {
+            ...hero,
+            level: bc.level || hero.level,
+            xp: bc.xp || hero.xp,
+            unspentPoints: bc.unspentPoints ?? hero.unspentPoints,
+            skillPoints: bc.skillPoints ?? hero.skillPoints,
+          };
+        });
+
+        const merged = [...updatedRoster, ...newFromBackend];
+        updates.heroRoster = merged;
+        updates.maxHeroSlots = Math.max(state.maxHeroSlots, merged.length);
+      }
+
+      if (balResult.status === 'fulfilled') {
+        updates.accountBalance = balResult.value;
+      }
+
+      set(updates);
+    } catch (err) {
+      console.warn('[gameStore] loadAccountData failed:', err.message);
+    }
+  },
+
+  /**
+   * Save a hero's current state to the backend.
+   * Call this after level-up, skill allocation, equipment changes, etc.
+   * Non-blocking — failures are logged but not thrown.
+   */
+  saveHeroToBackend: async (heroId) => {
+    const state = get();
+    const hero = state.heroRoster.find(h => h.id === heroId);
+    if (!hero || !hero.backendId) return; // no backend ID = not yet persisted
+    try {
+      await grudgeApi.characters.patch(hero.backendId, {
+        level: hero.level,
+        xp: hero.xp || 0,
+        attributePoints: hero.attributePoints,
+        unspentPoints: hero.unspentPoints || 0,
+        skillPoints: hero.skillPoints || 0,
+        unlockedSkills: hero.unlockedSkills || {},
+        currentHealth: hero.currentHealth,
+        currentMana: hero.currentMana,
+        currentStamina: hero.currentStamina,
+        abilityLoadout: hero.abilityLoadout || null,
+      });
+    } catch (err) {
+      console.warn(`[gameStore] saveHeroToBackend(${heroId}) failed:`, err.message);
+    }
+  },
+
+  /**
+   * Create a new character on the backend and store the returned ID.
+   * Call this right after addHeroToRoster() for new hero creations.
+   * @param {string} localHeroId - the hero's local id in heroRoster
+   */
+  createHeroOnBackend: async (localHeroId) => {
+    const state = get();
+    const hero = state.heroRoster.find(h => h.id === localHeroId);
+    if (!hero || hero.backendId) return; // already persisted
+    if (!grudgeApi.isAuthenticated()) return; // no auth = skip, local-only
+    try {
+      const result = await grudgeApi.characters.create({
+        name: hero.name,
+        classId: hero.classId,
+        raceId: hero.raceId,
+        level: hero.level || 1,
+        attributePoints: hero.attributePoints || {},
+        equipment: hero.equipment || {},
+        unlockedSkills: hero.unlockedSkills || {},
+      });
+      if (result?.id) {
+        // Store the backend ID on the local hero
+        const updatedRoster = state.heroRoster.map(h =>
+          h.id === localHeroId ? { ...h, backendId: result.id } : h
+        );
+        set({ heroRoster: updatedRoster });
+        console.log(`[gameStore] Character ${hero.name} persisted to backend: ${result.id}`);
+      }
+    } catch (err) {
+      console.warn(`[gameStore] createHeroOnBackend(${localHeroId}) failed:`, err.message);
+    }
   },
 
   setActiveHeroes: (heroIds) => {

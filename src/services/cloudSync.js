@@ -11,9 +11,11 @@
 import { API_BASE } from '../utils/apiBase.js';
 
 // ── Token Helpers ───────────────────────────────────────────────────────────
+// Single source of truth: grudge_auth_token in localStorage
+// This matches grudge-platform and grudge-sdk.js
 
 export function getSessionToken() {
-  return localStorage.getItem('grudge_session_token') || null;
+  return localStorage.getItem('grudge_auth_token') || null;
 }
 
 export function getSession() {
@@ -23,14 +25,13 @@ export function getSession() {
 }
 
 export function getGrudgeId() {
-  const session = getSession();
-  return session?.grudgeId || null;
+  return localStorage.getItem('grudge_id') ||
+    getSession()?.grudgeId || null;
 }
 
 export function isLoggedIn() {
-  const session = getSession();
-  if (!session) return false;
-  return session.type === 'puter' || session.type === 'discord' || session.type === 'grudge';
+  // Logged in if we have a token, regardless of session type
+  return !!getSessionToken();
 }
 
 /** Get Puter auth token from the SDK (if user is signed in) */

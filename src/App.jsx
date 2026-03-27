@@ -119,21 +119,29 @@ function GameApp() {
     window.history.replaceState(null, '', SCREEN_SLUGS[screen] || '/play');
     }
 
-    // Verify JWT on app load — if expired, clear session so TitleScreen shows login
-    const token = localStorage.getItem('grudge_session_token');
+    // Verify JWT on app load using canonical grudge_auth_token
+    // Validates against id.grudge-studio.com — same as grudge-platform
+    const token = localStorage.getItem('grudge_auth_token');
     if (token) {
-      fetch(`${API_BASE}/api/auth/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionToken: token }),
+      fetch('https://id.grudge-studio.com/api/auth/user', {
+        headers: { Authorization: `Bearer ${token}` },
       })
-        .then(r => r.json())
-        .then(data => {
-          if (!data.valid) {
-            // JWT expired or invalid — clear session
-            localStorage.removeItem('grudge_session_token');
+        .then(r => {
+          if (!r.ok) {
+            // JWT expired or invalid — clear all auth state
+            localStorage.removeItem('grudge_auth_token');
             localStorage.removeItem('grudge-session');
+            localStorage.removeItem('grudge_id');
+            localStorage.removeItem('grudge_username');
             if (screen !== 'title') setScreen('title');
+          } else {
+            // Auth is valid — hydrate backend account data (characters, balance)
+            // Small delay so the game store is fully initialized first
+            setTimeout(() => {
+              import('./stores/gameStore').then(m => {
+                m.default.getState().loadAccountData();
+              }).catch(() => {});
+            }, 1000);
           }
         })
         .catch(() => {

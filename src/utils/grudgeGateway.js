@@ -46,8 +46,8 @@ export function hydrateSessionFromGateway() {
   const gw = getGatewayUser();
   if (!gw) return null;
 
-  // Sync JWT so API calls via grudge_session_token also work
-  localStorage.setItem('grudge_session_token', gw.token);
+  // grudge_auth_token is the canonical key — already set by checkGatewayOnBoot()
+  // No need to copy to grudge_session_token
 
   const session = {
     type: 'gateway',
@@ -62,19 +62,23 @@ export function hydrateSessionFromGateway() {
 
 // ── Sign out ──────────────────────────────────────────────────────────────────
 export function gatewaySignOut() {
-  // Gateway keys
+  // Canonical keys
   localStorage.removeItem('grudge_auth_token');
   localStorage.removeItem('grudge_user_id');
   localStorage.removeItem('grudge_id');
   localStorage.removeItem('grudge_username');
-  // Local app keys
-  localStorage.removeItem('grudge_session_token');
   localStorage.removeItem('grudge-session');
+  // Legacy keys — clear for backward compat during transition
+  localStorage.removeItem('grudge_session_token');
+  localStorage.removeItem('grudge_sync_token');
+  localStorage.removeItem('grudge_sync_user');
+  localStorage.removeItem('grudge_imported_characters');
   localStorage.removeItem('discordUser');
   localStorage.removeItem('grudge_studio_session');
   localStorage.removeItem('grudge_studio_user');
   localStorage.removeItem('grudge_current_user');
   localStorage.removeItem('grudge_auth_user');
+  localStorage.removeItem('grudge_last_sync');
 }
 
 // ── Check on boot — returns session or null ───────────────────────────────────
