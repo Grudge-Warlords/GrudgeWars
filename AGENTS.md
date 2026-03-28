@@ -12,24 +12,27 @@
 
 ### Auth Gateway (Primary — all apps use this)
 ```
-URL:  https://auth-gateway-otb8qmmyd-grudgenexus.vercel.app
-Also: https://grudge-builder-auth.vercel.app
-Flow: redirect with ?return=<app_url> → user logs in → redirects back
+URL:  https://id.grudge-studio.com
+SSO:  https://id.grudge-studio.com/auth/sso-check?return=<app_url>
+Auth: https://id.grudge-studio.com/device
+Flow: redirect to /auth/sso-check?return=<app_url> → checks SSO cookie → redirects back with token or sso_required=true
+
+NOTE: The old auth-gateway-otb8qmmyd-grudgenexus.vercel.app is RETIRED. Do NOT use it.
 ```
-**localStorage keys set by gateway:**
+**localStorage keys set by auth:**
 | Key | Description |
 |-----|-------------|
 | `grudge_auth_token` | JWT — use as `Authorization: Bearer {token}` |
 | `grudge_user_id` | Numeric account ID |
-| `grudge_id` | Grudge UUID (USER-YYYYMMDDHHMMSS-XXXXXX-YYYYYYYY) |
+| `grudge_id` | Grudge UUID |
 | `grudge_username` | Display name |
 
 **Client utility**: `src/utils/grudgeGateway.js`
 - `checkGatewayOnBoot()` — check token on app load, hydrate session
-- `redirectToGateway(returnUrl)` — redirect to auth gateway
-- `gatewaySignOut()` — clears all auth keys
+- `redirectToGateway(returnUrl)` — redirect to id.grudge-studio.com SSO
+- `gatewaySignOut()` — clears all auth keys + server-side logout
 
-**NEVER create new standalone auth flows.** Always route through the gateway or `id.grudge-studio.com`.
+**NEVER create new standalone auth flows.** Always route through `id.grudge-studio.com`.
 
 ---
 
