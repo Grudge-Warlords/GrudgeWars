@@ -44,6 +44,7 @@ export default function DiscordAuth() {
           grudgeId: data.user.id,
           discordId: data.user.id,
           username: data.user.username,
+          loginTime: Date.now(),
         }));
         setStatus('success');
         window.history.replaceState({}, '', '/discordauth');
