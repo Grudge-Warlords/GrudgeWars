@@ -126,8 +126,34 @@
       setToken(null); _user = null;
     },
 
+    /** Redirect to unified Grudge auth page */
+    redirectToLogin(returnUrl) {
+      const redirect = encodeURIComponent(returnUrl || window.location.href);
+      window.location.href = ID_API + '/auth?redirect=' + redirect + '&app=grudge-warlords';
+    },
+
+    /** Require auth — redirects if not logged in */
+    requireAuth() {
+      if (auth.isLoggedIn()) return true;
+      auth.redirectToLogin();
+      return false;
+    },
+
     /** Check URL for OAuth callback token and initialize */
     async init() {
+      // Check hash fragment first (unified auth redirect)
+      if (location.hash && location.hash.includes('token=')) {
+        const h = new URLSearchParams(location.hash.slice(1));
+        const ht = h.get('token');
+        if (ht) {
+          setToken(ht);
+          localStorage.setItem('grudge_auth_token', ht);
+          if (h.get('grudgeId')) localStorage.setItem('grudge_id', h.get('grudgeId'));
+          if (h.get('name')) localStorage.setItem('grudge_username', h.get('name'));
+          history.replaceState(null, '', location.pathname + location.search);
+        }
+      }
+      // Then check query params (legacy SSO)
       const params = new URLSearchParams(window.location.search);
       const t = params.get('token') || params.get('sso_token');
       if (t) {
