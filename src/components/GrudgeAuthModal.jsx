@@ -314,10 +314,12 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
         grudgeId = data.grudgeId || data.user?.grudgeId || null;
       } catch {}
 
+      // Store canonical auth keys — grudge_auth_token is the single source of truth
       if (sessionToken) {
-        localStorage.setItem('grudge_session_token', sessionToken);
         localStorage.setItem('grudge_auth_token', sessionToken);
       }
+      if (grudgeId)       localStorage.setItem('grudge_id', grudgeId);
+      if (user.username)  localStorage.setItem('grudge_username', user.username);
       const session = {
         type: 'puter', username: user.username,
         grudgeId, loginTime: Date.now(),
@@ -363,10 +365,16 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
           grudgeId = d.grudgeId || null;
         }
       } catch {}
-      if (sessionToken) localStorage.setItem('grudge_session_token', sessionToken);
+      // Store canonical auth keys
+      if (sessionToken) {
+        localStorage.setItem('grudge_auth_token', sessionToken);
+      }
+      if (grudgeId) localStorage.setItem('grudge_id', grudgeId);
+      const walletUsername = `${address.slice(0, 4)}…${address.slice(-4)}`;
+      localStorage.setItem('grudge_username', walletUsername);
       const session = {
         type: 'wallet',
-        username: `${address.slice(0, 4)}…${address.slice(-4)}`,
+        username: walletUsername,
         walletAddress: address,
         grudgeId,
         loginTime: Date.now(),

@@ -1,0 +1,59 @@
+name               = "grudgeproduction"
+main               = "cloudflare-worker.js"
+compatibility_date = "2025-03-01"
+account_id         = "ee475864561b02d4588180b8b9acf694"
+workers_dev        = true
+
+[observability]
+enabled = true
+
+# ── R2: game assets CDN (2,245 objects, 497 MB) ──────────────────────────────
+[[r2_buckets]]
+binding     = "ASSETS"
+bucket_name = "grudge-assets"
+
+# ── KV: edge cache — leaderboard, arena stats, public game data (60s–5min TTL) ─
+[[kv_namespaces]]
+binding = "CACHE"
+id      = "9d257d944ac44b5d964da33c23b14e13"
+
+# ── KV: rate limiting per IP ──────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id      = "147bb3ba81464409805f2328a0d8302f"
+
+# ── Workers AI: edge AI (Llama 3.1 8B, image classification, embeddings) ──────
+[ai]
+binding = "AI"
+
+# ── D1: objectstore metadata (read leaderboard, public stats) ─────────────────
+[[d1_databases]]
+binding       = "OBJECTSTORE_DB"
+database_name = "grudge-objectstore"
+database_id   = "8fc367a8-9120-490e-a503-b0fcb755c044"
+
+# ── Env vars ──────────────────────────────────────────────────────────────────
+[vars]
+ENVIRONMENT          = "production"
+BACKEND_URL          = "https://grudgeplatform.io"
+VPS_API_URL          = "https://api.grudge-studio.com"
+ASSETS_CDN_URL       = "https://assets.grudge-studio.com"
+OBJECTSTORE_URL      = "https://objectstore.grudge-studio.com"
+# BACKEND_API_KEY is a wrangler SECRET: npx wrangler secret put BACKEND_API_KEY
+
+# ── Routes ────────────────────────────────────────────────────────────────────
+[[routes]]
+pattern = "grudgeplatform.io/*"
+zone_name = "grudgeplatform.io"
+
+[[routes]]
+pattern = "www.grudgeplatform.io/*"
+zone_name = "grudgeplatform.io"
+
+# ── Staging ───────────────────────────────────────────────────────────────────
+[env.staging]
+name = "grudgeproduction-staging"
+workers_dev = true
+[env.staging.vars]
+ENVIRONMENT = "staging"
+BACKEND_URL = "https://grudgeplatform.io"
