@@ -3,10 +3,11 @@ import crypto from 'crypto';
 import pg from 'pg';
 
 // ── Grudge Studio modules ───────────────────────────────────────────────────
-import { DATASETS, fetchDataset, searchAll, getCacheStats, clearCache, puterKvManifest } from './lib/object-store.js';
+import { DATASETS, fetchDataset, searchAll, getCacheStats, clearCache, puterKvManifest, resolveAssetUrl } from './lib/object-store.js';
 import * as UUID from './lib/uuid-service.js';
 import { listAgents, getAgentInfo, queryAgent } from './lib/ai-agents.js';
 import * as Puter from './lib/puter-service.js';
+import * as S3 from './lib/s3.js';
 
 const { Pool } = pg;
 
@@ -64,170 +65,310 @@ function verifyJWT(token) {
   } catch { return null; }
 }
 
-// ── Password Hashing ────────────────────────────────────────────────────────
-function hashPassword(password) {
-  return new Promise((resolve, reject) => {
-    const salt = crypto.randomBytes(16).toString('hex');
-    crypto.scrypt(password, salt, 64, (err, key) => {
-      if (err) reject(err);
-      else resolve(`${salt}:${key.toString('hex')}`);
-    });
-  });
+// ── VPS Auth with Circuit Breaker + Retry ───────────────────────────────────
+const VPS_AUTH_URL = process.env.VPS_AUTH_URL || 'https://id.grudge-studio.com';
+const VPS_TIMEOUT_MS = 5000;
+const VPS_MAX_RETRIES = 1;
+
+// Circuit breaker state — trips after repeated VPS failures
+const circuitBreaker = {
+  failures: 0,
+  threshold: 3,         // trip after 3 consecutive failures
+  resetMs: 60_000,      // try again after 60s
+  lastFailure: 0,
+  isOpen() {
+    if (this.failures < this.threshold) return false;
+    // Auto-reset after cooldown
+    if (Date.now() - this.lastFailure > this.resetMs) {
+      console.log('[Auth] Circuit breaker reset — retrying VPS');
+      this.failures = 0;
+      return false;
+    }
+    return true;
+  },
+  recordFailure() {
+    this.failures++;
+    this.lastFailure = Date.now();
+    if (this.failures >= this.threshold) {
+      console.warn(`[Auth] Circuit breaker OPEN — VPS auth disabled for ${this.resetMs / 1000}s`);
+    }
+  },
+  recordSuccess() {
+    if (this.failures > 0) console.log('[Auth] VPS recovered — circuit breaker reset');
+    this.failures = 0;
+  },
+};
+
+async function vpsPost(path, body = {}) {
+  // Short-circuit if breaker is open
+  if (circuitBreaker.isOpen()) {
+    return { status: 503, ok: false, data: { error: 'VPS auth temporarily unavailable' }, vpsDown: true };
+  }
+
+  for (let attempt = 0; attempt <= VPS_MAX_RETRIES; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), VPS_TIMEOUT_MS);
+      const res = await fetch(`${VPS_AUTH_URL}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      const data = await res.json().catch(() => ({}));
+      circuitBreaker.recordSuccess();
+      return { status: res.status, ok: res.ok, data, vpsDown: false };
+    } catch (err) {
+      const isLast = attempt >= VPS_MAX_RETRIES;
+      console.warn(`[Auth] VPS ${path} attempt ${attempt + 1} failed: ${err.name === 'AbortError' ? 'timeout' : err.message}`);
+      if (isLast) {
+        circuitBreaker.recordFailure();
+        return { status: 503, ok: false, data: { error: 'VPS auth unreachable' }, vpsDown: true };
+      }
+      // Brief pause before retry
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
 }
 
-function verifyPassword(password, hash) {
-  return new Promise((resolve, reject) => {
-    const [salt, key] = hash.split(':');
-    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
-      if (err) reject(err);
-      else resolve(derivedKey.toString('hex') === key);
-    });
+function extractVpsUser(data) {
+  const user = data.user || data;
+  return {
+    grudgeId: data.grudgeId || user.grudgeId || user.grudge_id,
+    username: data.username || user.username,
+    discordId: user.discordId || user.discord_id || null,
+    walletAddress: user.walletAddress || user.wallet_address || null,
+  };
+}
+
+// ── Local auth fallback (password hashing) ──────────────────────────────────
+// Simple SHA-256 hash for local fallback when VPS is down.
+// NOT bcrypt — but allows players to log in during outages.
+// Accounts created locally will re-sync with VPS when it recovers.
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password + JWT_SECRET()).digest('hex');
+}
+
+async function localLogin(username, password) {
+  const hash = hashPassword(password);
+  const result = await dbQuery(
+    `SELECT * FROM accounts WHERE username = $1 AND password_hash = $2 AND auth_type = 'local'`,
+    [username, hash]
+  ).catch(() => ({ rows: [] }));
+  return result.rows[0] || null;
+}
+
+async function localRegister(username, password, email) {
+  const hash = hashPassword(password);
+  const grudgeId = UUID.generate('user', username + Date.now());
+  const result = await dbQuery(
+    `INSERT INTO accounts (grudge_id, username, password_hash, email, auth_type, last_login)
+     VALUES ($1, $2, $3, $4, 'local', NOW())
+     ON CONFLICT (username) DO NOTHING
+     RETURNING *`,
+    [grudgeId, username, hash, email || null]
+  ).catch(() => ({ rows: [] }));
+  return result.rows[0] || null;
+}
+
+async function upsertLocalGameAccount({ grudgeId, username, discordId, walletAddress }) {
+  // Generate a Grudge UUID if none provided (new accounts)
+  const gid = grudgeId || UUID.generate('user', (discordId || walletAddress || username || 'guest') + Date.now());
+
+  // Try upsert by grudge_id first; fall back to discord_id for legacy rows
+  const result = await dbQuery(
+    `INSERT INTO accounts (grudge_id, username, discord_id, wallet_address, auth_type, last_login)
+     VALUES ($1, $2, $3, $4, 'vps', NOW())
+     ON CONFLICT (grudge_id) DO UPDATE SET
+       username       = COALESCE(EXCLUDED.username, accounts.username),
+       discord_id     = COALESCE(EXCLUDED.discord_id, accounts.discord_id),
+       wallet_address = COALESCE(EXCLUDED.wallet_address, accounts.wallet_address),
+       last_login     = NOW(), updated_at = NOW()
+     RETURNING *`,
+    [gid, username || 'Unknown', discordId || null, walletAddress || null]
+  ).catch(async (err) => {
+    // Fallback: if grudge_id constraint fails (NULL unique issue), upsert by discord_id
+    if (discordId && err.message?.includes('null value')) {
+      return dbQuery(
+        `INSERT INTO accounts (grudge_id, username, discord_id, wallet_address, auth_type, last_login)
+         VALUES ($1, $2, $3, $4, 'vps', NOW())
+         ON CONFLICT (discord_id) DO UPDATE SET
+           grudge_id      = COALESCE(accounts.grudge_id, EXCLUDED.grudge_id),
+           username       = COALESCE(EXCLUDED.username, accounts.username),
+           wallet_address = COALESCE(EXCLUDED.wallet_address, accounts.wallet_address),
+           last_login     = NOW(), updated_at = NOW()
+         RETURNING *`,
+        [gid, username || 'Unknown', discordId, walletAddress || null]
+      );
+    }
+    throw err;
   });
+  return result.rows[0];
 }
 
 // ── DB Init ─────────────────────────────────────────────────────────────────
 let _dbInitialized = false;
 async function ensureDB() {
   if (_dbInitialized) return;
-  try {
-    await dbQuery(`
-      CREATE TABLE IF NOT EXISTS accounts (
-        id SERIAL PRIMARY KEY,
-        discord_id VARCHAR(64) UNIQUE,
-        username VARCHAR(128) NOT NULL,
-        email VARCHAR(256),
-        avatar_url TEXT,
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW(),
-        last_login TIMESTAMPTZ,
-        gold INTEGER DEFAULT 0,
-        resources INTEGER DEFAULT 0,
-        premium BOOLEAN DEFAULT FALSE,
-        wallet_address VARCHAR(128),
-        wallet_chain VARCHAR(32),
-        wallet_created_at TIMESTAMPTZ
-      );
-      CREATE TABLE IF NOT EXISTS characters (
-        id SERIAL PRIMARY KEY,
-        account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-        name VARCHAR(128) NOT NULL,
-        race_id VARCHAR(64) NOT NULL,
-        class_id VARCHAR(64) NOT NULL,
-        level INTEGER DEFAULT 1,
-        experience INTEGER DEFAULT 0,
-        attribute_points JSONB DEFAULT '{}',
-        abilities JSONB DEFAULT '[]',
-        skill_tree JSONB DEFAULT '{}',
-        status_effects JSONB DEFAULT '[]',
-        current_health REAL,
-        current_mana REAL,
-        current_stamina REAL,
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW(),
-        is_active BOOLEAN DEFAULT TRUE,
-        slot_index INTEGER DEFAULT 0
-      );
-      CREATE TABLE IF NOT EXISTS inventory_items (
-        id SERIAL PRIMARY KEY,
-        character_id INTEGER NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
-        item_key VARCHAR(128) NOT NULL,
-        item_type VARCHAR(64) NOT NULL,
-        tier INTEGER DEFAULT 1,
-        slot VARCHAR(64),
-        stats JSONB DEFAULT '{}',
-        equipped BOOLEAN DEFAULT FALSE,
-        quantity INTEGER DEFAULT 1,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      );
-      CREATE TABLE IF NOT EXISTS crafted_items (
-        id SERIAL PRIMARY KEY,
-        character_id INTEGER NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
-        item_key VARCHAR(128) NOT NULL,
-        item_type VARCHAR(64) NOT NULL,
-        tier INTEGER DEFAULT 1,
-        base_item_key VARCHAR(128),
-        enchantments JSONB DEFAULT '[]',
-        stats JSONB DEFAULT '{}',
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      );
-      CREATE TABLE IF NOT EXISTS islands (
-        id SERIAL PRIMARY KEY,
-        account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-        name VARCHAR(128) NOT NULL,
-        zone_data JSONB DEFAULT '{}',
-        conquer_progress JSONB DEFAULT '{}',
-        quest_progress JSONB DEFAULT '{}',
-        unlocked_locations JSONB DEFAULT '[]',
-        harvest_state JSONB DEFAULT '{}',
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW()
-      );
-      CREATE TABLE IF NOT EXISTS arena_teams (
-        team_id TEXT PRIMARY KEY,
-        owner_id TEXT NOT NULL,
-        owner_name TEXT NOT NULL DEFAULT 'Unknown Warlord',
-        status TEXT NOT NULL DEFAULT 'ranked',
-        heroes JSONB NOT NULL DEFAULT '[]',
-        hero_count INTEGER NOT NULL DEFAULT 0,
-        avg_level INTEGER NOT NULL DEFAULT 1,
-        share_token TEXT,
-        snapshot_hash TEXT,
-        wins INTEGER NOT NULL DEFAULT 0,
-        losses INTEGER NOT NULL DEFAULT 0,
-        total_battles INTEGER NOT NULL DEFAULT 0,
-        rewards JSONB NOT NULL DEFAULT '{"gold":0,"resources":0,"equipment":[]}',
-        demoted_at TIMESTAMPTZ,
-        demote_reason TEXT,
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW()
-      );
-      CREATE TABLE IF NOT EXISTS arena_battles (
-        id SERIAL PRIMARY KEY,
-        battle_id TEXT NOT NULL,
-        team_id TEXT NOT NULL,
-        challenger_name TEXT NOT NULL DEFAULT 'Arena Challenger',
-        result TEXT NOT NULL,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      );
-      CREATE INDEX IF NOT EXISTS idx_arena_teams_wins ON arena_teams(wins DESC);
-      CREATE INDEX IF NOT EXISTS idx_arena_teams_owner ON arena_teams(owner_id);
-      CREATE INDEX IF NOT EXISTS idx_arena_teams_status ON arena_teams(status);
-      CREATE INDEX IF NOT EXISTS idx_arena_battles_team ON arena_battles(team_id);
-      CREATE INDEX IF NOT EXISTS idx_arena_battles_created ON arena_battles(created_at DESC);
-      CREATE INDEX IF NOT EXISTS idx_characters_account ON characters(account_id);
-      CREATE INDEX IF NOT EXISTS idx_inventory_character ON inventory_items(character_id);
-      CREATE INDEX IF NOT EXISTS idx_crafted_character ON crafted_items(character_id);
-      CREATE INDEX IF NOT EXISTS idx_islands_account ON islands(account_id);
 
-      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS grudge_username VARCHAR(64);
-      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS password_hash VARCHAR(256);
-      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS auth_type VARCHAR(32) DEFAULT 'discord';
-      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS grudge_id VARCHAR(32) UNIQUE;
-      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS puter_uuid VARCHAR(128);
-    `);
-    // Create unique index on grudge_username where not null
-    await dbQuery(`
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_accounts_grudge_username
-      ON accounts(grudge_username) WHERE grudge_username IS NOT NULL;
-    `).catch(() => {});
+  // Helper: run each statement individually so one failure doesn't block others
+  async function safe(sql, label) {
+    try { await dbQuery(sql); }
+    catch (err) { console.error(`[DB] ${label || 'init'} error:`, err.message); }
+  }
+
+  try {
+    // ── Core tables ────────────────────────────────────────────────────────
+    await safe(`CREATE TABLE IF NOT EXISTS accounts (
+      id SERIAL PRIMARY KEY,
+      discord_id VARCHAR(64) UNIQUE,
+      username VARCHAR(128) NOT NULL,
+      email VARCHAR(256),
+      avatar_url TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      last_login TIMESTAMPTZ,
+      gold INTEGER DEFAULT 0,
+      resources INTEGER DEFAULT 0,
+      premium BOOLEAN DEFAULT FALSE,
+      wallet_address VARCHAR(128),
+      wallet_chain VARCHAR(32),
+      wallet_created_at TIMESTAMPTZ
+    )`, 'accounts');
+
+    await safe(`CREATE TABLE IF NOT EXISTS characters (
+      id SERIAL PRIMARY KEY,
+      account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+      name VARCHAR(128) NOT NULL,
+      race_id VARCHAR(64) NOT NULL,
+      class_id VARCHAR(64) NOT NULL,
+      level INTEGER DEFAULT 1,
+      experience INTEGER DEFAULT 0,
+      attribute_points JSONB DEFAULT '{}',
+      abilities JSONB DEFAULT '[]',
+      skill_tree JSONB DEFAULT '{}',
+      status_effects JSONB DEFAULT '[]',
+      current_health REAL,
+      current_mana REAL,
+      current_stamina REAL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      is_active BOOLEAN DEFAULT TRUE,
+      slot_index INTEGER DEFAULT 0
+    )`, 'characters');
+
+    await safe(`CREATE TABLE IF NOT EXISTS inventory_items (
+      id SERIAL PRIMARY KEY,
+      character_id INTEGER NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+      item_key VARCHAR(128) NOT NULL,
+      item_type VARCHAR(64) NOT NULL,
+      tier INTEGER DEFAULT 1,
+      slot VARCHAR(64),
+      stats JSONB DEFAULT '{}',
+      equipped BOOLEAN DEFAULT FALSE,
+      quantity INTEGER DEFAULT 1,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )`, 'inventory_items');
+
+    await safe(`CREATE TABLE IF NOT EXISTS crafted_items (
+      id SERIAL PRIMARY KEY,
+      character_id INTEGER NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+      item_key VARCHAR(128) NOT NULL,
+      item_type VARCHAR(64) NOT NULL,
+      tier INTEGER DEFAULT 1,
+      base_item_key VARCHAR(128),
+      enchantments JSONB DEFAULT '[]',
+      stats JSONB DEFAULT '{}',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )`, 'crafted_items');
+
+    await safe(`CREATE TABLE IF NOT EXISTS islands (
+      id SERIAL PRIMARY KEY,
+      account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+      name VARCHAR(128) NOT NULL,
+      zone_data JSONB DEFAULT '{}',
+      conquer_progress JSONB DEFAULT '{}',
+      quest_progress JSONB DEFAULT '{}',
+      unlocked_locations JSONB DEFAULT '[]',
+      harvest_state JSONB DEFAULT '{}',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )`, 'islands');
+
+    // ── Arena tables ───────────────────────────────────────────────────────
+    await safe(`CREATE TABLE IF NOT EXISTS arena_teams (
+      team_id TEXT PRIMARY KEY,
+      owner_id TEXT NOT NULL,
+      owner_name TEXT NOT NULL DEFAULT 'Unknown Warlord',
+      status TEXT NOT NULL DEFAULT 'ranked',
+      heroes JSONB NOT NULL DEFAULT '[]',
+      hero_count INTEGER NOT NULL DEFAULT 0,
+      avg_level INTEGER NOT NULL DEFAULT 1,
+      share_token TEXT,
+      snapshot_hash TEXT,
+      wins INTEGER NOT NULL DEFAULT 0,
+      losses INTEGER NOT NULL DEFAULT 0,
+      total_battles INTEGER NOT NULL DEFAULT 0,
+      rewards JSONB NOT NULL DEFAULT '{"gold":0,"resources":0,"equipment":[]}',
+      demoted_at TIMESTAMPTZ,
+      demote_reason TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )`, 'arena_teams');
+
+    await safe(`CREATE TABLE IF NOT EXISTS arena_battles (
+      id SERIAL PRIMARY KEY,
+      battle_id TEXT NOT NULL,
+      team_id TEXT NOT NULL,
+      challenger_name TEXT NOT NULL DEFAULT 'Arena Challenger',
+      result TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )`, 'arena_battles');
+
+    // ── Indexes ────────────────────────────────────────────────────────────
+    const indexes = [
+      'CREATE INDEX IF NOT EXISTS idx_arena_teams_wins ON arena_teams(wins DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_arena_teams_owner ON arena_teams(owner_id)',
+      'CREATE INDEX IF NOT EXISTS idx_arena_teams_status ON arena_teams(status)',
+      'CREATE INDEX IF NOT EXISTS idx_arena_battles_team ON arena_battles(team_id)',
+      'CREATE INDEX IF NOT EXISTS idx_arena_battles_created ON arena_battles(created_at DESC)',
+      'CREATE INDEX IF NOT EXISTS idx_characters_account ON characters(account_id)',
+      'CREATE INDEX IF NOT EXISTS idx_inventory_character ON inventory_items(character_id)',
+      'CREATE INDEX IF NOT EXISTS idx_crafted_character ON crafted_items(character_id)',
+      'CREATE INDEX IF NOT EXISTS idx_islands_account ON islands(account_id)',
+    ];
+    for (const sql of indexes) await safe(sql, 'index');
+
+    // ── Column migrations (each runs independently) ───────────────────────
+    const migrations = [
+      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS grudge_username VARCHAR(64)',
+      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS password_hash VARCHAR(256)',
+      "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS auth_type VARCHAR(32) DEFAULT 'discord'",
+      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS grudge_id VARCHAR(64)',  // Grudge UUID format: USER-YYYYMMDDHHMMSS-XXXXXX-YYYYYYYY
+      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS puter_uuid VARCHAR(128)',
+      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS game_state JSONB',
+      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS game_state_updated_at TIMESTAMPTZ',
+      // Widen existing grudge_id column if it was created as VARCHAR(32)
+      'ALTER TABLE accounts ALTER COLUMN grudge_id TYPE VARCHAR(64)',
+      // Asset/inventory item UUID tracking
+      'ALTER TABLE inventory_items ADD COLUMN IF NOT EXISTS grudge_item_id VARCHAR(64)',
+      'ALTER TABLE crafted_items   ADD COLUMN IF NOT EXISTS grudge_item_id VARCHAR(64)',
+    ];
+    for (const sql of migrations) await safe(sql, 'migration');
+
+    // ── Unique constraints (may already exist) ────────────────────────────
+    await safe(`CREATE UNIQUE INDEX IF NOT EXISTS idx_accounts_grudge_id ON accounts(grudge_id) WHERE grudge_id IS NOT NULL`, 'grudge_id unique');
+    await safe(`CREATE UNIQUE INDEX IF NOT EXISTS idx_accounts_grudge_username ON accounts(grudge_username) WHERE grudge_username IS NOT NULL`, 'grudge_username unique');
+    await safe(`CREATE UNIQUE INDEX IF NOT EXISTS idx_accounts_username_unique ON accounts(username) WHERE auth_type = 'local'`, 'username unique for local auth');
+
     _dbInitialized = true;
+    console.log('[DB] Schema initialized successfully');
   } catch (err) {
     console.error('[DB] Init error:', err.message);
   }
 }
 
-// ── Grudge ID Generator ─────────────────────────────────────────────────────
-function generateGrudgeId() {
-  return `GRUDGE-${Date.now()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
-}
-
-async function ensureGrudgeId(accountId) {
-  const result = await dbQuery('SELECT grudge_id FROM accounts WHERE id = $1', [accountId]);
-  if (result.rows[0]?.grudge_id) return result.rows[0].grudge_id;
-  const grudgeId = generateGrudgeId();
-  await dbQuery('UPDATE accounts SET grudge_id = $1 WHERE id = $2', [grudgeId, accountId]);
-  return grudgeId;
-}
 
 // ── Auto Wallet Creation (Crossmint) ────────────────────────────────────────
 async function ensureWallet(account) {
@@ -261,11 +402,15 @@ const CANONICAL_EXTERNAL_REDIRECT = `${CANONICAL_ORIGIN}/api/external/callback`;
 const ALLOWED_ORIGINS = [
   'https://grudgewarlords.com',
   'https://www.grudgewarlords.com',
+  'https://gdevelop-assistant.vercel.app',
   'https://molochdagod.github.io',
   'https://warlord-crafting-suite.vercel.app',
   'https://public-fawn-nine.vercel.app',
   'https://grudgestudio.com',
   'https://www.grudgestudio.com',
+  'https://grudge-platform.vercel.app',
+  'https://grudgeplatform.com',
+  'https://www.grudgeplatform.com',
 ];
 
 app.use((req, res, next) => {
@@ -311,7 +456,14 @@ function requireSession(req, res, next) {
   if (!token) return res.status(401).json({ error: 'Session token required' });
   const payload = verifyJWT(token);
   if (!payload) return res.status(401).json({ error: 'Invalid or expired session' });
-  req.session = payload;
+  // Normalize VPS snake_case to camelCase
+  req.session = {
+    ...payload,
+    discordId: payload.discordId || payload.discord_id,
+    grudgeId: payload.grudgeId || payload.grudge_id,
+    accountId: payload.accountId || null,
+    username: payload.username,
+  };
   next();
 }
 
@@ -334,162 +486,191 @@ function requireAuth(req, res, next) {
   next();
 }
 
-// ── AUTH: Register ──────────────────────────────────────────────────────────
+// ── AUTH: Register (VPS proxy + local fallback) ─────────────────────────────
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
-    if (username.length < 3 || username.length > 32) return res.status(400).json({ error: 'Username must be 3-32 characters' });
-    if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
-    if (!/^[a-zA-Z0-9_-]+$/.test(username)) return res.status(400).json({ error: 'Username can only contain letters, numbers, _ and -' });
 
-    const existing = await dbQuery('SELECT id FROM accounts WHERE grudge_username = $1', [username.toLowerCase()]);
-    if (existing.rows.length > 0) return res.status(409).json({ error: 'Username already taken' });
+    // Try VPS first
+    const vps = await vpsPost('/auth/register', { username, password, email });
+    if (vps.ok) {
+      const u = extractVpsUser(vps.data);
+      await upsertLocalGameAccount(u);
+      return res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId, authSource: 'vps' });
+    }
 
-    const hashed = await hashPassword(password);
-    const result = await dbQuery(
-      `INSERT INTO accounts (grudge_username, username, password_hash, auth_type, last_login)
-       VALUES ($1, $2, $3, 'grudge', NOW()) RETURNING *`,
-      [username.toLowerCase(), username, hashed]
-    );
-    const account = result.rows[0];
-    const grudgeId = await ensureGrudgeId(account.id);
-    const wallet = await ensureWallet({ ...account, grudge_id: grudgeId });
-    const jwt = createJWT({
-      accountId: account.id,
-      grudgeId,
-      username: account.username,
-      grudgeUsername: account.grudge_username,
-      authType: 'grudge',
-    });
-    res.json({
-      success: true,
-      sessionToken: jwt,
-      user: { id: account.id, grudgeId, username: account.username, grudgeUsername: account.grudge_username, authType: 'grudge' },
-      wallet: wallet || undefined,
-    });
+    // If VPS is down (not just a 400/401), fall back to local registration
+    if (vps.vpsDown) {
+      console.log(`[Auth] VPS down — registering '${username}' locally`);
+      const account = await localRegister(username, password, email);
+      if (!account) return res.status(409).json({ error: 'Username already taken' });
+      const token = createJWT({ grudge_id: account.grudge_id, username: account.username, accountId: account.id });
+      return res.json({ success: true, sessionToken: token, token, user: { id: account.id, username: account.username }, grudgeId: account.grudge_id, authSource: 'local' });
+    }
+
+    // VPS returned an error (400, 409, etc.) — forward it
+    return res.status(vps.status).json(vps.data);
   } catch (err) {
-    console.error('Register error:', err);
+    console.error('Register error:', err.message);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
 
-// ── AUTH: Login ─────────────────────────────────────────────────────────────
+// ── AUTH: Login (VPS proxy + local fallback) ────────────────────────────────
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
 
-    const result = await dbQuery('SELECT * FROM accounts WHERE grudge_username = $1', [username.toLowerCase()]);
-    if (!result.rows[0]) return res.status(401).json({ error: 'Invalid username or password' });
-    const account = result.rows[0];
-    if (!account.password_hash) return res.status(401).json({ error: 'This account uses a different login method' });
+    // Try VPS first
+    const vps = await vpsPost('/auth/login', { username, password });
+    if (vps.ok) {
+      const u = extractVpsUser(vps.data);
+      await upsertLocalGameAccount(u);
+      return res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId, authSource: 'vps' });
+    }
 
-    const valid = await verifyPassword(password, account.password_hash);
-    if (!valid) return res.status(401).json({ error: 'Invalid username or password' });
+    // If VPS is down, try local login
+    if (vps.vpsDown) {
+      console.log(`[Auth] VPS down — attempting local login for '${username}'`);
+      const account = await localLogin(username, password);
+      if (account) {
+        const token = createJWT({ grudge_id: account.grudge_id, username: account.username, accountId: account.id });
+        return res.json({ success: true, sessionToken: token, token, user: { id: account.id, username: account.username }, grudgeId: account.grudge_id, authSource: 'local' });
+      }
+      // Also try matching by username in DB (for accounts that were created via VPS but have no local password)
+      const existing = await dbQuery('SELECT * FROM accounts WHERE username = $1', [username]).catch(() => ({ rows: [] }));
+      if (existing.rows[0]) {
+        // User exists but has no local password — can't verify without VPS
+        return res.status(503).json({ error: 'Auth server temporarily unavailable. Please try again in a moment.', retryAfter: 60 });
+      }
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
 
-    await dbQuery('UPDATE accounts SET last_login = NOW() WHERE id = $1', [account.id]);
-    const grudgeId = await ensureGrudgeId(account.id);
-
-    const wallet = await ensureWallet({ ...account, grudge_id: grudgeId });
-    const jwt = createJWT({
-      accountId: account.id,
-      grudgeId,
-      username: account.username,
-      grudgeUsername: account.grudge_username,
-      discordId: account.discord_id,
-      authType: 'grudge',
-    });
-    res.json({
-      success: true,
-      sessionToken: jwt,
-      user: {
-        id: account.id,
-        grudgeId,
-        username: account.username,
-        grudgeUsername: account.grudge_username,
-        discordId: account.discord_id,
-        authType: 'grudge',
-      },
-      wallet: wallet || undefined,
-    });
+    // VPS returned a real error (wrong password, etc.)
+    return res.status(vps.status).json(vps.data);
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('Login error:', err.message);
     res.status(500).json({ error: 'Login failed' });
   }
 });
 
-// ── AUTH: Puter ─────────────────────────────────────────────────────────────
+// ── AUTH: Wallet (VPS proxy + local fallback) ─────────────────────────────────────
+app.post('/api/auth/wallet', async (req, res) => {
+  try {
+    const { address, wallet_address, web3auth_token } = req.body;
+    const cleanAddr = (wallet_address || address || '').trim().slice(0, 64);
+    if (!cleanAddr || cleanAddr.length < 32) {
+      return res.status(400).json({ error: 'Valid wallet address required' });
+    }
+
+    // Try VPS first
+    const vps = await vpsPost('/auth/wallet', { wallet_address: cleanAddr, web3auth_token });
+    if (vps.ok) {
+      const u = extractVpsUser(vps.data);
+      await upsertLocalGameAccount({ ...u, walletAddress: cleanAddr });
+      return res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId, authSource: 'vps' });
+    }
+
+    // VPS down — local fallback
+    if (vps.vpsDown) {
+      console.log(`[Auth] VPS down — handling wallet auth locally for '${cleanAddr.slice(0,8)}...'`);
+      const username = `${cleanAddr.slice(0, 4)}…${cleanAddr.slice(-4)}`;
+      const result = await dbQuery(
+        `INSERT INTO accounts (wallet_address, wallet_chain, username, auth_type, last_login)
+         VALUES ($1, 'solana', $2, 'wallet', NOW())
+         ON CONFLICT (wallet_address) DO UPDATE SET last_login = NOW(), updated_at = NOW()
+         RETURNING *`,
+        [cleanAddr, username]
+      ).catch(async () => {
+        const r2 = await dbQuery(
+          `INSERT INTO accounts (wallet_address, wallet_chain, username, auth_type, last_login)
+           VALUES ($1, 'solana', $2, 'wallet', NOW())
+           ON CONFLICT DO NOTHING RETURNING *`,
+          [cleanAddr, username]
+        );
+        if (r2.rows.length) return r2;
+        return dbQuery(`SELECT * FROM accounts WHERE wallet_address=$1`, [cleanAddr]);
+      });
+      const account = result.rows[0];
+      if (!account) return res.status(500).json({ error: 'Account upsert failed' });
+      const sessionToken = createJWT({ grudge_id: account.grudge_id, username: account.username, wallet_address: cleanAddr });
+      return res.json({ success: true, sessionToken, token: sessionToken, grudgeId: account.grudge_id, user: { id: account.id, username: account.username, walletAddress: cleanAddr }, authSource: 'local' });
+    }
+
+    return res.status(vps.status).json(vps.data);
+  } catch (err) {
+    console.error('Wallet auth error:', err.message);
+    res.status(500).json({ error: 'Wallet auth failed' });
+  }
+});
+
+// ── AUTH: Puter (VPS proxy + local fallback) ──────────────────────────────
 app.post('/api/auth/puter', async (req, res) => {
   try {
     const { puterUsername, puterUuid } = req.body;
-    if (!puterUsername) return res.status(400).json({ error: 'puterUsername required' });
+    if (!puterUsername && !puterUuid) return res.status(400).json({ error: 'Puter credentials required' });
 
-    const existing = await dbQuery('SELECT * FROM accounts WHERE grudge_username = $1', [puterUsername.toLowerCase()]);
-    let account;
-    if (existing.rows[0]) {
-      account = existing.rows[0];
-      const updates = ['last_login = NOW()'];
-      const params = [];
-      if (puterUuid && !account.puter_uuid) {
-        params.push(puterUuid);
-        updates.push(`puter_uuid = $${params.length}`);
-      }
-      params.push(account.id);
-      await dbQuery(`UPDATE accounts SET ${updates.join(', ')} WHERE id = $${params.length}`, params);
-    } else {
-      const grudgeId = generateGrudgeId();
-      const result = await dbQuery(
-        `INSERT INTO accounts (grudge_username, username, auth_type, grudge_id, puter_uuid, last_login)
-         VALUES ($1, $2, 'puter', $3, $4, NOW()) RETURNING *`,
-        [puterUsername.toLowerCase(), puterUsername, grudgeId, puterUuid || null]
-      );
-      account = result.rows[0];
+    // Try VPS first
+    const vps = await vpsPost('/auth/puter', { puterUuid, puterUsername });
+    if (vps.ok) {
+      const u = extractVpsUser(vps.data);
+      await upsertLocalGameAccount(u);
+      return res.json({ success: true, sessionToken: vps.data.token, token: vps.data.token, user: vps.data.user, grudgeId: u.grudgeId, authSource: 'vps' });
     }
 
-    const grudgeId = await ensureGrudgeId(account.id);
-    const wallet = await ensureWallet({ ...account, grudge_id: grudgeId });
-    const jwt = createJWT({
-      accountId: account.id,
-      grudgeId,
-      username: account.username,
-      grudgeUsername: account.grudge_username,
-      discordId: account.discord_id,
-      authType: 'puter',
-    });
-    res.json({
-      success: true,
-      sessionToken: jwt,
-      user: {
-        id: account.id,
-        grudgeId,
-        username: account.username,
-        grudgeUsername: account.grudge_username,
-        discordId: account.discord_id,
-        authType: 'puter',
-      },
-      wallet: wallet || undefined,
-    });
+    // If VPS is down, create/upsert locally with puter UUID
+    if (vps.vpsDown) {
+      console.log(`[Auth] VPS down — handling Puter auth locally for '${puterUsername}'`);
+      const grudgeId = UUID.generate('user', (puterUuid || puterUsername) + Date.now());
+      const account = await upsertLocalGameAccount({ grudgeId, username: puterUsername || 'PuterUser', puterId: puterUuid });
+      if (!account) return res.status(500).json({ error: 'Account creation failed' });
+      const token = createJWT({ grudge_id: account.grudge_id, username: account.username, accountId: account.id, puter_uuid: puterUuid });
+      return res.json({ success: true, sessionToken: token, token, user: { id: account.id, username: account.username }, grudgeId: account.grudge_id, authSource: 'local' });
+    }
+
+    return res.status(vps.status).json(vps.data);
   } catch (err) {
-    console.error('Puter auth error:', err);
+    console.error('Puter auth error:', err.message);
     res.status(500).json({ error: 'Puter auth failed' });
   }
 });
 
-// ── AUTH: Verify ────────────────────────────────────────────────────────────
-app.post('/api/auth/verify', (req, res) => {
+// ── AUTH: Verify (local-first, VPS fallback) ──────────────────────────────
+app.post('/api/auth/verify', async (req, res) => {
   const { sessionToken } = req.body;
   if (!sessionToken) return res.status(400).json({ error: 'sessionToken required' });
+
+  // Always try local JWT verification first (instant, no network)
   const payload = verifyJWT(sessionToken);
-  if (!payload) return res.status(401).json({ error: 'Invalid or expired session' });
+  if (payload) {
+    return res.json({ valid: true, grudgeId: payload.grudgeId || payload.grudge_id, discordId: payload.discordId || payload.discord_id, username: payload.username, authSource: 'local' });
+  }
+
+  // If local fails, try VPS (token may have been issued by VPS with different secret)
+  const vps = await vpsPost('/auth/verify', { token: sessionToken });
+  if (vps.ok && vps.data.valid) {
+    const p = vps.data.payload || vps.data;
+    return res.json({ valid: true, grudgeId: p.grudge_id, username: p.username, discordId: p.discord_id, authSource: 'vps' });
+  }
+
+  // Both failed
+  return res.status(401).json({ valid: false, error: vps.vpsDown ? 'Auth server temporarily unavailable' : 'Invalid or expired token' });
+});
+
+// ── AUTH: Health / VPS status ──────────────────────────────────────────
+app.get('/api/auth/status', (req, res) => {
   res.json({
-    valid: true,
-    accountId: payload.accountId,
-    grudgeId: payload.grudgeId,
-    discordId: payload.discordId,
-    username: payload.username,
-    grudgeUsername: payload.grudgeUsername,
-    authType: payload.authType,
+    vpsUrl: VPS_AUTH_URL,
+    circuitBreaker: {
+      open: circuitBreaker.isOpen(),
+      failures: circuitBreaker.failures,
+      threshold: circuitBreaker.threshold,
+      lastFailure: circuitBreaker.lastFailure ? new Date(circuitBreaker.lastFailure).toISOString() : null,
+    },
+    localFallback: true,
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -562,8 +743,9 @@ app.post('/api/discord/callback', async (req, res) => {
 
     if (!tokenRes.ok) {
       const err = await tokenRes.text();
-      console.error('Token exchange failed:', err);
-      return res.status(400).json({ error: 'Token exchange failed' });
+      console.error(`[Discord] Token exchange failed (${tokenRes.status}):`, err);
+      console.error(`[Discord] client_id used: ${DISCORD_CLIENT_ID?.slice(0, 6)}...  redirect_uri: ${redirectUri}`);
+      return res.status(400).json({ error: 'Token exchange failed', detail: `Discord returned ${tokenRes.status}` });
     }
 
     const tokenData = await tokenRes.json();
@@ -590,37 +772,33 @@ app.post('/api/discord/callback', async (req, res) => {
       } catch (e) { console.error('Guild join failed:', e.message); }
     }
 
-    // Upsert account
-    const accountResult = await dbQuery(
-      `INSERT INTO accounts (discord_id, username, email, avatar_url, auth_type, last_login)
-       VALUES ($1, $2, $3, $4, 'discord', NOW())
-       ON CONFLICT (discord_id) DO UPDATE SET
-         username = EXCLUDED.username, email = EXCLUDED.email,
-         avatar_url = EXCLUDED.avatar_url, updated_at = NOW(), last_login = NOW()
-       RETURNING *`,
-      [user.id, user.username, user.email, user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : null]
-    );
-    const account = accountResult.rows[0];
+    // Upsert local game account (VPS-compatible)
+    const account = await upsertLocalGameAccount({ grudgeId: null, username: user.username, discordId: user.id });
+    const grudgeId = account.grudge_id;
+    const wallet = await ensureWallet({ ...account, grudge_id: grudgeId });
 
-    const jwt = createJWT({
-      accountId: account.id,
-      discordId: user.id,
+    const sessionToken = createJWT({
+      grudge_id: grudgeId,
       username: user.username,
-      authType: 'discord',
+      discord_id: user.id,
+      wallet_address: account.wallet_address || null,
     });
 
     res.json({
       success: true,
       user: {
         id: user.id,
+        accountId: account.id,
         username: user.username,
         discriminator: user.discriminator,
         avatar: user.avatar,
         email: user.email,
         globalName: user.global_name,
+        grudgeId,
       },
       guildJoined,
-      sessionToken: jwt,
+      sessionToken,
+      wallet: wallet || undefined,
     });
   } catch (err) {
     console.error('Discord callback error:', err);
@@ -683,22 +861,13 @@ app.get('/api/external/callback', async (req, res) => {
     });
     const user = await userRes.json();
 
-    // Upsert
-    const accountResult = await dbQuery(
-      `INSERT INTO accounts (discord_id, username, email, auth_type, last_login)
-       VALUES ($1, $2, $3, 'discord', NOW())
-       ON CONFLICT (discord_id) DO UPDATE SET
-         username = EXCLUDED.username, email = EXCLUDED.email, updated_at = NOW(), last_login = NOW()
-       RETURNING *`,
-      [user.id, user.username, user.email]
-    );
-    const account = accountResult.rows[0];
+    // Upsert local game account
+    const account = await upsertLocalGameAccount({ grudgeId: null, username: user.username, discordId: user.id });
 
     const jwt = createJWT({
-      accountId: account.id,
-      discordId: user.id,
+      grudge_id: account.grudge_id,
       username: user.username,
-      authType: 'discord',
+      discord_id: user.id,
     });
 
     const returnOrigin = new URL(returnUrl).origin;
@@ -1488,7 +1657,7 @@ app.get('/api/wallet/all', requireAdmin, async (req, res) => {
 app.get('/api/discord/invite', async (req, res) => {
   try {
     const botToken = env('DISCORD_BOT_TOKEN') || env('GAME_API_GRUDA');
-    const BETA_CHANNEL_ID = '1381760000946470987';
+    const BETA_CHANNEL_ID = env('DISCORD_BETA_CHANNEL_ID') || '1394826401311625306';
     if (!botToken) throw new Error('Bot token not configured');
     const inviteRes = await fetch(`https://discord.com/api/v10/channels/${BETA_CHANNEL_ID}/invites`, { method: 'POST', headers: { Authorization: `Bot ${botToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ max_age: 86400, max_uses: 1, unique: true }) });
     if (!inviteRes.ok) throw new Error('Invite creation failed');
@@ -1738,6 +1907,146 @@ app.post('/api/studio/sync/pull', requireSession, async (req, res) => {
   }
 });
 
+// ── Studio: User Archive ─────────────────────────────────────────────────────
+
+/** POST /api/studio/archive — Create a manual snapshot of current game state */
+app.post('/api/studio/archive', requireSession, async (req, res) => {
+  try {
+    const accountId = req.session.accountId || req.session.discordId;
+    const puterToken = req.headers['x-puter-token'];
+    if (!puterToken) return res.status(400).json({ error: 'X-Puter-Token required' });
+
+    // Read current save to snapshot it
+    const current = await Puter.syncPull(accountId, puterToken);
+    if (!current.ok || !current.value) {
+      return res.status(404).json({ error: 'No save data to archive' });
+    }
+
+    const result = await Puter.archiveSnapshot(accountId, current.value, req.body.reason || 'manual', puterToken);
+    res.json(result);
+  } catch (err) {
+    console.error('[Archive] Create error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/** GET /api/studio/archives — List available snapshots */
+app.get('/api/studio/archives', requireSession, async (req, res) => {
+  try {
+    const accountId = req.session.accountId || req.session.discordId;
+    const puterToken = req.headers['x-puter-token'];
+    if (!puterToken) return res.status(400).json({ error: 'X-Puter-Token required' });
+
+    const result = await Puter.listArchives(accountId, puterToken);
+    res.json(result);
+  } catch (err) {
+    console.error('[Archive] List error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/** POST /api/studio/archive/restore — Restore from a snapshot */
+app.post('/api/studio/archive/restore', requireSession, async (req, res) => {
+  try {
+    const { timestamp } = req.body;
+    if (!timestamp) return res.status(400).json({ error: 'timestamp required' });
+
+    const accountId = req.session.accountId || req.session.discordId;
+    const puterToken = req.headers['x-puter-token'];
+    if (!puterToken) return res.status(400).json({ error: 'X-Puter-Token required' });
+
+    const result = await Puter.restoreArchive(accountId, timestamp, puterToken);
+    res.json(result);
+  } catch (err) {
+    console.error('[Archive] Restore error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Studio: Resolve Asset URL (S3 → GitHub fallback) ────────────────────────
+app.get('/api/studio/resolve-asset', async (req, res) => {
+  const { path: assetPath } = req.query;
+  if (!assetPath) return res.status(400).json({ error: 'path query parameter required' });
+  try {
+    const url = await resolveAssetUrl(assetPath);
+    // Allow client to redirect or fetch the resolved URL
+    if (req.query.redirect === 'true') {
+      return res.redirect(302, url);
+    }
+    res.json({ path: assetPath, url, source: url.includes('s3') || url.includes('amazonaws') || url.includes('railway') ? 's3' : 'github' });
+  } catch (err) {
+    res.status(404).json({ error: 'Asset not found', path: assetPath, message: err.message });
+  }
+});
+
+/** GET /api/studio/resolve-asset/batch — Resolve multiple asset paths at once */
+app.post('/api/studio/resolve-asset/batch', async (req, res) => {
+  const { paths } = req.body;
+  if (!Array.isArray(paths) || paths.length === 0) return res.status(400).json({ error: 'paths array required' });
+  const results = {};
+  const limit = Math.min(paths.length, 50);
+  for (let i = 0; i < limit; i++) {
+    try {
+      results[paths[i]] = await resolveAssetUrl(paths[i]);
+    } catch {
+      results[paths[i]] = null;
+    }
+  }
+  res.json({ resolved: results, count: Object.values(results).filter(Boolean).length, total: limit });
+});
+
+// ── Studio: 3D Models Catalog ───────────────────────────────────────────
+app.get('/api/studio/models/catalog', async (req, res) => {
+  try {
+    const data = await fetchDataset('models');
+    if (!data) return res.status(404).json({ error: 'Models catalog not available' });
+    const { category, tag, q } = req.query;
+    if (!category && !tag && !q) return res.json(data);
+    // Filter by category
+    let cats = data.categories;
+    if (category) cats = { [category]: cats[category] };
+    // Filter items by tag or search query
+    const filtered = {};
+    for (const [catKey, catData] of Object.entries(cats)) {
+      if (!catData) continue;
+      let items = catData.items || [];
+      if (tag) items = items.filter(i => i.tags?.includes(tag));
+      if (q) {
+        const ql = q.toLowerCase();
+        items = items.filter(i => i.name.toLowerCase().includes(ql) || i.id.includes(ql) || i.tags?.some(t => t.includes(ql)));
+      }
+      if (items.length > 0) filtered[catKey] = { ...catData, items };
+    }
+    res.json({ ...data, categories: filtered });
+  } catch (err) {
+    res.status(502).json({ error: 'Models catalog fetch failed', message: err.message });
+  }
+});
+
+/** GET /api/studio/models/:category/:id — Get a single model entry with resolved URLs */
+app.get('/api/studio/models/:category/:id', async (req, res) => {
+  try {
+    const data = await fetchDataset('models');
+    if (!data) return res.status(404).json({ error: 'Models catalog not available' });
+    const cat = data.categories?.[req.params.category];
+    if (!cat) return res.status(404).json({ error: 'Unknown category', available: Object.keys(data.categories) });
+    const model = cat.items.find(i => i.id === req.params.id);
+    if (!model) return res.status(404).json({ error: 'Model not found' });
+    // Resolve URLs for each available format
+    const urls = {};
+    const extMap = cat.fileExtensions || {};
+    for (const [fmt, basePath] of Object.entries(cat.basePaths)) {
+      const ext = extMap[fmt] || (fmt === 'glb' ? '.glb' : fmt === 'gltf' ? '.gltf' : `.${fmt}`);
+      try {
+        urls[fmt] = await resolveAssetUrl(`${basePath}/${model.file}${ext}`);
+      } catch { urls[fmt] = null; }
+    }
+    res.json({ ...model, category: req.params.category, urls, pack: cat.pack });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Studio: Cache ObjectStore → Puter KV ────────────────────────────────────
 app.post('/api/studio/cache/objectstore', async (req, res) => {
   const { datasets } = req.body; // array of dataset names, or omit for all
@@ -1760,6 +2069,90 @@ app.post('/api/studio/cache/objectstore', async (req, res) => {
     }
   }
   res.json({ cached: Object.values(results).filter(v => v === 'cached').length, total: targets.length, results });
+});
+
+// ── S3 Asset Storage ────────────────────────────────────────────────────────
+
+/** GET /api/assets/status — Check if S3 bucket is configured and reachable */
+app.get('/api/assets/status', async (req, res) => {
+  if (!S3.isConfigured()) return res.json({ configured: false });
+  try {
+    const result = await S3.list('', 1);
+    res.json({ configured: true, reachable: true, bucket: process.env.BUCKET_NAME });
+  } catch (err) {
+    res.json({ configured: true, reachable: false, error: err.message });
+  }
+});
+
+/** GET /api/assets/list?prefix=sprites/&max=100&token=... — List objects */
+app.get('/api/assets/list', requireAdmin, async (req, res) => {
+  try {
+    const { prefix = '', max = '1000', token } = req.query;
+    const result = await S3.list(prefix, Math.min(parseInt(max) || 1000, 1000), token || undefined);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/** GET /api/assets/url/:key — Presigned download URL for an asset */
+app.get('/api/assets/url/{*key}', async (req, res) => {
+  try {
+    const key = req.params.key;
+    if (!key) return res.status(400).json({ error: 'key required' });
+    const url = await S3.presignedDownloadUrl(key);
+    res.json({ url, key, expiresIn: 3600 });
+  } catch (err) {
+    res.status(err.name === 'NoSuchKey' ? 404 : 500).json({ error: err.message });
+  }
+});
+
+/** POST /api/assets/presign — Get presigned upload URL (admin) */
+app.post('/api/assets/presign', requireAdmin, async (req, res) => {
+  try {
+    const { key, contentType = 'application/octet-stream', expiresIn = 3600 } = req.body;
+    if (!key) return res.status(400).json({ error: 'key required' });
+    const result = await S3.presignedUploadUrl(key, contentType, Math.min(expiresIn, 86400));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/** GET /api/assets/meta/:key — Object metadata (head) */
+app.get('/api/assets/meta/{*key}', async (req, res) => {
+  try {
+    const key = req.params.key;
+    if (!key) return res.status(400).json({ error: 'key required' });
+    const meta = await S3.head(key);
+    res.json(meta);
+  } catch (err) {
+    res.status(err.name === 'NotFound' ? 404 : 500).json({ error: err.message });
+  }
+});
+
+/** POST /api/assets/copy — Copy object within bucket (admin) */
+app.post('/api/assets/copy', requireAdmin, async (req, res) => {
+  try {
+    const { source, dest } = req.body;
+    if (!source || !dest) return res.status(400).json({ error: 'source and dest required' });
+    const result = await S3.copy(source, dest);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/** DELETE /api/assets/:key — Delete an asset (admin) */
+app.delete('/api/assets/{*key}', requireAdmin, async (req, res) => {
+  try {
+    const key = req.params.key;
+    if (!key) return res.status(400).json({ error: 'key required' });
+    await S3.remove(key);
+    res.json({ deleted: true, key });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 export default app;

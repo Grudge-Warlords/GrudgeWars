@@ -28,9 +28,42 @@ import GameTooltipRenderer from './components/GameTooltip';
 import GameContextMenuRenderer from './components/GameContextMenu';
 import { HERO_CREATE_MODAL } from './constants/layers';
 import GameContainer from './components/GameContainer';
+import StudioPortal from './components/StudioPortal';
+import CraftingSuitePage from './components/CraftingSuitePage';
+import CharacterPage from './components/CharacterPage';
+import GKOCampaign from './components/GKOCampaign';
+import { API_BASE } from './utils/apiBase.js';
+
+// ── Auth Bridge: receive tokens from parent GDevelop frame ──────────
+// When embedded in GDevelop Assistant via iframe, the parent sends
+// { type: 'grudge:auth', token, grudgeId, username } via postMessage.
+// We store it so all API calls can use it.
+if (typeof window !== 'undefined') {
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'grudge:auth' && e.data.token) {
+      localStorage.setItem('grudge_auth_token', e.data.token);
+      if (e.data.grudgeId) localStorage.setItem('grudge_id', e.data.grudgeId);
+      if (e.data.username) localStorage.setItem('grudge_username', e.data.username);
+      // Also store in grudge-session format for backward compat
+      try {
+        const existing = JSON.parse(localStorage.getItem('grudge-session') || '{}');
+        localStorage.setItem('grudge-session', JSON.stringify({
+          ...existing,
+          type: 'grudge',
+          grudgeId: e.data.grudgeId || existing.grudgeId,
+          username: e.data.username || existing.username,
+        }));
+      } catch {}
+    }
+  });
+  // Request auth from parent if we're in an iframe
+  if (window.parent !== window) {
+    try { window.parent.postMessage({ type: 'grudge:requestAuth' }, '*'); } catch {}
+  }
+}
 
 const SCREEN_SLUGS = {
-  title: '/',
+  title: '/play',
   intro: '/intro',
   lobby: '/war-room',
   create: '/create-character',
@@ -43,13 +76,14 @@ const SCREEN_SLUGS = {
   account: '/account',
   training: '/training',
   scene: '/scene',
+  craftingSuite: '/crafting-suite',
 };
 
 const SLUG_TO_SCREEN = Object.fromEntries(
   Object.entries(SCREEN_SLUGS).map(([screen, slug]) => [slug, screen])
 );
 
-const SAFE_ENTRY_SCREENS = ['title', 'lobby', 'create', 'world', 'account', 'training'];
+const SAFE_ENTRY_SCREENS = ['title', 'lobby', 'create', 'world', 'account', 'training', 'craftingSuite'];
 
 function getScreenFromPath(pathname) {
   const screen = SLUG_TO_SCREEN[pathname];
@@ -82,7 +116,37 @@ function GameApp() {
       skipPushRef.current = true;
       setScreen(initialScreen);
     } else if (!initialScreen && path !== '/' && !SLUG_TO_SCREEN[path]) {
-      window.history.replaceState(null, '', SCREEN_SLUGS[screen] || '/');
+    window.history.replaceState(null, '', SCREEN_SLUGS[screen] || '/play');
+    }
+
+    // Verify JWT on app load using canonical grudge_auth_token
+    // Validates against id.grudge-studio.com — same as grudge-platform
+    const token = localStorage.getItem('grudge_auth_token');
+    if (token) {
+      fetch('https://id.grudge-studio.com/api/auth/user', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(r => {
+          if (!r.ok) {
+            // JWT expired or invalid — clear all auth state
+            localStorage.removeItem('grudge_auth_token');
+            localStorage.removeItem('grudge-session');
+            localStorage.removeItem('grudge_id');
+            localStorage.removeItem('grudge_username');
+            if (screen !== 'title') setScreen('title');
+          } else {
+            // Auth is valid — hydrate backend account data (characters, balance)
+            // Small delay so the game store is fully initialized first
+            setTimeout(() => {
+              import('./stores/gameStore').then(m => {
+                m.default.getState().loadAccountData();
+              }).catch(() => {});
+            }, 1000);
+          }
+        })
+        .catch(() => {
+          // Network error — don't clear session, let the user play offline
+        });
     }
   }, []);
 
@@ -100,6 +164,7 @@ function GameApp() {
     account: 'Grudge Warlords — Account',
     training: 'Grudge Warlords — Training',
     scene: 'Grudge Warlords — Scene',
+    craftingSuite: 'Grudge Warlords — Crafting Suite',
   };
 
   useEffect(() => {
@@ -223,6 +288,7 @@ function GameApp() {
       case 'account': return <AccountPage />;
       case 'training': return <TrainingScreen />;
       case 'scene': return <SceneView />;
+      case 'craftingSuite': return <CraftingSuitePage />;
       default: return <TitleScreen />;
     }
   };
@@ -244,16 +310,15 @@ function GameApp() {
     opacity: (transitioning && transitionType !== 'none') ? 0 : undefined,
   };
 
-  const sessionUsername = (() => {
+  const sessionData = (() => {
     try {
-      const s = JSON.parse(localStorage.getItem('grudge-session') || '{}');
-      return s.puterUsername || s.username || (s.type === 'guest' ? 'Guest' : null);
-    } catch { return null; }
+      return JSON.parse(localStorage.getItem('grudge-session') || '{}');
+    } catch { return {}; }
   })();
+  const sessionUsername = sessionData.puterUsername || sessionData.username || (sessionData.type === 'guest' ? 'Guest' : null);
+  const sessionGrudgeId = sessionData.grudgeId || null;
   const showUserBadge = sessionUsername && screen !== 'title' && screen !== 'loading';
-  const sessionType = (() => {
-    try { return JSON.parse(localStorage.getItem('grudge-session') || '{}').type || 'guest'; } catch { return 'guest'; }
-  })();
+  const sessionType = sessionData.type || 'guest';
 
 
   return (
@@ -268,34 +333,52 @@ function GameApp() {
           {renderScreen()}
         </div>
         {showUserBadge && (
-          <div style={{
-            position: 'absolute', top: 8, left: 10, zIndex: 10510,
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(0,0,0,0.55)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 6, padding: '4px 10px 4px 6px',
-            pointerEvents: 'none',
-            animation: 'fadeIn 0.5s ease 0.3s both',
-          }}>
+          <div
+            onClick={() => setScreen('account')}
+            style={{
+              position: 'absolute', top: 8, left: 10, zIndex: 10510,
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: 'rgba(0,0,0,0.55)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 6, padding: '4px 10px 4px 6px',
+              cursor: 'pointer',
+              animation: 'fadeIn 0.5s ease 0.3s both',
+              transition: 'border-color 0.2s, background 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(250,172,71,0.3)'; e.currentTarget.style.background = 'rgba(0,0,0,0.7)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(0,0,0,0.55)'; }}
+          >
             <div style={{
               width: 16, height: 16, borderRadius: 3,
               background: sessionType === 'puter'
                 ? 'linear-gradient(135deg, #DB6331, #FAAC47)'
                 : sessionType === 'discord'
                   ? '#5865F2'
-                  : 'rgba(255,255,255,0.15)',
+                  : sessionType === 'grudge'
+                    ? 'linear-gradient(135deg, #DB6331, #FAAC47)'
+                    : 'rgba(255,255,255,0.15)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '0.5rem', fontWeight: 800, color: '#fff',
               overflow: 'hidden',
             }}>
-              {sessionType === 'puter' ? <img src="/sprites/ui/grudge_logo.png" alt="G" style={{ width: 14, height: 14, objectFit: 'contain' }} /> : sessionType === 'discord' ? 'D' : '\u2022'}
+              {(sessionType === 'puter' || sessionType === 'grudge') ? <img src="/sprites/ui/grudge_logo.png" alt="G" style={{ width: 14, height: 14, objectFit: 'contain' }} /> : sessionType === 'discord' ? 'D' : '\u2022'}
             </div>
-            <span style={{
-              color: 'rgba(255,255,255,0.6)', fontSize: '0.7rem', fontWeight: 500,
-              fontFamily: "'Jost', sans-serif", letterSpacing: 0.5,
-            }}>
-              {sessionUsername}
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{
+                color: 'rgba(255,255,255,0.6)', fontSize: '0.7rem', fontWeight: 500,
+                fontFamily: "'Jost', sans-serif", letterSpacing: 0.5, lineHeight: 1.2,
+              }}>
+                {sessionUsername}
+              </span>
+              {sessionGrudgeId && (
+                <span style={{
+                  color: 'rgba(255,255,255,0.25)', fontSize: '0.5rem', fontWeight: 400,
+                  fontFamily: "'Jost', sans-serif", letterSpacing: 0.5, lineHeight: 1,
+                }}>
+                  {sessionGrudgeId}
+                </span>
+              )}
+            </div>
           </div>
         )}
         <div id="game-ui-portal" style={{
@@ -353,6 +436,9 @@ export default function App() {
     return null;
   }
   if (path === '/discordauth') return <DiscordAuth />;
+  if (path === '/character') return <CharacterPage />;
+  if (path === '/gko-boxing') return <GKOCampaign />;
+  if (path === '/') return <StudioPortal />;
 
   return (
     <GameContainer>

@@ -9,6 +9,66 @@ import { registerWalletRoutes } from './src/server/walletRoutes.js';
 import { registerCraftingRoutes } from './src/server/craftingRoutes.js';
 import { testSuiteConnection } from './src/server/suiteDb.js';
 import { startBot, addUserToGuild } from './src/server/discordBot.js';
+import { vpsLogin, vpsRegister, vpsPuter, vpsVerifyToken, upsertLocalGameAccount, extractVpsUser } from './src/server/vpsAuth.js';
+import {
+  accountInit, accountLinkDiscord, accountLinkCharacters, accountGet,
+  syncPush, syncPull, kvGet, kvSet, kvList, prefsGet, prefsSet,
+  healthCheck as puterHealthCheck, deployLogAppend,
+} from './api/lib/puter-service.js';
+import { proxyToBackend, verifyToken as verifyBackendToken, ALLOWED_ORIGINS as PROXY_ORIGINS } from './src/server/backendProxy.js';
+
+// ── Phase 6: In-memory rate limiter ──────────────────────────────────────────────
+const _rateBuckets = new Map(); // key -> { count, resetAt }
+
+function rateLimiter(maxPerMin) {
+  return (req, res, next) => {
+    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+    const key = `${maxPerMin}:${ip}:${req.path.split('/')[2] || 'root'}`;
+    const now = Date.now();
+    const bucket = _rateBuckets.get(key);
+    if (!bucket || now > bucket.resetAt) {
+      _rateBuckets.set(key, { count: 1, resetAt: now + 60_000 });
+      return next();
+    }
+    if (bucket.count >= maxPerMin) {
+      const retryAfter = Math.ceil((bucket.resetAt - now) / 1000);
+      res.setHeader('Retry-After', retryAfter);
+      return res.status(429).json({ error: 'Too many requests — please slow down', retryAfter });
+    }
+    bucket.count++;
+    next();
+  };
+}
+
+// Purge stale buckets every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of _rateBuckets) { if (now > v.resetAt) _rateBuckets.delete(k); }
+}, 5 * 60_000);
+
+// ── Phase 6: Character creation validators ─────────────────────────────────────
+const VALID_CLASSES = new Set(['warrior', 'mage', 'ranger', 'worge']);
+const VALID_RACES   = new Set(['human', 'elf', 'dwarf', 'orc', 'undead', 'barbarian', 'goblin']);
+const NAME_REGEX    = /^[a-zA-Z0-9 '-]{1,30}$/;
+const MAX_CHARACTERS = 15;
+
+function validateCharacterBody(body) {
+  const { name, classId, raceId } = body || {};
+  if (!name || !NAME_REGEX.test(name))
+    return 'name must be 1-30 characters (letters, numbers, spaces, hyphens, apostrophes)';
+  if (!VALID_CLASSES.has(classId))
+    return `classId must be one of: ${[...VALID_CLASSES].join(', ')}`;
+  if (!VALID_RACES.has(raceId))
+    return `raceId must be one of: ${[...VALID_RACES].join(', ')}`;
+  return null;
+}
+
+// ── Phase 6: Audit logger ────────────────────────────────────────────────────────
+function auditLog(action, grudgeId, detail) {
+  console.log(`[AUDIT] ${new Date().toISOString()} | ${action} | ${grudgeId || 'unknown'} | ${JSON.stringify(detail)}`);
+  // Future: proxyToBackend('/api/audit', ...) to persist to backend
+}
+import * as S3 from './api/lib/s3.js';
 
 const __filename_server = fileURLToPath(import.meta.url);
 const __dirname_server = path.dirname(__filename_server);
@@ -18,14 +78,13 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : (isProd ? 5000 
 
 const app = express();
 
+// CORS allowlist — single truth for server.js.
+// Full list with circuit breaker is in src/server/backendProxy.js (PROXY_ORIGINS).
 const ALLOWED_ORIGINS = [
-  'https://grudgewarlords.com',
-  'https://www.grudgewarlords.com',
-  'https://gdevelop-assistant.vercel.app',
-  'https://grudgeplatform.com',
-  'https://www.grudgeplatform.com',
-  'https://molochdagod.github.io',
-  'https://warlord-crafting-suite.vercel.app',
+  ...PROXY_ORIGINS,
+  // Extra server-specific origins
+  'https://grudge-platform.vercel.app',
+  'https://public-fawn-nine.vercel.app',
 ];
 
 const CSP_FRAME_ANCESTORS = [
@@ -34,6 +93,7 @@ const CSP_FRAME_ANCESTORS = [
   'https://www.grudgewarlords.com',
   'https://gdevelop-assistant.vercel.app',
   'https://grudgeplatform.com',
+  'https://grudge-crafting.puter.site',
   'https://puter.com',
   'https://*.puter.com',
 ].join(' ');
@@ -50,7 +110,7 @@ app.use((req, res, next) => {
   if (origin && isAllowedOrigin) {
     res.header('Access-Control-Allow-Origin', origin);
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Session-Token');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Session-Token, X-Puter-Token, X-Api-Key');
     res.header('Access-Control-Allow-Credentials', 'true');
     if (req.method === 'OPTIONS') return res.sendStatus(204);
   }
@@ -62,10 +122,66 @@ app.use(express.json({ limit: '1mb' }));
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const DISCORD_BOT_TOKEN_VAL = process.env.DISCORD_BOT_TOKEN;
-const BETA_CHANNEL_ID = '1394826401311625306';
+const BETA_CHANNEL_ID = process.env.DISCORD_BETA_CHANNEL_ID || '1394826401311625306';
 
 const pendingStates = new Map();
-const activeSessions = new Map();
+
+// ── JWT Auth ────────────────────────────────────────────────────────────────────────────
+const _jwtSecret = process.env.JWT_SECRET || process.env.GAME_API_GRUDA;
+if (!_jwtSecret) throw new Error('JWT_SECRET or GAME_API_GRUDA environment variable is required');
+const JWT_SECRET = () => _jwtSecret;
+
+function base64url(buf) {
+  return Buffer.from(buf).toString('base64url');
+}
+
+function createJWT(payload, expiresInDays = 7) {
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const now = Math.floor(Date.now() / 1000);
+  const body = { ...payload, iat: now, exp: now + expiresInDays * 86400 };
+  const segments = [base64url(JSON.stringify(header)), base64url(JSON.stringify(body))];
+  const sig = crypto.createHmac('sha256', JWT_SECRET()).update(segments.join('.')).digest('base64url');
+  return [...segments, sig].join('.');
+}
+
+function verifyJWT(token) {
+  if (!token) return null;
+  try {
+    const [headerB64, bodyB64, sigB64] = token.split('.');
+    const expectedSig = crypto.createHmac('sha256', JWT_SECRET()).update(`${headerB64}.${bodyB64}`).digest('base64url');
+    if (sigB64 !== expectedSig) return null;
+    const payload = JSON.parse(Buffer.from(bodyB64, 'base64url').toString());
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
+    return payload;
+  } catch { return null; }
+}
+
+
+// ── Auto Wallet Creation (Crossmint) ────────────────────────────────────────
+async function ensureWallet(account) {
+  if (account.wallet_address) return { address: account.wallet_address, chain: account.wallet_chain || 'solana', existing: true };
+  const CROSSMINT_KEY = (process.env.CROSSMINT_SERVER_API_KEY || '').trim();
+  if (!CROSSMINT_KEY) return null;
+  try {
+    const { query: dbQuery } = await import('./src/server/db.js');
+    const linkedUser = `userId:${account.grudge_id || account.discord_id || account.id}`;
+    const walletRes = await fetch('https://www.crossmint.com/api/v1-alpha2/wallets', {
+      method: 'POST',
+      headers: { 'X-API-KEY': CROSSMINT_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ linkedUser, chain: 'solana' }),
+    });
+    const walletData = await walletRes.json();
+    const address = walletData.address || walletData.publicKey;
+    if (!address) { console.warn('[Wallet] Auto-create returned no address:', walletData); return null; }
+    await dbQuery('UPDATE accounts SET wallet_address=$1, wallet_chain=$2, wallet_created_at=NOW() WHERE id=$3', [address, 'solana', account.id]);
+    console.log(`[Wallet] Auto-created Solana wallet for ${account.username}: ${address}`);
+    return { address, chain: 'solana', existing: false };
+  } catch (err) {
+    console.warn('[Wallet] Auto-create failed:', err.message);
+    return null;
+  }
+}
+
 
 function getPublicOrigin(req) {
   // Check for configured public URL first
@@ -84,9 +200,7 @@ function getPublicOrigin(req) {
   // Fallback: check platform-specific env vars
   const domain = process.env.VERCEL_URL 
     || process.env.RAILWAY_PUBLIC_DOMAIN 
-    || process.env.RENDER_EXTERNAL_URL
-    || process.env.REPLIT_DOMAINS 
-    || process.env.REPLIT_DEV_DOMAIN;
+    || process.env.RENDER_EXTERNAL_URL;
 
   if (domain) {
     const cleanDomain = domain.replace(/^https?:\/\//, '');
@@ -96,7 +210,8 @@ function getPublicOrigin(req) {
   return `${proto}://${host || `localhost:${PORT}`}`;
 }
 
-app.get('/api/discord/login', (req, res) => {
+// Auth routes: rate-limited
+app.get('/api/discord/login', rateLimiter(10), (req, res) => {
   const redirectUrl = req.query.redirect_uri || null;
   const origin = getPublicOrigin(req);
   const redirectUri = redirectUrl || `${origin}/discordauth`;
@@ -163,53 +278,38 @@ app.post('/api/discord/callback', async (req, res) => {
       console.error('Auto guild join failed:', joinErr.message);
     }
 
-    const sessionToken = crypto.randomBytes(32).toString('hex');
-
-    activeSessions.set(sessionToken, {
-      discordId: user.id,
+    // Upsert local game account row (for FK relationships to characters/inventory)
+    const account = await upsertLocalGameAccount({
+      grudgeId: null, // will be generated if new
       username: user.username,
-      createdAt: Date.now(),
+      discordId: user.id,
     });
+    const grudgeId = account.grudge_id;
+    const wallet = await ensureWallet({ ...account, grudge_id: grudgeId });
 
-    if (activeSessions.size > 5000) {
-      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-      for (const [k, v] of activeSessions) {
-        if (v.createdAt < cutoff) activeSessions.delete(k);
-      }
-    }
-
-    // Upsert account to DB so record exists immediately on login
-    const avatarUrl = user.avatar
-      ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-      : null;
-    try {
-      const { query: dbQuery } = await import('./src/server/db.js');
-      await dbQuery(
-        `INSERT INTO accounts (discord_id, username, email, avatar_url, last_login)
-         VALUES ($1, $2, $3, $4, NOW())
-         ON CONFLICT (discord_id) DO UPDATE SET
-           username = EXCLUDED.username,
-           email = COALESCE(EXCLUDED.email, accounts.email),
-           avatar_url = COALESCE(EXCLUDED.avatar_url, accounts.avatar_url),
-           updated_at = NOW(), last_login = NOW()`,
-        [user.id, user.username, user.email || null, avatarUrl]
-      );
-    } catch (dbErr) {
-      console.error('[Discord] Account upsert failed (non-fatal):', dbErr.message);
-    }
+    // Issue JWT with VPS-compatible payload using shared JWT_SECRET
+    const sessionToken = createJWT({
+      grudge_id: grudgeId,
+      username: account.username,
+      discord_id: user.id,
+      wallet_address: account.wallet_address || null,
+    });
 
     res.json({
       success: true,
       user: {
         id: user.id,
+        accountId: account.id,
         username: user.username,
         discriminator: user.discriminator,
         avatar: user.avatar,
         email: user.email,
         globalName: user.global_name,
+        grudgeId,
       },
       guildJoined,
       sessionToken,
+      wallet: wallet || undefined,
     });
   } catch (err) {
     console.error('Discord callback error:', err);
@@ -477,6 +577,100 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });
 
+// ── Game Server Registry ────────────────────────────────────────────────────
+// In-memory state for active game servers (Unity headless, Colyseus, etc.)
+// Heartbeats from server containers keep this alive
+const activeGameServers = new Map();
+const HEARTBEAT_TIMEOUT_MS = 90_000; // mark offline after 90s with no heartbeat
+
+// Heartbeat endpoint — called by Unity entrypoint every 30s
+app.post('/api/servers/unity/heartbeat', (req, res) => {
+  const { name, region, port, status, maxPlayers, currentPlayers, tickRate, startedAt } = req.body;
+  const serverId = `unity-${port || 7777}`;
+  const now = Date.now();
+
+  activeGameServers.set(serverId, {
+    id: serverId,
+    name: name || 'Grudge Warlords Dedicated',
+    type: 'unity-dedicated',
+    region: region || 'us-east-1',
+    port: port || 7777,
+    status: status || 'online',
+    maxPlayers: maxPlayers || 100,
+    currentPlayers: currentPlayers || 0,
+    tickRate: tickRate || 30,
+    startedAt: startedAt || new Date().toISOString(),
+    lastHeartbeat: new Date(now).toISOString(),
+    lastHeartbeatMs: now,
+  });
+
+  console.log(`[GameServer] Heartbeat from ${serverId}: ${status} (${currentPlayers || 0}/${maxPlayers || 100} players)`);
+  res.json({ success: true, serverId });
+});
+
+// Unity server status — for clients to check before connecting
+app.get('/api/servers/unity/status', (req, res) => {
+  const serverId = `unity-${req.query.port || 7777}`;
+  const server = activeGameServers.get(serverId);
+  if (!server) {
+    return res.json({ status: 'offline', serverId, message: 'No heartbeat received' });
+  }
+  // Check if heartbeat is stale
+  const stale = (Date.now() - server.lastHeartbeatMs) > HEARTBEAT_TIMEOUT_MS;
+  res.json({
+    ...server,
+    status: stale ? 'offline' : server.status,
+    stale,
+  });
+});
+
+// Full server listing — all active game servers for matchmaking / lobby
+app.get('/api/servers', (req, res) => {
+  const now = Date.now();
+  const servers = [];
+
+  for (const [id, srv] of activeGameServers) {
+    const stale = (now - srv.lastHeartbeatMs) > HEARTBEAT_TIMEOUT_MS;
+    servers.push({
+      ...srv,
+      status: stale ? 'offline' : srv.status,
+      stale,
+    });
+  }
+
+  // Also include Colyseus if configured
+  const colyseusUrl = process.env.COLYSEUS_SERVER_URL;
+  if (colyseusUrl) {
+    servers.push({
+      id: 'colyseus-lobbies',
+      name: 'Grudge Lobbies (Colyseus)',
+      type: 'colyseus',
+      url: colyseusUrl,
+      wsUrl: colyseusUrl.replace('https://', 'wss://').replace('http://', 'ws://'),
+      status: 'configured',
+      rooms: ['lobby', 'island', 'arena', 'dungeon'],
+    });
+  }
+
+  res.json({
+    success: true,
+    servers,
+    count: servers.length,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Cleanup stale servers every 60s
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, srv] of activeGameServers) {
+    if ((now - srv.lastHeartbeatMs) > HEARTBEAT_TIMEOUT_MS * 3) {
+      console.log(`[GameServer] Removing stale server: ${id}`);
+      activeGameServers.delete(id);
+    }
+  }
+}, 60_000);
+
 const ALLOWED_RETURN_ORIGINS = [...ALLOWED_ORIGINS];
 
 app.get('/api/external/login', (req, res) => {
@@ -535,22 +729,37 @@ app.get('/api/external/callback', async (req, res) => {
       await addUserToGuild(tokenData.access_token, user.id);
     } catch (e) {}
 
-    const sessionToken = crypto.randomBytes(32).toString('hex');
-    activeSessions.set(sessionToken, {
+    // Upsert account into DB, assign grudge_id, provision wallet, generate JWT
+    const { account, grudgeId, wallet, jwt } = await upsertDiscordAccount(user);
+
+    // Keep in-memory session for backward compat
+    activeSessions.set(jwt, {
       discordId: user.id,
       username: user.username,
+      accountId: account.id,
+      grudgeId,
       createdAt: Date.now(),
     });
 
     const returnOrigin = new URL(returnUrl).origin;
+    const loginData = { token: jwt, user: { id: user.id, accountId: account.id, username: user.username, avatar: user.avatar, email: user.email, grudgeId } };
     res.send(`<!DOCTYPE html><html><head><title>Grudge Login</title></head><body>
 <script>
   try {
-    var data = ${JSON.stringify({ sessionToken, user: { id: user.id, username: user.username, avatar: user.avatar, email: user.email } })};
-    localStorage.setItem('grudge_studio_session', data.sessionToken);
-    localStorage.setItem('grudge_studio_user', JSON.stringify(data.user));
+    var d = ${JSON.stringify(loginData)};
+    // Canonical keys — matches grudge-platform and grudge-sdk.js
+    localStorage.setItem('grudge_auth_token', d.token);
+    localStorage.setItem('grudge_id', d.user.grudgeId || '');
+    localStorage.setItem('grudge_username', d.user.username || '');
+    localStorage.setItem('grudge_user_id', d.user.accountId || '');
+    localStorage.setItem('grudge-session', JSON.stringify({
+      type: 'discord', grudgeId: d.user.grudgeId,
+      username: d.user.username, loginTime: Date.now()
+    }));
+    // Legacy keys — kept for backward compat during transition
+    localStorage.setItem('grudge_session_token', d.token);
     if (window.opener) {
-      window.opener.postMessage({ type: 'grudge_login', data: data }, ${JSON.stringify(returnOrigin)});
+      window.opener.postMessage({ type: 'grudge:auth', token: d.token, grudgeId: d.user.grudgeId, username: d.user.username }, ${JSON.stringify(returnOrigin)});
       window.close();
     } else {
       window.location.href = ${JSON.stringify(returnUrl)};
@@ -998,185 +1207,126 @@ app.get('/api/arena/leaderboard', async (req, res) => {
   }
 });
 
-app.post('/api/auth/verify', (req, res) => {
+// ── Auth: Verify (VPS proxy) ────────────────────────────────────────────────
+app.post('/api/auth/verify', async (req, res) => {
   const { sessionToken } = req.body;
   if (!sessionToken) return res.status(400).json({ error: 'sessionToken required' });
-  const session = activeSessions.get(sessionToken);
-  if (!session) return res.status(401).json({ error: 'Invalid or expired session' });
-  const age = Date.now() - session.createdAt;
-  if (age > 7 * 24 * 60 * 60 * 1000) {
-    activeSessions.delete(sessionToken);
-    return res.status(401).json({ error: 'Session expired' });
-  }
-  res.json({
-    valid: true,
-    discordId: session.discordId,
-    username: session.username,
-  });
-});
 
-app.post('/api/auth/extension', async (req, res) => {
-  const { sessionToken } = req.body;
-  if (!sessionToken) return res.status(400).json({ error: 'sessionToken required' });
-  const session = activeSessions.get(sessionToken);
-  if (!session) return res.status(401).json({ error: 'Invalid session' });
-  const age = Date.now() - session.createdAt;
-  if (age > 7 * 24 * 60 * 60 * 1000) {
-    activeSessions.delete(sessionToken);
-    return res.status(401).json({ error: 'Session expired' });
-  }
-  const extensionToken = crypto.randomBytes(32).toString('hex');
-
-  activeSessions.set(extensionToken, {
-    discordId: session.discordId,
-    username: session.username,
-    createdAt: Date.now(),
-    isExtension: true,
-  });
-
-  res.json({
-    extensionToken,
-    discordId: session.discordId,
-    username: session.username,
-    expiresIn: '7d',
-  });
-});
-
-// ── Password Utilities (scrypt — no extra deps) ──────────────────────────────
-
-function generateGrudgeAccountId() {
-  const now = new Date();
-  const ts = now.getFullYear().toString() +
-    String(now.getMonth() + 1).padStart(2, '0') +
-    String(now.getDate()).padStart(2, '0') +
-    String(now.getHours()).padStart(2, '0') +
-    String(now.getMinutes()).padStart(2, '0') +
-    String(now.getSeconds()).padStart(2, '0');
-  const rand = crypto.randomBytes(4).toString('hex').toUpperCase();
-  return `GRD-${ts}-${rand}`;
-}
-
-async function hashPassword(password) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  return new Promise((resolve, reject) => {
-    crypto.scrypt(password, salt, 64, (err, buf) => {
-      if (err) reject(err);
-      else resolve(`${salt}:${buf.toString('hex')}`);
+  // Try local JWT verification first (shared JWT_SECRET)
+  const jwtPayload = verifyJWT(sessionToken);
+  if (jwtPayload) {
+    return res.json({
+      valid: true,
+      accountId: jwtPayload.accountId,
+      discordId: jwtPayload.discordId || jwtPayload.discord_id,
+      username: jwtPayload.username,
+      grudgeId: jwtPayload.grudgeId || jwtPayload.grudge_id,
     });
-  });
-}
+  }
 
-async function verifyPassword(password, stored) {
-  const [salt, hash] = stored.split(':');
-  return new Promise((resolve, reject) => {
-    crypto.scrypt(password, salt, 64, (err, buf) => {
-      if (err) reject(err);
-      else {
-        try {
-          resolve(crypto.timingSafeEqual(buf, Buffer.from(hash, 'hex')));
-        } catch { resolve(false); }
-      }
-    });
-  });
-}
-
-// ── Grudge ID / Username Auth ─────────────────────────────────────────────────
-
-app.post('/api/auth/register', async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'username and password required' });
-  if (username.length < 3 || username.length > 24) return res.status(400).json({ error: 'Username must be 3–24 chars' });
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) return res.status(400).json({ error: 'Alphanumeric and _ only' });
-  if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 chars' });
+  // Fallback to VPS verify
   try {
-    const { query: dbQuery } = await import('./src/server/db.js');
-    const existing = await dbQuery('SELECT id FROM accounts WHERE LOWER(username) = $1 AND password_hash IS NOT NULL', [username.toLowerCase()]);
-    if (existing.rows[0]) return res.status(409).json({ error: 'Username already taken' });
+    const vps = await vpsVerifyToken(sessionToken);
+    if (vps.ok && vps.data.valid) {
+      const p = vps.data.payload || vps.data;
+      return res.json({ valid: true, grudgeId: p.grudge_id, username: p.username, discordId: p.discord_id });
+    }
+    return res.status(401).json({ valid: false, error: 'Invalid or expired token' });
+  } catch {
+    return res.status(401).json({ valid: false, error: 'Invalid or expired session' });
+  }
+});
 
-    const grudgeId = generateGrudgeAccountId();
-    const pwHash = await hashPassword(password);
-    const result = await dbQuery(
-      `INSERT INTO accounts (username, password_hash, grudge_id, last_login)
-       VALUES ($1, $2, $3, NOW()) RETURNING id, username, grudge_id`,
-      [username, pwHash, grudgeId]
-    );
-    const acc = result.rows[0];
+// ── Auth: Register (VPS proxy) ──────────────────────────────────────────────
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, password, email } = req.body;
+    const vps = await vpsRegister(username, password, email);
+    if (!vps.ok) return res.status(vps.status).json(vps.data);
 
-    const sessionToken = crypto.randomBytes(32).toString('hex');
-    activeSessions.set(sessionToken, { discordId: null, username: acc.username, accountId: acc.id, createdAt: Date.now() });
+    // Sync to local game DB
+    const u = extractVpsUser(vps.data);
+    await upsertLocalGameAccount(u);
 
-    res.json({ success: true, sessionToken, user: { id: acc.id, username: acc.username, grudgeId: acc.grudge_id } });
+    res.status(vps.status).json({
+      success: true,
+      sessionToken: vps.data.token,
+      token: vps.data.token,
+      user: vps.data.user,
+      grudgeId: u.grudgeId,
+    });
   } catch (err) {
     console.error('[Auth] Register error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(502).json({ error: 'Auth service unavailable' });
   }
 });
 
+// ── Auth: Login (VPS proxy) ─────────────────────────────────────────────────
 app.post('/api/auth/login', async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'username and password required' });
   try {
-    const { query: dbQuery } = await import('./src/server/db.js');
-    const result = await dbQuery(
-      'SELECT id, username, grudge_id, password_hash FROM accounts WHERE LOWER(username) = $1 AND password_hash IS NOT NULL',
-      [username.toLowerCase()]
-    );
-    const acc = result.rows[0];
-    if (!acc) return res.status(401).json({ error: 'Invalid username or password' });
+    const { username, password } = req.body;
+    const vps = await vpsLogin(username, password);
+    if (!vps.ok) return res.status(vps.status).json(vps.data);
 
-    const valid = await verifyPassword(password, acc.password_hash);
-    if (!valid) return res.status(401).json({ error: 'Invalid username or password' });
+    const u = extractVpsUser(vps.data);
+    await upsertLocalGameAccount(u);
 
-    await dbQuery('UPDATE accounts SET last_login = NOW(), updated_at = NOW() WHERE id = $1', [acc.id]);
-
-    const sessionToken = crypto.randomBytes(32).toString('hex');
-    activeSessions.set(sessionToken, { discordId: null, username: acc.username, accountId: acc.id, createdAt: Date.now() });
-
-    res.json({ success: true, sessionToken, user: { id: acc.id, username: acc.username, grudgeId: acc.grudge_id } });
+    res.json({
+      success: true,
+      sessionToken: vps.data.token,
+      token: vps.data.token,
+      user: vps.data.user,
+      grudgeId: u.grudgeId,
+    });
   } catch (err) {
     console.error('[Auth] Login error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(502).json({ error: 'Auth service unavailable' });
   }
 });
 
+// ── Auth: Puter (VPS proxy) ─────────────────────────────────────────────────
 app.post('/api/auth/puter', async (req, res) => {
-  const { puterUsername, puterUuid } = req.body;
-  if (!puterUsername) return res.status(400).json({ error: 'puterUsername required' });
   try {
-    const { query: dbQuery } = await import('./src/server/db.js');
-    const grudgeId = generateGrudgeAccountId();
-    const result = await dbQuery(
-      `INSERT INTO accounts (username, grudge_id, last_login)
-       VALUES ($1, $2, NOW())
-       ON CONFLICT (username) DO UPDATE SET
-         last_login = NOW(), updated_at = NOW()
-       RETURNING id, username, grudge_id`,
-      [puterUsername, grudgeId]
-    );
-    const acc = result.rows[0];
+    const { puterUsername, puterUuid } = req.body;
+    const vps = await vpsPuter(puterUuid, puterUsername);
+    if (!vps.ok) return res.status(vps.status).json(vps.data);
 
-    const sessionToken = crypto.randomBytes(32).toString('hex');
-    activeSessions.set(sessionToken, { discordId: null, username: acc.username, accountId: acc.id, createdAt: Date.now() });
+    const u = extractVpsUser(vps.data);
+    await upsertLocalGameAccount(u);
 
-    res.json({ success: true, sessionToken, user: { id: acc.id, username: acc.username, grudgeId: acc.grudge_id } });
+    res.json({
+      success: true,
+      sessionToken: vps.data.token,
+      token: vps.data.token,
+      user: vps.data.user,
+      grudgeId: u.grudgeId,
+    });
   } catch (err) {
     console.error('[Auth] Puter error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(502).json({ error: 'Auth service unavailable' });
   }
 });
 
+// ── Session verification middleware ────────────────────────────────────────
 function requireSession(req, res, next) {
   const token = req.headers['x-session-token'] || req.body?.sessionToken;
   if (!token) return res.status(401).json({ error: 'Session token required' });
-  const session = activeSessions.get(token);
-  if (!session) return res.status(401).json({ error: 'Invalid session' });
-  const age = Date.now() - session.createdAt;
-  if (age > 7 * 24 * 60 * 60 * 1000) {
-    activeSessions.delete(token);
-    return res.status(401).json({ error: 'Session expired' });
+
+  // Verify JWT (works for both VPS-issued and locally-issued tokens, same JWT_SECRET)
+  const jwtPayload = verifyJWT(token);
+  if (jwtPayload) {
+    // Normalize VPS snake_case to camelCase for downstream routes
+    req.session = {
+      ...jwtPayload,
+      discordId: jwtPayload.discordId || jwtPayload.discord_id,
+      grudgeId: jwtPayload.grudgeId || jwtPayload.grudge_id,
+      accountId: jwtPayload.accountId || null,
+      username: jwtPayload.username,
+    };
+    return next();
   }
-  req.session = session;
-  next();
+
+  return res.status(401).json({ error: 'Invalid or expired session' });
 }
 
 app.get('/api/public/profile', requireSession, async (req, res) => {
@@ -1471,10 +1621,795 @@ if (isProd) {
   }));
 }
 
+// ── Crafting Suite SSO ──────────────────────────────────────────────────────
+const CRAFTING_SUITE_URL = process.env.CRAFTING_SUITE_URL || 'https://grudge-crafting.puter.site';
+const SSO_SECRET = process.env.SSO_SECRET || process.env.SESSION_SECRET || 'grudge-cross-app-sso-secret';
+const SSO_TOKEN_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
+
+function generateSsoSignature(payload) {
+  return crypto.createHmac('sha256', SSO_SECRET).update(payload).digest('hex');
+}
+
+/**
+ * POST /api/crafting/sso-token
+ * Generates a short-lived HMAC-signed SSO token so the player can
+ * open the Crafting Suite and land authenticated with their account.
+ * Requires a valid Discord session (X-Session-Token header).
+ */
+app.post('/api/crafting/sso-token', requireSession, async (req, res) => {
+  try {
+    const { discordId, username } = req.session;
+    const { characterId } = req.body;
+
+    // Try to resolve suite account for richer context
+    let suiteAccountId = null;
+    let grudgeId = null;
+    try {
+      const { suiteQuery, isConnected } = await import('./src/server/suiteDb.js');
+      if (isConnected()) {
+        const result = await suiteQuery(
+          `SELECT id, grudge_id FROM accounts WHERE discord_id = $1`,
+          [discordId]
+        );
+        if (result.rows[0]) {
+          suiteAccountId = result.rows[0].id;
+          grudgeId = result.rows[0].grudge_id;
+        }
+      }
+    } catch (err) {
+      console.warn('[SSO] Suite DB lookup failed (non-fatal):', err.message);
+    }
+
+    const expiresAt = Date.now() + SSO_TOKEN_EXPIRY_MS;
+    const payload = JSON.stringify({
+      discordId,
+      username,
+      suiteAccountId,
+      grudgeId,
+      characterId: characterId || null,
+      expiresAt,
+      source: 'grudge-wars',
+    });
+    const signature = generateSsoSignature(payload);
+    const token = Buffer.from(payload).toString('base64') + '.' + signature;
+
+    const params = new URLSearchParams({ sso_token: token });
+    if (characterId) params.set('characterId', characterId);
+
+    res.json({
+      success: true,
+      token,
+      redirectUrl: `${CRAFTING_SUITE_URL}/?${params.toString()}`,
+      expiresAt,
+    });
+  } catch (err) {
+    console.error('[SSO] Token generation error:', err.message);
+    res.status(500).json({ error: 'Failed to generate SSO token' });
+  }
+});
+
+/**
+ * POST /api/crafting/sso-verify
+ * Allows the Crafting Suite to verify an SSO token server-side.
+ * Called by the Crafting Suite backend to validate tokens it receives.
+ */
+app.post('/api/crafting/sso-verify', async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ valid: false, error: 'Token required' });
+
+    const [payloadB64, signature] = token.split('.');
+    if (!payloadB64 || !signature) {
+      return res.status(400).json({ valid: false, error: 'Invalid token format' });
+    }
+
+    let payload;
+    try {
+      payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString('utf-8'));
+    } catch {
+      return res.status(400).json({ valid: false, error: 'Invalid token payload' });
+    }
+
+    // Verify HMAC signature
+    const expected = generateSsoSignature(JSON.stringify({
+      discordId: payload.discordId,
+      username: payload.username,
+      suiteAccountId: payload.suiteAccountId,
+      grudgeId: payload.grudgeId,
+      characterId: payload.characterId,
+      expiresAt: payload.expiresAt,
+      source: payload.source,
+    }));
+
+    if (expected !== signature) {
+      return res.status(403).json({ valid: false, error: 'Invalid signature' });
+    }
+
+    if (payload.expiresAt < Date.now()) {
+      return res.status(401).json({ valid: false, error: 'Token expired' });
+    }
+
+    res.json({
+      valid: true,
+      discordId: payload.discordId,
+      username: payload.username,
+      suiteAccountId: payload.suiteAccountId,
+      grudgeId: payload.grudgeId,
+      characterId: payload.characterId,
+    });
+  } catch (err) {
+    console.error('[SSO] Token verify error:', err.message);
+    res.status(500).json({ valid: false, error: 'Verification failed' });
+  }
+});
+
+// ── Studio Hub Bridge ────────────────────────────────────────────────────────
+// These routes let the Grudge Studio App (Puter) interact with game data.
+// Auth is either via Discord session (X-Session-Token) or Puter token (X-Puter-Token).
+
+/**
+ * POST /api/studio/account/init
+ * Initialise or fetch the unified Puter KV account record.
+ * Body: { puterId, puterUsername }
+ */
+app.post('/api/studio/account/init', async (req, res) => {
+  try {
+    const { puterId, puterUsername } = req.body;
+    if (!puterId) return res.status(400).json({ error: 'puterId required' });
+    const result = await accountInit(puterId, puterUsername || 'unknown', req);
+    res.json(result);
+  } catch (err) {
+    console.error('[Studio] Account init error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/studio/account/link-discord
+ * Link Discord identity to Puter account. Requires Discord session.
+ */
+app.post('/api/studio/account/link-discord', requireSession, async (req, res) => {
+  try {
+    const { puterId } = req.body;
+    if (!puterId) return res.status(400).json({ error: 'puterId required' });
+    const { discordId, username: discordUsername } = req.session;
+
+    // Try to resolve grudgeId from suite DB
+    let grudgeId = null;
+    try {
+      const { suiteQuery, isConnected } = await import('./src/server/suiteDb.js');
+      if (isConnected()) {
+        const result = await suiteQuery('SELECT grudge_id FROM accounts WHERE discord_id = $1', [discordId]);
+        if (result.rows[0]) grudgeId = result.rows[0].grudge_id;
+      }
+    } catch { /* non-fatal */ }
+
+    const result = await accountLinkDiscord(puterId, discordId, discordUsername, grudgeId, req);
+    res.json(result);
+  } catch (err) {
+    console.error('[Studio] Link discord error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/studio/account/:puterId
+ * Fetch the unified account from Puter KV.
+ */
+app.get('/api/studio/account/:puterId', async (req, res) => {
+  try {
+    const result = await accountGet(req.params.puterId, req);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/studio/characters
+ * Returns characters for the authenticated player.
+ * Resolves identity via Discord session → suite DB → characters.
+ */
+app.get('/api/studio/characters', requireSession, async (req, res) => {
+  try {
+    const { discordId } = req.session;
+    const { suiteQuery, isConnected } = await import('./src/server/suiteDb.js');
+    if (!isConnected()) return res.status(503).json({ error: 'Suite DB not available' });
+
+    const accResult = await suiteQuery('SELECT id, grudge_id FROM accounts WHERE discord_id = $1', [discordId]);
+    if (!accResult.rows[0]) return res.json({ characters: [], linked: false });
+    const accountId = accResult.rows[0].id;
+
+    const charResult = await suiteQuery(
+      `SELECT id, name, race_id, class_id, level, experience, profession,
+              attribute_points, current_health, current_mana, current_stamina,
+              profession_progression, created_at, updated_at
+       FROM characters WHERE account_id = $1 ORDER BY created_at`, [accountId]
+    );
+
+    res.json({
+      characters: charResult.rows.map(c => ({
+        id: c.id, name: c.name, raceId: c.race_id, classId: c.class_id,
+        level: c.level, experience: c.experience, profession: c.profession,
+        attributes: c.attribute_points || {},
+        currentHealth: c.current_health, currentMana: c.current_mana, currentStamina: c.current_stamina,
+        professionProgression: c.profession_progression || {},
+        createdAt: c.created_at, updatedAt: c.updated_at,
+      })),
+      linked: true,
+      grudgeId: accResult.rows[0].grudge_id,
+    });
+  } catch (err) {
+    console.error('[Studio] Characters error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/studio/character/:id/full
+ * Full character data: character + inventory + crafted items + skills + recipes.
+ */
+app.get('/api/studio/character/:id/full', requireSession, async (req, res) => {
+  try {
+    const charId = req.params.id;
+    const { discordId } = req.session;
+    const { suiteQuery, isConnected } = await import('./src/server/suiteDb.js');
+    if (!isConnected()) return res.status(503).json({ error: 'Suite DB not available' });
+
+    // Verify ownership
+    const accResult = await suiteQuery('SELECT id FROM accounts WHERE discord_id = $1', [discordId]);
+    if (!accResult.rows[0]) return res.status(404).json({ error: 'Account not found' });
+    const accountId = accResult.rows[0].id;
+
+    const charResult = await suiteQuery('SELECT * FROM characters WHERE id = $1 AND account_id = $2', [charId, accountId]);
+    if (!charResult.rows[0]) return res.status(404).json({ error: 'Character not found or not owned' });
+    const char = charResult.rows[0];
+
+    // Fetch related data in parallel
+    const [invResult, craftResult, skillResult, recipeResult] = await Promise.all([
+      suiteQuery('SELECT * FROM inventory_items WHERE character_id = $1', [charId]),
+      suiteQuery('SELECT * FROM crafted_items WHERE character_id = $1', [charId]),
+      suiteQuery('SELECT * FROM unlocked_skills WHERE character_id = $1', [charId]),
+      suiteQuery('SELECT * FROM unlocked_recipes WHERE character_id = $1', [charId]),
+    ]);
+
+    res.json({
+      character: {
+        id: char.id, name: char.name, raceId: char.race_id, classId: char.class_id,
+        level: char.level, experience: char.experience, gold: char.gold,
+        profession: char.profession,
+        attributes: char.attribute_points || {},
+        equipment: char.equipment || {},
+        currentHealth: char.current_health, currentMana: char.current_mana, currentStamina: char.current_stamina,
+        professionProgression: char.profession_progression || {},
+      },
+      inventory: invResult.rows.map(i => ({
+        id: i.id, itemKey: i.item_key || i.item_name, itemType: i.item_type,
+        tier: i.tier, quantity: i.quantity, equipped: i.equipped, stats: i.stats || {},
+      })),
+      craftedItems: craftResult.rows.map(c => ({
+        id: c.id, itemName: c.item_name, profession: c.profession,
+        tier: c.tier, equipped: c.equipped, itemType: c.item_type,
+      })),
+      skills: skillResult.rows.map(s => ({
+        id: s.id, nodeId: s.node_id, profession: s.profession,
+        skillName: s.skill_name, tier: s.tier,
+      })),
+      recipes: recipeResult.rows.map(r => ({
+        id: r.id, recipeId: r.recipe_id, source: r.source,
+      })),
+    });
+  } catch (err) {
+    console.error('[Studio] Character full error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/studio/character/:id/sync
+ * Sync hero state from GrudgeWars back to the Crafting Suite character.
+ * Body: { level, experience, attributes, currentHealth, currentMana, currentStamina }
+ */
+app.post('/api/studio/character/:id/sync', requireSession, async (req, res) => {
+  try {
+    const charId = req.params.id;
+    const { discordId } = req.session;
+    const { suiteQuery, isConnected } = await import('./src/server/suiteDb.js');
+    if (!isConnected()) return res.status(503).json({ error: 'Suite DB not available' });
+
+    // Verify ownership
+    const accResult = await suiteQuery('SELECT id FROM accounts WHERE discord_id = $1', [discordId]);
+    if (!accResult.rows[0]) return res.status(404).json({ error: 'Account not found' });
+    const accountId = accResult.rows[0].id;
+
+    const charCheck = await suiteQuery('SELECT id FROM characters WHERE id = $1 AND account_id = $2', [charId, accountId]);
+    if (!charCheck.rows[0]) return res.status(404).json({ error: 'Character not found or not owned' });
+
+    const { level, experience, attributes, currentHealth, currentMana, currentStamina } = req.body;
+    const updates = [];
+    const params = [];
+    let idx = 1;
+
+    if (level !== undefined) { updates.push(`level = $${idx++}`); params.push(level); }
+    if (experience !== undefined) { updates.push(`experience = $${idx++}`); params.push(experience); }
+    if (attributes !== undefined) { updates.push(`attribute_points = $${idx++}`); params.push(JSON.stringify(attributes)); }
+    if (currentHealth !== undefined) { updates.push(`current_health = $${idx++}`); params.push(currentHealth); }
+    if (currentMana !== undefined) { updates.push(`current_mana = $${idx++}`); params.push(currentMana); }
+    if (currentStamina !== undefined) { updates.push(`current_stamina = $${idx++}`); params.push(currentStamina); }
+
+    if (updates.length === 0) return res.json({ success: true, changed: false });
+
+    updates.push(`updated_at = NOW()`);
+    params.push(charId, accountId);
+    await suiteQuery(
+      `UPDATE characters SET ${updates.join(', ')} WHERE id = $${idx++} AND account_id = $${idx++}`,
+      params
+    );
+
+    res.json({ success: true, changed: true });
+  } catch (err) {
+    console.error('[Studio] Character sync error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/studio/crafting/jobs
+ * Active crafting queue for authenticated player.
+ */
+app.get('/api/studio/crafting/jobs', requireSession, async (req, res) => {
+  try {
+    const { discordId } = req.session;
+    const { suiteQuery, isConnected } = await import('./src/server/suiteDb.js');
+    if (!isConnected()) return res.status(503).json({ error: 'Suite DB not available' });
+
+    const accResult = await suiteQuery('SELECT id FROM accounts WHERE discord_id = $1', [discordId]);
+    if (!accResult.rows[0]) return res.json({ jobs: [] });
+
+    const jobResult = await suiteQuery(
+      `SELECT cj.*, c.name as character_name FROM crafting_jobs cj
+       JOIN characters c ON c.id = cj.character_id
+       WHERE c.account_id = $1 ORDER BY cj.started_at DESC LIMIT 50`, [accResult.rows[0].id]
+    );
+
+    const now = Date.now();
+    res.json({
+      jobs: jobResult.rows.map(j => ({
+        id: j.id, recipeId: j.recipe_id, characterId: j.character_id,
+        characterName: j.character_name, quantity: j.quantity,
+        status: j.status, startedAt: j.started_at,
+        completesAt: j.completes_at,
+        isReady: j.status === 'pending' && new Date(j.completes_at).getTime() <= now,
+      })),
+    });
+  } catch (err) {
+    console.error('[Studio] Crafting jobs error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/studio/crafting/claim
+ * Claim a completed crafting job remotely.
+ * Body: { jobId }
+ */
+app.post('/api/studio/crafting/claim', requireSession, async (req, res) => {
+  try {
+    const { jobId } = req.body;
+    if (!jobId) return res.status(400).json({ error: 'jobId required' });
+    const { discordId } = req.session;
+    const { suiteQuery, isConnected } = await import('./src/server/suiteDb.js');
+    if (!isConnected()) return res.status(503).json({ error: 'Suite DB not available' });
+
+    // Verify ownership through account → character → job
+    const accResult = await suiteQuery('SELECT id FROM accounts WHERE discord_id = $1', [discordId]);
+    if (!accResult.rows[0]) return res.status(404).json({ error: 'Account not found' });
+
+    const jobResult = await suiteQuery(
+      `SELECT cj.* FROM crafting_jobs cj
+       JOIN characters c ON c.id = cj.character_id
+       WHERE cj.id = $1 AND c.account_id = $2`, [jobId, accResult.rows[0].id]
+    );
+    if (!jobResult.rows[0]) return res.status(404).json({ error: 'Job not found or not owned' });
+
+    const job = jobResult.rows[0];
+    if (job.status === 'claimed') return res.status(400).json({ error: 'Already claimed' });
+    if (new Date(job.completes_at).getTime() > Date.now()) return res.status(400).json({ error: 'Not yet complete' });
+
+    await suiteQuery(
+      `UPDATE crafting_jobs SET status = 'claimed', claimed_at = NOW() WHERE id = $1`, [jobId]
+    );
+
+    res.json({ success: true, jobId });
+  } catch (err) {
+    console.error('[Studio] Crafting claim error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// NOTE: /api/studio/sync/push and /pull are handled by the DB-backed routes above (lines ~1456/1484).
+// Puter KV sync is available via /api/studio/puter/push and /api/studio/puter/pull if needed.
+
+// ── Studio: User Archive ─────────────────────────────────────────────────────
+import { archiveSnapshot, listArchives, restoreArchive } from './api/lib/puter-service.js';
+
+app.post('/api/studio/archive', requireSession, async (req, res) => {
+  try {
+    const accountId = req.session.discordId;
+    const puterToken = req.headers['x-puter-token'];
+    if (!puterToken) return res.status(400).json({ error: 'X-Puter-Token required' });
+
+    const current = await syncPull(accountId, puterToken);
+    if (!current.ok || !current.value) {
+      return res.status(404).json({ error: 'No save data to archive' });
+    }
+
+    const result = await archiveSnapshot(accountId, current.value, req.body.reason || 'manual', puterToken);
+    res.json(result);
+  } catch (err) {
+    console.error('[Archive] Create error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/studio/archives', requireSession, async (req, res) => {
+  try {
+    const accountId = req.session.discordId;
+    const puterToken = req.headers['x-puter-token'];
+    if (!puterToken) return res.status(400).json({ error: 'X-Puter-Token required' });
+
+    const result = await listArchives(accountId, puterToken);
+    res.json(result);
+  } catch (err) {
+    console.error('[Archive] List error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/studio/archive/restore', requireSession, async (req, res) => {
+  try {
+    const { timestamp } = req.body;
+    if (!timestamp) return res.status(400).json({ error: 'timestamp required' });
+
+    const accountId = req.session.discordId;
+    const puterToken = req.headers['x-puter-token'];
+    if (!puterToken) return res.status(400).json({ error: 'X-Puter-Token required' });
+
+    const result = await restoreArchive(accountId, timestamp, puterToken);
+    res.json(result);
+  } catch (err) {
+    console.error('[Archive] Restore error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/studio/saves
+ * List all save keys for the player.
+ */
+app.get('/api/studio/saves', async (req, res) => {
+  try {
+    const result = await kvList('grudge:save:*', req);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/studio/health
+ * Health check for Puter KV + Suite DB connectivity.
+ */
+app.get('/api/studio/health', async (req, res) => {
+  try {
+    const puterStatus = await puterHealthCheck();
+    let suiteStatus = { available: false };
+    try {
+      const { isConnected } = await import('./src/server/suiteDb.js');
+      suiteStatus = { available: isConnected() };
+    } catch { /* non-fatal */ }
+
+    res.json({
+      puter: puterStatus,
+      suiteDb: suiteStatus,
+      server: { status: 'ok', uptime: process.uptime() },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+console.log('[Server] Studio Hub bridge routes registered');
+
+// ── S3 Asset Storage ────────────────────────────────────────────────────────
+(function registerS3Routes() {
+  const adminCheck = (req, res, next) => {
+    const auth = req.headers['x-admin-token'];
+    const tok = (process.env.GAME_API_GRUDA || '').trim();
+    if (!auth || !tok || auth !== tok) return res.status(403).json({ error: 'Unauthorized' });
+    next();
+  };
+
+  app.get('/api/assets/status', async (req, res) => {
+    if (!S3.isConfigured()) return res.json({ configured: false });
+    try {
+      await S3.list('', 1);
+      res.json({ configured: true, reachable: true, bucket: process.env.BUCKET_NAME });
+    } catch (err) {
+      res.json({ configured: true, reachable: false, error: err.message });
+    }
+  });
+
+  app.get('/api/assets/list', adminCheck, async (req, res) => {
+    try {
+      const { prefix = '', max = '1000', token } = req.query;
+      const result = await S3.list(prefix, Math.min(parseInt(max) || 1000, 1000), token || undefined);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/assets/url/{*key}', async (req, res) => {
+    try {
+      const key = req.params.key;
+      if (!key) return res.status(400).json({ error: 'key required' });
+      const url = await S3.presignedDownloadUrl(key);
+      res.json({ url, key, expiresIn: 3600 });
+    } catch (err) {
+      res.status(err.name === 'NoSuchKey' ? 404 : 500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/assets/presign', adminCheck, async (req, res) => {
+    try {
+      const { key, contentType = 'application/octet-stream', expiresIn = 3600 } = req.body;
+      if (!key) return res.status(400).json({ error: 'key required' });
+      const result = await S3.presignedUploadUrl(key, contentType, Math.min(expiresIn, 86400));
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/assets/meta/{*key}', async (req, res) => {
+    try {
+      const key = req.params.key;
+      if (!key) return res.status(400).json({ error: 'key required' });
+      const meta = await S3.head(key);
+      res.json(meta);
+    } catch (err) {
+      res.status(err.name === 'NotFound' ? 404 : 500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/assets/copy', adminCheck, async (req, res) => {
+    try {
+      const { source, dest } = req.body;
+      if (!source || !dest) return res.status(400).json({ error: 'source and dest required' });
+      const result = await S3.copy(source, dest);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.delete('/api/assets/{*key}', adminCheck, async (req, res) => {
+    try {
+      const key = req.params.key;
+      if (!key) return res.status(400).json({ error: 'key required' });
+      await S3.remove(key);
+      res.json({ deleted: true, key });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  console.log('[Server] S3 asset routes registered');
+})();
+
 registerDbRoutes(app);
 registerWalletRoutes(app, requireSession);
 registerCraftingRoutes(app);
 console.log('[Server] Crafting routes registered');
+
+// ────────────────────────────────────────────────────────────────────
+// GRUDGE ENGINE ROUTES
+// All routes below proxy to api.grudge-studio.com via backendProxy.
+// requireUserAuth verifies grudge_auth_token via id.grudge-studio.com.
+// ────────────────────────────────────────────────────────────────────
+
+// Auth middleware — verifies Bearer token against id.grudge-studio.com
+async function requireUserAuth(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  const token = auth.slice(7);
+  const user = await verifyBackendToken(token);
+  if (!user) return res.status(401).json({ error: 'Invalid or expired token' });
+  req.grudgeUser = user;
+  next();
+}
+
+// ── Characters ────────────────────────────────────────────────────────────
+app.get('/api/characters', requireUserAuth, rateLimiter(60), (req, res) =>
+  proxyToBackend('/api/characters', req, res, { passQuery: true }));
+
+// Character creation: validate body + enforce slot cap
+app.post('/api/characters', requireUserAuth, rateLimiter(20), async (req, res) => {
+  const validationError = validateCharacterBody(req.body);
+  if (validationError) return res.status(400).json({ error: validationError });
+
+  // Enforce 15-character slot cap
+  try {
+    const upstream = await fetch(`${process.env.GRUDGE_API_URL || 'https://api.grudge-studio.com'}/api/characters`, {
+      headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (upstream.ok) {
+      const data = await upstream.json();
+      const count = (data.characters || []).length;
+      if (count >= MAX_CHARACTERS) {
+        return res.status(400).json({
+          error: `Character limit reached (${MAX_CHARACTERS} max). Delete a character to create a new one.`,
+          count, max: MAX_CHARACTERS,
+        });
+      }
+    }
+  } catch { /* best-effort — let backend handle it if check fails */ }
+
+  return proxyToBackend('/api/characters', req, res);
+});
+
+app.get('/api/characters/:id', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}`, req, res));
+
+app.patch('/api/characters/:id', requireUserAuth, rateLimiter(20), (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}`, req, res));
+
+app.delete('/api/characters/:id', requireUserAuth, async (req, res) => {
+  auditLog('character.delete', req.grudgeUser?.grudgeId, { characterId: req.params.id });
+  return proxyToBackend(`/api/characters/${req.params.id}`, req, res);
+});
+
+// ── Inventory ────────────────────────────────────────────────────────────
+app.get('/api/characters/:id/inventory', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}/inventory`, req, res, { passQuery: true }));
+
+app.post('/api/characters/:id/inventory', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}/inventory`, req, res));
+
+app.patch('/api/inventory/:itemId', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/inventory/${req.params.itemId}`, req, res));
+
+app.delete('/api/inventory/:itemId', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/inventory/${req.params.itemId}`, req, res));
+
+// Equip / unequip — atomic slot operation
+app.post('/api/characters/:id/equip', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/characters/${req.params.id}/equip`, req, res));
+
+// ── Cloud sync ───────────────────────────────────────────────────────────
+app.post('/api/studio/sync/push', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/studio/sync/push', req, res));
+
+app.post('/api/studio/sync/pull', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/studio/sync/pull', req, res));
+
+// ── Economy ───────────────────────────────────────────────────────────────
+app.get('/api/economy/balance', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/economy/balance', req, res));
+
+app.post('/api/economy/transfer', requireUserAuth, rateLimiter(5), (req, res) => {
+  const { toAddress, amount, currency } = req.body || {};
+  auditLog('economy.transfer', req.grudgeUser?.grudgeId, { toAddress, amount, currency });
+  return proxyToBackend('/api/economy/transfer', req, res);
+});
+
+// ── Crafting (public recipes, gated craft action) ───────────────────────────
+app.get('/api/crafting/recipes', (req, res) =>
+  proxyToBackend('/api/crafting/recipes', req, res, { passQuery: true }));
+
+app.get('/api/crafting/professions/:grudgeId', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/crafting/professions/${req.params.grudgeId}`, req, res));
+
+app.post('/api/crafting/craft', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/crafting/craft', req, res));
+
+// ── Missions ──────────────────────────────────────────────────────────────
+app.get('/api/missions', requireUserAuth, (req, res) =>
+  proxyToBackend('/api/missions', req, res));
+
+app.post('/api/missions/:id/complete', requireUserAuth, (req, res) =>
+  proxyToBackend(`/api/missions/${req.params.id}/complete`, req, res));
+
+// ── Battle Engine — server-authoritative session state ────────────────────
+// In-memory battle sessions. Each session is keyed by a battle ID.
+// This is the foundation for server-authoritative combat.
+const battleSessions = new Map();
+
+app.post('/api/battle/start', requireUserAuth, (req, res) => {
+  const { characters, mode, opponentId } = req.body;
+  if (!characters || !Array.isArray(characters) || characters.length === 0) {
+    return res.status(400).json({ error: 'characters array required' });
+  }
+  const battleId = crypto.randomBytes(16).toString('hex');
+  const session = {
+    battleId,
+    grudgeId: req.grudgeUser.grudgeId,
+    mode: mode || 'pve',
+    opponentId: opponentId || null,
+    characters,
+    actions: [],
+    state: 'active',
+    startedAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  battleSessions.set(battleId, session);
+  console.log(`[Battle] Started ${battleId} for ${req.grudgeUser.grudgeId} (${mode || 'pve'})`);
+  res.json({ success: true, battleId, state: 'active' });
+});
+
+app.post('/api/battle/:battleId/action', requireUserAuth, (req, res) => {
+  const session = battleSessions.get(req.params.battleId);
+  if (!session) return res.status(404).json({ error: 'Battle session not found' });
+  if (session.grudgeId !== req.grudgeUser.grudgeId) {
+    return res.status(403).json({ error: 'Not your battle session' });
+  }
+  if (session.state !== 'active') {
+    return res.status(400).json({ error: 'Battle is not active' });
+  }
+  const { action, actorId, targetId, abilityId } = req.body;
+  if (!action || !actorId) return res.status(400).json({ error: 'action and actorId required' });
+
+  const record = { action, actorId, targetId, abilityId, ts: Date.now() };
+  session.actions.push(record);
+  session.updatedAt = Date.now();
+
+  res.json({ success: true, battleId: session.battleId, action: record, actionCount: session.actions.length });
+});
+
+app.post('/api/battle/:battleId/end', requireUserAuth, async (req, res) => {
+  const session = battleSessions.get(req.params.battleId);
+  if (!session) return res.status(404).json({ error: 'Battle session not found' });
+  if (session.grudgeId !== req.grudgeUser.grudgeId) {
+    return res.status(403).json({ error: 'Not your battle session' });
+  }
+  const { result, rewards } = req.body; // result: 'win' | 'loss' | 'draw'
+  session.state = 'ended';
+  session.result = result || 'unknown';
+  session.rewards = rewards || null;
+  session.endedAt = Date.now();
+
+  // Persist result to backend (fire-and-forget)
+  proxyToBackend('/api/battles/record', req, { status: () => ({ json: () => {} }), setHeader: () => {} }, {
+    method: 'POST',
+    extraHeaders: { 'X-Battle-Id': session.battleId },
+  }).catch(() => {});
+
+  console.log(`[Battle] Ended ${session.battleId}: ${result}`);
+
+  // Clean up after 5 minutes
+  setTimeout(() => battleSessions.delete(session.battleId), 5 * 60 * 1000);
+
+  res.json({
+    success: true, battleId: session.battleId,
+    result: session.result, durationMs: session.endedAt - session.startedAt,
+    actionCount: session.actions.length,
+  });
+});
+
+app.get('/api/battle/:battleId', requireUserAuth, (req, res) => {
+  const session = battleSessions.get(req.params.battleId);
+  if (!session) return res.status(404).json({ error: 'Battle session not found' });
+  if (session.grudgeId !== req.grudgeUser.grudgeId) {
+    return res.status(403).json({ error: 'Not your battle session' });
+  }
+  res.json(session);
+});
+
+console.log('[Server] Grudge Engine routes registered (characters, inventory, sync, economy, battle)');
 
 if (isProd) {
   const htmlPages = ['compendium', 'arena', 'discordauth', 'hero-codex'];
@@ -1498,11 +2433,29 @@ app.use((err, req, res, next) => {
 });
 
 (async () => {
-  const connected = await testConnection();
-  if (connected) await initDatabase();
-  // Test suite DB connection (crafting/inventory integration)
-  await testSuiteConnection();
-  await startBot();
+  // Legacy Neon DB connections — wrap gracefully.
+  // These may fail if Neon is decommissioned; engine routes still work.
+  try {
+    const connected = await testConnection();
+    if (connected) {
+      await initDatabase();
+      console.log('[Server] Legacy DB connected');
+    } else {
+      console.warn('[Server] Legacy DB not available — engine routes still operational via api.grudge-studio.com');
+    }
+  } catch (err) {
+    console.warn('[Server] Legacy DB init failed (non-fatal):', err.message);
+  }
+  try {
+    await testSuiteConnection();
+  } catch (err) {
+    console.warn('[Server] Suite DB init failed (non-fatal):', err.message);
+  }
+  try {
+    await startBot(new Map(), []);
+  } catch (err) {
+    console.warn('[Server] Discord bot init failed (non-fatal):', err.message);
+  }
 })();
 
 const server = app.listen(PORT, '0.0.0.0', () => {

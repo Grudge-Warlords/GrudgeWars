@@ -1,7 +1,8 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import useGameStore, { getHeroStatsWithBonuses } from '../stores/gameStore';
 import { classDefinitions } from '../data/classes';
 import { raceDefinitions } from '../data/races';
+import { API_BASE } from '../utils/apiBase.js';
 import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite, namedHeroes } from '../data/spriteMap';
 import { locations } from '../data/enemies';
@@ -469,10 +470,112 @@ function EditorWrapper({ children }) {
   );
 }
 
+// ── Auth constants ──────────────────────────────────────────────────────────
+const VPS_AUTH = 'https://id.grudge-studio.com';
+const ADMIN_USERNAMES = ['admin', 'grudgewarlord', 'outapps', 'grudachain', 'racalvin'];
+
+// ── Studio Services config ──────────────────────────────────────────────────
+const STUDIO_SERVICES = [
+  { key: 'id', label: 'Identity API', url: 'https://id.grudge-studio.com', health: 'https://id.grudge-studio.com/health', color: '#f59e0b' },
+  { key: 'api', label: 'Game API', url: 'https://api.grudge-studio.com', health: 'https://api.grudge-studio.com/health', color: '#ef4444' },
+  { key: 'account', label: 'Account API', url: 'https://account.grudge-studio.com', health: 'https://account.grudge-studio.com/health', color: '#3b82f6' },
+  { key: 'ws', label: 'WebSocket', url: 'https://ws.grudge-studio.com', health: 'https://ws.grudge-studio.com/health', color: '#8b5cf6' },
+  { key: 'assets', label: 'Asset CDN', url: 'https://assets.grudge-studio.com', health: 'https://assets.grudge-studio.com/health', color: '#06b6d4' },
+  { key: 'launcher', label: 'Launcher', url: 'https://launcher.grudge-studio.com', health: 'https://launcher.grudge-studio.com/health', color: '#10b981' },
+];
+
+const STUDIO_LINKS = [
+  { label: 'Dashboard', url: 'https://dash.grudge-studio.com', icon: '📊' },
+  { label: 'Client Portal', url: 'https://client.grudge-studio.com', icon: '🖥️' },
+  { label: 'The Engine', url: 'https://the-engine-grudgenexus.vercel.app', icon: '🎮' },
+  { label: 'Crafting Suite', url: 'https://warlord-crafting-suite.vercel.app', icon: '⚗️' },
+  { label: 'Object Store', url: 'https://molochdagod.github.io/ObjectStore', icon: '📦' },
+  { label: 'GrudaChain', url: 'https://grudachain-rho.vercel.app', icon: '⛓️' },
+  { label: 'Status Page', url: 'https://grudge-studio.com/landing#status', icon: '📡' },
+  { label: 'API Docs', url: 'https://grudge-studio.com/api/docs.json', icon: '📄' },
+  { label: 'Admin (Studio)', url: 'https://grudge-studio.com/admin', icon: '🔧' },
+  { label: 'Wallet', url: 'https://wallet.grudge-studio.com', icon: '💰' },
+];
+
 export default function AdminDashboard() {
   const state = useGameStore();
   const [expandedHero, setExpandedHero] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+
+  // ── Auth gate ─────────────────────────────────────────────────────────────
+  const [authState, setAuthState] = useState('checking'); // 'checking' | 'ok' | 'denied'
+  const [adminUser, setAdminUser] = useState(null);
+  const [serviceHealth, setServiceHealth] = useState({});
+
+  useEffect(() => {
+    const token = localStorage.getItem('grudge_session_token') || localStorage.getItem('grudge_auth_token');
+    if (!token) { setAuthState('denied'); return; }
+
+    // Verify token with VPS
+    fetch(`${VPS_AUTH}/auth/user`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => {
+        setAdminUser(data);
+        setAuthState('ok');
+      })
+      .catch(() => {
+        // Try local verify as fallback
+        fetch(`${API_BASE}/api/auth/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionToken: token }),
+        })
+          .then(r => r.json())
+          .then(d => {
+            if (d.valid) {
+              setAdminUser({ username: d.username, grudgeId: d.grudgeId });
+              setAuthState('ok');
+            } else { setAuthState('denied'); }
+          })
+          .catch(() => setAuthState('denied'));
+      });
+  }, []);
+
+  // ── Health checks ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (authState !== 'ok') return;
+    const checkAll = () => {
+      STUDIO_SERVICES.forEach(svc => {
+        const start = Date.now();
+        fetch(svc.health, { signal: AbortSignal.timeout(5000) })
+          .then(r => r.ok ? r.json() : Promise.reject())
+          .then(() => setServiceHealth(prev => ({ ...prev, [svc.key]: { status: 'ok', latency: Date.now() - start } })))
+          .catch(() => setServiceHealth(prev => ({ ...prev, [svc.key]: { status: 'down', latency: null } })));
+      });
+    };
+    checkAll();
+    const iv = setInterval(checkAll, 30000);
+    return () => clearInterval(iv);
+  }, [authState]);
+
+  // ── Auth gate UI ──────────────────────────────────────────────────────────
+  if (authState === 'checking') {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0a14', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffd700', fontFamily: "'Cinzel', serif" }}>
+        Verifying admin access...
+      </div>
+    );
+  }
+  if (authState === 'denied') {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0a14', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, color: '#e2e8f0', fontFamily: "'Jost', sans-serif" }}>
+        <div style={{ fontFamily: "'Cinzel', serif", color: '#ffd700', fontSize: '1.5rem' }}>Admin Access Required</div>
+        <div style={{ color: '#6b7280', fontSize: '0.85rem' }}>Sign in with a Grudge ID to access the admin dashboard.</div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+          <a href="/" style={{ padding: '10px 20px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#ffd700', textDecoration: 'none', fontWeight: 600 }}>Back to Game</a>
+          <button onClick={() => { window.location.href = `${VPS_AUTH}/auth/discord?redirect_uri=${encodeURIComponent(window.location.href)}`; }} style={{ padding: '10px 20px', background: '#5865F222', border: '1px solid #5865F255', borderRadius: 6, color: '#7289da', cursor: 'pointer', fontWeight: 600 }}>Sign in with Discord</button>
+          <button onClick={() => { window.location.href = `${VPS_AUTH}/auth/google?redirect_uri=${encodeURIComponent(window.location.href)}`; }} style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 6, color: '#e2e8f0', cursor: 'pointer', fontWeight: 600 }}>Sign in with Google</button>
+        </div>
+      </div>
+    );
+  }
 
   const {
     heroRoster, activeHeroIds, level, gold, xp, xpToNext,
@@ -492,6 +595,7 @@ export default function AdminDashboard() {
 
   const infoTabs = [
     { id: 'overview', label: 'Overview', color: '#ffd700' },
+    { id: 'studio', label: 'Studio', color: '#DB6331' },
     { id: 'heroes', label: 'Characters (24)', color: '#3b82f6' },
     { id: 'world', label: 'World', color: '#22c55e' },
     { id: 'systems', label: 'Systems', color: '#8b5cf6' },
@@ -590,13 +694,24 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <a href="/" style={{
-          color: '#ffd700', textDecoration: 'none', fontWeight: 600, fontSize: '0.7rem',
-          padding: '4px 12px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)',
-          borderRadius: 6, flexShrink: 0,
-        }}>
-          Back to Game
-        </a>
+        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+          <a href="https://the-engine-grudgenexus.vercel.app" target="_blank" rel="noopener noreferrer" style={{
+            color: '#0a0a12', textDecoration: 'none', fontWeight: 700, fontSize: '0.7rem',
+            padding: '5px 14px', background: 'linear-gradient(135deg, #DB6331, #FAAC47)',
+            border: 'none', borderRadius: 6,
+            display: 'flex', alignItems: 'center', gap: 5,
+            boxShadow: '0 2px 10px rgba(219,99,49,0.3)',
+          }}>
+            🎮 Open Engine
+          </a>
+          <a href="/" style={{
+            color: '#ffd700', textDecoration: 'none', fontWeight: 600, fontSize: '0.7rem',
+            padding: '4px 12px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)',
+            borderRadius: 6,
+          }}>
+            Back to Game
+          </a>
+        </div>
       </div>
 
       {isEditorTab ? (
@@ -605,6 +720,78 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px', position: 'relative', zIndex: 10 }}>
+
+          {/* STUDIO SERVICES TAB */}
+          {activeTab === 'studio' && (
+            <div>
+              {/* Admin user info */}
+              {adminUser && (
+                <div style={{
+                  background: 'rgba(20,15,30,0.5)', border: '1px solid rgba(255,215,0,0.12)',
+                  borderRadius: 10, padding: 16, marginBottom: 20,
+                  display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap',
+                }}>
+                  <div style={{ fontFamily: "'Cinzel', serif", color: '#ffd700', fontSize: '1rem', fontWeight: 700 }}>
+                    {adminUser.displayName || adminUser.username}
+                  </div>
+                  <span style={{ fontSize: '0.6rem', color: '#6ee7b7', background: 'rgba(110,231,183,0.1)', padding: '2px 8px', borderRadius: 4 }}>
+                    {adminUser.grudgeId || adminUser.grudge_id || 'Admin'}
+                  </span>
+                  {adminUser.serverWalletAddress && (
+                    <span style={{ fontSize: '0.55rem', color: '#a78bfa', background: 'rgba(167,139,250,0.08)', padding: '2px 8px', borderRadius: 4, fontFamily: 'monospace' }}>
+                      ◎ {adminUser.serverWalletAddress.slice(0,8)}...
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Service Health */}
+              <div style={{ fontSize: '0.65rem', color: '#8a7d65', textTransform: 'uppercase', marginBottom: 12 }}>Backend Services</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10, marginBottom: 24 }}>
+                {STUDIO_SERVICES.map(svc => {
+                  const h = serviceHealth[svc.key];
+                  const ok = h?.status === 'ok';
+                  return (
+                    <a key={svc.key} href={svc.url} target="_blank" rel="noopener noreferrer" style={{
+                      textDecoration: 'none',
+                      background: ok ? 'rgba(34,197,94,0.04)' : 'rgba(239,68,68,0.04)',
+                      border: `1px solid ${ok ? 'rgba(34,197,94,0.2)' : h ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                      borderRadius: 8, padding: '14px 16px',
+                      transition: 'border-color 0.2s',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: svc.color }}>{svc.label}</span>
+                        <span style={{
+                          width: 8, height: 8, borderRadius: '50%',
+                          background: ok ? '#22c55e' : h ? '#ef4444' : '#6b7280',
+                          boxShadow: ok ? '0 0 6px #22c55e' : h ? '0 0 6px #ef4444' : 'none',
+                        }} />
+                      </div>
+                      <div style={{ fontSize: '0.6rem', color: '#6b7280', fontFamily: 'monospace' }}>
+                        {ok ? `${h.latency}ms` : h ? 'DOWN' : 'checking...'}
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+
+              {/* Studio Quick Links */}
+              <div style={{ fontSize: '0.65rem', color: '#8a7d65', textTransform: 'uppercase', marginBottom: 12 }}>Studio Tools & Apps</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
+                {STUDIO_LINKS.map(link => (
+                  <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer" style={{
+                    display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+                    background: 'rgba(20,15,30,0.5)', border: '1px solid rgba(255,215,0,0.1)',
+                    borderRadius: 8, textDecoration: 'none', color: '#e2e8f0',
+                    fontSize: '0.75rem', fontWeight: 500, transition: 'all 0.15s',
+                  }}>
+                    <span style={{ fontSize: '1.1rem' }}>{link.icon}</span>
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           {activeTab === 'overview' && (
             <div>

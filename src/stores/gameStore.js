@@ -14,6 +14,8 @@ import { getSavedBattleRow, getSavedBattleColumn } from '../utils/battlePosition
 import { adminConfig } from '../utils/adminConfig';
 import { TOTEM_DEFINITIONS, COMPANION_DEFINITIONS, namedHeroes } from '../data/spriteMap';
 import { schedulePush, isLoggedIn as cloudIsLoggedIn } from '../services/cloudSync';
+import { API_BASE } from '../utils/apiBase.js';
+import grudgeApi from '../services/grudgeApi.js';
 
 function floorTo2(n) { return Math.floor(n * 100) / 100; }
 
@@ -456,11 +458,11 @@ const useGameStore = create(persist((set, get) => ({
   shopLastRefresh: 0,
   pendingLoot: [],
   harvestNodes: [
-    { id: 'gold_mine', name: 'Gold Mine', icon: 'pickaxe', resource: 'gold', baseRate: 3, unlockLevel: 1 },
-    { id: 'herb_garden', name: 'Herb Garden', icon: 'nature', resource: 'herbs', baseRate: 2, unlockLevel: 2 },
-    { id: 'lumber_yard', name: 'Lumber Yard', icon: 'wood', resource: 'wood', baseRate: 2, unlockLevel: 3 },
-    { id: 'ore_vein', name: 'Ore Vein', icon: 'ore', resource: 'ore', baseRate: 1, unlockLevel: 5 },
-    { id: 'crystal_cave', name: 'Crystal Cave', icon: 'diamond', resource: 'crystals', baseRate: 1, unlockLevel: 8 },
+    { id: 'gold_mine', name: 'Gold Mine', icon: 'pickaxe', resource: 'gold', baseRate: 1.5, unlockLevel: 1 },
+    { id: 'herb_garden', name: 'Herb Garden', icon: 'nature', resource: 'herbs', baseRate: 1, unlockLevel: 2 },
+    { id: 'lumber_yard', name: 'Lumber Yard', icon: 'wood', resource: 'wood', baseRate: 1, unlockLevel: 3 },
+    { id: 'ore_vein', name: 'Ore Vein', icon: 'ore', resource: 'ore', baseRate: 0.5, unlockLevel: 5 },
+    { id: 'crystal_cave', name: 'Crystal Cave', icon: 'diamond', resource: 'crystals', baseRate: 0.5, unlockLevel: 8 },
   ],
   activeHarvests: {},
   heroExpeditions: {},
@@ -482,6 +484,14 @@ const useGameStore = create(persist((set, get) => ({
   sceneReturnTo: null,
   dungeonProgress: null,
 
+  // ── Home Island State ──
+  islandBuildings: [],       // { id, type, gridX, gridY, level, hp, maxHp }
+  islandHeroes: [],          // { heroId, buildingId, deployedAt }
+  islandTerrain: null,       // generated once, persisted
+  islandResources: { gold: 0, wood: 0, stone: 0, ore: 0, food: 0, crystals: 0 },
+  islandLastTick: Date.now(),
+  islandBuildingNextId: 1,
+
   // ── Warlord-Crafting-Suite Integration State ──
   suiteLinked: false,
   suiteAccountId: null,
@@ -497,6 +507,17 @@ const useGameStore = create(persist((set, get) => ({
   suiteProfessions: {},    // { characterId: { Miner: {level,xp}, Forester: ... } }
   suiteCharacters: [],     // characters from suite DB
   suiteSyncError: null,
+
+  // ── AFK Harvest Assignments (server-persisted) ──
+  afkHarvestAssignments: {},  // { heroId: { buildingType, startedAt, rates } }
+  afkHarvestLastSync: 0,
+
+  // ── Backend Account State ──
+  // These are populated by loadAccountData() after login.
+  // They are NOT persisted locally — always fetched from the backend.
+  backendSynced: false,
+  accountBalance: null,       // { gold, gbux, walletAddress }
+  lastBackendSync: 0,
 
   setScreen: (screen) => set({ screen }),
 
@@ -649,6 +670,10 @@ const useGameStore = create(persist((set, get) => ({
       equipment: equip,
       abilityLoadout: hero.abilityLoadout || getDefaultLoadout(hero.classId, equip?.weapon?.weaponType),
     };
+    // Persist to backend (non-blocking, offline-safe)
+    if (!heroWithSkills.backendId && !heroWithSkills.source) {
+      setTimeout(() => get().createHeroOnBackend(heroWithSkills.id), 500);
+    }
     const newRoster = [...state.heroRoster, heroWithSkills];
     const newActiveIds = state.activeHeroIds.length < 3
       ? [...state.activeHeroIds, heroWithSkills.id]
@@ -678,6 +703,230 @@ const useGameStore = create(persist((set, get) => ({
         heroCreationPending: false,
         screen: 'world',
       });
+    }
+  },
+
+  importWcsHero: (wcsChar) => {
+    const state = get();
+    const heroId = `wcs_${wcsChar.id}`;
+
+    // Prevent duplicate imports
+    if (state.heroRoster.some(h => h.id === heroId)) {
+      return { success: false, reason: 'already_imported' };
+    }
+
+    // Validate race/class — fall back to human/warrior if WCS uses unknown values
+    const validRaces = Object.keys(raceDefinitions);
+    const validClasses = Object.keys(classDefinitions);
+    const raceId = validRaces.includes(wcsChar.raceId) ? wcsChar.raceId : 'human';
+    const classId = validClasses.includes(wcsChar.classId) ? wcsChar.classId : 'warrior';
+
+    // Build attribute points from WCS data or compute from class+race defaults
+    const zero = { Strength: 0, Vitality: 0, Endurance: 0, Dexterity: 0, Agility: 0, Intellect: 0, Wisdom: 0, Tactics: 0 };
+    const wcsAttrs = wcsChar.attributes || {};
+    const hasAttrs = Object.values(wcsAttrs).some(v => v > 0);
+    let attributePoints;
+    if (hasAttrs) {
+      attributePoints = { ...zero };
+      Object.entries(wcsAttrs).forEach(([key, val]) => {
+        if (attributePoints[key] !== undefined) attributePoints[key] = val;
+      });
+    } else {
+      // Compute from class starting attrs + race bonuses + level-up points
+      const classDef = classDefinitions[classId];
+      const raceDef = raceDefinitions[raceId];
+      attributePoints = { ...(classDef?.startingAttributes || zero) };
+      if (raceDef) {
+        Object.entries(raceDef.bonuses).forEach(([attr, val]) => {
+          if (attributePoints[attr] !== undefined) attributePoints[attr] += val;
+        });
+      }
+    }
+
+    const level = Math.max(1, wcsChar.level || 1);
+    const stats = calculateStats(attributePoints, level);
+    const equip = getStartingEquipment(classId);
+
+    const hero = {
+      id: heroId,
+      name: wcsChar.name || 'WCS Hero',
+      raceId,
+      classId,
+      level,
+      namedHeroId: null,
+      attributePoints,
+      baseAttributePoints: { ...attributePoints },
+      currentHealth: Math.floor(stats.health),
+      currentMana: Math.floor(stats.mana),
+      currentStamina: Math.floor(stats.stamina),
+      unspentPoints: Math.max(0, POINTS_PER_LEVEL * (level - 1)),
+      skillPoints: Math.max(0, level),
+      unlockedSkills: {},
+      equipment: equip,
+      abilityLoadout: getDefaultLoadout(classId, equip?.weapon?.weaponType),
+      source: 'wcs',
+      wcsCharacterId: wcsChar.id,
+    };
+
+    const newRoster = [...state.heroRoster, hero];
+    const newMaxSlots = Math.max(state.maxHeroSlots, newRoster.length);
+    const newActiveIds = state.activeHeroIds.length < 3
+      ? [...state.activeHeroIds, heroId]
+      : state.activeHeroIds;
+
+    set({
+      heroRoster: newRoster,
+      activeHeroIds: newActiveIds,
+      maxHeroSlots: newMaxSlots,
+    });
+    return { success: true, heroId };
+  },
+
+  syncWcsHeroes: () => {
+    const state = get();
+    if (!grudgeApi.isAuthenticated()) return;
+    const wcsHeroes = state.heroRoster.filter(h => h.source === 'wcs' && h.wcsCharacterId);
+    if (wcsHeroes.length === 0) return;
+    wcsHeroes.forEach(hero => {
+      grudgeApi.characters.patch(hero.wcsCharacterId, {
+        level: hero.level,
+        attributePoints: hero.attributePoints,
+        currentHealth: hero.currentHealth,
+        currentMana: hero.currentMana,
+        currentStamina: hero.currentStamina,
+      }).catch(() => {});
+    });
+  },
+
+  /**
+   * Load account data from the backend on auth/login.
+   * Fetches character roster and economy balance, merges backend characters
+   * into heroRoster (without overwriting local-only heroes).
+   */
+  loadAccountData: async () => {
+    if (!grudgeApi.isAuthenticated()) return;
+    try {
+      // Fetch characters and economy in parallel
+      const [charResult, balResult] = await Promise.allSettled([
+        grudgeApi.characters.list(),
+        grudgeApi.economy.balance(),
+      ]);
+
+      const state = get();
+      let updates = { backendSynced: true, lastBackendSync: Date.now() };
+
+      if (charResult.status === 'fulfilled') {
+        const backendChars = (charResult.value?.characters || []);
+        // Merge: update existing heroes by backendId, add new ones not in local roster
+        const localIds = new Set(state.heroRoster.map(h => h.backendId).filter(Boolean));
+        const newFromBackend = backendChars
+          .filter(bc => !localIds.has(bc.id))
+          .map(bc => ({
+            id: `backend_${bc.id}`,
+            backendId: bc.id,
+            name: bc.name,
+            classId: bc.classId,
+            raceId: bc.raceId,
+            level: bc.level || 1,
+            xp: bc.xp || 0,
+            attributePoints: bc.attributePoints || {},
+            unspentPoints: bc.unspentPoints || 0,
+            skillPoints: bc.skillPoints || 0,
+            unlockedSkills: bc.unlockedSkills || {},
+            equipment: bc.equipment || {},
+            currentHealth: bc.currentHealth || 100,
+            currentMana: bc.currentMana || 50,
+            currentStamina: bc.currentStamina || 100,
+            abilityLoadout: bc.abilityLoadout || null,
+            source: 'backend',
+          }));
+
+        // Update existing heroes that have backendIds
+        const updatedRoster = state.heroRoster.map(hero => {
+          if (!hero.backendId) return hero;
+          const bc = backendChars.find(c => c.id === hero.backendId);
+          if (!bc) return hero;
+          return {
+            ...hero,
+            level: bc.level || hero.level,
+            xp: bc.xp || hero.xp,
+            unspentPoints: bc.unspentPoints ?? hero.unspentPoints,
+            skillPoints: bc.skillPoints ?? hero.skillPoints,
+          };
+        });
+
+        const merged = [...updatedRoster, ...newFromBackend];
+        updates.heroRoster = merged;
+        updates.maxHeroSlots = Math.max(state.maxHeroSlots, merged.length);
+      }
+
+      if (balResult.status === 'fulfilled') {
+        updates.accountBalance = balResult.value;
+      }
+
+      set(updates);
+    } catch (err) {
+      console.warn('[gameStore] loadAccountData failed:', err.message);
+    }
+  },
+
+  /**
+   * Save a hero's current state to the backend.
+   * Call this after level-up, skill allocation, equipment changes, etc.
+   * Non-blocking — failures are logged but not thrown.
+   */
+  saveHeroToBackend: async (heroId) => {
+    const state = get();
+    const hero = state.heroRoster.find(h => h.id === heroId);
+    if (!hero || !hero.backendId) return; // no backend ID = not yet persisted
+    try {
+      await grudgeApi.characters.patch(hero.backendId, {
+        level: hero.level,
+        xp: hero.xp || 0,
+        attributePoints: hero.attributePoints,
+        unspentPoints: hero.unspentPoints || 0,
+        skillPoints: hero.skillPoints || 0,
+        unlockedSkills: hero.unlockedSkills || {},
+        currentHealth: hero.currentHealth,
+        currentMana: hero.currentMana,
+        currentStamina: hero.currentStamina,
+        abilityLoadout: hero.abilityLoadout || null,
+      });
+    } catch (err) {
+      console.warn(`[gameStore] saveHeroToBackend(${heroId}) failed:`, err.message);
+    }
+  },
+
+  /**
+   * Create a new character on the backend and store the returned ID.
+   * Call this right after addHeroToRoster() for new hero creations.
+   * @param {string} localHeroId - the hero's local id in heroRoster
+   */
+  createHeroOnBackend: async (localHeroId) => {
+    const state = get();
+    const hero = state.heroRoster.find(h => h.id === localHeroId);
+    if (!hero || hero.backendId) return; // already persisted
+    if (!grudgeApi.isAuthenticated()) return; // no auth = skip, local-only
+    try {
+      const result = await grudgeApi.characters.create({
+        name: hero.name,
+        classId: hero.classId,
+        raceId: hero.raceId,
+        level: hero.level || 1,
+        attributePoints: hero.attributePoints || {},
+        equipment: hero.equipment || {},
+        unlockedSkills: hero.unlockedSkills || {},
+      });
+      if (result?.id) {
+        // Store the backend ID on the local hero
+        const updatedRoster = state.heroRoster.map(h =>
+          h.id === localHeroId ? { ...h, backendId: result.id } : h
+        );
+        set({ heroRoster: updatedRoster });
+        console.log(`[gameStore] Character ${hero.name} persisted to backend: ${result.id}`);
+      }
+    } catch (err) {
+      console.warn(`[gameStore] createHeroOnBackend(${localHeroId}) failed:`, err.message);
     }
   },
 
@@ -2215,11 +2464,12 @@ const useGameStore = create(persist((set, get) => ({
         heroRoster: updatedRoster,
         completedMissions,
         activeMission: null,
-        battleLog: log.slice(-12),
+      battleLog: log.slice(-12),
         playerHealth: playerUnit ? playerUnit.health : state.playerHealth,
         playerMana: playerUnit ? playerUnit.mana : state.playerMana,
         playerStamina: playerUnit ? playerUnit.stamina : state.playerStamina,
       });
+      get().syncWcsHeroes();
       return;
     }
 
@@ -2230,7 +2480,7 @@ const useGameStore = create(persist((set, get) => ({
 
       // Fire-and-forget: report result to API (challenger won = defender's team lost)
       const { arenaTeamId, arenaChallengeToken, arenaOwnerName } = state.battleState;
-      fetch('/api/arena/battle/result', {
+      fetch(`${API_BASE}/api/arena/battle/result`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ teamId: arenaTeamId, challengeToken: arenaChallengeToken, result: 'team_lost', challengerName: state.playerName }),
@@ -2296,6 +2546,7 @@ const useGameStore = create(persist((set, get) => ({
         playerMana: playerUnit ? playerUnit.mana : state.playerMana,
         playerStamina: playerUnit ? playerUnit.stamina : state.playerStamina,
       });
+      get().syncWcsHeroes();
       return;
     }
 
@@ -2365,6 +2616,7 @@ const useGameStore = create(persist((set, get) => ({
         playerMana: playerUnit ? playerUnit.mana : state.playerMana,
         playerStamina: playerUnit ? playerUnit.stamina : state.playerStamina,
       });
+      get().syncWcsHeroes();
       return;
     }
 
@@ -2535,6 +2787,7 @@ const useGameStore = create(persist((set, get) => ({
       playerStamina: playerUnit ? playerUnit.stamina : state.playerStamina,
       eventBonusRewards: null,
     });
+    get().syncWcsHeroes();
 
     if (leveledUp) {
       const stats = get().getStats();
@@ -2555,7 +2808,7 @@ const useGameStore = create(persist((set, get) => ({
     // Report arena challenge loss to API (challenger lost = defender's team won)
     if (state.battleState?.isArenaChallenge) {
       const { arenaTeamId, arenaChallengeToken } = state.battleState;
-      fetch('/api/arena/battle/result', {
+      fetch(`${API_BASE}/api/arena/battle/result`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ teamId: arenaTeamId, challengeToken: arenaChallengeToken, result: 'team_won', challengerName: state.playerName }),
@@ -3157,6 +3410,23 @@ const useGameStore = create(persist((set, get) => ({
       }
     }
 
+    // Camp income: idle heroes (not active, not harvesting, not on expedition) generate passive resources
+    const busyHeroIds = new Set([
+      ...state.activeHeroIds,
+      ...Object.values(state.activeHarvests),
+      ...Object.keys(state.heroExpeditions || {}),
+      ...(state.islandHeroes || []).map(h => h.heroId),
+    ]);
+    const idleHeroes = state.heroRoster.filter(h => !busyHeroIds.has(h.id));
+    if (idleHeroes.length > 0) {
+      const campResTypes = ['herbs', 'wood', 'ore'];
+      idleHeroes.forEach(hero => {
+        const campRate = 0.15 * (1 + hero.level * 0.05);
+        const res = campResTypes[Math.floor(Date.now() / 60000 + hero.id.charCodeAt(0)) % campResTypes.length];
+        newResources[res] = floorTo2((newResources[res] || 0) + campRate * elapsed);
+      });
+    }
+
     const updates = { lastHarvestTick: now, harvestResources: newResources };
     if (goldGained > 0) updates.gold = state.gold + goldGained;
     if (conquerChanged) updates.zoneConquer = zoneConquer;
@@ -3751,6 +4021,216 @@ const useGameStore = create(persist((set, get) => ({
 
   setSuiteSyncError: (error) => set({ suiteSyncError: error }),
 
+  // ── Home Island Actions ──
+
+  generateIslandTerrain: (seed) => {
+    const W = 140, H = 110;
+    const terrain = [];
+    const cx = W / 2, cy = H / 2, radius = Math.min(cx, cy) * 0.7;
+    for (let y = 0; y < H; y++) {
+      const row = [];
+      for (let x = 0; x < W; x++) {
+        const dx = x - cx, dy = y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const noise = Math.sin(x * 0.1 + seed) * Math.cos(y * 0.1 + seed) * 0.5
+          + Math.sin(x * 0.05) * Math.sin(y * 0.05) * 0.3;
+        const falloff = 1 - (dist / radius);
+        const val = falloff + noise;
+        // 0=water 1=beach 2=grass 3=forest 4=mountain
+        row.push(val < 0 ? 0 : val < 0.1 ? 1 : val < 0.4 ? 2 : val < 0.7 ? 3 : 4);
+      }
+      terrain.push(row);
+    }
+    set({ islandTerrain: terrain });
+    return terrain;
+  },
+
+  placeIslandBuilding: (type, gridX, gridY) => {
+    const state = get();
+    const ISLAND_BUILDINGS = {
+      camp:     { size: 2, hp: 1000, cost: { gold: 500, wood: 300, stone: 200 }, profession: null,  produces: null },
+      mine:     { size: 1, hp: 200,  cost: { gold: 200, ore: 50 },              profession: 'Miner',    produces: { ore: 5, stone: 3 } },
+      lumber:   { size: 1, hp: 200,  cost: { gold: 200, wood: 100 },            profession: 'Forester', produces: { wood: 8 } },
+      herb:     { size: 1, hp: 150,  cost: { gold: 150, herbs: 30 },            profession: 'Mystic',   produces: { herbs: 6 } },
+      kitchen:  { size: 1, hp: 150,  cost: { gold: 150, food: 50 },             profession: 'Chef',     produces: { food: 10 } },
+      workshop: { size: 1, hp: 200,  cost: { gold: 300, ore: 50, crystals: 20 },profession: 'Engineer', produces: { crystals: 3 } },
+      farm:     { size: 1, hp: 150,  cost: { gold: 150 },                       profession: null,       produces: { food: 10 } },
+    };
+    const config = ISLAND_BUILDINGS[type];
+    if (!config) return { success: false, reason: 'Unknown building type' };
+
+    // Check cost against gold + harvestResources (island uses same economy)
+    if (config.cost.gold && state.gold < (config.cost.gold || 0)) {
+      return { success: false, reason: 'Not enough gold' };
+    }
+    for (const [res, amt] of Object.entries(config.cost)) {
+      if (res === 'gold') continue;
+      if ((state.harvestResources[res] || 0) < amt) {
+        return { success: false, reason: `Not enough ${res}` };
+      }
+    }
+
+    // Deduct resources
+    const newResources = { ...state.harvestResources };
+    let newGold = state.gold;
+    for (const [res, amt] of Object.entries(config.cost)) {
+      if (res === 'gold') { newGold -= amt; continue; }
+      newResources[res] = (newResources[res] || 0) - amt;
+    }
+
+    const building = {
+      id: `island_b_${state.islandBuildingNextId}`,
+      type,
+      gridX,
+      gridY,
+      level: 1,
+      hp: config.hp,
+      maxHp: config.hp,
+    };
+
+    set({
+      islandBuildings: [...state.islandBuildings, building],
+      islandBuildingNextId: state.islandBuildingNextId + 1,
+      gold: newGold,
+      harvestResources: newResources,
+    });
+    return { success: true, building };
+  },
+
+  removeIslandBuilding: (buildingId) => {
+    const state = get();
+    // Unassign any heroes at this building
+    const newHeroes = state.islandHeroes.filter(h => h.buildingId !== buildingId);
+    set({
+      islandBuildings: state.islandBuildings.filter(b => b.id !== buildingId),
+      islandHeroes: newHeroes,
+    });
+  },
+
+  deployHeroToIsland: (heroId) => {
+    const state = get();
+    const hero = state.heroRoster.find(h => h.id === heroId);
+    if (!hero) return { success: false, reason: 'Hero not found' };
+    // Can't deploy if hero is in active party, harvesting at camp, or already on island
+    if (state.activeHeroIds.includes(heroId)) return { success: false, reason: 'Hero is in active party' };
+    if (Object.values(state.activeHarvests).includes(heroId)) return { success: false, reason: 'Hero is harvesting at camp' };
+    if (state.islandHeroes.some(h => h.heroId === heroId)) return { success: false, reason: 'Hero already on island' };
+
+    set({
+      islandHeroes: [...state.islandHeroes, { heroId, buildingId: null, deployedAt: Date.now() }],
+    });
+    return { success: true };
+  },
+
+  recallHeroFromIsland: (heroId) => {
+    const state = get();
+    set({
+      islandHeroes: state.islandHeroes.filter(h => h.heroId !== heroId),
+    });
+  },
+
+  assignHeroToBuilding: (heroId, buildingId) => {
+    const state = get();
+    const entry = state.islandHeroes.find(h => h.heroId === heroId);
+    if (!entry) return;
+    // Make sure building exists
+    if (buildingId && !state.islandBuildings.find(b => b.id === buildingId)) return;
+    // Unassign any other hero from this building
+    const updated = state.islandHeroes.map(h => {
+      if (h.heroId === heroId) return { ...h, buildingId };
+      if (buildingId && h.buildingId === buildingId) return { ...h, buildingId: null };
+      return h;
+    });
+    set({ islandHeroes: updated });
+  },
+
+  tickIslandHarvests: () => {
+    const state = get();
+    const now = Date.now();
+    const elapsed = (now - state.islandLastTick) / 1000;
+    if (elapsed < 1) return;
+
+    const ISLAND_BUILDINGS = {
+      mine:     { produces: { ore: 5, stone: 3 } },
+      lumber:   { produces: { wood: 8 } },
+      herb:     { produces: { herbs: 6 } },
+      kitchen:  { produces: { food: 10 } },
+      workshop: { produces: { crystals: 3 } },
+      farm:     { produces: { food: 10 } },
+    };
+
+    const newRes = { ...state.islandResources };
+    let goldGained = 0;
+
+    state.islandBuildings.forEach(building => {
+      const config = ISLAND_BUILDINGS[building.type];
+      if (!config || !config.produces) return;
+      // Check if a hero is assigned — heroes boost rate, but buildings produce passively at 25%
+      const assignedHero = state.islandHeroes.find(h => h.buildingId === building.id);
+      const hero = assignedHero ? state.heroRoster.find(h => h.id === assignedHero.heroId) : null;
+      const heroMult = hero ? (1 + hero.level * 0.1) : 0.25;
+      // Rate is per-minute, elapsed is seconds
+      const rateScale = (elapsed / 60) * heroMult;
+      for (const [res, rate] of Object.entries(config.produces)) {
+        newRes[res] = floorTo2((newRes[res] || 0) + rate * rateScale);
+      }
+    });
+
+    set({ islandResources: newRes, islandLastTick: now });
+  },
+
+  collectIslandResources: () => {
+    const state = get();
+    const collected = { ...state.islandResources };
+    const total = Object.values(collected).reduce((a, b) => a + Math.floor(b), 0);
+    if (total <= 0) return { success: false, reason: 'Nothing to collect' };
+
+    // Move island resources into main harvestResources + gold
+    const newHarvest = { ...state.harvestResources };
+    let newGold = state.gold;
+    for (const [res, amt] of Object.entries(collected)) {
+      const floored = Math.floor(amt);
+      if (floored <= 0) continue;
+      if (res === 'gold') {
+        newGold += floored;
+      } else if (newHarvest[res] !== undefined) {
+        newHarvest[res] = floorTo2((newHarvest[res] || 0) + floored);
+      }
+    }
+
+    set({
+      harvestResources: newHarvest,
+      gold: newGold,
+      islandResources: { gold: 0, wood: 0, stone: 0, ore: 0, food: 0, crystals: 0 },
+    });
+    return { success: true, total };
+  },
+
+  // ── AFK Harvest Actions ──
+
+  setAfkHarvestAssignments: (assignments) => set({ afkHarvestAssignments: assignments || {} }),
+
+  assignAfkHarvest: (heroId, buildingType) => {
+    const state = get();
+    if (state.activeHeroIds.includes(heroId)) return { success: false, reason: 'Hero is in active party' };
+    const RATES = {
+      mine: { ore: 5, stone: 3 }, lumber: { wood: 8 }, herb: { herbs: 6 },
+      kitchen: { food: 10 }, workshop: { crystals: 3 }, farm: { food: 10 },
+    };
+    if (!RATES[buildingType]) return { success: false, reason: 'Invalid building type' };
+    const newAssignments = { ...state.afkHarvestAssignments };
+    newAssignments[heroId] = { buildingType, startedAt: Date.now(), rates: RATES[buildingType] };
+    set({ afkHarvestAssignments: newAssignments });
+    return { success: true };
+  },
+
+  unassignAfkHarvest: (heroId) => {
+    const state = get();
+    const newAssignments = { ...state.afkHarvestAssignments };
+    delete newAssignments[heroId];
+    set({ afkHarvestAssignments: newAssignments });
+  },
+
   resetGame: () => {
     localStorage.removeItem('grudge-warlords-save');
     const zero = { Strength: 0, Vitality: 0, Endurance: 0, Dexterity: 0, Agility: 0, Intellect: 0, Wisdom: 0, Tactics: 0 };
@@ -3831,11 +4311,20 @@ const useGameStore = create(persist((set, get) => ({
       suiteProfessions: {},
       suiteCharacters: [],
       suiteSyncError: null,
+      afkHarvestAssignments: {},
+      afkHarvestLastSync: 0,
+      // Reset island state
+      islandBuildings: [],
+      islandHeroes: [],
+      islandTerrain: null,
+      islandResources: { gold: 0, wood: 0, stone: 0, ore: 0, food: 0, crystals: 0 },
+      islandLastTick: Date.now(),
+      islandBuildingNextId: 1,
     });
   },
 }), {
   name: 'grudge-warlords-save',
-  version: 4,
+  version: 5,
   migrate: (persistedState, version) => {
     if (version < 2) {
       const rarityToTier = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5 };
@@ -3904,6 +4393,13 @@ const useGameStore = create(persist((set, get) => ({
       if (!persistedState.zoneStats) persistedState.zoneStats = {};
       if (!persistedState.completedQuests) persistedState.completedQuests = {};
     }
+    if (version < 5) {
+      if (!persistedState.islandBuildings) persistedState.islandBuildings = [];
+      if (!persistedState.islandHeroes) persistedState.islandHeroes = [];
+      if (!persistedState.islandTerrain) persistedState.islandTerrain = null;
+      if (!persistedState.islandResources) persistedState.islandResources = { gold: 0, wood: 0, stone: 0, ore: 0, food: 0, crystals: 0 };
+      if (!persistedState.islandBuildingNextId) persistedState.islandBuildingNextId = 1;
+    }
     return persistedState;
   },
   partialize: (state) => ({
@@ -3950,6 +4446,12 @@ const useGameStore = create(persist((set, get) => ({
     roamingAirship: state.roamingAirship,
     pirateShopInventory: state.pirateShopInventory,
     pirateShopLastRefresh: state.pirateShopLastRefresh,
+    // Home Island
+    islandBuildings: state.islandBuildings,
+    islandHeroes: state.islandHeroes,
+    islandTerrain: state.islandTerrain,
+    islandResources: state.islandResources,
+    islandBuildingNextId: state.islandBuildingNextId,
     // Suite integration
     suiteLinked: state.suiteLinked,
     suiteAccountId: state.suiteAccountId,
@@ -3980,7 +4482,7 @@ const _partialize = (state) => ({
 useGameStore.subscribe((state, prevState) => {
   // Only push if meaningful game state changed (not transient UI like screen)
   if (!cloudIsLoggedIn()) return;
-  const keys = ['heroRoster', 'inventory', 'gold', 'level', 'zoneConquer', 'completedQuests', 'harvestResources', 'victories', 'losses', 'bossesDefeated'];
+  const keys = ['heroRoster', 'inventory', 'gold', 'level', 'zoneConquer', 'completedQuests', 'harvestResources', 'victories', 'losses', 'bossesDefeated', 'islandBuildings', 'islandHeroes'];
   const changed = keys.some(k => state[k] !== prevState[k]);
   if (changed) {
     schedulePush(() => _partialize(useGameStore.getState()));

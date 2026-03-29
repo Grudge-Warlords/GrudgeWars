@@ -1,4 +1,4 @@
----
+﻿---
 name: grudge-warlords
 description: Complete knowledge base for the Grudge Warlords RPG project. Covers architecture, sprite system, admin tools, Discord OAuth login, Grudge Studio SDK, arena/leaderboard, server API, deployment, and best practices. Use when working on any Grudge Warlords feature, debugging, or extending the game systems.
 ---
@@ -13,7 +13,7 @@ description: Complete knowledge base for the Grudge Warlords RPG project. Covers
 - **Deployment:** Replit VM target (persistent process for Discord bot + in-memory arena)
 - **Production URL:** `https://grudge-warlords-rpg.replit.app`
 - **External site:** `https://grudgewarlords.com`
-- **Discord invite:** `https://discord.gg/KmAC5aXs84`
+- **Discord invite:** `https://discord.gg/FtGtmxmwkh`
 
 ## Architecture Overview
 
@@ -21,7 +21,7 @@ description: Complete knowledge base for the Grudge Warlords RPG project. Covers
 Single Express server auto-detects mode via `NODE_ENV`:
 - **Dev mode:** Runs on port 3001, proxied through Vite on port 5000
 - **Production:** Runs on port 5000, serves built assets from `dist/`
-- **Build:** `npm run build` (Vite) → **Start:** `npm run start` (NODE_ENV=production node server.js)
+- **Build:** `npm run build` (Vite) â†’ **Start:** `npm run start` (NODE_ENV=production node server.js)
 
 ### Key Environment Variables (Secrets)
 | Variable | Purpose |
@@ -32,18 +32,23 @@ Single Express server auto-detects mode via `NODE_ENV`:
 | `DISCORD_GRUDGE_WEBHOOK` | Webhook URL for arena broadcasts |
 | `GAME_API_GRUDA` | Admin token / fallback bot token |
 | `GRUDGE_ACCOUNT_DB` | Neon PostgreSQL connection string |
+| `BUCKET_NAME` | S3 bucket identifier (Railway Object Storage) |
+| `BUCKET_REGION` | S3 region (default: us-east-1) |
+| `BUCKET_ENDPOINT` | S3-compatible endpoint URL |
+| `BUCKET_ACCESS_KEY` | S3 access key ID |
+| `BUCKET_SECRET_KEY` | S3 secret access key |
 
 ### Workflows
-1. **Discord API Server** — `node server.js` (Express + Discord bot)
-2. **Start application** — `npx vite --host 0.0.0.0 --port 5000` (Vite dev server)
+1. **Discord API Server** â€” `node server.js` (Express + Discord bot)
+2. **Start application** â€” `npx vite --host 0.0.0.0 --port 5000` (Vite dev server)
 
 ## Login & Authentication Flow
 
 ### Discord OAuth (In-Game)
-1. Client calls `GET /api/discord/login` → receives authorization URL + CSRF state
-2. User redirects to Discord → authorizes scopes: `identify`, `email`, `guilds.join`
+1. Client calls `GET /api/discord/login` â†’ receives authorization URL + CSRF state
+2. User redirects to Discord â†’ authorizes scopes: `identify`, `email`, `guilds.join`
 3. Discord redirects to `/discordauth` with code
-4. Client sends code to `POST /api/discord/callback` → server exchanges for access token
+4. Client sends code to `POST /api/discord/callback` â†’ server exchanges for access token
 5. Server fetches user profile from Discord API
 6. Server generates `sessionToken` via `crypto.randomBytes(32)`, stores in `activeSessions` Map
 7. Server auto-joins user to Grudge Warlords guild via `guilds.join` scope
@@ -52,18 +57,18 @@ Single Express server auto-detects mode via `NODE_ENV`:
 ### Grudge ID
 The user's **Grudge ID** is their **Discord user ID** (`discordId`). It is returned from session verification and used as the primary player identifier across all systems (arena, profiles, game saves).
 
-### External Login (grudgewarlords.com → Replit)
-1. `GET /api/external/login?returnUrl=...` → redirects to Discord OAuth
-2. `GET /api/external/callback` → handles token exchange server-side
+### External Login (grudgewarlords.com â†’ Replit)
+1. `GET /api/external/login?returnUrl=...` â†’ redirects to Discord OAuth
+2. `GET /api/external/callback` â†’ handles token exchange server-side
 3. Renders HTML page that stores session in `localStorage` and posts back via `window.postMessage`
 4. Allowed return origins: `grudgewarlords.com`, `www.grudgewarlords.com`
 
 ### Session Verification
-- `POST /api/auth/verify` — body: `{ sessionToken }` → returns `{ valid, discordId, username }`
-- `requireSession` middleware — reads `X-Session-Token` header or body `sessionToken`
+- `POST /api/auth/verify` â€” body: `{ sessionToken }` â†’ returns `{ valid, discordId, username }`
+- `requireSession` middleware â€” reads `X-Session-Token` header or body `sessionToken`
 
 ### Auth Page
-- `public/discordauth.html` — standalone login page with Discord branding
+- `public/discordauth.html` â€” standalone login page with Discord branding
 - Storage keys: `grudge_studio_session`, `grudge_studio_user`
 
 ## Grudge Studio SDK (`public/grudge-studio-sdk.js`)
@@ -128,26 +133,87 @@ Events: `login`, `logout`, `sync`, `error` via `.on()` / `.off()`
 | POST | `/api/discord/webhook/tip` | Admin | Send gameplay tip |
 | POST | `/api/discord/webhook/custom` | Admin | Send custom embed |
 
+### S3 Asset Storage
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/api/assets/status` | No | Check if S3 bucket is configured and reachable |
+| GET | `/api/assets/list?prefix=&max=` | Admin | List objects by prefix (paginated) |
+| GET | `/api/assets/url/:key` | No | Get presigned download URL (1h expiry) |
+| GET | `/api/assets/meta/:key` | No | Get object metadata (size, type, lastModified) |
+| POST | `/api/assets/presign` | Admin | Get presigned upload URL for client-side upload |
+| POST | `/api/assets/copy` | Admin | Copy object within bucket |
+| DELETE | `/api/assets/:key` | Admin | Delete an asset |
+
+#### S3 Module (`api/lib/s3.js`)
+Lazy-init S3Client using Railway-injected `BUCKET_*` env vars. Works with any S3-compatible provider (Railway, R2, MinIO, AWS).
+- `forcePathStyle: true` for Railway/R2 compatibility
+- Presigned URLs for both upload and download (no proxy needed)
+- `isConfigured()` check for graceful degradation when bucket isn't set up
+
+#### Railway Bucket: `grudge-assets`
+Connected to 5 Railway services via `${{grudge-assets.*}}` variable references:
+- grudge-studio-backend, GDevelopAssistant, ObjectStore, Warlord-Crafting-Suite, grudge-warlords
+
+#### S3 Bucket Organization
+```
+grudge-assets/
+  sprites/          # 2D sprite sheets
+  backgrounds/      # battle/scene backgrounds
+  icons/            # weapon/armor/ability icons
+  audio/            # SFX files
+  models/           # 3D GLB/GLTF
+  vfx/              # effect sprite sheets
+  exports/v1/       # ObjectStore JSON datasets (mirrors api/v1/*.json)
+  ugc/              # user-generated content (avatars, screenshots)
+```
+
+#### ObjectStore Resolution Order
+`object-store.js` fetches datasets in this priority: Memory cache â†’ S3 (`exports/v1/`) â†’ GitHub Pages â†’ Stale cache.
+`resolveAssetUrl(path)` returns S3 presigned URL if asset exists in bucket, else GitHub Pages URL.
+
+#### Migration Script
+`node scripts/migrate-objectstore-to-s3.js [--dry-run] [--prefix sprites] [--objectstore /path]`
+Uploads ObjectStore binary assets and JSON data to S3 bucket. Skips existing files with matching sizes.
+
+### Puter KV User Archive System
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/api/studio/archive` | Session+Puter | Create manual snapshot of current game save |
+| GET | `/api/studio/archives` | Session+Puter | List available archive snapshots |
+| POST | `/api/studio/archive/restore` | Session+Puter | Restore from a snapshot (auto-archives current first) |
+
+#### Archive Behavior (`puter-service.js`)
+- Auto-archives every 10 `syncPush` calls (with 4h cooldown between auto-archives)
+- Keeps last 15 snapshots per user, prunes oldest automatically
+- KV keys: `grudge:archive:<id>:<timestamp>` (data), `grudge:archive:<id>:index` (index)
+- `restoreArchive()` auto-creates a `pre-restore` snapshot before overwriting current save
+- Reasons tracked: `auto`, `manual`, `pre-restore`
+
+#### Data Layer Architecture
+- **PostgreSQL (Neon)** â€” Source of truth: accounts, characters, inventory, arena, leaderboard
+- **Puter KV** â€” User archive: game save snapshots, preferences, offline restore
+- **S3 (grudge-assets)** â€” Binary assets: sprites, audio, models, UGC, shared across all users
+
 ## Arena & Leaderboard System
 
 ### Data Model (PostgreSQL)
-- `arena_teams` table — team snapshots with ranked/unranked status
-- `arena_battles` table — battle history with results
-- `challengeNonces` Map — in-memory CSRF protection for battle results
+- `arena_teams` table â€” team snapshots with ranked/unranked status
+- `arena_battles` table â€” battle history with results
+- `challengeNonces` Map â€” in-memory CSRF protection for battle results
 
 ### Team Lifecycle
-1. **Submit:** Player submits 1-3 hero snapshots → team gets `ranked` status
-2. **Challenge:** Other player fetches team → receives `challengeNonce` (30min expiry)
+1. **Submit:** Player submits 1-3 hero snapshots â†’ team gets `ranked` status
+2. **Challenge:** Other player fetches team â†’ receives `challengeNonce` (30min expiry)
 3. **Battle:** AI controls the defending team, challenger fights live
 4. **Result:** `team_won` or `team_lost` updates wins/losses
-5. **Relegation:** 3 losses → auto-demoted to `unranked`
+5. **Relegation:** 3 losses â†’ auto-demoted to `unranked`
 6. **Replacement:** Submitting new team auto-demotes previous ranked team
 
 ### Rank Tiers
-Bronze (0W) → Silver (5W) → Gold (10W) → Platinum (20W) → Diamond (35W) → Legend (50W)
+Bronze (0W) â†’ Silver (5W) â†’ Gold (10W) â†’ Platinum (20W) â†’ Diamond (35W) â†’ Legend (50W)
 
 ### Leaderboard Sorting
-Primary: wins DESC → losses ASC → winRate DESC
+Primary: wins DESC â†’ losses ASC â†’ winRate DESC
 
 ### Discord Webhooks
 Auto-broadcasts: new challengers, relegations, 5-win streaks with rank badge info
@@ -175,16 +241,16 @@ Auto-broadcasts: new challengers, relegations, 5-win streaks with rank badge inf
 health, mana, stamina, physicalDamage, magicDamage, defense, block, blockEffect, evasion, accuracy, criticalChance, criticalDamage, attackSpeed, movementSpeed, resistance, drainHealth, manaRegen, healthRegen, cooldownReduction, armor, damageReduction, armorPenetration, blockPenetration, etc.
 
 ### Build Classification (CLASS_TIERS from `src/data/classes.js`)
-Legendary (rank 1-10) → Warlord (11-50) → Epic (51-100) → Hero (101-200) → Normal (201-300)
+Legendary (rank 1-10) â†’ Warlord (11-50) â†’ Epic (51-100) â†’ Hero (101-200) â†’ Normal (201-300)
 
 ### Important: Never use non-Grudge stat names
 Do NOT use: luck, speed, charisma, or any other stat names. Always use the 8 Grudge attributes above.
 
-## Sprite System — Complete Reference
+## Sprite System â€” Complete Reference
 
 ### Architecture
-- `src/data/spriteMap.js` — Central registry of ALL sprite data (88 sprite sheet folders, 24 race/class combos, named heroes)
-- `src/components/SpriteAnimation.jsx` — Renders sprite sheet animations with equipment overlays
+- `src/data/spriteMap.js` â€” Central registry of ALL sprite data (88 sprite sheet folders, 24 race/class combos, named heroes)
+- `src/components/SpriteAnimation.jsx` â€” Renders sprite sheet animations with equipment overlays
 - Sprite sheets stored in `public/sprites/<name>/` as horizontal strip PNGs
 - Effect sprite sheets stored in `dist/effects/` organized by category
 
@@ -195,7 +261,7 @@ A sprite sheet is a single PNG containing all frames of one animation laid out h
 |  100x100  |  100x100  |  100x100  |  100x100  |  100x100  |  100x100  |
 Total PNG: 600x100, frameWidth=100, frameHeight=100, frames=6
 ```
-**Critical formula:** `imageWidth / frameWidth = frames` — mismatch causes visual glitches.
+**Critical formula:** `imageWidth / frameWidth = frames` â€” mismatch causes visual glitches.
 
 Common frame sizes in this project:
 - Standard characters: 100x100 per frame
@@ -251,61 +317,61 @@ Each sprite should include these animation keys:
 2. **Display size:** `displayWidth = frameWidth * displayScale`, `displayHeight = targetHeight`
 3. **Sprite strip rendering:** Uses CSS `background-image` + `background-position` to show one frame
 4. **Frame cycling:** `setInterval` advances frame index, `backgroundPosition` shifts by `-frameWidth * displayScale * frameIndex`
-5. **Flip logic (battle):** `facesLeft ? team === 'player' : team === 'enemy'` — ensures all units face their opponents
+5. **Flip logic (battle):** `facesLeft ? team === 'player' : team === 'enemy'` â€” ensures all units face their opponents
 6. **Containerless mode:** Wrapper div has `width: 0, overflow: visible` for precise absolute positioning in battles
 
 ### Flip Logic Deep Dive
 ```
-facesLeft=true  + player team → flip=true  (sprite faces right, toward enemies) ✓
-facesLeft=true  + enemy team  → flip=false (sprite stays facing left, toward players) ✓
-facesLeft=false + player team → flip=false (sprite stays facing right, toward enemies) ✓  
-facesLeft=false + enemy team  → flip=true  (sprite faces left, toward players) ✓
+facesLeft=true  + player team â†’ flip=true  (sprite faces right, toward enemies) âœ“
+facesLeft=true  + enemy team  â†’ flip=false (sprite stays facing left, toward players) âœ“
+facesLeft=false + player team â†’ flip=false (sprite stays facing right, toward enemies) âœ“  
+facesLeft=false + enemy team  â†’ flip=true  (sprite faces left, toward players) âœ“
 ```
 
 ### Battle Positioning System
 - Units positioned using percentage-based coordinates (x=0-100%, y=0-100%)
-- Player units: x≈18-32% (left side), Enemy units: x≈55-74% (right side)
-- Y positioning: base y=88% with ±10% spread per unit in row
-- Row system: Protection(x=22) → Battle(x=32) → Back(x=18) for players
-- Row system: Charge(x=55) → Vanguard(x=65) → Formation(x=74) for enemies
+- Player units: xâ‰ˆ18-32% (left side), Enemy units: xâ‰ˆ55-74% (right side)
+- Y positioning: base y=88% with Â±10% spread per unit in row
+- Row system: Protection(x=22) â†’ Battle(x=32) â†’ Back(x=18) for players
+- Row system: Charge(x=55) â†’ Vanguard(x=65) â†’ Formation(x=74) for enemies
 - `transform: translate(-50%, -100%)` anchors sprites at bottom-center
 - `bodyY(unit)` calculates mid-body position for projectile targeting
 
 ### Projectile Targeting
-- Angle calculation: `Math.atan2(dy, dx) * (180 / Math.PI)` — always use raw angle
-- Player→Enemy: angle ≈ 0° (pointing right), Enemy→Player: angle ≈ 180° (pointing left)
-- Projectile sprites/CSS shapes face RIGHT by default — rotation handles direction
-- Never add +180° offsets — atan2 already produces correct angles for both directions
+- Angle calculation: `Math.atan2(dy, dx) * (180 / Math.PI)` â€” always use raw angle
+- Playerâ†’Enemy: angle â‰ˆ 0Â° (pointing right), Enemyâ†’Player: angle â‰ˆ 180Â° (pointing left)
+- Projectile sprites/CSS shapes face RIGHT by default â€” rotation handles direction
+- Never add +180Â° offsets â€” atan2 already produces correct angles for both directions
 - Specialized projectiles: FireballProjectile, WaterArrowProjectile, IceStormProjectile, PoisonGustProjectile
 - Generic projectiles: daggers (CSS-drawn), beams (image), orbs (radial gradient), electric (ThunderProjectileSprite)
 
 ### Storage & File Organization Best Practices
 ```
 public/sprites/
-  ├── <character-name>/          # One folder per sprite sheet
-  │   ├── idle.png               # Horizontal strip: frameW * frames × frameH
-  │   ├── attack1.png
-  │   ├── hurt.png
-  │   ├── death.png
-  │   └── run.png
-  ├── bosses/                    # Boss variants
-  ├── companions/                # Summoned companions
-  ├── effects/                   # Legacy effects location
-  └── ui/                        # UI sprites (cursor, bars)
+  â”œâ”€â”€ <character-name>/          # One folder per sprite sheet
+  â”‚   â”œâ”€â”€ idle.png               # Horizontal strip: frameW * frames Ã— frameH
+  â”‚   â”œâ”€â”€ attack1.png
+  â”‚   â”œâ”€â”€ hurt.png
+  â”‚   â”œâ”€â”€ death.png
+  â”‚   â””â”€â”€ run.png
+  â”œâ”€â”€ bosses/                    # Boss variants
+  â”œâ”€â”€ companions/                # Summoned companions
+  â”œâ”€â”€ effects/                   # Legacy effects location
+  â””â”€â”€ ui/                        # UI sprites (cursor, bars)
 
 dist/effects/                    # All VFX effect sprite sheets
-  ├── pixel/                     # 20 numbered spritesheet effects (600x600 to 1100x1100)
-  ├── slash/                     # Melee slash effects (5 colors × 3 sizes + demon slashes)
-  ├── beams/                     # Beam trail projectiles (5 colors, 1024x128)
-  ├── retro_impact/              # Hit impact sprites (14 colors × 2 variants, 576x384)
-  ├── bullet_impact/             # Bullet hit effects (5 colors)
-  ├── custom/                    # Hand-crafted ability effects (14 effects)
-  └── *.png                      # Root-level standalone effects
+  â”œâ”€â”€ pixel/                     # 20 numbered spritesheet effects (600x600 to 1100x1100)
+  â”œâ”€â”€ slash/                     # Melee slash effects (5 colors Ã— 3 sizes + demon slashes)
+  â”œâ”€â”€ beams/                     # Beam trail projectiles (5 colors, 1024x128)
+  â”œâ”€â”€ retro_impact/              # Hit impact sprites (14 colors Ã— 2 variants, 576x384)
+  â”œâ”€â”€ bullet_impact/             # Bullet hit effects (5 colors)
+  â”œâ”€â”€ custom/                    # Hand-crafted ability effects (14 effects)
+  â””â”€â”€ *.png                      # Root-level standalone effects
 
 public/icons/
-  ├── ability_*.png              # 28 ability icons (painted RPG style, 1024x1024)
-  ├── fireball_frame_*.png       # Fireball projectile animation frames
-  └── water_arrow_frame_*.png    # Water arrow projectile animation frames
+  â”œâ”€â”€ ability_*.png              # 28 ability icons (painted RPG style, 1024x1024)
+  â”œâ”€â”€ fireball_frame_*.png       # Fireball projectile animation frames
+  â””â”€â”€ water_arrow_frame_*.png    # Water arrow projectile animation frames
 ```
 
 ### Effect Asset Catalog
@@ -346,12 +412,12 @@ Standalone sheets: fire_explosion, heal_spritesheet, hit_effect_{1-3}, holy_impa
 ### Golden Rules for Sprites
 1. Frame counts MUST match actual PNG dimensions: `imageWidth / frameWidth = frames`
 2. All battle sprites scale to 200px display height via: `scale = 200 / frameHeight`
-3. Never add per-combo scale overrides — uniform scaling only
+3. Never add per-combo scale overrides â€” uniform scaling only
 4. `containerless={true}` for battle sprites (zero-width, absolute positioning)
 5. `containerless={false}` for admin tools and UI previews
 6. All sprite PNGs must use `image-rendering: pixelated` for crisp pixel art
 7. Minimum display height: 80px for any sprite anywhere in the game
-8. Projectile sprites face RIGHT by default — atan2 rotation handles both directions
+8. Projectile sprites face RIGHT by default â€” atan2 rotation handles both directions
 9. Equipment overlays use `mixBlendMode: 'color'` with tier-based opacity
 10. Always verify frameWidth/frameHeight against actual PNG before registering in spriteMap
 
@@ -386,25 +452,25 @@ Viewport sizes: AdminSprite = 500x420px, AdminSize = 200x200px
 3. Register in `spriteMap.js` under `spriteSheets` with correct frameWidth/frameHeight/frames
 4. Set `facesLeft: true` only if sprite's default pose faces left
 5. Add race/class mapping in `raceClassSpriteMap` if applicable
-6. Test in Admin Sprite Editor (`/admin` → Sprite tab) before battle use
+6. Test in Admin Sprite Editor (`/admin` â†’ Sprite tab) before battle use
 7. Verify flip logic works correctly for both player and enemy teams
 
 ## Admin Tools
 
 ### Admin Hub (`/admin`)
 Tabbed dashboard with 7 editors + info tabs:
-- **Map Editor** — Zone placement on world map
-- **Battle Editor** — Formation layout, action bar config
-- **Sprite Editor** — Preview all sprites with effect/beam overlays, draggable markers
-- **UI Layout** — UI element positioning
-- **Icon Manager** — Icon registry management
-- **PvP Placement** — Arena formation layout
-- **Size & Color** — Per-context (map/battle/scenes) scale + CSS filter per sprite
-- **Sprite Forge** — Knowledge base for sprite creation
-- **Backgrounds** — Battle background management with zoom/remove/restore
+- **Map Editor** â€” Zone placement on world map
+- **Battle Editor** â€” Formation layout, action bar config
+- **Sprite Editor** â€” Preview all sprites with effect/beam overlays, draggable markers
+- **UI Layout** â€” UI element positioning
+- **Icon Manager** â€” Icon registry management
+- **PvP Placement** â€” Arena formation layout
+- **Size & Color** â€” Per-context (map/battle/scenes) scale + CSS filter per sprite
+- **Sprite Forge** â€” Knowledge base for sprite creation
+- **Backgrounds** â€” Battle background management with zoom/remove/restore
 
 ### Admin Config Persistence
-`src/utils/adminConfig.js` — localStorage with deep-merged defaults. Auto-applies to gameplay (BattleScreen reads effect positions, gameStore reads formations).
+`src/utils/adminConfig.js` â€” localStorage with deep-merged defaults. Auto-applies to gameplay (BattleScreen reads effect positions, gameStore reads formations).
 
 ## HTML Server & Static Pages
 
@@ -441,7 +507,8 @@ app.get('/{*splat}', (req, res) => res.sendFile('dist/index.html'));
 | Sprite overflows admin panel | Use fixed viewport pattern (position: relative + overflow: hidden) |
 | Login fails | Check `DISCORD_CLIENT_ID`/`SECRET` secrets, verify redirect URI matches Discord app settings |
 | Session expired | Sessions last 7 days, stored in-memory `activeSessions` Map (lost on restart) |
-| Arena data lost | Arena uses PostgreSQL (`arena_teams`/`arena_battles` tables) — data persists across restarts |
+| Arena data lost | Arena uses PostgreSQL (`arena_teams`/`arena_battles` tables) â€” data persists across restarts |
 | Leaderboard empty | Need at least 1 battle (`totalBattles > 0`) to appear |
 | Webhook not sending | Check `DISCORD_GRUDGE_WEBHOOK` secret is set |
 | CORS on external site | Server uses `cors()` middleware, SDK uses `mode: 'cors'` |
+

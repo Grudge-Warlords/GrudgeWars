@@ -5,7 +5,9 @@
  * and error normalization.
  */
 
-const API_BASE = '/api/crafting';
+import { API_BASE as SITE_BASE } from '../utils/apiBase.js';
+
+const API_BASE = SITE_BASE + '/api/crafting';
 
 // ── Auth helpers ──
 
@@ -146,6 +148,26 @@ export async function submitHarvest({ grudgeId, characterId, materialId, quantit
     method: 'POST',
     body: JSON.stringify({ grudgeId, characterId, materialId, quantity, tier, profession, nodeType }),
   });
+}
+
+// ── AFK Harvest ──
+
+export async function assignHeroToHarvest({ grudgeId, heroId, buildingType }) {
+  return craftFetch('/harvest/assign', {
+    method: 'POST',
+    body: JSON.stringify({ grudgeId, heroId, buildingType }),
+  });
+}
+
+export async function collectHarvest(grudgeId, heroLevels = {}) {
+  return craftFetch('/harvest/collect', {
+    method: 'POST',
+    body: JSON.stringify({ grudgeId, heroLevels }),
+  });
+}
+
+export async function fetchHarvestState(grudgeId) {
+  return craftFetch(`/harvest/state/${grudgeId}`);
 }
 
 // ── Professions ──

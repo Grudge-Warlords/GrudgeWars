@@ -107,6 +107,26 @@ const NAMED_WEAPON_ICONS = {
   'lightning-tome':'weapons/lightning_tome_sprite.png',
   'nature-tome':'weapons/nature_tome_sprite.png',
   'arcane-tome':'weapons/arcane_tome_sprite.png',
+
+  // ── Nature / Worge staves ─────────────────────────────────────────────────
+  'verdant-wrath':     'weapons/nature_tome_sprite.png',
+  'thorn-grudge':      'weapons/nature_tome_sprite.png',
+  'wild-oathbreaker':  'weapons/nature_tome_sprite.png',
+  'grove-guardian':     'weapons/nature_tome_sprite.png',
+  'blossom-fury':      'weapons/nature_tome_sprite.png',
+  'root-warden':       'weapons/nature_tome_sprite.png',
+
+  // ── Arcane / General staves ───────────────────────────────────────────────
+  'arcane-fury':       'weapons/arcane_tome_sprite.png',
+  'thunder-spire':     'weapons/lightning_tome_sprite.png',
+  'redemption-staff':  'weapons/holy_tome_sprite.png',
+
+  // ── Named tomes ───────────────────────────────────────────────────────────
+  'crimson-inferno-tome':  'weapons/fire_tome_sprite.png',
+  'blazewrath-grimoire':   'weapons/fire_tome_sprite.png',
+  'frozen-glacier-tome':   'weapons/frost_tome_sprite.png',
+  'ancient-verdant-tome':  'weapons/nature_tome_sprite.png',
+  'radiant-dawn-tome':     'weapons/holy_tome_sprite.png',
 };
 
 /**
@@ -168,6 +188,41 @@ export function getMaterialIcon(category, tier = 1) {
   if (!map) return `${OBJECTSTORE_BASE}/icons/materials/bronze_gear_t1_sprite.png`;
   const filename = map[tier] || map[1];
   return `${OBJECTSTORE_BASE}/icons/materials/${filename}.png`;
+}
+
+// ── 3D Model URL helpers ───────────────────────────────────────────────────────
+
+/**
+ * Get a resource model URL (GLTF preferred, OBJ fallback).
+ * @param {string} modelName - e.g. "Silver_Bars", "Copper_Bar"
+ * @param {string} format - 'gltf' | 'obj' | 'fbx' (default: 'gltf')
+ * @returns {string} Full CDN URL
+ */
+export function getResourceModelUrl(modelName, format = 'gltf') {
+  const ext = format === 'gltf' ? '.gltf' : format === 'obj' ? '.obj' : `.${format}`;
+  return `${OBJECTSTORE_BASE}/KayKit_ResourceBits_1.0_FREE/Assets/${format}/${modelName}${ext}`;
+}
+
+/**
+ * Get a building model URL.
+ * @param {string} modelName - e.g. "castle", "market"
+ * @param {string} format - 'gltf' | 'obj' | 'fbx'
+ * @returns {string} Full CDN URL
+ */
+export function getBuildingModelUrl(modelName, format = 'gltf') {
+  // KayKit Medieval Builder GLB files use .gltf.glb naming convention
+  const ext = format === 'gltf' ? '.gltf.glb' : `.${format}`;
+  const sub = format === 'gltf' ? 'gltf' : format;
+  return `${OBJECTSTORE_BASE}/models/KayKit_MedievalBuilder/objects/${sub}/${modelName}${ext}`;
+}
+
+/**
+ * Get a character model URL (GLB only).
+ * @param {string} characterName - e.g. "Knight", "Barbarian"
+ * @returns {string} Full CDN URL
+ */
+export function getCharacterModelUrl(characterName) {
+  return `${OBJECTSTORE_BASE}/models/characters/kaykit/${characterName}.glb`;
 }
 
 // ── Profession icons ─────────────────────────────────────────────────────────
@@ -235,4 +290,66 @@ const UI_ICONS = {
 export function getUIIcon(name) {
   const relative = UI_ICONS[name];
   return relative ? `${OBJECTSTORE_BASE}/icons/${relative}` : null;
+}
+
+// ── GrudgeUUID Sprite Manifest Integration ───────────────────────────────────
+// Sprite manifest from warlord-crafting-suite with UUIDs and sheet metadata.
+// Load once, then use getSpriteByUuid() or getSpriteBySlug() for lookups.
+
+let _spriteManifest = null;
+let _uuidIndex = null;
+let _slugIndex = null;
+
+/**
+ * Initialize the sprite manifest for UUID-based lookups.
+ * @param {Array} sprites - Array of sprite entries from manifest.json
+ */
+export function initSpriteManifest(sprites) {
+  _spriteManifest = sprites;
+  _uuidIndex = new Map();
+  _slugIndex = new Map();
+  for (const s of sprites) {
+    if (s.grudgeUuid) _uuidIndex.set(s.grudgeUuid, s);
+    if (s.id) _slugIndex.set(s.id, s);
+  }
+}
+
+/**
+ * Get a sprite entry by its GrudgeUUID.
+ * @param {string} uuid - e.g. "ANIM-20260320073512-000001-569789E6"
+ * @returns {Object|null} Sprite entry with path, sheetMeta, dimensions
+ */
+export function getSpriteByUuid(uuid) {
+  return _uuidIndex?.get(uuid) || null;
+}
+
+/**
+ * Get a sprite entry by its slug ID.
+ * @param {string} id - e.g. "boar-idle-with-shadow"
+ * @returns {Object|null} Sprite entry
+ */
+export function getSpriteBySlug(id) {
+  return _slugIndex?.get(id) || null;
+}
+
+/**
+ * Get all sprites in a category.
+ * @param {string} category - e.g. "animal", "weapon", "armor"
+ * @returns {Array} Matching sprite entries
+ */
+export function getSpritesByCategory(category) {
+  if (!_spriteManifest) return [];
+  return _spriteManifest.filter(s => s.category === category);
+}
+
+/**
+ * Get the full ObjectStore or local URL for a sprite entry.
+ * @param {Object} sprite - Sprite entry from manifest
+ * @param {boolean} useCDN - If true, return ObjectStore CDN URL
+ * @returns {string} Full URL
+ */
+export function getSpriteUrl(sprite, useCDN = false) {
+  if (!sprite) return '';
+  if (useCDN) return `${OBJECTSTORE_BASE}${sprite.path}`;
+  return sprite.path;
 }

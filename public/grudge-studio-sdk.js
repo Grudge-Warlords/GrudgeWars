@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GRUDGE STUDIO SDK v1.0
  * Integration script for grudgewarlords.com
  *
@@ -266,7 +266,7 @@
      * @returns {string}
      */
     getDiscordInvite: function () {
-      return 'https://discord.gg/KmAC5aXs84';
+      return 'https://discord.gg/FtGtmxmwkh';
     },
 
 
@@ -451,3 +451,4 @@
   console.log('%c[GrudgeStudio SDK v1.0] Loaded', 'color: #e94560; font-weight: bold;');
 
 })(typeof window !== 'undefined' ? window : this);
+

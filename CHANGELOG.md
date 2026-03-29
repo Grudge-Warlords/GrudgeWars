@@ -1,5 +1,49 @@
 # Changelog
 
+## [2026-03-15b] — Builder Integration + Character Create Refactor
+
+### Added
+- **`src/utils/studioUrls.js`** — Centralized cross-app URLs (Builder, Crafting Suite, ObjectStore) with SSO token forwarding
+- **BUILDER nav button** in LobbyScreen — opens Grudge Builder `/character` page in new tab with session token
+- **Character Builder quick link** in portal QuickLinks component
+- Proper multi-size favicon support: `favicon-32x32.png`, `favicon-16x16.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`
+
+### Changed
+- **CharacterCreate.jsx** — Major refactor/simplification (731 lines reduced)
+- **HeroCreate.jsx** — Major refactor/simplification (571 lines reduced)
+- Legacy versions preserved as `.LEGACY.jsx` files
+- Updated `index.html` favicon links to use sized PNG variants
+- Updated `favicon.ico` with improved icon
+
+## [2026-03-15] — Weapon Skill Atlas
+
+### Added
+- **`weapon-skill-tree.html`** — Standalone weapon skill tree viewer at `/weapon-skill-tree.html`
+  - All 17 weapon types with 6 named variants each (102 total loadouts)
+  - Two tabs: Mastery Tree (passive tiers) and Combat Skills (active loadout)
+  - Real skill icons from `skill_nobg/` and `weapons_full/` CDN paths (ObjectStore)
+  - Real ability data (damage, cooldown, descriptions, effects) from `weaponSkillsNew.ts`
+  - Per-variant named weapon sprites (Nightfang, Doomspire, etc.) from ObjectStore CDN
+  - Rich tooltips with type, power, cooldown, cost, and effect tags
+  - Class badge indicators (Warrior/Mage/Ranger/Worge) per weapon
+  - `CLASS_ICONS` mapped from `abilityIcons.js` (46 class skill icons)
+  - `SKILL_DB` with ~130 entries sourced from `weaponSkillsNew.ts` + `weaponsComplete.ts`
+
+## [2026-03-14] — Favicon Fixes & Pre-Deploy Check
+
+### Fixed
+- **favicon.ico 404 on all pages** — Vercel SPA rewrite was catching `/favicon.ico` and returning HTML
+- Added `favicon` to `vercel.json` rewrite exclusion pattern
+- Added `<link rel="icon" href="/favicon.ico">` + PNG + apple-touch-icon to all 7 HTML files
+  - `index.html`, `arena.html` (root + public), `compendium.html`, `hero-codex.html`, `discordauth.html`, `api/play/gruda.html`
+
+### Added
+- **`scripts/check-favicons.ps1`** — Pre-deploy check that validates:
+  - `favicon.ico` exists in `public/`
+  - Every HTML `<head>` has a `rel="icon"` link
+  - `vercel.json` rewrites exclude `favicon`
+- `npm run check:favicons` and `npm run predeploy` scripts in `package.json`
+
 ## [2026-02-22b] — Env Var Sanitization
 
 ### Fixed

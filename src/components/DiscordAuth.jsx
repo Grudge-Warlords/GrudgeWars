@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
+import { API_BASE } from '../utils/apiBase.js';
 
 export default function DiscordAuth() {
   const [status, setStatus] = useState('loading');
@@ -16,11 +17,11 @@ export default function DiscordAuth() {
       return;
     }
 
-    // State is now verified server-side via HMAC signature — clear stale client state
+    // State is now verified server-side via HMAC signature â€” clear stale client state
     sessionStorage.removeItem('discord_oauth_state');
 
     setStatus('exchanging');
-    fetch('/api/discord/callback', {
+    fetch(`${API_BASE}/api/discord/callback`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code, state: returnedState }),
@@ -37,17 +38,27 @@ export default function DiscordAuth() {
         if (data.sessionToken) {
           localStorage.setItem('grudge_session_token', data.sessionToken);
         }
-        localStorage.setItem('discordUser', JSON.stringify(data.user));
-        // Set grudge-session so cloudSync.isLoggedIn() returns true
-        localStorage.setItem('grudge-session', JSON.stringify({
+        // Store session in same format as Puter/Guest for TitleScreen compatibility
+        const session = {
           type: 'discord',
-          grudgeId: data.user.id,
+          username: data.user.globalName || data.user.username,
           discordId: data.user.id,
           username: data.user.username,
           loginTime: Date.now(),
         }));
+          grudgeId: data.user.grudgeId || null,
+          accountId: data.user.accountId || null,
+          loginTime: Date.now(),
+        };
+        localStorage.setItem('grudge-session', JSON.stringify(session));
+        localStorage.setItem('discordUser', JSON.stringify(data.user));
         setStatus('success');
         window.history.replaceState({}, '', '/discordauth');
+
+        // Auto-redirect to game after brief success display
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
       })
       .catch(err => {
         setError(err.message);
@@ -57,7 +68,7 @@ export default function DiscordAuth() {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch('/api/discord/login');
+      const res = await fetch(`${API_BASE}/api/discord/login`);
       const data = await res.json();
       if (data.state) sessionStorage.setItem('discord_oauth_state', data.state);
       window.location.href = data.url;
@@ -177,7 +188,7 @@ export default function DiscordAuth() {
             </div>
 
             {!guildJoined && (
-              <a href="https://discord.gg/KmAC5aXs84" target="_blank" rel="noopener noreferrer" style={{
+              <a href="https://discord.gg/FtGtmxmwkh" target="_blank" rel="noopener noreferrer" style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 background: '#5865F2', border: 'none', borderRadius: 8,
                 padding: '12px 28px', color: '#fff', fontSize: '0.95rem',
@@ -191,12 +202,15 @@ export default function DiscordAuth() {
               </a>
             )}
 
-            <div style={{ marginTop: 20 }}>
+            <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div style={{ color: '#6b7280', fontSize: '0.75rem', animation: 'pulse 1.5s infinite' }}>
+                Entering the Realm...
+              </div>
               <a href="/" style={{
                 color: '#d4a96a', fontSize: '0.85rem', textDecoration: 'none',
                 borderBottom: '1px solid rgba(212,169,106,0.3)',
               }}>
-                Return to Game
+                Enter Now
               </a>
             </div>
           </div>
@@ -236,3 +250,4 @@ export default function DiscordAuth() {
     </div>
   );
 }
+

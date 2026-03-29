@@ -787,6 +787,262 @@ export function registerCraftingRoutes(app) {
   });
 
   // ────────────────────────────────────────────
+  // HOME ISLAND BATCH HARVEST
+  // ────────────────────────────────────────────
+
+  /**
+   * POST /api/crafting/island/tick
+   * Batch-record harvests from home island heroes.
+   * Body: { grudgeId, harvests: [{ characterId, buildingType, materialId, quantity, tier, profession }] }
+   */
+  app.post('/api/crafting/island/tick', requireAuth, requireSuiteDb, async (req, res) => {
+    const client = await getSuiteClient();
+    try {
+      const { grudgeId, harvests } = req.body;
+      if (!grudgeId || !harvests || !Array.isArray(harvests) || harvests.length === 0) {
+        return res.status(400).json({ error: 'grudgeId and non-empty harvests array required' });
+      }
+
+      const account = await resolveAccountByGrudgeId(grudgeId);
+      if (!account) return res.status(404).json({ error: 'Account not found' });
+
+      await client.query('BEGIN');
+
+      const results = [];
+      for (const h of harvests) {
+        const { characterId, buildingType, materialId, quantity = 1, tier = 1, profession } = h;
+        if (!characterId || !materialId || !profession) continue;
+        if (!PROFESSIONS.includes(profession)) continue;
+
+        // Upsert resource
+        const existing = await client.query(
+          `SELECT id, quantity FROM account_resources
+           WHERE account_id = $1 AND resource_type = $2 AND tier = $3`,
+          [account.id, materialId, tier]
+        );
+
+        if (existing.rows[0]) {
+          await client.query(
+            `UPDATE account_resources SET quantity = quantity + $1, updated_at = NOW() WHERE id = $2`,
+            [quantity, existing.rows[0].id]
+          );
+        } else {
+          await client.query(
+            `INSERT INTO account_resources (account_id, grudge_id, resource_type, tier, quantity)
+             VALUES ($1, $2, $3, $4, $5)`,
+            [account.id, grudgeId, materialId, tier, quantity]
+          );
+        }
+
+        // Profession XP
+        const baseXp = 10 * tier;
+        const profXpGained = baseXp * quantity;
+        const profXpCol = `prof_${profession.toLowerCase()}_xp`;
+        await client.query(
+          `UPDATE characters SET ${profXpCol} = ${profXpCol} + $1, updated_at = NOW()
+           WHERE id = $2 AND account_id = $3`,
+          [profXpGained, characterId, account.id]
+        );
+
+        // Log
+        await client.query(
+          `INSERT INTO harvest_log
+           (account_id, character_id, grudge_id, node_type, material_id, tier, quantity, profession_xp_gained, profession)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+          [account.id, characterId, grudgeId, buildingType || 'island',
+           materialId, tier, quantity, profXpGained, profession]
+        );
+
+        results.push({ characterId, materialId, quantity, profXpGained });
+      }
+
+      await client.query('COMMIT');
+      res.json({ success: true, processed: results.length, results });
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      console.error('[Crafting] Island tick error:', err.message);
+      res.status(500).json({ error: err.message });
+    } finally {
+      client.release();
+    }
+  });
+
+  // ────────────────────────────────────────────
+  // AFK HARVEST — ASSIGN & COLLECT
+  // ────────────────────────────────────────────
+
+  const HARVEST_RATES = {
+    mine:     { ore: 5, stone: 3 },
+    lumber:   { wood: 8 },
+    herb:     { herbs: 6 },
+    kitchen:  { food: 10 },
+    workshop: { crystals: 3 },
+    farm:     { food: 10 },
+  };
+
+  /**
+   * POST /api/crafting/harvest/assign
+   * Assign a hero to an island building for AFK harvesting.
+   * Body: { grudgeId, heroId, buildingType }
+   * Persists to islands.harvest_state JSON column.
+   */
+  app.post('/api/crafting/harvest/assign', requireAuth, async (req, res) => {
+    try {
+      const { grudgeId, heroId, buildingType } = req.body;
+      if (!grudgeId || !heroId || !buildingType) {
+        return res.status(400).json({ error: 'grudgeId, heroId, buildingType required' });
+      }
+      if (!HARVEST_RATES[buildingType]) {
+        return res.status(400).json({ error: `Invalid buildingType: ${buildingType}` });
+      }
+
+      // Look up the island for this account via the game DB
+      const { query: dbQuery, getClient } = await import('./db.js');
+      const acctResult = await dbQuery('SELECT id FROM accounts WHERE discord_id = $1 OR grudge_id = $1', [grudgeId]);
+      const account = acctResult.rows[0];
+      if (!account) return res.status(404).json({ error: 'Account not found' });
+
+      const islandResult = await dbQuery('SELECT id, harvest_state FROM islands WHERE account_id = $1 LIMIT 1', [account.id]);
+      const island = islandResult.rows[0];
+      if (!island) return res.status(404).json({ error: 'No island found for this account' });
+
+      const harvestState = (typeof island.harvest_state === 'string' ? JSON.parse(island.harvest_state) : island.harvest_state) || {};
+      if (!harvestState.assignments) harvestState.assignments = {};
+
+      // Assign hero
+      harvestState.assignments[heroId] = {
+        buildingType,
+        startedAt: Date.now(),
+        rates: HARVEST_RATES[buildingType],
+      };
+
+      await dbQuery(
+        `UPDATE islands SET harvest_state = $1, updated_at = NOW() WHERE id = $2`,
+        [JSON.stringify(harvestState), island.id]
+      );
+
+      const ratePerMin = Object.entries(HARVEST_RATES[buildingType]).map(([r, v]) => `${v} ${r}/min`).join(', ');
+      res.json({ success: true, heroId, buildingType, ratePerMin, harvestState });
+    } catch (err) {
+      console.error('[Crafting] Harvest assign error:', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  /**
+   * POST /api/crafting/harvest/collect
+   * Collect accumulated AFK harvest resources for all assigned heroes.
+   * Calculates elapsed time × rate × hero level multiplier.
+   * Credits account_resources in suite DB, resets timers.
+   * Body: { grudgeId, heroLevels: { heroId: level } }
+   */
+  app.post('/api/crafting/harvest/collect', requireAuth, async (req, res) => {
+    try {
+      const { grudgeId, heroLevels = {} } = req.body;
+      if (!grudgeId) return res.status(400).json({ error: 'grudgeId required' });
+
+      const { query: dbQuery } = await import('./db.js');
+      const acctResult = await dbQuery('SELECT id FROM accounts WHERE discord_id = $1 OR grudge_id = $1', [grudgeId]);
+      const account = acctResult.rows[0];
+      if (!account) return res.status(404).json({ error: 'Account not found' });
+
+      const islandResult = await dbQuery('SELECT id, harvest_state FROM islands WHERE account_id = $1 LIMIT 1', [account.id]);
+      const island = islandResult.rows[0];
+      if (!island) return res.status(404).json({ error: 'No island found' });
+
+      const harvestState = (typeof island.harvest_state === 'string' ? JSON.parse(island.harvest_state) : island.harvest_state) || {};
+      const assignments = harvestState.assignments || {};
+      const now = Date.now();
+      const collected = {};
+
+      // Calculate resources for each assigned hero
+      for (const [heroId, assignment] of Object.entries(assignments)) {
+        const elapsed = (now - (assignment.startedAt || now)) / 1000; // seconds
+        if (elapsed <= 0) continue;
+        const heroLevel = heroLevels[heroId] || 1;
+        const heroMult = 1 + heroLevel * 0.1;
+        const rates = assignment.rates || HARVEST_RATES[assignment.buildingType] || {};
+        const rateScale = (elapsed / 60) * heroMult; // rates are per-minute
+        for (const [resource, rate] of Object.entries(rates)) {
+          const amount = Math.floor(rate * rateScale);
+          if (amount > 0) collected[resource] = (collected[resource] || 0) + amount;
+        }
+        // Reset timer
+        assignment.startedAt = now;
+      }
+
+      harvestState.assignments = assignments;
+      harvestState.lastCollect = now;
+
+      // Save updated harvest_state
+      await dbQuery(
+        `UPDATE islands SET harvest_state = $1, updated_at = NOW() WHERE id = $2`,
+        [JSON.stringify(harvestState), island.id]
+      );
+
+      // Best-effort: credit to suite DB account_resources
+      if (isConnected() && Object.keys(collected).length > 0) {
+        try {
+          for (const [resource, amount] of Object.entries(collected)) {
+            const existing = await suiteQuery(
+              `SELECT id, quantity FROM account_resources WHERE account_id = $1 AND resource_type = $2`,
+              [account.id, resource]
+            );
+            if (existing.rows[0]) {
+              await suiteQuery(
+                `UPDATE account_resources SET quantity = quantity + $1, updated_at = NOW() WHERE id = $2`,
+                [amount, existing.rows[0].id]
+              );
+            } else {
+              await suiteQuery(
+                `INSERT INTO account_resources (account_id, grudge_id, resource_type, tier, quantity)
+                 VALUES ($1, $2, $3, 1, $4)`,
+                [account.id, grudgeId, resource, amount]
+              );
+            }
+          }
+        } catch (suiteErr) {
+          console.warn('[Crafting] Suite sync on collect failed (non-fatal):', suiteErr.message);
+        }
+      }
+
+      res.json({
+        success: true,
+        collected,
+        totalResources: Object.values(collected).reduce((a, b) => a + b, 0),
+        activeAssignments: Object.keys(assignments).length,
+      });
+    } catch (err) {
+      console.error('[Crafting] Harvest collect error:', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  /**
+   * GET /api/crafting/harvest/state/:grudgeId
+   * Get current AFK harvest assignments and accumulated preview.
+   */
+  app.get('/api/crafting/harvest/state/:grudgeId', requireAuth, async (req, res) => {
+    try {
+      const { grudgeId } = req.params;
+      const { query: dbQuery } = await import('./db.js');
+      const acctResult = await dbQuery('SELECT id FROM accounts WHERE discord_id = $1 OR grudge_id = $1', [grudgeId]);
+      const account = acctResult.rows[0];
+      if (!account) return res.status(404).json({ error: 'Account not found' });
+
+      const islandResult = await dbQuery('SELECT id, harvest_state FROM islands WHERE account_id = $1 LIMIT 1', [account.id]);
+      const island = islandResult.rows[0];
+      if (!island) return res.json({ success: true, assignments: {}, accumulated: {} });
+
+      const harvestState = (typeof island.harvest_state === 'string' ? JSON.parse(island.harvest_state) : island.harvest_state) || {};
+      res.json({ success: true, ...harvestState });
+    } catch (err) {
+      console.error('[Crafting] Harvest state error:', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ────────────────────────────────────────────
   // SUITE DB STATUS
   // ────────────────────────────────────────────
 

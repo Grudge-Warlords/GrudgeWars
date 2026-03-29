@@ -23,6 +23,8 @@ export const KV_KEYS = {
   save:        (id) => `grudge:save:${id}`,
   prefs:       (id) => `grudge:prefs:${id}`,
   asset:       (id) => `grudge:studio:assets:${id}`,
+  archive:     (id, ts) => `grudge:archive:${id}:${ts}`,
+  archiveIndex:(id) => `grudge:archive:${id}:index`,
 };
 
 // ── Resolve auth token ──────────────────────────────────────────────────────
@@ -115,14 +117,27 @@ export async function kvList(pattern, tokenSource) {
 
 // ── Game Save Sync ──────────────────────────────────────────────────────────
 
+const ARCHIVE_INTERVAL = 10;  // auto-archive every N pushes
+const ARCHIVE_MAX = 15;       // keep last N snapshots
+const ARCHIVE_COOLDOWN = 4 * 3600 * 1000; // min 4h between auto-archives
+
 /** Push full game state to Puter KV (called from /api/studio/sync/push) */
 export async function syncPush(accountId, gameState, tokenSource) {
   const key = KV_KEYS.save(accountId);
+  const prevVersion = gameState._syncMeta?.version || 0;
+  const newVersion = prevVersion + 1;
   const payload = {
     ...gameState,
-    _syncMeta: { pushedAt: Date.now(), version: gameState._syncMeta?.version ? gameState._syncMeta.version + 1 : 1 },
+    _syncMeta: { pushedAt: Date.now(), version: newVersion },
   };
-  return kvSet(key, payload, tokenSource);
+  const result = await kvSet(key, payload, tokenSource);
+
+  // Auto-archive every N pushes (non-blocking)
+  if (result.ok && newVersion % ARCHIVE_INTERVAL === 0) {
+    archiveSnapshot(accountId, payload, 'auto', tokenSource).catch(() => {});
+  }
+
+  return result;
 }
 
 /** Pull game state from Puter KV */
@@ -131,12 +146,184 @@ export async function syncPull(accountId, tokenSource) {
   return kvGet(key, tokenSource);
 }
 
+// ── Versioned Archive ───────────────────────────────────────────────────────
+
+/** Create a timestamped snapshot of user game state */
+export async function archiveSnapshot(accountId, gameState, reason = 'manual', tokenSource) {
+  const token = resolveToken(tokenSource);
+  if (!token) return { ok: false, error: 'no_puter_token' };
+
+  // Load existing index
+  const indexKey = KV_KEYS.archiveIndex(accountId);
+  const indexResult = await kvGet(indexKey, token);
+  const index = (indexResult.ok && Array.isArray(indexResult.value)) ? indexResult.value : [];
+
+  // Cooldown check for auto-archives
+  if (reason === 'auto' && index.length > 0) {
+    const lastTs = index[0]?.ts || 0;
+    if (Date.now() - lastTs < ARCHIVE_COOLDOWN) return { ok: true, skipped: true, reason: 'cooldown' };
+  }
+
+  // Write the snapshot
+  const ts = Date.now();
+  const snapshotKey = KV_KEYS.archive(accountId, ts);
+  const snapshot = {
+    ...gameState,
+    _archiveMeta: { ts, reason, version: gameState._syncMeta?.version || 0 },
+  };
+  const writeResult = await kvSet(snapshotKey, snapshot, token);
+  if (!writeResult.ok) return writeResult;
+
+  // Update index (newest first)
+  index.unshift({ ts, reason, version: snapshot._archiveMeta.version });
+
+  // Prune old snapshots beyond ARCHIVE_MAX
+  const pruned = [];
+  while (index.length > ARCHIVE_MAX) {
+    const old = index.pop();
+    // Fire-and-forget delete of old snapshot data
+    kvDel(KV_KEYS.archive(accountId, old.ts), token).catch(() => {});
+    pruned.push(old.ts);
+  }
+
+  await kvSet(indexKey, index, token);
+
+  return { ok: true, ts, reason, totalSnapshots: index.length, pruned: pruned.length };
+}
+
+/** List available archive snapshots for a user */
+export async function listArchives(accountId, tokenSource) {
+  const indexKey = KV_KEYS.archiveIndex(accountId);
+  const result = await kvGet(indexKey, tokenSource);
+  if (!result.ok) return result;
+  return { ok: true, snapshots: Array.isArray(result.value) ? result.value : [] };
+}
+
+/** Restore game state from an archive snapshot */
+export async function restoreArchive(accountId, timestamp, tokenSource) {
+  const token = resolveToken(tokenSource);
+  if (!token) return { ok: false, error: 'no_puter_token' };
+
+  // Read the snapshot
+  const snapshotKey = KV_KEYS.archive(accountId, timestamp);
+  const snapshotResult = await kvGet(snapshotKey, token);
+  if (!snapshotResult.ok || !snapshotResult.value) {
+    return { ok: false, error: 'snapshot_not_found' };
+  }
+
+  // Archive current state before overwriting (safety net)
+  const currentResult = await kvGet(KV_KEYS.save(accountId), token);
+  if (currentResult.ok && currentResult.value) {
+    await archiveSnapshot(accountId, currentResult.value, 'pre-restore', token);
+  }
+
+  // Write snapshot as current save
+  const restored = {
+    ...snapshotResult.value,
+    _syncMeta: {
+      ...snapshotResult.value._syncMeta,
+      pushedAt: Date.now(),
+      restoredFrom: timestamp,
+    },
+  };
+  delete restored._archiveMeta;
+  const writeResult = await kvSet(KV_KEYS.save(accountId), restored, token);
+  if (!writeResult.ok) return writeResult;
+
+  return { ok: true, restoredFrom: timestamp, version: restored._syncMeta?.version };
+}
+
 // ── ObjectStore → Puter KV caching ─────────────────────────────────────────
 
 /** Cache an ObjectStore dataset in the user's Puter KV for offline/fast access */
 export async function cacheObjectStoreDataset(dataset, data, tokenSource) {
   const key = KV_KEYS.objectStore(dataset);
   return kvSet(key, { data, cachedAt: Date.now() }, tokenSource);
+}
+
+// ── Account Linking ─────────────────────────────────────────────────────────
+
+/** Initialise or fetch unified account record from Puter KV */
+export async function accountInit(puterId, puterUsername, tokenSource) {
+  const key = KV_KEYS.account(puterId);
+  const existing = await kvGet(key, tokenSource);
+  if (existing.ok && existing.value && existing.value.puterId) {
+    // Update lastSeenAt
+    const updated = { ...existing.value, lastSeenAt: Date.now(), puterUsername };
+    await kvSet(key, updated, tokenSource);
+    return { ok: true, account: updated, created: false };
+  }
+  // Create new account
+  const account = {
+    puterId,
+    puterUsername,
+    discordId: null,
+    discordUsername: null,
+    grudgeId: null,
+    walletAddress: null,
+    linkedCharacterIds: [],
+    createdAt: Date.now(),
+    lastSeenAt: Date.now(),
+  };
+  const setResult = await kvSet(key, account, tokenSource);
+  if (!setResult.ok) return setResult;
+  return { ok: true, account, created: true };
+}
+
+/** Link a Discord identity to an existing Puter account */
+export async function accountLinkDiscord(puterId, discordId, discordUsername, grudgeId, tokenSource) {
+  const key = KV_KEYS.account(puterId);
+  const existing = await kvGet(key, tokenSource);
+  if (!existing.ok || !existing.value) return { ok: false, error: 'account_not_found' };
+  const updated = {
+    ...existing.value,
+    discordId,
+    discordUsername,
+    grudgeId: grudgeId || existing.value.grudgeId,
+    lastSeenAt: Date.now(),
+  };
+  await kvSet(key, updated, tokenSource);
+  return { ok: true, account: updated };
+}
+
+/** Link character IDs from the Crafting Suite to the account */
+export async function accountLinkCharacters(puterId, characterIds, tokenSource) {
+  const key = KV_KEYS.account(puterId);
+  const existing = await kvGet(key, tokenSource);
+  if (!existing.ok || !existing.value) return { ok: false, error: 'account_not_found' };
+  const merged = [...new Set([...(existing.value.linkedCharacterIds || []), ...characterIds])];
+  const updated = { ...existing.value, linkedCharacterIds: merged, lastSeenAt: Date.now() };
+  await kvSet(key, updated, tokenSource);
+  return { ok: true, account: updated };
+}
+
+/** Get account by Puter ID */
+export async function accountGet(puterId, tokenSource) {
+  return kvGet(KV_KEYS.account(puterId), tokenSource);
+}
+
+// ── Preferences ─────────────────────────────────────────────────────────────
+
+/** Get player preferences */
+export async function prefsGet(accountId, tokenSource) {
+  return kvGet(KV_KEYS.prefs(accountId), tokenSource);
+}
+
+/** Set player preferences */
+export async function prefsSet(accountId, prefs, tokenSource) {
+  return kvSet(KV_KEYS.prefs(accountId), prefs, tokenSource);
+}
+
+// ── Deploy Logs ─────────────────────────────────────────────────────────────
+
+/** Append a deploy log entry */
+export async function deployLogAppend(entry, tokenSource) {
+  const key = 'grudge:deploy:log';
+  const existing = await kvGet(key, tokenSource);
+  const logs = (existing.ok && Array.isArray(existing.value)) ? existing.value : [];
+  logs.unshift({ ...entry, ts: Date.now() });
+  if (logs.length > 100) logs.length = 100; // keep last 100
+  return kvSet(key, logs, tokenSource);
 }
 
 // ── Health Check ────────────────────────────────────────────────────────────

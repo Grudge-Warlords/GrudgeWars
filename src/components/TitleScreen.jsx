@@ -3,6 +3,7 @@ import useGameStore from '../stores/gameStore';
 import { setBgm, getMusicMuted, setMusicMuted } from '../utils/audioManager';
 import { EssentialIcon } from '../data/uiSprites';
 import { pullSave } from '../services/cloudSync';
+import { API_BASE } from '../utils/apiBase.js';
 
 function TitleParticles() {
   const canvasRef = useRef(null);
@@ -171,6 +172,7 @@ export default function TitleScreen() {
   const [puterUser, setPuterUser] = useState(null);
   const [puterLoading, setPuterLoading] = useState(false);
   const [discordLoading, setDiscordLoading] = useState(false);
+  const [continueLoading, setContinueLoading] = useState(false);
   const [autoChecked, setAutoChecked] = useState(false);
   const [muted, setMuted] = useState(() => getMusicMuted());
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -180,7 +182,24 @@ export default function TitleScreen() {
   const [formError, setFormError] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [cloudRestore, setCloudRestore] = useState(null); // { data, source }
-  const [discordSession, setDiscordSession] = useState(null); // existing Discord session
+  const [returningSession, setReturningSession] = useState(null); // any existing valid session
+  // Puter SDK loaded on-demand — button is always available
+  const loadPuterSdk = () => new Promise((resolve, reject) => {
+    if (window.puter?.auth) { resolve(); return; }
+    if (document.querySelector('script[src*="puter.com"]')) {
+      const poll = setInterval(() => { if (window.puter?.auth) { clearInterval(poll); resolve(); } }, 100);
+      setTimeout(() => { clearInterval(poll); resolve(); }, 8000);
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = 'https://js.puter.com/v2/';
+    s.onload = () => {
+      const poll = setInterval(() => { if (window.puter?.auth) { clearInterval(poll); resolve(); } }, 100);
+      setTimeout(() => { clearInterval(poll); resolve(); }, 3000);
+    };
+    s.onerror = () => reject(new Error('Failed to load Puter SDK'));
+    document.head.appendChild(s);
+  });
 
   const toggleMute = () => {
     const next = !muted;
@@ -192,10 +211,22 @@ export default function TitleScreen() {
     setBgm('intro');
     const t1 = setTimeout(() => setFadeClass(true), 200);
 
-    // Check for existing Discord session in localStorage
+    // Check for any existing session (discord, grudge, or puter)
     try {
-      const s = JSON.parse(localStorage.getItem('grudge-session') || '{}');
-      if (s.type === 'discord' && s.username) setDiscordSession(s);
+      const existingSession = JSON.parse(localStorage.getItem('grudge-session') || '{}');
+      const hasToken = !!localStorage.getItem('grudge_session_token');
+      const isLoggedInType = ['discord', 'grudge', 'puter'].includes(existingSession.type);
+
+      if (isLoggedInType && existingSession.username && hasToken && existingSession.loginTime) {
+        const age = Date.now() - existingSession.loginTime;
+        if (age < 7 * 24 * 60 * 60 * 1000) {
+          // Valid recent session — show welcome-back (don't auto-navigate, let user click Continue)
+          setReturningSession(existingSession);
+        }
+      } else if (isLoggedInType && existingSession.username) {
+        // Session exists but missing token or loginTime — still show as returning
+        setReturningSession(existingSession);
+      }
     } catch {}
 
     if (typeof window !== 'undefined' && window.puter?.auth?.isSignedIn?.()) {
@@ -210,11 +241,57 @@ export default function TitleScreen() {
     return () => clearTimeout(t1);
   }, []);
 
+  // Continue with an existing session (any type) — verify + pull cloud save
+  const handleContinueSession = async () => {
+    setContinueLoading(true);
+    try {
+      // Verify the session is still valid
+      const token = localStorage.getItem('grudge_session_token');
+      if (token) {
+        try {
+          const verifyRes = await fetch(`${API_BASE}/api/auth/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionToken: token }),
+          });
+          const verifyData = await verifyRes.json();
+          if (!verifyData.valid) {
+            // Token expired — clear and show login
+            localStorage.removeItem('grudge_session_token');
+            localStorage.removeItem('grudge-session');
+            setReturningSession(null);
+            setContinueLoading(false);
+            return;
+          }
+          // Update session with verified data
+          const session = { ...returningSession, grudgeId: verifyData.grudgeId || returningSession?.grudgeId, loginTime: Date.now() };
+          localStorage.setItem('grudge-session', JSON.stringify(session));
+        } catch {
+          // Verification failed (network) — proceed anyway with existing session
+        }
+      }
+
+      // Try cloud pull
+      const pull = await pullSave();
+      if (pull.success && pull.data && pull.data.gameState) {
+        const localSave = localStorage.getItem('grudge-warlords-storage');
+        if (localSave) {
+          setCloudRestore({ data: pull.data.gameState, source: pull.source });
+          setContinueLoading(false);
+          return;
+        }
+        localStorage.setItem('grudge-warlords-storage', JSON.stringify({ state: pull.data.gameState, version: 4 }));
+      }
+    } catch {}
+    setScreen('intro');
+    setContinueLoading(false);
+  };
+
   // Shared helper: authenticate with Puter → store session → try cloud pull
   const completePuterAuth = async (user) => {
     let grudgeId = null;
     try {
-      const r = await fetch('/api/auth/puter', {
+      const r = await fetch(`${API_BASE}/api/auth/puter`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ puterUsername: user.username, puterUuid: user.uuid || null }),
@@ -233,14 +310,11 @@ export default function TitleScreen() {
     try {
       const pull = await pullSave();
       if (pull.success && pull.data && pull.data.gameState) {
-        // Cloud save exists — check if local save also exists
         const localSave = localStorage.getItem('grudge-warlords-storage');
         if (localSave) {
-          // Both exist — offer choice
           setCloudRestore({ data: pull.data.gameState, source: pull.source });
-          return; // don't navigate yet
+          return;
         } else {
-          // No local save — auto-restore from cloud
           localStorage.setItem('grudge-warlords-storage', JSON.stringify({ state: pull.data.gameState, version: 4 }));
         }
       }
@@ -251,7 +325,7 @@ export default function TitleScreen() {
   const handleRestoreCloud = () => {
     if (cloudRestore?.data) {
       localStorage.setItem('grudge-warlords-storage', JSON.stringify({ state: cloudRestore.data, version: 4 }));
-      window.location.reload(); // reload to hydrate zustand from restored data
+      window.location.reload();
     }
   };
 
@@ -260,23 +334,30 @@ export default function TitleScreen() {
     setScreen('intro');
   };
 
+  // "LOGIN WITH GRUDGE" = Puter auth (Grudge ID IS Puter)
   const handleGrudgeLogin = async () => {
-    if (!window.puter) {
-      setShowLoginForm(true);
-      return;
-    }
     setPuterLoading(true);
     try {
+      await loadPuterSdk();
+      if (!window.puter?.auth) throw new Error('Puter SDK unavailable');
       if (puterUser) {
         await completePuterAuth(puterUser);
         setPuterLoading(false);
         return;
       }
-      await window.puter.auth.signIn();
+      if (!window.puter.auth.isSignedIn?.()) {
+        await window.puter.auth.signIn();
+      }
       const user = await window.puter.auth.getUser();
+      if (!user?.username) throw new Error('No Puter user');
       setPuterUser(user);
       await completePuterAuth(user);
-    } catch {}
+    } catch (err) {
+      const msg = err.message || '';
+      if (!msg.toLowerCase().includes('cancel') && !msg.toLowerCase().includes('closed')) {
+        console.warn('[Puter] Sign-in failed:', msg);
+      }
+    }
     setPuterLoading(false);
   };
 
@@ -285,7 +366,7 @@ export default function TitleScreen() {
     if (!formUsername || !formPassword) { setFormError('Enter username and password'); return; }
     setFormLoading(true); setFormError('');
     try {
-      const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+      const endpoint = isRegister ? `${API_BASE}/api/auth/register` : `${API_BASE}/api/auth/login`;
       const r = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: formUsername, password: formPassword }) });
       const data = await r.json();
       if (!r.ok) { setFormError(data.error || 'Failed'); setFormLoading(false); return; }
@@ -297,35 +378,18 @@ export default function TitleScreen() {
     setFormLoading(false);
   };
 
-  const handleDiscordLogin = async () => {
+  // Discord — route through VPS directly (avoids needing DISCORD_CLIENT_ID env var on Vercel)
+  const VPS_AUTH = 'https://id.grudge-studio.com';
+  const handleDiscordLogin = () => {
     setDiscordLoading(true);
-    try {
-      const res = await fetch('/api/discord/login');
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch {}
-    setDiscordLoading(false);
+    window.location.href = `${VPS_AUTH}/auth/discord?redirect_uri=${encodeURIComponent(window.location.origin + '/play')}`;
   };
 
-  // Continue with an already-authenticated Discord session
-  const handleDiscordContinue = async () => {
-    setDiscordLoading(true);
-    try {
-      const pull = await pullSave();
-      if (pull.success && pull.data && pull.data.gameState) {
-        const localSave = localStorage.getItem('grudge-warlords-storage');
-        if (localSave) {
-          setCloudRestore({ data: pull.data.gameState, source: pull.source });
-          setDiscordLoading(false);
-          return;
-        }
-        localStorage.setItem('grudge-warlords-storage', JSON.stringify({ state: pull.data.gameState, version: 4 }));
-      }
-    } catch {}
-    setScreen('intro');
-    setDiscordLoading(false);
+  const handleSignOut = () => {
+    localStorage.removeItem('grudge-session');
+    localStorage.removeItem('grudge_session_token');
+    localStorage.removeItem('discordUser');
+    setReturningSession(null);
   };
 
   const handleGuest = () => {
@@ -392,29 +456,106 @@ export default function TitleScreen() {
           display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center',
           marginBottom: 24,
         }}>
-          {!showLoginForm ? (
-            <LoginButton
-              label={puterUser ? `ENTER AS ${puterUser.username.toUpperCase()}` : 'LOGIN WITH GRUDGE'}
-              sublabel={puterUser ? 'Grudge Studio Account' : 'Sign in to save progress'}
-              onClick={handleGrudgeLogin}
-              variant="grudge"
-              active={!!puterUser}
-              disabled={puterLoading}
-              icon={
+          {/* Returning user welcome-back banner */}
+          {returningSession && !showLoginForm && (
+            <div style={{
+              width: 360, display: 'flex', flexDirection: 'column', gap: 8,
+              background: 'linear-gradient(135deg, rgba(110,231,183,0.12), rgba(16,185,129,0.05))',
+              border: '2px solid rgba(110,231,183,0.4)',
+              borderRadius: 10, padding: '14px 20px',
+              animation: 'slideUp 0.4s ease both',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{
-                  width: 24, height: 24, borderRadius: 4,
-                  background: puterUser
-                    ? 'linear-gradient(135deg, #10b981, #34d399)'
+                  width: 32, height: 32, borderRadius: 6,
+                  background: returningSession.type === 'discord'
+                    ? '#5865F2'
                     : 'linear-gradient(135deg, #DB6331, #FAAC47)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.75rem', fontWeight: 800, color: '#fff',
-                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '0.7rem', fontWeight: 800, color: '#fff',
                   overflow: 'hidden',
                 }}>
-                  {puterUser ? '\u2713' : <img src="/sprites/ui/grudge_logo.png" alt="G" style={{ width: 20, height: 20, objectFit: 'contain' }} />}
+                  {returningSession.type === 'discord'
+                    ? <DiscordSvg size={18} color="#fff" />
+                    : <img src="/sprites/ui/grudge_logo.png" alt="G" style={{ width: 22, height: 22, objectFit: 'contain' }} />}
                 </div>
-              }
-              delay={0.3}
+                <div style={{ flex: 1, textAlign: 'left' }}>
+                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: '0.85rem', color: '#6ee7b7', fontWeight: 700 }}>
+                    Welcome back, {returningSession.username}
+                  </div>
+                  {returningSession.grudgeId && (
+                    <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', fontFamily: "'Jost', sans-serif", letterSpacing: 1 }}>
+                      {returningSession.grudgeId}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={handleContinueSession}
+                  disabled={continueLoading}
+                  style={{
+                    flex: 1, padding: '10px', background: 'linear-gradient(135deg, #10b981, #34d399)',
+                    border: 'none', borderRadius: 6, color: '#0a0a12', fontWeight: 700,
+                    fontSize: '0.9rem', fontFamily: "'LifeCraft', 'Cinzel', serif",
+                    letterSpacing: 2, cursor: continueLoading ? 'wait' : 'pointer',
+                    opacity: continueLoading ? 0.7 : 1,
+                  }}
+                >
+                  {continueLoading ? 'LOADING...' : 'CONTINUE'}
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  style={{
+                    padding: '10px 14px', background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6,
+                    color: '#888', fontSize: '0.75rem', cursor: 'pointer',
+                    fontFamily: "'Jost', sans-serif",
+                  }}
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          )}
+
+          <LoginButton
+            label={puterLoading ? 'CONNECTING...' : 'LOGIN WITH GRUDGE'}
+            sublabel={'Sign in or create your Grudge ID'}
+            onClick={handleGrudgeLogin}
+            variant="grudge"
+            disabled={puterLoading}
+            icon={
+              <div style={{
+                width: 24, height: 24, borderRadius: 4,
+                background: 'linear-gradient(135deg, #DB6331, #FAAC47)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                overflow: 'hidden',
+              }}>
+                <img src="/sprites/ui/grudge_logo.png" alt="G" style={{ width: 20, height: 20, objectFit: 'contain' }} />
+              </div>
+            }
+            delay={returningSession ? 0.1 : 0.3}
+          />
+
+          <LoginButton
+            label={'LOGIN WITH DISCORD'}
+            sublabel={'Sync community & leaderboards'}
+            onClick={handleDiscordLogin}
+            variant="discord"
+            disabled={discordLoading}
+            icon={<DiscordSvg size={22} color={'#7289da'} />}
+            delay={returningSession ? 0.2 : 0.45}
+          />
+
+          {/* Username/password fallback */}
+          {!showLoginForm ? (
+            <LoginButton
+              label="USE USERNAME & PASSWORD"
+              sublabel="Grudge account login"
+              onClick={() => setShowLoginForm(true)}
+              variant="default"
+              delay={returningSession ? 0.25 : 0.5}
             />
           ) : (
             <form onSubmit={handleFormSubmit} style={{
@@ -424,7 +565,7 @@ export default function TitleScreen() {
               animation: 'slideUp 0.3s ease both',
             }}>
               <div style={{ fontFamily: "'LifeCraft', 'Cinzel', serif", fontSize: '1.1rem', color: 'var(--accent)', letterSpacing: 2, textAlign: 'center', marginBottom: 4 }}>
-                {isRegister ? 'CREATE GRUDGE ID' : 'GRUDGE LOGIN'}
+                {isRegister ? 'CREATE ACCOUNT' : 'SIGN IN'}
               </div>
               <input
                 type="text" placeholder="Username" value={formUsername}
@@ -459,23 +600,12 @@ export default function TitleScreen() {
           )}
 
           <LoginButton
-            label={discordSession ? `CONTINUE AS ${discordSession.username.toUpperCase()}` : 'LOGIN WITH DISCORD'}
-            sublabel={discordSession ? 'Discord account linked' : 'Sync community & leaderboards'}
-            onClick={discordSession ? handleDiscordContinue : handleDiscordLogin}
-            variant="discord"
-            active={!!discordSession}
-            disabled={discordLoading}
-            icon={<DiscordSvg size={22} color={discordSession ? '#6ee7b7' : '#7289da'} />}
-            delay={0.45}
-          />
-
-          <LoginButton
             label="PLAY AS GUEST"
             sublabel="No account needed"
             onClick={handleGuest}
             variant="default"
             icon={<EssentialIcon name="Gamepad" size={18} style={{ opacity: 0.5 }} />}
-            delay={0.55}
+            delay={returningSession ? 0.35 : 0.55}
           />
         </div>
 

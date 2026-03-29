@@ -103,9 +103,12 @@ export async function initDatabase() {
       ALTER TABLE accounts ADD COLUMN IF NOT EXISTS wallet_chain VARCHAR(32);
       ALTER TABLE accounts ADD COLUMN IF NOT EXISTS wallet_created_at TIMESTAMPTZ;
       ALTER TABLE accounts ADD COLUMN IF NOT EXISTS grudge_id VARCHAR(64) UNIQUE;
+      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS grudge_username VARCHAR(64);
+      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS password_hash VARCHAR(256);
+      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS auth_type VARCHAR(32) DEFAULT 'discord';
+      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS puter_uuid VARCHAR(128);
       ALTER TABLE accounts ADD COLUMN IF NOT EXISTS game_state JSONB DEFAULT NULL;
       ALTER TABLE accounts ADD COLUMN IF NOT EXISTS game_state_updated_at TIMESTAMPTZ;
-      ALTER TABLE accounts ADD COLUMN IF NOT EXISTS password_hash VARCHAR(256);
 
       CREATE TABLE IF NOT EXISTS arena_teams (
         team_id TEXT PRIMARY KEY,

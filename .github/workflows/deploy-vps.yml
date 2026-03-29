@@ -1,0 +1,112 @@
+name: Build & Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ── Lint & Test ──────────────────────────
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint check
+        run: npm run lint --if-present
+
+      - name: Run tests
+        run: npm test --if-present
+
+  # ── Build Docker Image ───────────────────
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+            type=ref,event=branch
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── Deploy via Coolify Webhook ───────────
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Trigger Coolify deployment
+        run: |
+          curl -sSf -X POST "${{ secrets.COOLIFY_WEBHOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"force": true}'
+        env:
+          COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
+
+      - name: Wait for deployment health
+        run: |
+          echo "Waiting 30s for deployment to stabilize..."
+          sleep 30
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.grudge-studio.com/health || echo "000")
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "⚠️ Health check returned $HTTP_STATUS — deployment may need attention"
+            exit 1
+          fi
+          echo "✅ Health check passed (HTTP $HTTP_STATUS)"
+
+      - name: Notify Discord
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" = "success" ]; then
+            COLOR=3066993
+            EMOJI="✅"
+            DESC="Deployed \`${{ github.sha }}\` to VPS"
+          else
+            COLOR=15158332
+            EMOJI="❌"
+            DESC="Deploy failed for \`${{ github.sha }}\`"
+          fi
+          curl -s -o /dev/null -X POST "${{ secrets.DISCORD_DEPLOY_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"embeds\":[{\"title\":\"${EMOJI} Grudge VPS Deploy\",\"description\":\"${DESC}\",\"color\":${COLOR},\"fields\":[{\"name\":\"Branch\",\"value\":\"\`${{ github.ref_name }}\`\",\"inline\":true},{\"name\":\"Actor\",\"value\":\"\`${{ github.actor }}\`\",\"inline\":true}],\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}]}" || true

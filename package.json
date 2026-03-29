@@ -2,24 +2,28 @@
   "name": "grudge-warlords",
   "version": "1.0.0",
   "type": "module",
-  "description": "Final Fantasy 7-inspired turn-based RPG with multi-hero tactical combat",
+  "description": "Grudge Warlords — Souls-like action RPG with multi-hero tactical combat",
   "author": "Grudge Studio",
   "license": "UNLICENSED",
   "private": true,
   "engines": {
-    "node": ">=20.19.0"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5000",
     "dev:server": "node server.js",
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\"",
+    "check:favicons": "pwsh -File scripts/check-favicons.ps1",
     "build": "vite build",
+    "build:vercel": "vite build",
+    "predeploy": "pwsh -File scripts/check-favicons.ps1",
     "start": "node server.js",
     "preview": "vite preview",
     "export:skills": "node scripts/export-skill-trees.js"
   },
   "dependencies": {
-    "discord.js": "^14.25.1",
+    "@aws-sdk/client-s3": "^3.1007.0",
+    "@aws-sdk/s3-request-presigner": "^3.1007.0",
     "express": "^5.2.1",
     "framer-motion": "^12.34.0",
     "pg": "^8.18.0",
@@ -32,5 +36,8 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "vite": "^7.3.1"
+  },
+  "optionalDependencies": {
+    "discord.js": "^14.25.1"
   }
 }

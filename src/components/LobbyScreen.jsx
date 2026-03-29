@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import useGameStore from '../stores/gameStore';
 import { InlineIcon, EssentialIcon } from '../data/uiSprites';
 import SpriteAnimation from './SpriteAnimation';
@@ -12,6 +12,10 @@ import adminConfig from '../utils/adminConfig';
 import GrudgeOnlinePage from './GrudgeOnlinePage';
 import HeroCodexTab from './HeroCodexTab';
 import { pullSave, forcePush, getLastSync, isLoggedIn as cloudIsLoggedIn } from '../services/cloudSync';
+import { launchCraftingSuite } from '../utils/craftingSuiteSSO';
+import { linkAccount } from '../services/craftingApi';
+import { API_BASE } from '../utils/apiBase.js';
+import { openBuilder } from '../utils/studioUrls';
 
 export default function LobbyScreen() {
   const setScreen = useGameStore(s => s.setScreen);
@@ -33,10 +37,31 @@ export default function LobbyScreen() {
   }, []);
 
   const hasExistingSave = playerName && playerName.length > 0;
+  const suiteLinked = useGameStore(s => s.suiteLinked);
+  const linkSuiteAccount = useGameStore(s => s.linkSuiteAccount);
 
   useEffect(() => {
     setBgm('intro');
   }, []);
+
+  // Auto-link Crafting Suite account on lobby mount (if logged in and not already linked)
+  useEffect(() => {
+    if (suiteLinked) return;
+    const discordUser = (() => { try { return JSON.parse(localStorage.getItem('discordUser') || 'null'); } catch { return null; } })();
+    if (!discordUser?.id) return;
+    linkAccount(discordUser.id).then(result => {
+      if (result.success && result.linked) {
+        linkSuiteAccount({
+          accountId: result.accountId,
+          grudgeId: result.grudgeId,
+          gold: result.gold,
+          gbux: result.gbux,
+          accountXp: result.accountXp,
+        });
+        console.log('[Suite] Auto-linked crafting account:', result.grudgeId);
+      }
+    }).catch(() => {});
+  }, [suiteLinked]);
 
   const handleContinue = () => {
     if (hasExistingSave) {
@@ -188,9 +213,11 @@ export default function LobbyScreen() {
           }} />
           <NavItem essentialIcon="Gamepad" label="PLAY" active={activeTab === 'main'} onClick={() => setActiveTab('main')} />
           <NavItem essentialIcon="Team" label="CHARACTERS" active={activeTab === 'characters'} onClick={() => setActiveTab('characters')} />
+          <NavItem essentialIcon="Briefcase" label="BUILDER" active={false} onClick={() => openBuilder('/character', { newTab: true })} />
           <NavItem essentialIcon="Briefcase" label="ACCOUNT" active={activeTab === 'account'} onClick={() => setActiveTab('account')} />
           <NavItem essentialIcon="Cloud" label="DISCORD" active={activeTab === 'discord'} onClick={() => setActiveTab('discord')} />
           <NavItem essentialIcon="File" label="CODEX" active={activeTab === 'codex'} onClick={() => setActiveTab('codex')} />
+          <NavItem essentialIcon="Briefcase" label="CRAFTING" active={false} onClick={() => setScreen('craftingSuite')} />
           <div style={{ flex: 1 }} />
           <NavItem essentialIcon="Trophy" label="CREDITS" active={activeTab === 'credits'} onClick={() => setActiveTab('credits')} />
         </div>
@@ -254,12 +281,13 @@ function NavItem({ essentialIcon, label, active, onClick }) {
       }}
     >
       <img
-        src={active ? '/ui/wood_light.png' : '/ui/wood_dark.png'}
+        src={active ? '/ui/wood_plank_light.png' : '/ui/wood_plank_dark.png'}
         alt=""
         style={{
           display: 'block', width: '100%', height: 94,
           objectFit: 'fill',
           pointerEvents: 'none',
+          borderRadius: 6,
         }}
       />
       <span style={{
@@ -333,7 +361,7 @@ function MainTab({ hasExistingSave, onContinue, onNewGame, playerName, playerLev
       setWalletState({ loading: false, hasWallet: false, wallet: null, error: null, creating: false });
       return;
     }
-    fetch('/api/wallet/status', { headers: { 'x-session-token': sessionToken } })
+    fetch(`${API_BASE}/api/wallet/status`, { headers: { 'x-session-token': sessionToken } })
       .then(r => r.json())
       .then(data => {
         setWalletState({ loading: false, hasWallet: data.hasWallet, wallet: data.wallet || null, error: null, creating: false });
@@ -346,7 +374,7 @@ function MainTab({ hasExistingSave, onContinue, onNewGame, playerName, playerLev
     if (!sessionToken) return;
     setWalletState(s => ({ ...s, creating: true, error: null }));
     try {
-      const res = await fetch('/api/wallet/create', {
+      const res = await fetch(`${API_BASE}/api/wallet/create`, {
         method: 'POST',
         headers: { 'x-session-token': sessionToken, 'Content-Type': 'application/json' },
       });
@@ -442,6 +470,8 @@ function MainTab({ hasExistingSave, onContinue, onNewGame, playerName, playerLev
           subtitle={walletState.loading ? 'Loading...' : walletState.hasWallet ? <>SOL &bull; {walletState.wallet?.address?.slice(0, 6)}...{walletState.wallet?.address?.slice(-4)}</> : 'Create your Solana wallet'}
           cardStyle={cardStyle}
         />
+
+        <CraftingSuiteCard cardStyle={cardStyle} />
       </div>
 
       <HeroSlideshow />
@@ -641,12 +671,12 @@ const FACTION_MAP = {
   undead: { name: 'Legion', god: 'Madra', color: '#ef4444', icon: '/icons/pack/factions/legion-emblem.png' },
   elf: { name: 'Fabled', god: 'The Omni', color: '#22d3ee', icon: '/icons/pack/factions/fabled-emblem.png' },
   dwarf: { name: 'Fabled', god: 'The Omni', color: '#22d3ee', icon: '/icons/pack/factions/fabled-emblem.png' },
-  pirates: { name: 'Pirates', god: 'None — Neutral Mercenaries', color: '#d4a017', icon: '/factions/faction_pirates.png' },
+  pirates: { name: 'Pirates', god: 'None â€” Neutral Mercenaries', color: '#d4a017', icon: '/factions/faction_pirates.png' },
 };
 
 const HERO_SLOGANS = {
   human_warrior: "My blade is the will of the Crusade.",
-  human_mage: "Knowledge and faith — both are my weapons.",
+  human_mage: "Knowledge and faith â€” both are my weapons.",
   human_worge: "The storm within answers to no one.",
   human_ranger: "One shot. One kill. Honor demands precision.",
   orc_warrior: "Blood and iron! I fear nothing!",
@@ -654,7 +684,7 @@ const HERO_SLOGANS = {
   orc_worge: "The beast within hungers for war!",
   orc_ranger: "My arrows carry the Legion's fury.",
   elf_warrior: "Centuries of discipline forged this blade.",
-  elf_mage: "The arcane speaks — I merely translate.",
+  elf_mage: "The arcane speaks â€” I merely translate.",
   elf_worge: "Nature's wrath takes many forms.",
   elf_ranger: "The wind guides every arrow I loose.",
   undead_warrior: "Death could not stop me. Neither will you.",
@@ -663,7 +693,7 @@ const HERO_SLOGANS = {
   undead_ranger: "The dead have perfect aim.",
   barbarian_warrior: "RAAAAGH! Come face me, coward!",
   barbarian_mage: "Primal fury needs no fancy spells!",
-  barbarian_worge: "Two beasts in one body — twice the carnage!",
+  barbarian_worge: "Two beasts in one body â€” twice the carnage!",
   barbarian_ranger: "I hunt what others fear to face.",
   dwarf_warrior: "Forged in mountain stone. Unbreakable.",
   dwarf_mage: "Rune magic runs deeper than any ley line.",
@@ -672,10 +702,10 @@ const HERO_SLOGANS = {
 };
 
 const LORE_QUOTES = {
-  warrior: "Forged in the crucible of the Grudge Wars — blades drawn, shields raised.",
+  warrior: "Forged in the crucible of the Grudge Wars â€” blades drawn, shields raised.",
   mage: "Channeling ancient ley lines and forgotten gods since the first grudge was spoken.",
-  worge: "Walking between worlds — scholar in mortal guise, predator unleashed.",
-  ranger: "Silent as shadow, deadly as the wind — masters of the killing blow.",
+  worge: "Walking between worlds â€” scholar in mortal guise, predator unleashed.",
+  ranger: "Silent as shadow, deadly as the wind â€” masters of the killing blow.",
 };
 
 function SlideshowVFXSprite({ effectKey, displaySize = 280, style }) {
@@ -2075,17 +2105,17 @@ function HeroSlideshow() {
               </div>
               <div>X: <span style={{ color: '#6f6' }}>{editorX}</span> | Y: <span style={{ color: '#6f6' }}>{editorY}</span> | Scale: <span style={{ color: '#6f6' }}>{editorScale.toFixed(2)}</span></div>
               <div style={{ color: '#FAAC47', marginTop: 2, fontSize: '0.65rem' }}>
-                Final → X: {spriteXOffset + editorX} | Y: {spriteYOffset + editorY} | Scale: {((scaleOverride || 1) * editorScale).toFixed(2)}
+                Final â†’ X: {spriteXOffset + editorX} | Y: {spriteYOffset + editorY} | Scale: {((scaleOverride || 1) * editorScale).toFixed(2)}
               </div>
             </>
           ) : editorTarget === 'transform' ? (
             <>
               <div style={{ color: '#4fc3f7', fontWeight: 700, fontSize: '0.7rem' }}>
-                {combo.raceId}_{combo.classId} → {activeForm?.label || 'base'}
+                {combo.raceId}_{combo.classId} â†’ {activeForm?.label || 'base'}
               </div>
               <div>X: <span style={{ color: '#6f6' }}>{transformEditorX}</span> | Y: <span style={{ color: '#6f6' }}>{transformEditorY}</span> | Scale: <span style={{ color: '#6f6' }}>{transformEditorScale.toFixed(2)}</span></div>
               <div style={{ color: '#4fc3f7', marginTop: 2, fontSize: '0.65rem' }}>
-                Saved → X: {savedTransformOverride?.offsetX || 0} | Y: {savedTransformOverride?.offsetY || 0} | Scale: {(savedTransformOverride?.scale || 1).toFixed(2)}
+                Saved â†’ X: {savedTransformOverride?.offsetX || 0} | Y: {savedTransformOverride?.offsetY || 0} | Scale: {(savedTransformOverride?.scale || 1).toFixed(2)}
               </div>
             </>
           ) : (
@@ -2095,7 +2125,7 @@ function HeroSlideshow() {
               </div>
               <div>X: <span style={{ color: '#6f6' }}>{dummyEditorX}</span> | Y: <span style={{ color: '#6f6' }}>{dummyEditorY}</span> | Scale: <span style={{ color: '#6f6' }}>{dummyEditorScale.toFixed(2)}</span></div>
               <div style={{ color: '#c084fc', marginTop: 2, fontSize: '0.65rem' }}>
-                Final → X: {dummyPos.x + dummyEditorX} | Y: {dummyPos.y + dummyEditorY} | Scale: {((dummyPos.scale || 5) * dummyEditorScale).toFixed(2)}
+                Final â†’ X: {dummyPos.x + dummyEditorX} | Y: {dummyPos.y + dummyEditorY} | Scale: {((dummyPos.scale || 5) * dummyEditorScale).toFixed(2)}
               </div>
             </>
           )}
@@ -2112,7 +2142,7 @@ function HeroSlideshow() {
               color: '#22c55e', fontWeight: 700, marginTop: 4, fontSize: '0.8rem',
               animation: 'ssFadeIn 0.3s ease',
             }}>
-              SAVED {editorTarget === 'dummy' ? 'DUMMY' : editorTarget === 'transform' ? `${comboKey} → ${activeForm?.label}` : comboKey}
+              SAVED {editorTarget === 'dummy' ? 'DUMMY' : editorTarget === 'transform' ? `${comboKey} â†’ ${activeForm?.label}` : comboKey}
             </div>
           )}
           {editorTarget === 'hero' && savedPos && !editorSaved && (
@@ -2379,6 +2409,7 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
   const setPlayerName = useGameStore(s => s.setPlayerName);
   const resetGame = useGameStore(s => s.resetGame);
   const setScreen = useGameStore(s => s.setScreen);
+  const importWcsHero = useGameStore(s => s.importWcsHero);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [exportCopied, setExportCopied] = useState(false);
   const [editingName, setEditingName] = useState(false);
@@ -2388,10 +2419,28 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
   const [discordLoading, setDiscordLoading] = useState(false);
   const [syncStatus, setSyncStatus] = useState('idle'); // idle | syncing | synced | error
   const [lastSyncTime, setLastSyncTime] = useState(() => getLastSync()?.timestamp || null);
+  const [wcsCharacters, setWcsCharacters] = useState(null); // null = not loaded, [] = empty
+  const [wcsLoading, setWcsLoading] = useState(false);
+  const [importStatus, setImportStatus] = useState({}); // { [charId]: 'importing'|'done'|'error'|'duplicate' }
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.puter?.auth?.isSignedIn?.()) {
       window.puter.auth.getUser().then(u => setPuterUser(u)).catch(() => {});
+    }
+    // Fetch WCS characters if we have a session token
+    const token = localStorage.getItem('grudge_session_token');
+    if (token && !wcsCharacters) {
+      setWcsLoading(true);
+      fetch(`${API_BASE}/api/studio/characters`, {
+        headers: { 'X-Session-Token': token },
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data?.characters) setWcsCharacters(data.characters);
+          else setWcsCharacters([]);
+        })
+        .catch(() => setWcsCharacters([]))
+        .finally(() => setWcsLoading(false));
     }
   }, []);
 
@@ -2417,7 +2466,7 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
   const handleDiscordLogin = async () => {
     setDiscordLoading(true);
     try {
-      const res = await fetch('/api/discord/login');
+      const res = await fetch(`${API_BASE}/api/discord/login`);
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
@@ -2426,32 +2475,58 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
     setDiscordLoading(false);
   };
 
+  const loadPuterSdk = () => new Promise((resolve, reject) => {
+    if (window.puter?.auth) { resolve(); return; }
+    if (document.querySelector('script[src*="puter.com"]')) {
+      const poll = setInterval(() => { if (window.puter?.auth) { clearInterval(poll); resolve(); } }, 100);
+      setTimeout(() => { clearInterval(poll); resolve(); }, 8000);
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = 'https://js.puter.com/v2/';
+    s.onload = () => {
+      const poll = setInterval(() => { if (window.puter?.auth) { clearInterval(poll); resolve(); } }, 100);
+      setTimeout(() => { clearInterval(poll); resolve(); }, 3000);
+    };
+    s.onerror = () => reject(new Error('Puter SDK load failed'));
+    document.head.appendChild(s);
+  });
+
   const handlePuterLogin = async () => {
-    if (!window.puter) return;
     setPuterLoading(true);
     try {
-      await window.puter.auth.signIn();
+      await loadPuterSdk();
+      if (!window.puter?.auth) throw new Error('Puter SDK unavailable');
+      if (!window.puter.auth.isSignedIn?.()) {
+        await window.puter.auth.signIn();
+      }
       const user = await window.puter.auth.getUser();
+      if (!user?.username) throw new Error('No Puter user');
       setPuterUser(user);
       // Auth with backend to get/create Grudge ID
       let grudgeId = null;
       try {
-        const r = await fetch('/api/auth/puter', {
+        const r = await fetch(`${API_BASE}/api/auth/puter`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ puterUsername: user.username, puterUuid: user.uuid || null }),
         });
         const data = await r.json();
-        if (data.sessionToken) localStorage.setItem('grudge_session_token', data.sessionToken);
-        grudgeId = data.user?.grudgeId || null;
+        const tok = data.sessionToken || data.token || null;
+        if (tok) { localStorage.setItem('grudge_session_token', tok); localStorage.setItem('grudge_auth_token', tok); }
+        grudgeId = data.grudgeId || data.user?.grudgeId || null;
       } catch {}
       const s = JSON.parse(localStorage.getItem('grudge-session') || '{}');
-      s.type = 'puter';
-      s.puterUsername = user.username;
+      s.type = 'puter'; s.username = user.username; s.puterUsername = user.username;
       if (grudgeId) s.grudgeId = grudgeId;
       s.loginTime = Date.now();
       localStorage.setItem('grudge-session', JSON.stringify(s));
-    } catch {}
+    } catch (err) {
+      const msg = err.message || '';
+      if (!msg.toLowerCase().includes('cancel') && !msg.toLowerCase().includes('closed')) {
+        console.warn('[Puter] Login failed:', msg);
+      }
+    }
     setPuterLoading(false);
   };
 
@@ -2639,7 +2714,7 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
               </div>
               <div style={{ fontSize: '0.65rem', color: 'var(--muted)', marginTop: 2 }}>
                 {isPuterConnected
-                  ? `Signed in as ${puterUser?.username || session.puterUsername || 'User'} — tap to sign out`
+                  ? `Signed in as ${puterUser?.username || session.puterUsername || 'User'} â€” tap to sign out`
                   : 'Free cloud account, no API keys needed'}
               </div>
             </div>
@@ -2697,7 +2772,7 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
                 transition: 'all 0.2s ease',
               }}
             >
-              {syncStatus === 'syncing' ? 'Syncing...' : syncStatus === 'synced' ? 'Synced ✓' : 'Sync Now'}
+              {syncStatus === 'syncing' ? 'Syncing...' : syncStatus === 'synced' ? 'Synced âœ“' : 'Sync Now'}
             </button>
           </div>
           <div style={{ color: 'var(--muted)', fontSize: '0.65rem', opacity: 0.6 }}>
@@ -2705,6 +2780,109 @@ function AccountTab({ session, panelStyle, hasExistingSave }) {
           </div>
         </div>
       )}
+
+      {/* Crafting Suite Characters */}
+      <div style={{ ...panelStyle }}>
+        {sectionTitle('Crafting Suite Characters')}
+        {wcsLoading && (
+          <div style={{ color: 'var(--muted)', fontSize: '0.8rem', padding: '8px 0' }}>Loading characters...</div>
+        )}
+      {!wcsLoading && wcsCharacters && wcsCharacters.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {wcsCharacters.map(c => {
+              const alreadyImported = heroRoster.some(h => h.id === `wcs_${c.id}`);
+              const status = importStatus[c.id];
+              return (
+                <div key={c.id} style={{
+                  display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
+                  background: alreadyImported ? 'rgba(110,231,183,0.06)' : 'rgba(250,172,71,0.06)',
+                  border: `1px solid ${alreadyImported ? 'rgba(110,231,183,0.2)' : 'rgba(250,172,71,0.15)'}`,
+                  borderRadius: 8,
+                }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 4,
+                    background: 'linear-gradient(135deg, rgba(250,172,71,0.2), rgba(219,99,49,0.15))',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '0.6rem', fontWeight: 700, color: '#FAAC47',
+                  }}>
+                    {c.level || 1}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ color: '#e2e8f0', fontSize: '0.8rem', fontWeight: 600 }}>{c.name}</div>
+                    <div style={{ color: 'var(--muted)', fontSize: '0.6rem' }}>
+                      {c.raceId} {c.classId} {c.profession ? `â€¢ ${c.profession}` : ''}
+                    </div>
+                  </div>
+                  {alreadyImported ? (
+                    <span style={{ color: '#6ee7b7', fontSize: '0.6rem', fontWeight: 600 }}>In Roster</span>
+                  ) : (
+                    <button
+                      disabled={status === 'importing'}
+                      onClick={() => {
+                        setImportStatus(prev => ({ ...prev, [c.id]: 'importing' }));
+                        try {
+                          const result = importWcsHero(c);
+                          if (result.success) {
+                            setImportStatus(prev => ({ ...prev, [c.id]: 'done' }));
+                          } else {
+                            setImportStatus(prev => ({ ...prev, [c.id]: result.reason === 'already_imported' ? 'duplicate' : 'error' }));
+                          }
+                        } catch {
+                          setImportStatus(prev => ({ ...prev, [c.id]: 'error' }));
+                        }
+                      }}
+                      style={{
+                        background: status === 'done' ? 'rgba(110,231,183,0.15)' : 'rgba(250,172,71,0.15)',
+                        border: `1px solid ${status === 'done' ? 'rgba(110,231,183,0.4)' : 'rgba(250,172,71,0.4)'}`,
+                        borderRadius: 6, padding: '4px 10px', cursor: status === 'importing' ? 'wait' : 'pointer',
+                        color: status === 'done' ? '#6ee7b7' : '#FAAC47',
+                        fontSize: '0.65rem', fontWeight: 600, fontFamily: "'Jost', sans-serif",
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {status === 'done' ? 'Imported âœ“' : status === 'duplicate' ? 'Already In' : status === 'importing' ? '...' : 'Import Hero'}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {!wcsLoading && wcsCharacters && wcsCharacters.length === 0 && (
+          <div style={{ color: 'var(--muted)', fontSize: '0.75rem', padding: '4px 0' }}>No characters found in Crafting Suite</div>
+        )}
+        {!wcsLoading && !wcsCharacters && !isDiscordConnected && (
+          <div style={{ color: 'var(--muted)', fontSize: '0.75rem', padding: '4px 0' }}>Link Discord to see your Crafting Suite characters</div>
+        )}
+        <button
+          onClick={async () => {
+            const token = localStorage.getItem('grudge_session_token');
+            if (token) {
+              try {
+                const res = await fetch(`${API_BASE}/api/crafting/sso-token`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'X-Session-Token': token },
+                });
+                const data = await res.json();
+                if (data.redirectUrl) {
+                  window.open(data.redirectUrl, '_blank', 'noopener,noreferrer');
+                  return;
+                }
+              } catch { /* fall through to plain URL */ }
+            }
+            window.open('https://warlord-crafting-suite.vercel.app', '_blank', 'noopener,noreferrer');
+          }}
+          style={{
+            marginTop: 10, display: 'flex', alignItems: 'center', gap: 8,
+            background: 'rgba(250,172,71,0.1)', border: '1px solid rgba(250,172,71,0.3)',
+            borderRadius: 8, color: '#FAAC47', padding: '8px 16px', cursor: 'pointer',
+            fontSize: '0.75rem', fontFamily: "'Jost', sans-serif", fontWeight: 600,
+            width: '100%', justifyContent: 'center',
+          }}
+        >
+          Open Crafting Suite
+        </button>
+      </div>
 
       <div style={{ ...panelStyle }}>
         {sectionTitle('Campaign Stats')}
@@ -2809,7 +2987,7 @@ function DiscordTab({ panelStyle }) {
   const verifyAdmin = async () => {
     setVerifying(true);
     try {
-      const res = await fetch('/api/discord/webhook/verify', {
+      const res = await fetch(`${API_BASE}/api/discord/webhook/verify`, {
         headers: { 'x-admin-token': adminToken },
       });
       const data = await res.json();
@@ -2848,7 +3026,7 @@ function DiscordTab({ panelStyle }) {
           payload[key] = payload[key].split('\n').filter(l => l.trim());
         }
       });
-      const res = await fetch(`/api/discord/webhook/${webhookType}`, {
+      const res = await fetch(`${API_BASE}/api/discord/webhook/${webhookType}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
         body: JSON.stringify(payload),
@@ -2900,7 +3078,7 @@ function DiscordTab({ panelStyle }) {
         </div>
 
         <a
-          href="https://discord.gg/KmAC5aXs84"
+          href="https://discord.gg/FtGtmxmwkh"
           target="_blank"
           rel="noopener noreferrer"
           style={{
@@ -3148,7 +3326,7 @@ function CreditsTab({ panelStyle }) {
         {divider}
         {sectionHeader('Special Thanks')}
         <CreditEntry title="The Grudge Warlords Community" role="Beta testers, feedback & bug reports" />
-        <CreditEntry title="Discord Community" role="discord.gg/KmAC5aXs84" />
+        <CreditEntry title="Discord Community" role="discord.gg/FtGtmxmwkh" />
       </div>
 
       <div style={{
@@ -3175,6 +3353,28 @@ function CreditsTab({ panelStyle }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function CraftingSuiteCard({ cardStyle }) {
+  const setScreen = useGameStore(s => s.setScreen);
+
+  return (
+    <>
+      <WarRoomCard
+        onClick={() => setScreen('craftingSuite')}
+        borderColor="rgba(59,130,246,0.3)"
+        hoverBorderColor="rgba(59,130,246,0.6)"
+        hoverShadow="0 0 24px rgba(59,130,246,0.2), 0 8px 32px rgba(0,0,0,0.4)"
+        bgImage="/backgrounds/crafting_forge.png"
+        tagColor="rgba(59,130,246,0.7)"
+        tag="CRAFTING"
+        titleColor="#3b82f6"
+        title="Crafting Suite"
+        subtitle="Inventory, crafting & professions"
+        cardStyle={cardStyle}
+      />
+    </>
   );
 }
 
@@ -3229,3 +3429,4 @@ function LobbyButton({ label, onClick, primary, icon }) {
     </button>
   );
 }
+

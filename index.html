@@ -17,7 +17,7 @@
     <meta property="og:url" content="https://grudgewarlords.com/" />
     <meta property="og:title" content="Grudge Warlords | Dark Fantasy Turn-Based RPG" />
     <meta property="og:description" content="Build your team of warlords from 6 races and 4 classes. Battle in the arena, explore dungeons, and conquer the realm. A Grudge Studio production." />
-    <meta property="og:image" content="/images/og-banner.png" />
+    <meta property="og:image" content="/images/grudge_rpg_logo.png" />
     <meta property="og:site_name" content="Grudge Warlords" />
     
     <!-- Twitter -->
@@ -25,7 +25,7 @@
     <meta property="twitter:url" content="https://grudgewarlords.com/" />
     <meta property="twitter:title" content="Grudge Warlords | Dark Fantasy Turn-Based RPG" />
     <meta property="twitter:description" content="Build your team of warlords from 6 races and 4 classes. Battle in the arena, explore dungeons, and conquer the realm." />
-    <meta property="twitter:image" content="/images/og-banner.png" />
+    <meta property="twitter:image" content="/images/grudge_rpg_logo.png" />
     
     <!-- Additional Meta -->
     <meta name="theme-color" content="#0a0a0f" />
@@ -34,8 +34,10 @@
     <meta name="apple-mobile-web-app-title" content="Grudge Warlords" />
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/images/grudge_rpg_logo.png" />
-    <link rel="apple-touch-icon" href="/images/grudge_rpg_logo.png" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://grudgewarlords.com/" />
@@ -67,6 +69,9 @@
       }
     }
     </script>
+    <!-- Puter SDK — loaded at page start so existing Puter sessions auto-authenticate -->
+    <!-- signIn() will check if user is already logged in to puter.com and skip the popup -->
+    <script src="https://js.puter.com/v2/" async></script>
   </head>
   <body>
     <div id="root"></div>

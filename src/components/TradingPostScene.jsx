@@ -4,6 +4,7 @@ import SpriteAnimation from './SpriteAnimation';
 import { getPlayerSprite, SCENE_NPCS, npcSpriteMap } from '../data/spriteMap';
 import { getItemPrice, getSellPrice } from '../data/equipment';
 import { InlineIcon } from '../data/uiSprites';
+import { getWeaponIcon, getArmorIcon, OBJECTSTORE_BASE } from '../data/objectStoreIcons.js';
 import { setBgm } from '../utils/audioManager';
 import NpcSprite from './NpcSprite';
 import { SCENE } from '../constants/layers';
@@ -28,6 +29,34 @@ const NPC_BARKS = [
 ];
 
 const SPAWN_POS = { x: 50, y: 82 };
+
+const FOOD_ICON_MAP = {
+  food_steak:  '/icons/food/95_steak.png',
+  food_ramen:  '/icons/food/87_ramen.png',
+  food_burger: '/icons/food/15_burger.png',
+  food_curry:  '/icons/food/32_curry.png',
+  food_salmon: '/icons/food/88_salmon.png',
+  food_pizza:  '/icons/food/81_pizza.png',
+};
+
+const ARMOR_MAX_IDX = { armor: 83, helmet: 72, feet: 56, offhand: 56, ring: 57, relic: 6 };
+
+function getItemIconUrl(item) {
+  if (item.slot === 'consumable' || item.isConsumable) {
+    if (item.icon && FOOD_ICON_MAP[item.icon]) return FOOD_ICON_MAP[item.icon];
+    return `${OBJECTSTORE_BASE}/icons/consumables/health_potion.png`;
+  }
+  if (item.slot === 'weapon') {
+    return getWeaponIcon(item.weaponType || 'sword');
+  }
+  if (ARMOR_MAX_IDX[item.slot] !== undefined) {
+    const max = ARMOR_MAX_IDX[item.slot];
+    const tier = item.tier || 1;
+    const idx = Math.min(max, Math.max(1, Math.ceil((tier / 8) * max)));
+    return getArmorIcon(item.slot, idx);
+  }
+  return getWeaponIcon('sword');
+}
 
 export default function TradingPostScene() {
   useEffect(() => { setBgm('tavern'); }, []);
@@ -243,9 +272,9 @@ export default function TradingPostScene() {
 
       {selectedTrader && (
         <div style={{
-          position: 'absolute', top: '8%', left: '50%', transform: 'translateX(-50%)',
-          width: '80%', maxWidth: 340, maxHeight: '70%',
-          background: 'rgba(10,15,30,0.95)', border: '2px solid #fbbf24',
+          position: 'absolute', top: '6%', left: '50%', transform: 'translateX(-50%)',
+          width: '88%', maxWidth: 400, maxHeight: '80%',
+          background: 'rgba(10,15,30,0.97)', border: '2px solid #fbbf24',
           borderRadius: 12, zIndex: SCENE.POPUP, backdropFilter: 'blur(8px)',
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
@@ -270,7 +299,7 @@ export default function TradingPostScene() {
             ))}
           </div>
 
-          <div style={{ flex: 1, overflow: 'auto', padding: 8 }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: '8px 10px' }}>
             {tab === 'buy' ? (
               getFilteredShop().length === 0 ? (
                 <div style={{ color: '#666', fontSize: '0.8rem', textAlign: 'center', padding: 16 }}>No items available</div>
@@ -278,22 +307,47 @@ export default function TradingPostScene() {
                 getFilteredShop().map(item => {
                   const price = getItemPrice(item);
                   const canAfford = gold >= price;
+                  const tc = tierColors[item.tier] || '#9ca3af';
                   return (
                     <div key={item.id} style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '4px 6px', borderBottom: '1px solid rgba(255,255,255,0.03)',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '6px 8px', marginBottom: 5,
+                      background: 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${tc}28`,
+                      borderRadius: 7,
                     }}>
-                      <div>
-                        <span style={{ color: tierColors[item.tier] || '#ccc', fontSize: '0.8rem', fontWeight: 600 }}>
-                          {item.icon ? <InlineIcon name={item.icon} /> : <InlineIcon name="bag" />} {item.name}
-                        </span>
-                        <span style={{ color: '#666', fontSize: '0.65rem', marginLeft: 4 }}>T{item.tier}</span>
+                      <div style={{
+                        width: 42, height: 42, flexShrink: 0, borderRadius: 6,
+                        background: `${tc}18`,
+                        border: `1px solid ${tc}44`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        overflow: 'hidden',
+                      }}>
+                        <img
+                          src={getItemIconUrl(item)}
+                          alt={item.name}
+                          style={{ width: 38, height: 38, objectFit: 'contain' }}
+                          onError={e => { e.target.style.opacity = '0.25'; }}
+                        />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          color: tc, fontSize: '0.8rem', fontWeight: 700,
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                          fontFamily: "'LifeCraft', 'Cinzel', serif",
+                        }}>{item.name}</div>
+                        <div style={{ color: '#666', fontSize: '0.6rem', marginTop: 1 }}>
+                          T{item.tier} · {item.slot}{item.weaponType ? ` · ${item.weaponType}` : ''}
+                        </div>
                       </div>
                       <button disabled={!canAfford} onClick={() => buyItem(item.id)} style={{
                         background: canAfford ? 'rgba(251,191,36,0.2)' : 'rgba(50,50,50,0.3)',
-                        border: '1px solid rgba(251,191,36,0.3)', borderRadius: 4,
-                        padding: '2px 8px', color: canAfford ? '#fbbf24' : '#555',
-                        cursor: canAfford ? 'pointer' : 'default', fontSize: '0.7rem', fontWeight: 700,
+                        border: `1px solid ${canAfford ? 'rgba(251,191,36,0.5)' : 'rgba(80,80,80,0.3)'}`,
+                        borderRadius: 5, padding: '4px 10px',
+                        color: canAfford ? '#fbbf24' : '#555',
+                        cursor: canAfford ? 'pointer' : 'default',
+                        fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap',
+                        fontFamily: "'LifeCraft', 'Cinzel', serif",
                       }}>{price}g</button>
                     </div>
                   );
@@ -305,20 +359,46 @@ export default function TradingPostScene() {
               ) : (
                 getSellItems().map(item => {
                   const price = getSellPrice(item);
+                  const tc = tierColors[item.tier] || '#9ca3af';
                   return (
                     <div key={item.id} style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '4px 6px', borderBottom: '1px solid rgba(255,255,255,0.03)',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '6px 8px', marginBottom: 5,
+                      background: 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${tc}28`,
+                      borderRadius: 7,
                     }}>
-                      <div>
-                        <span style={{ color: tierColors[item.tier] || '#ccc', fontSize: '0.8rem', fontWeight: 600 }}>
-                          {item.icon ? <InlineIcon name={item.icon} /> : <InlineIcon name="bag" />} {item.name}
-                        </span>
+                      <div style={{
+                        width: 42, height: 42, flexShrink: 0, borderRadius: 6,
+                        background: `${tc}18`,
+                        border: `1px solid ${tc}44`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        overflow: 'hidden',
+                      }}>
+                        <img
+                          src={getItemIconUrl(item)}
+                          alt={item.name}
+                          style={{ width: 38, height: 38, objectFit: 'contain' }}
+                          onError={e => { e.target.style.opacity = '0.25'; }}
+                        />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          color: tc, fontSize: '0.8rem', fontWeight: 700,
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                          fontFamily: "'LifeCraft', 'Cinzel', serif",
+                        }}>{item.name}</div>
+                        <div style={{ color: '#666', fontSize: '0.6rem', marginTop: 1 }}>
+                          T{item.tier} · {item.slot}{item.weaponType ? ` · ${item.weaponType}` : ''}
+                        </div>
                       </div>
                       <button onClick={() => sellItem(item.id)} style={{
-                        background: 'rgba(110,231,183,0.2)', border: '1px solid rgba(110,231,183,0.3)',
-                        borderRadius: 4, padding: '2px 8px', color: '#6ee7b3',
-                        cursor: 'pointer', fontSize: '0.7rem', fontWeight: 700,
+                        background: 'rgba(110,231,183,0.15)',
+                        border: '1px solid rgba(110,231,183,0.4)',
+                        borderRadius: 5, padding: '4px 10px',
+                        color: '#6ee7b3', cursor: 'pointer',
+                        fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap',
+                        fontFamily: "'LifeCraft', 'Cinzel', serif",
                       }}>{price}g</button>
                     </div>
                   );

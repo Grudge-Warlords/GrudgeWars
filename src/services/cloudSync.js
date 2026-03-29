@@ -8,12 +8,14 @@
  *   Manual "Sync Now" button in Account tab
  */
 
-const API_BASE = '';  // same-origin
+import { API_BASE } from '../utils/apiBase.js';
 
 // ── Token Helpers ───────────────────────────────────────────────────────────
+// Single source of truth: grudge_auth_token in localStorage
+// This matches grudge-platform and grudge-sdk.js
 
 export function getSessionToken() {
-  return localStorage.getItem('grudge_session_token') || null;
+  return localStorage.getItem('grudge_auth_token') || null;
 }
 
 export function getSession() {
@@ -23,14 +25,13 @@ export function getSession() {
 }
 
 export function getGrudgeId() {
-  const session = getSession();
-  return session?.grudgeId || null;
+  return localStorage.getItem('grudge_id') ||
+    getSession()?.grudgeId || null;
 }
 
 export function isLoggedIn() {
-  const session = getSession();
-  if (!session) return false;
-  return session.type === 'puter' || session.type === 'discord' || session.type === 'grudge';
+  // Logged in if we have a token, regardless of session type
+  return !!getSessionToken();
 }
 
 /** Get Puter auth token from the SDK (if user is signed in) */
@@ -59,10 +60,10 @@ export async function pushSave(gameState) {
   try {
     const headers = {
       'Content-Type': 'application/json',
-      'X-Session-Token': sessionToken,
+      'Authorization': `Bearer ${sessionToken}`,
     };
 
-    // Add Puter token if available
+    // Add Puter token if available (for dual-save to Puter KV)
     const puterToken = await getPuterToken();
     if (puterToken) headers['X-Puter-Token'] = puterToken;
 
@@ -101,7 +102,7 @@ export async function pullSave() {
   try {
     const headers = {
       'Content-Type': 'application/json',
-      'X-Session-Token': sessionToken,
+      'Authorization': `Bearer ${sessionToken}`,
     };
 
     const puterToken = await getPuterToken();

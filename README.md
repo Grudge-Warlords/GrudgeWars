@@ -55,6 +55,23 @@ All endpoints live in `api/index.js` as a single Vercel serverless function.
 ### Arena, Profile, Island, Wallet
 See `api/index.js` for full CRUD — arena teams/battles, character management, island ownership, Crossmint wallet integration.
 
+### Crafting Suite (In-App)
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/crafting/harvest/assign` | Assign hero to AFK harvesting building |
+| POST | `/api/crafting/harvest/collect` | Collect accumulated harvest resources |
+| GET  | `/api/crafting/harvest/state/:grudgeId` | Get current AFK harvest state |
+
+The Crafting Suite (`CraftingSuitePage.jsx`) is an in-app screen accessible from the War Room lobby, Camp scene, and Island sidebar. It provides:
+- **Dashboard** — Profession levels, active crafting jobs, recent activity
+- **Crafting Bench** — Recipe browser with tier/type/profession filters, material check, craft animation
+- **Inventory** — Combined suite + local items/resources with search and tier-colored borders
+- **AFK Harvest** — Deploy idle heroes to island buildings for passive resource generation
+- **Item Database** — Browse 3,400+ items from ObjectStore with tooltips
+- **5 Profession Pages** — Miner, Forester, Mystic, Chef, Engineer with XP bars and recipe lists
+
+Icons are resolved through the ObjectStore CDN (`objectStoreIcons.js`) with fallback to emoji. Tooltips use the shared `GameTooltip` system. Tier names and colors sync with `equipment.js` TIERS. Sidebar is mobile-responsive with collapse/expand.
+
 ## Cross-Platform Integration
 
 Grudge Warlords exposes public endpoints consumed by the Grudge Studio site (`public-fawn-nine.vercel.app`) and other Grudge apps.
@@ -86,6 +103,27 @@ Key columns on `accounts`: `grudge_id` (UUID, primary), `puter_uuid`, `wallet_ad
 ## Legacy Infrastructure
 
 The repo also contains VPS deployment scripts (`scripts/`, `deployment/`), Docker config, and a PM2 ecosystem file from the original standalone server setup. These are retained for reference but the active deployment target is Vercel.
+
+## Cross-App Links
+
+Centralized in `src/utils/studioUrls.js` with SSO token forwarding:
+
+- **Grudge Builder** (`grudge-builder.vercel.app`) — Character creation, islands, roster management
+- **Crafting Suite** — Now integrated in-app at `/crafting-suite` route (previously external at `warlord-crafting-suite.vercel.app`)
+- **Object Store** (`molochdagod.github.io/ObjectStore`) — Game assets & sprites CDN
+
+## Standalone Tool Pages
+
+Static HTML pages served from `public/`, accessible without login:
+
+- **[/weapon-skill-tree.html](https://grudgewarlords.com/weapon-skill-tree.html)** — Weapon Skill Atlas: browse all 17 weapon types, 6 variants each, with mastery trees and combat skill loadouts
+- `/arena.html` — Arena browser
+- `/compendium.html` — Game compendium
+- `/hero-codex.html` — Hero codex viewer
+
+### React-Routed Pages
+
+- **[/character](https://grudgewarlords.com/character)** — Character compendium: 6 races, 4 classes with sprite previews and ability breakdowns, 8 attributes, 5 professions, island buildings, arena ranks, and gear overview. Uses ObjectStore icons throughout.
 
 ## Related Projects
 

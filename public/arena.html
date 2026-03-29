@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -29,7 +29,9 @@
 
 <!-- Additional Meta -->
 <meta name="theme-color" content="#0a0a12" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" href="/images/grudge_rpg_logo.png" />
+<link rel="apple-touch-icon" href="/images/grudge_rpg_logo.png" />
 <link rel="canonical" href="https://grudgewarlords.com/arena.html" />
 
 <!-- Fonts -->
@@ -178,7 +180,7 @@ h1,h2,h3,h4{font-family:'Cinzel',serif}
   <div class="discord-bar">
     <svg width="20" height="15" viewBox="0 0 71 55" fill="white"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.2a.2.2 0 0 0-.2.1 40.8 40.8 0 0 0-1.8 3.7 54 54 0 0 0-16.2 0A37.4 37.4 0 0 0 25.4.3a.2.2 0 0 0-.2-.1A58.4 58.4 0 0 0 10.5 5a.2.2 0 0 0-.1.1C1.5 18.7-.9 32 .3 45.1v.1a58.8 58.8 0 0 0 17.9 9 .2.2 0 0 0 .3-.1 42 42 0 0 0 3.6-5.9.2.2 0 0 0-.1-.3 38.8 38.8 0 0 1-5.5-2.6.2.2 0 0 1 0-.4l1.1-.9a.2.2 0 0 1 .2 0 42 42 0 0 0 35.6 0 .2.2 0 0 1 .2 0l1.1.9a.2.2 0 0 1 0 .3 36.4 36.4 0 0 1-5.5 2.7.2.2 0 0 0-.1.3 47.2 47.2 0 0 0 3.6 5.8.2.2 0 0 0 .3.1A58.6 58.6 0 0 0 71 45.2v-.1C72.4 30.1 68.4 17 60.2 5a.2.2 0 0 0-.1 0zM23.7 37a6.8 6.8 0 0 1-6.3-7 6.7 6.7 0 0 1 6.3-7c3.4 0 6.3 3.1 6.2 7a6.7 6.7 0 0 1-6.2 7zm23.2 0a6.8 6.8 0 0 1-6.3-7 6.7 6.7 0 0 1 6.3-7c3.4 0 6.4 3.1 6.3 7a6.8 6.8 0 0 1-6.3 7z"/></svg>
     Join the fight &mdash;
-    <a href="https://discord.gg/KmAC5aXs84" target="_blank">Join Discord Server</a>
+    <a href="https://discord.gg/FtGtmxmwkh" target="_blank">Join Discord Server</a>
   </div>
 
   <div id="stats-bar" class="stats-bar">
@@ -223,10 +225,10 @@ h1,h2,h3,h4{font-family:'Cinzel',serif}
 (function() {
   'use strict';
 
-  // ╔═══════════════════════════════════════════════════════════════════════════╗
-  // ║ GRUDGE STUDIO API CONFIGURATION                                           ║
-  // ║ Replace with your production API URL when deploying to grudgewarlords.com║
-  // ╚═══════════════════════════════════════════════════════════════════════════╝
+  // â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+  // â•‘ GRUDGE STUDIO API CONFIGURATION                                           â•‘
+  // â•‘ Replace with your production API URL when deploying to grudgewarlords.comâ•‘
+  // â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   var API = window.location.origin;
 
   var RACE_NAMES = {
@@ -305,7 +307,7 @@ h1,h2,h3,h4{font-family:'Cinzel',serif}
           '<div class="empty-state">' +
             '<h3>No Warriors Yet</h3>' +
             '<p>The arena awaits its first challengers. Submit your war party in-game to appear here!</p>' +
-            '<a class="cta" href="https://discord.gg/KmAC5aXs84" target="_blank">Join Discord to Play</a>' +
+            '<a class="cta" href="https://discord.gg/FtGtmxmwkh" target="_blank">Join Discord to Play</a>' +
           '</div>';
         document.getElementById('lobby-pagination').innerHTML = '';
         return;
@@ -377,7 +379,7 @@ h1,h2,h3,h4{font-family:'Cinzel',serif}
           '<div class="empty-state">' +
             '<h3>Leaderboard Empty</h3>' +
             '<p>No battles have been fought yet. Be the first to claim glory!</p>' +
-            '<a class="cta" href="https://discord.gg/KmAC5aXs84" target="_blank">Join Discord to Play</a>' +
+            '<a class="cta" href="https://discord.gg/FtGtmxmwkh" target="_blank">Join Discord to Play</a>' +
           '</div>';
         return;
       }
@@ -511,7 +513,7 @@ h1,h2,h3,h4{font-family:'Cinzel',serif}
   </div>
   
   <div style="display:flex;gap:16px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;">
-    <a href="https://discord.gg/KmAC5aXs84" target="_blank" style="color:#5865F2;text-decoration:none;font-size:0.85rem;display:flex;align-items:center;gap:6px;">
+    <a href="https://discord.gg/FtGtmxmwkh" target="_blank" style="color:#5865F2;text-decoration:none;font-size:0.85rem;display:flex;align-items:center;gap:6px;">
       <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.2a.2.2 0 0 0-.2.1 40.8 40.8 0 0 0-1.8 3.7 54 54 0 0 0-16.2 0A37.4 37.4 0 0 0 25.4.3a.2.2 0 0 0-.2-.1A58.4 58.4 0 0 0 10.5 5a.2.2 0 0 0-.1.1C1.5 18.7-.9 32 .3 45.1v.1a58.8 58.8 0 0 0 17.9 9 .2.2 0 0 0 .3-.1 42 42 0 0 0 3.6-5.9.2.2 0 0 0-.1-.3 38.8 38.8 0 0 1-5.5-2.6.2.2 0 0 1 0-.4l1.1-.9a.2.2 0 0 1 .2 0 42 42 0 0 0 35.6 0 .2.2 0 0 1 .2 0l1.1.9a.2.2 0 0 1 0 .3 36.4 36.4 0 0 1-5.5 2.7.2.2 0 0 0-.1.3 47.2 47.2 0 0 0 3.6 5.8.2.2 0 0 0 .3.1A58.6 58.6 0 0 0 71 45.2v-.1C72.4 30.1 68.4 17 60.2 5a.2.2 0 0 0-.1 0z"/></svg>
       Discord Community
     </a>
@@ -527,3 +529,4 @@ h1,h2,h3,h4{font-family:'Cinzel',serif}
 
 </body>
 </html>
+
