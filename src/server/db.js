@@ -1,3 +1,14 @@
+/**
+ * @deprecated This Neon PostgreSQL connection is being migrated to the VPS MySQL backend.
+ * All new routes should use backendProxy.js to proxy to api.grudge-studio.com.
+ * Arena data → api.grudge-studio.com/arena/*
+ * Player islands → api.grudge-studio.com/player-islands/*
+ * Characters → api.grudge-studio.com/characters/*
+ * Auth → id.grudge-studio.com/auth/*
+ *
+ * This file will be removed once all arena routes are migrated.
+ * See: grudge-studio-backend/services/game-api/src/routes/arena.js
+ */
 import pg from 'pg';
 const { Pool } = pg;
 

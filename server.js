@@ -9,7 +9,7 @@ import { registerWalletRoutes } from './src/server/walletRoutes.js';
 import { registerCraftingRoutes } from './src/server/craftingRoutes.js';
 import { testSuiteConnection } from './src/server/suiteDb.js';
 import { startBot, addUserToGuild } from './src/server/discordBot.js';
-import { vpsLogin, vpsRegister, vpsPuter, vpsVerifyToken, upsertLocalGameAccount, extractVpsUser } from './src/server/vpsAuth.js';
+import { vpsLogin, vpsRegister, vpsPuter, vpsVerifyToken, vpsGuest, vpsWallet, vpsDiscordExchange, upsertLocalGameAccount, extractVpsUser } from './src/server/vpsAuth.js';
 import {
   accountInit, accountLinkDiscord, accountLinkCharacters, accountGet,
   syncPush, syncPull, kvGet, kvSet, kvList, prefsGet, prefsSet,
@@ -124,63 +124,20 @@ const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const DISCORD_BOT_TOKEN_VAL = process.env.DISCORD_BOT_TOKEN;
 const BETA_CHANNEL_ID = process.env.DISCORD_BETA_CHANNEL_ID || '1394826401311625306';
 
-const pendingStates = new Map();
-
-// ── JWT Auth ────────────────────────────────────────────────────────────────────────────
+// ── JWT Auth ── Uses shared JWT_SECRET matching id.grudge-studio.com ─────────
+import jsonwebtoken from 'jsonwebtoken';
 const _jwtSecret = process.env.JWT_SECRET || process.env.GAME_API_GRUDA;
 if (!_jwtSecret) throw new Error('JWT_SECRET or GAME_API_GRUDA environment variable is required');
-const JWT_SECRET = () => _jwtSecret;
-
-function base64url(buf) {
-  return Buffer.from(buf).toString('base64url');
-}
-
-function createJWT(payload, expiresInDays = 7) {
-  const header = { alg: 'HS256', typ: 'JWT' };
-  const now = Math.floor(Date.now() / 1000);
-  const body = { ...payload, iat: now, exp: now + expiresInDays * 86400 };
-  const segments = [base64url(JSON.stringify(header)), base64url(JSON.stringify(body))];
-  const sig = crypto.createHmac('sha256', JWT_SECRET()).update(segments.join('.')).digest('base64url');
-  return [...segments, sig].join('.');
-}
 
 function verifyJWT(token) {
   if (!token) return null;
   try {
-    const [headerB64, bodyB64, sigB64] = token.split('.');
-    const expectedSig = crypto.createHmac('sha256', JWT_SECRET()).update(`${headerB64}.${bodyB64}`).digest('base64url');
-    if (sigB64 !== expectedSig) return null;
-    const payload = JSON.parse(Buffer.from(bodyB64, 'base64url').toString());
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
-    return payload;
+    return jsonwebtoken.verify(token, _jwtSecret);
   } catch { return null; }
 }
 
-
-// ── Auto Wallet Creation (Crossmint) ────────────────────────────────────────
-async function ensureWallet(account) {
-  if (account.wallet_address) return { address: account.wallet_address, chain: account.wallet_chain || 'solana', existing: true };
-  const CROSSMINT_KEY = (process.env.CROSSMINT_SERVER_API_KEY || '').trim();
-  if (!CROSSMINT_KEY) return null;
-  try {
-    const { query: dbQuery } = await import('./src/server/db.js');
-    const linkedUser = `userId:${account.grudge_id || account.discord_id || account.id}`;
-    const walletRes = await fetch('https://www.crossmint.com/api/v1-alpha2/wallets', {
-      method: 'POST',
-      headers: { 'X-API-KEY': CROSSMINT_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ linkedUser, chain: 'solana' }),
-    });
-    const walletData = await walletRes.json();
-    const address = walletData.address || walletData.publicKey;
-    if (!address) { console.warn('[Wallet] Auto-create returned no address:', walletData); return null; }
-    await dbQuery('UPDATE accounts SET wallet_address=$1, wallet_chain=$2, wallet_created_at=NOW() WHERE id=$3', [address, 'solana', account.id]);
-    console.log(`[Wallet] Auto-created Solana wallet for ${account.username}: ${address}`);
-    return { address, chain: 'solana', existing: false };
-  } catch (err) {
-    console.warn('[Wallet] Auto-create failed:', err.message);
-    return null;
-  }
-}
+// Wallet creation is now handled by the VPS wallet-service via grudge-id.
+// Crossmint local wallet creation has been removed.
 
 
 function getPublicOrigin(req) {
@@ -210,107 +167,23 @@ function getPublicOrigin(req) {
   return `${proto}://${host || `localhost:${PORT}`}`;
 }
 
-// Auth routes: rate-limited
+// ── Auth routes: Proxy to id.grudge-studio.com via vpsAuth ──────────────────
+// Local Discord OAuth removed — all auth goes through the canonical VPS backend.
+
 app.get('/api/discord/login', rateLimiter(10), (req, res) => {
-  const redirectUrl = req.query.redirect_uri || null;
-  const origin = getPublicOrigin(req);
-  const redirectUri = redirectUrl || `${origin}/discordauth`;
-  const scope = encodeURIComponent('identify email guilds.join');
-  const state = crypto.randomBytes(16).toString('hex');
-  pendingStates.set(state, { ts: Date.now(), redirectUri });
-  const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&state=${state}`;
-  res.json({ url, state, clientId: DISCORD_CLIENT_ID, scope: 'identify email guilds.join' });
+  // Redirect client to grudge-id Discord OAuth start
+  const redirect_uri = req.query.redirect_uri || `${getPublicOrigin(req)}/auth`;
+  const authUrl = `https://id.grudge-studio.com/auth/discord?redirect_uri=${encodeURIComponent(redirect_uri)}`;
+  res.json({ url: authUrl });
 });
 
-app.post('/api/discord/callback', async (req, res) => {
-  const { code, state } = req.body;
+app.post('/api/discord/callback', rateLimiter(10), async (req, res) => {
+  const { code, redirect_uri } = req.body;
   if (!code) return res.status(400).json({ error: 'Missing code' });
-
-  if (!state || !pendingStates.has(state)) {
-    return res.status(403).json({ error: 'Invalid or missing state parameter' });
-  }
-  const stateEntry = pendingStates.get(state);
-  pendingStates.delete(state);
-
-  for (const [k, v] of pendingStates) {
-    const ts = typeof v === 'object' ? v.ts : v;
-    if (Date.now() - ts > 600000) pendingStates.delete(k);
-  }
-
   try {
-    const redirectUri = req.body.redirect_uri || (typeof stateEntry === 'object' ? stateEntry.redirectUri : null) || `${getPublicOrigin(req)}/discordauth`;
-
-    const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: DISCORD_CLIENT_ID,
-        client_secret: DISCORD_CLIENT_SECRET,
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: redirectUri,
-      }),
-    });
-
-    if (!tokenRes.ok) {
-      const err = await tokenRes.text();
-      console.error('Token exchange failed:', err);
-      return res.status(400).json({ error: 'Token exchange failed' });
-    }
-
-    const tokenData = await tokenRes.json();
-    const accessToken = tokenData.access_token;
-
-    const userRes = await fetch('https://discord.com/api/users/@me', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    if (!userRes.ok) {
-      return res.status(400).json({ error: 'Failed to fetch user' });
-    }
-
-    const user = await userRes.json();
-
-    let guildJoined = false;
-    try {
-      guildJoined = await addUserToGuild(accessToken, user.id);
-    } catch (joinErr) {
-      console.error('Auto guild join failed:', joinErr.message);
-    }
-
-    // Upsert local game account row (for FK relationships to characters/inventory)
-    const account = await upsertLocalGameAccount({
-      grudgeId: null, // will be generated if new
-      username: user.username,
-      discordId: user.id,
-    });
-    const grudgeId = account.grudge_id;
-    const wallet = await ensureWallet({ ...account, grudge_id: grudgeId });
-
-    // Issue JWT with VPS-compatible payload using shared JWT_SECRET
-    const sessionToken = createJWT({
-      grudge_id: grudgeId,
-      username: account.username,
-      discord_id: user.id,
-      wallet_address: account.wallet_address || null,
-    });
-
-    res.json({
-      success: true,
-      user: {
-        id: user.id,
-        accountId: account.id,
-        username: user.username,
-        discriminator: user.discriminator,
-        avatar: user.avatar,
-        email: user.email,
-        globalName: user.global_name,
-        grudgeId,
-      },
-      guildJoined,
-      sessionToken,
-      wallet: wallet || undefined,
-    });
+    const result = await vpsDiscordExchange(code, redirect_uri || `${getPublicOrigin(req)}/discordauth`);
+    if (!result.ok) return res.status(result.status).json(result.data);
+    res.json(result.data);
   } catch (err) {
     console.error('Discord callback error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -673,6 +546,7 @@ setInterval(() => {
 
 const ALLOWED_RETURN_ORIGINS = [...ALLOWED_ORIGINS];
 
+// ── External login: Redirect to id.grudge-studio.com SSO ────────────────
 app.get('/api/external/login', (req, res) => {
   let returnUrl = req.query.returnUrl || 'https://grudgewarlords.com/dungeon';
   try {
@@ -683,94 +557,8 @@ app.get('/api/external/login', (req, res) => {
   } catch (e) {
     returnUrl = 'https://grudgewarlords.com/dungeon';
   }
-  const state = crypto.randomBytes(16).toString('hex');
-  pendingStates.set(state, { ts: Date.now(), returnUrl });
-  const origin = getPublicOrigin(req);
-  const redirectUri = `${origin}/api/external/callback`;
-  const scope = 'identify email guilds.join';
-  const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
-  res.redirect(url);
-});
-
-app.get('/api/external/callback', async (req, res) => {
-  const { code, state } = req.query;
-  if (!code || !state || !pendingStates.has(state)) {
-    return res.status(403).send('Invalid or expired login attempt. Please try again.');
-  }
-  const stateData = pendingStates.get(state);
-  pendingStates.delete(state);
-  const returnUrl = (typeof stateData === 'object' ? stateData.returnUrl : null) || 'https://grudgewarlords.com/dungeon';
-
-  try {
-    const origin = getPublicOrigin(req);
-    const redirectUri = `${origin}/api/external/callback`;
-    const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: DISCORD_CLIENT_ID,
-        client_secret: DISCORD_CLIENT_SECRET,
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: redirectUri,
-      }),
-    });
-    const tokenData = await tokenRes.json();
-    if (!tokenData.access_token) {
-      return res.status(400).send('Discord login failed. Please try again.');
-    }
-
-    const userRes = await fetch('https://discord.com/api/users/@me', {
-      headers: { Authorization: `Bearer ${tokenData.access_token}` },
-    });
-    const user = await userRes.json();
-
-    try {
-      await addUserToGuild(tokenData.access_token, user.id);
-    } catch (e) {}
-
-    // Upsert account into DB, assign grudge_id, provision wallet, generate JWT
-    const { account, grudgeId, wallet, jwt } = await upsertDiscordAccount(user);
-
-    // Keep in-memory session for backward compat
-    activeSessions.set(jwt, {
-      discordId: user.id,
-      username: user.username,
-      accountId: account.id,
-      grudgeId,
-      createdAt: Date.now(),
-    });
-
-    const returnOrigin = new URL(returnUrl).origin;
-    const loginData = { token: jwt, user: { id: user.id, accountId: account.id, username: user.username, avatar: user.avatar, email: user.email, grudgeId } };
-    res.send(`<!DOCTYPE html><html><head><title>Grudge Login</title></head><body>
-<script>
-  try {
-    var d = ${JSON.stringify(loginData)};
-    // Canonical keys — matches grudge-platform and grudge-sdk.js
-    localStorage.setItem('grudge_auth_token', d.token);
-    localStorage.setItem('grudge_id', d.user.grudgeId || '');
-    localStorage.setItem('grudge_username', d.user.username || '');
-    localStorage.setItem('grudge_user_id', d.user.accountId || '');
-    localStorage.setItem('grudge-session', JSON.stringify({
-      type: 'discord', grudgeId: d.user.grudgeId,
-      username: d.user.username, loginTime: Date.now()
-    }));
-    // Legacy keys — kept for backward compat during transition
-    localStorage.setItem('grudge_session_token', d.token);
-    if (window.opener) {
-      window.opener.postMessage({ type: 'grudge:auth', token: d.token, grudgeId: d.user.grudgeId, username: d.user.username }, ${JSON.stringify(returnOrigin)});
-      window.close();
-    } else {
-      window.location.href = ${JSON.stringify(returnUrl)};
-    }
-  } catch(e) {
-    window.location.href = ${JSON.stringify(returnUrl)};
-  }
-</script></body></html>`);
-  } catch (err) {
-    res.status(500).send('Login error: ' + err.message);
-  }
+  // Redirect to canonical Grudge ID SSO — comes back with ?token= in URL
+  res.redirect(`https://id.grudge-studio.com/auth/discord?redirect_uri=${encodeURIComponent(returnUrl)}`);
 });
 
 const challengeNonces = new Map();
@@ -803,7 +591,11 @@ function computeSha256Hex(str) {
   return hashModule.digest('hex').slice(0, 16);
 }
 
+// Arena queries now proxy to VPS game-api /arena/* endpoints.
+// Legacy arenaQuery kept as wrapper for backward compat with remaining routes.
 async function arenaQuery(text, params) {
+  // TODO: Migrate remaining arena routes to proxy to api.grudge-studio.com/arena/*
+  // For now, keep Neon fallback until all routes are migrated
   const { query: dbQuery } = await import('./src/server/db.js');
   return dbQuery(text, params);
 }
