@@ -1302,25 +1302,43 @@ app.post('/api/studio/sync/push', requireSession, async (req, res) => {
     if (!gameState) return res.status(400).json({ error: 'gameState required' });
     const { query: dbQuery } = await import('./src/server/db.js');
     const discordId = req.session.discordId;
+    const accountId = req.session.accountId;
     const username = req.session.username;
     const gold = typeof gameState.gold === 'number' ? gameState.gold : null;
 
-    await dbQuery(
-      `INSERT INTO accounts (discord_id, username, game_state, game_state_updated_at, last_login)
-       VALUES ($1, $2, $3, NOW(), NOW())
-       ON CONFLICT (discord_id) DO UPDATE SET
-         game_state = EXCLUDED.game_state,
-         game_state_updated_at = NOW(),
-         gold = COALESCE($4, accounts.gold),
-         updated_at = NOW(),
-         last_login = NOW()
-       RETURNING game_state_updated_at`,
-      [discordId, username, JSON.stringify(gameState), gold]
-    );
+    let result;
+    if (discordId) {
+      result = await dbQuery(
+        `INSERT INTO accounts (discord_id, username, game_state, game_state_updated_at, last_login)
+         VALUES ($1, $2, $3, NOW(), NOW())
+         ON CONFLICT (discord_id) DO UPDATE SET
+           game_state = EXCLUDED.game_state,
+           game_state_updated_at = NOW(),
+           gold = COALESCE($4, accounts.gold),
+           updated_at = NOW(),
+           last_login = NOW()
+         RETURNING game_state_updated_at`,
+        [discordId, username, JSON.stringify(gameState), gold]
+      );
+    } else if (accountId) {
+      // Username / Grudge / Puter accounts: update the existing account row by primary key
+      result = await dbQuery(
+        `UPDATE accounts
+           SET game_state = $1,
+               game_state_updated_at = NOW(),
+               gold = COALESCE($2, gold),
+               updated_at = NOW(),
+               last_login = NOW()
+         WHERE id = $3
+         RETURNING game_state_updated_at`,
+        [JSON.stringify(gameState), gold, accountId]
+      );
+    } else {
+      return res.status(400).json({ error: 'No account associated with session' });
+    }
 
     const { game_state_updated_at } = result.rows[0] || {};
     res.json({ success: true, timestamp: game_state_updated_at });
-  } catch (err) {
     console.error('[StudioSync] Push error:', err.message);
     res.status(500).json({ error: err.message });
   }
