@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { BrowserSDK, AddressType } from '@phantom/browser-sdk';
 
 const VPS_AUTH = 'https://id.grudge-studio.com';
+const PHANTOM_APP_ID = '656b4ef2-7acc-44fe-bec7-4b288cfdd2e9';
 
 // ── SVG icons ────────────────────────────────────────────────────────────────
 const DiscordSvg = ({ size = 18 }) => (
@@ -339,17 +341,32 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     setGrudgeIdLoading(false);
   };
 
-  // ── Phantom Wallet ───────────────────────────────────────────────────────
-  const handleWallet = async () => {
-    const provider = window.solana || window.phantom?.solana;
-    if (!provider?.isPhantom) {
-      window.open('https://phantom.app/', '_blank');
-      return;
+  // ── Phantom Connect SDK ──────────────────────────────────────────────────
+  const phantomSdk = useRef(null);
+  const getPhantomSdk = () => {
+    if (!phantomSdk.current) {
+      phantomSdk.current = new BrowserSDK({
+        providers: ['google', 'phantom', 'injected', 'deeplink'],
+        addressTypes: [AddressType.solana, AddressType.ethereum],
+        appId: PHANTOM_APP_ID,
+        authOptions: {
+          authUrl: 'https://connect.phantom.app/login',
+          redirectUrl: window.location.origin + '/',
+        },
+      });
     }
+    return phantomSdk.current;
+  };
+
+  // ── Phantom Wallet (via Phantom Connect SDK) ────────────────────────────
+  const handleWallet = async () => {
     setLoading(true); setError('');
     try {
-      const { publicKey } = await provider.connect();
-      const address = publicKey.toString();
+      const sdk = getPhantomSdk();
+      const { addresses } = await sdk.connect({ provider: 'injected' });
+      const solAddr = addresses.find(a => a.addressType === 'solana');
+      const address = solAddr?.address || addresses[0]?.address;
+      if (!address) throw new Error('No address returned');
       let sessionToken = null;
       let grudgeId = null;
       try {
@@ -360,17 +377,15 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
         });
         if (r.ok) {
           const d = await r.json();
-          sessionToken = d.sessionToken || null;
+          sessionToken = d.sessionToken || d.token || null;
           grudgeId = d.grudgeId || null;
         }
       } catch {}
-      // Store canonical auth keys
-      if (sessionToken) {
-        localStorage.setItem('grudge_auth_token', sessionToken);
-      }
+      if (sessionToken) localStorage.setItem('grudge_auth_token', sessionToken);
       if (grudgeId) localStorage.setItem('grudge_id', grudgeId);
       const walletUsername = `${address.slice(0, 4)}…${address.slice(-4)}`;
       localStorage.setItem('grudge_username', walletUsername);
+      localStorage.setItem('grudge_wallet_address', address);
       const session = {
         type: 'wallet',
         username: walletUsername,
@@ -382,7 +397,12 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       if (onSuccess) onSuccess(session);
       else window.location.href = '/play';
     } catch (err) {
-      setError(err.message?.includes('cancel') ? 'Wallet connection cancelled.' : 'Could not connect wallet.');
+      const msg = err?.message || '';
+      if (msg.includes('cancel') || msg.includes('closed')) {
+        setError('Wallet connection cancelled.');
+      } else {
+        setError('Could not connect wallet. Install Phantom at phantom.app');
+      }
     }
     setLoading(false);
   };
