@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE } from '../utils/apiBase.js';
 
 const VPS_AUTH = 'https://id.grudge-studio.com';
 
@@ -304,7 +303,7 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       let grudgeId = null;
       let sessionToken = null;
       try {
-        const r = await fetch(`${API_BASE}/api/auth/puter`, {
+        const r = await fetch(`${VPS_AUTH}/auth/puter`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ puterUsername: user.username, puterUuid: user.uuid || null }),
@@ -354,10 +353,10 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       let sessionToken = null;
       let grudgeId = null;
       try {
-        const r = await fetch(`${API_BASE}/api/auth/wallet`, {
+        const r = await fetch(`${VPS_AUTH}/auth/wallet`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address }),
+          body: JSON.stringify({ walletAddress: address, walletType: 'solana' }),
         });
         if (r.ok) {
           const d = await r.json();
@@ -454,7 +453,7 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     if (!username || !password) { setError('Enter username and password.'); return; }
     setLoading(true); setError('');
     try {
-      const endpoint = tab === 'register' ? `${API_BASE}/api/auth/register` : `${API_BASE}/api/auth/login`;
+      const endpoint = tab === 'register' ? `${VPS_AUTH}/auth/register` : `${VPS_AUTH}/auth/login`;
       const r = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
