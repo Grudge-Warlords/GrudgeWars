@@ -107,7 +107,7 @@ const defaultLayout = {
   spellPlayX: 0, spellPlayY: -20, effectScale: 1.5, effectOffsetX: 0, effectOffsetY: -20,
 };
 
-function EffectSpritePreview({ effectKey, scale = 2, speed = 80, filter = '' }) {
+function EffectSpritePreview({ effectKey, scale = 2, speed = 80, filter = '', phase = null }) {
   const [frame, setFrame] = useState(0);
   const intervalRef = useRef(null);
   const effect = effectSprites[effectKey];
@@ -115,18 +115,22 @@ function EffectSpritePreview({ effectKey, scale = 2, speed = 80, filter = '' }) 
 
   const isGrid = effect.cols && effect.rows;
   const totalFrames = effect.frames || 1;
+  const phaseData = phase && effect.phases?.[phase];
+  const startFrame = phaseData ? phaseData.start : 0;
+  const endFrame = phaseData ? phaseData.end : totalFrames - 1;
+  const phaseFrameCount = endFrame - startFrame + 1;
 
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     let f = 0;
-    setFrame(0);
+    setFrame(startFrame);
     intervalRef.current = setInterval(() => {
       f++;
-      if (f >= totalFrames) f = 0;
-      setFrame(f);
+      if (f >= phaseFrameCount) f = 0;
+      setFrame(startFrame + f);
     }, speed);
     return () => clearInterval(intervalRef.current);
-  }, [effectKey, totalFrames, speed]);
+  }, [effectKey, startFrame, phaseFrameCount, speed]);
 
   if (isGrid) {
     const fw = (effect.frameW || 48) * scale;
@@ -1320,11 +1324,46 @@ export default function AdminSprite() {
                               <div><strong style={{ color: '#c4b998' }}>Frames:</strong> {e.frames}</div>
                               {e.cols && <div><strong style={{ color: '#c4b998' }}>Grid:</strong> {e.cols}x{e.rows} ({e.frameW}x{e.frameH}px)</div>}
                               {e.size && <div><strong style={{ color: '#c4b998' }}>Sheet:</strong> {e.size}x{e.size}px (auto-grid)</div>}
+                              {e.phases && <div><strong style={{ color: '#06b6d4' }}>Phases:</strong> {Object.keys(e.phases).length} parsed</div>}
                             </>
                           );
                         })()}
                       </div>
                     </div>
+
+                    {effectSprites[gallerySelected]?.phases && (
+                      <div style={{ ...S.panel, marginTop: 12 }}>
+                        <h3 style={{ ...S.h3, color: '#06b6d4' }}>Parsed Phases</h3>
+                        <p style={{ fontSize: 10, color: '#8a7d65', marginBottom: 8 }}>
+                          Each phase plays only its frame range from the sprite sheet.
+                        </p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 8 }}>
+                          {Object.entries(effectSprites[gallerySelected].phases).map(([phaseId, phaseInfo]) => {
+                            const phaseColors = { projectile: '#f97316', slash: '#fb923c', rise: '#facc15', explosion: '#ef4444', impact: '#ef4444', dissipate: '#94a3b8', sustained: '#22c55e' };
+                            const pColor = phaseColors[phaseId] || '#8b5cf6';
+                            return (
+                              <div key={phaseId} style={{
+                                background: 'rgba(0,0,0,0.4)', border: `1px solid ${pColor}44`,
+                                borderRadius: 6, padding: 6, textAlign: 'center',
+                              }}>
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 70, marginBottom: 4,
+                                  background: 'radial-gradient(ellipse at center, rgba(30,25,40,0.6) 0%, rgba(10,10,20,0.9) 80%)',
+                                  borderRadius: 4,
+                                }}>
+                                  <EffectSpritePreview effectKey={gallerySelected} scale={1.5} speed={120} phase={phaseId} />
+                                </div>
+                                <div style={{ fontSize: 10, color: pColor, fontWeight: 'bold', marginBottom: 2 }}>{phaseInfo.label}</div>
+                                <div style={{ fontSize: 9, color: '#8a7d65' }}>frames {phaseInfo.start}-{phaseInfo.end}</div>
+                                <button onClick={() => {
+                                  navigator.clipboard.writeText(`{ effect: '${gallerySelected}', phase: '${phaseId}' }`);
+                                  flash(`Copied ${phaseId} phase!`);
+                                }} style={{ ...S.btn(pColor), fontSize: 8, padding: '2px 6px', marginTop: 4, width: '100%' }}>Copy</button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
 
                     <div style={{ ...S.panel, marginTop: 12 }}>
                       <h3 style={S.h3}>Skill Bindings</h3>

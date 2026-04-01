@@ -221,13 +221,14 @@ function buildRegistry() {
   for (const [key, spriteData] of Object.entries(effectSprites)) {
     if (!spriteData) continue;
     const anims = getAnimationKeys(spriteData);
+    const phaseTags = spriteData.phases ? Object.keys(spriteData.phases).map(p => `phase:${p}`) : [];
     if (anims.length === 0 && spriteData.frames != null) {
       add({
         uid: `effect_${key}`,
         name: capitalize(key),
         category: 'effect',
-        subCategory: 'vfx',
-        tags: ['effect', 'vfx', key],
+        subCategory: spriteData.phases ? 'vfx-parsed' : 'vfx',
+        tags: ['effect', 'vfx', key, ...phaseTags],
         spriteData,
         frameWidth: spriteData.frameWidth || 100,
         frameHeight: spriteData.frameHeight || 100,
@@ -238,13 +239,15 @@ function buildRegistry() {
         hasFilter: !!spriteData.filter,
         hasCustomScale: !!spriteData.scale,
         facesLeft: false,
+        phases: spriteData.phases || null,
+        phaseCount: spriteData.phases ? Object.keys(spriteData.phases).length : 0,
       });
     } else if (anims.length > 0) {
       add(makeEntry(
         `effect_${key}`,
         capitalize(key),
         'effect', 'vfx',
-        ['effect', 'vfx', key],
+        ['effect', 'vfx', key, ...phaseTags],
         spriteData, key
       ));
     }

@@ -708,7 +708,7 @@ const LORE_QUOTES = {
   ranger: "Silent as shadow, deadly as the wind â€” masters of the killing blow.",
 };
 
-function SlideshowVFXSprite({ effectKey, displaySize = 280, style }) {
+function SlideshowVFXSprite({ effectKey, displaySize = 280, style, phase = null }) {
   const [frame, setFrame] = useState(0);
   const sprite = effectSprites[effectKey];
   const mountedRef = useRef(false);
@@ -717,22 +717,25 @@ function SlideshowVFXSprite({ effectKey, displaySize = 280, style }) {
   const cols = hasCustomLayout ? sprite.cols : (sprite ? Math.round(Math.sqrt(sprite.frames)) : 1);
   const frameW = hasCustomLayout ? sprite.frameW : (sprite ? (sprite.size / cols) : 100);
   const frameH = hasCustomLayout ? sprite.frameH : (sprite ? (sprite.size / cols) : 100);
-  const totalFrames = sprite ? sprite.frames : 1;
-  const rows = sprite?.rows || Math.ceil(totalFrames / cols);
+  const phaseData = phase && sprite?.phases?.[phase];
+  const startFrame = phaseData ? phaseData.start : 0;
+  const endFrame = phaseData ? phaseData.end : (sprite ? sprite.frames - 1 : 0);
+  const totalFrames = endFrame - startFrame + 1;
+  const rows = sprite?.rows || Math.ceil((sprite?.frames || 1) / cols);
 
   useEffect(() => {
     if (!sprite) return;
     mountedRef.current = true;
     let f = 0;
-    setFrame(0);
+    setFrame(startFrame);
     const interval = setInterval(() => {
       if (!mountedRef.current) { clearInterval(interval); return; }
       f++;
       if (f >= totalFrames) { clearInterval(interval); return; }
-      setFrame(f);
+      setFrame(startFrame + f);
     }, 40);
     return () => { mountedRef.current = false; clearInterval(interval); };
-  }, [effectKey, totalFrames]);
+  }, [effectKey, startFrame, totalFrames]);
 
   if (!sprite) return null;
 
