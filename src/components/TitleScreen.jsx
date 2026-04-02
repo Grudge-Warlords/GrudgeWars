@@ -168,6 +168,8 @@ const DiscordSvg = ({ size = 20, color = 'currentColor' }) => (
 
 export default function TitleScreen() {
   const setScreen = useGameStore(s => s.setScreen);
+  const heroRoster = useGameStore(s => s.heroRoster);
+  const heroCount = heroRoster?.length || 0;
   const [fadeClass, setFadeClass] = useState(false);
   const [puterUser, setPuterUser] = useState(null);
   const [puterLoading, setPuterLoading] = useState(false);
@@ -492,17 +494,23 @@ export default function TitleScreen() {
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
-                  onClick={handleContinueSession}
-                  disabled={continueLoading}
+                  onClick={heroCount > 0 ? handleContinueSession : undefined}
+                  disabled={continueLoading || heroCount === 0}
+                  title={heroCount === 0 ? 'Create a hero first' : ''}
                   style={{
-                    flex: 1, padding: '10px', background: 'linear-gradient(135deg, #10b981, #34d399)',
-                    border: 'none', borderRadius: 6, color: '#0a0a12', fontWeight: 700,
-                    fontSize: '0.9rem', fontFamily: "'LifeCraft', 'Cinzel', serif",
-                    letterSpacing: 2, cursor: continueLoading ? 'wait' : 'pointer',
-                    opacity: continueLoading ? 0.7 : 1,
+                    flex: 1, padding: '10px',
+                    background: heroCount > 0 ? 'linear-gradient(135deg, #10b981, #34d399)' : 'rgba(255,255,255,0.06)',
+                    border: heroCount === 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                    borderRadius: 6,
+                    color: heroCount > 0 ? '#0a0a12' : '#555',
+                    fontWeight: 700, fontSize: '0.9rem',
+                    fontFamily: "'LifeCraft', 'Cinzel', serif",
+                    letterSpacing: 2,
+                    cursor: continueLoading ? 'wait' : heroCount === 0 ? 'not-allowed' : 'pointer',
+                    opacity: continueLoading ? 0.7 : heroCount === 0 ? 0.4 : 1,
                   }}
                 >
-                  {continueLoading ? 'LOADING...' : 'CONTINUE'}
+                  {continueLoading ? 'LOADING...' : heroCount === 0 ? 'NO HEROES' : 'CONTINUE'}
                 </button>
                 <button
                   onClick={handleSignOut}

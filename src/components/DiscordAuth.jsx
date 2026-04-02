@@ -43,9 +43,6 @@ export default function DiscordAuth() {
           type: 'discord',
           username: data.user.globalName || data.user.username,
           discordId: data.user.id,
-          username: data.user.username,
-          loginTime: Date.now(),
-        }));
           grudgeId: data.user.grudgeId || null,
           accountId: data.user.accountId || null,
           loginTime: Date.now(),

@@ -1,12 +1,12 @@
 ﻿import React, { useState } from 'react';
 
 const LINKS = [
-  { label: 'Character Builder', desc: 'Create & manage characters', href: 'https://grudge-builder.vercel.app/character', color: '#DB6331' },
-  { label: 'Crafting Suite', desc: 'Forge weapons & armor', href: 'https://warlord-crafting-suite.vercel.app', color: '#FAAC47' },
-  { label: 'Object Store', desc: 'Game assets & sprites', href: 'https://molochdagod.github.io/ObjectStore/', color: '#6ee7b7' },
+  { label: 'GrudaWars', desc: 'Lead your warlords into battle', href: 'https://grudgewarlords.com', color: '#DB6331', external: true },
+  { label: 'Character Builder', desc: 'Create & manage characters', href: 'https://client.grudge-studio.com/character', color: '#FAAC47' },
+  { label: 'Crafting Suite', desc: 'Forge weapons & armor', href: 'https://warlord-crafting-suite.vercel.app', color: '#6ee7b7', external: true },
   { label: 'Arena', desc: 'Ranked PvP battles', href: '/play#arena', color: '#3b82f6' },
-  { label: 'Compendium', desc: 'Game data reference', href: '/compendium.html', color: '#a78bfa' },
-  { label: 'Hero Codex', desc: 'All 26 playable heroes', href: '/hero-codex.html', color: '#f97316' },
+  { label: 'Game Engine', desc: '3D world & asset editor', href: 'https://engine.grudge-studio.com', color: '#a78bfa', external: true },
+  { label: 'GDevelop', desc: 'Game editor & launcher', href: 'https://gdevelop.io', color: '#f97316', external: true },
   { label: 'Discord', desc: 'Join the community', href: 'https://discord.gg/FtGtmxmwkh', color: '#5865F2', external: true },
 ];
 

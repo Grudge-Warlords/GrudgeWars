@@ -12,6 +12,10 @@
 import { API_BASE } from '../utils/apiBase.js';
 const ID_BASE = import.meta.env.VITE_AUTH_URL || 'https://id.grudge-studio.com';
 
+/** Canonical Grudge backend — always used for character CRUD + game data to ensure
+ *  uniform data across all Grudge Warlord games (cNFT, attributes, prefabs). */
+const GAME_API = import.meta.env.VITE_API_URL || 'https://api.grudge-studio.com';
+
 // ── Auth helpers ─────────────────────────────────────────────────────────────
 
 export function getToken() {
@@ -69,19 +73,24 @@ export const auth = {
 
 export const characters = {
   /** List all characters for the authenticated account */
-  list: () => apiFetch('/api/characters'),
+  list: () => apiFetch('/api/characters', {}, GAME_API),
 
   /** Get a single character by ID */
-  get: (id) => apiFetch(`/api/characters/${id}`),
+  get: (id) => apiFetch(`/api/characters/${id}`, {}, GAME_API),
 
   /**
-   * Create a new character
-   * @param {{ name, classId, raceId, attributePoints, level?, equipment?, unlockedSkills? }} data
+   * Create a new character via the canonical unified backend.
+   * This endpoint validates race/class, computes attributes (base + race + class + manual),
+   * generates an AI avatar, mints a cNFT, and returns the full character.
+   * @param {{ name, classId, raceId, manualAttributes?, gameOrigin? }} data
    */
   create: (data) => apiFetch('/api/characters', {
     method: 'POST',
-    body: JSON.stringify(data),
-  }),
+    body: JSON.stringify({
+      ...data,
+      gameOrigin: data.gameOrigin || 'grudge-wars',
+    }),
+  }, GAME_API),
 
   /**
    * Update character progression fields
@@ -93,10 +102,22 @@ export const characters = {
   patch: (id, data) => apiFetch(`/api/characters/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),
-  }),
+  }, GAME_API),
+
+  /** Mint or re-mint character cNFT */
+  mint: (id) => apiFetch(`/api/characters/${id}/mint`, { method: 'POST' }, GAME_API),
 
   /** Soft-delete / archive a character */
-  delete: (id) => apiFetch(`/api/characters/${id}`, { method: 'DELETE' }),
+  delete: (id) => apiFetch(`/api/characters/${id}`, { method: 'DELETE' }, GAME_API),
+};
+
+// ── Game Data (canonical race/class/attribute definitions) ───────────────────
+
+export const gameData = {
+  /** Fetch all canonical races, classes, factions, tiers */
+  all: () => apiFetch('/api/game-data/all', {}, GAME_API),
+  races: () => apiFetch('/api/game-data/races', {}, GAME_API),
+  classes: () => apiFetch('/api/game-data/classes', {}, GAME_API),
 };
 
 // ── Inventory endpoints ──────────────────────────────────────────────────────
@@ -197,6 +218,7 @@ export const missions = {
 export default {
   auth,
   characters,
+  gameData,
   inventory,
   economy,
   sync,

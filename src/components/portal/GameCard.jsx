@@ -22,7 +22,7 @@ export default function GameCard({ isLoggedIn }) {
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => { window.location.href = '/play'; }}
+      onClick={() => { if (hasSave && heroCount === 0) return; window.location.href = '/play'; }}
     >
       {/* Background image */}
       <div style={{
@@ -88,17 +88,23 @@ export default function GameCard({ isLoggedIn }) {
           )}
         </div>
 
-        <div style={{
-          background: isLoggedIn
-            ? 'linear-gradient(135deg, #DB6331, #FAAC47)'
-            : 'rgba(255,255,255,0.08)',
-          border: isLoggedIn ? 'none' : '1px solid rgba(255,255,255,0.15)',
-          borderRadius: 8, padding: '8px 24px',
-          color: isLoggedIn ? '#0a0a12' : '#888',
-          fontFamily: "'LifeCraft', 'Cinzel', serif",
-          fontSize: '0.95rem', fontWeight: 700, letterSpacing: 3,
-        }}>
-          {hasSave ? 'CONTINUE' : 'PLAY'}
+        <div
+          title={hasSave && heroCount === 0 ? 'Create a hero first to continue' : ''}
+          style={{
+            background: isLoggedIn && heroCount > 0
+              ? 'linear-gradient(135deg, #DB6331, #FAAC47)'
+              : 'rgba(255,255,255,0.05)',
+            border: isLoggedIn && heroCount > 0 ? 'none' : '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 8, padding: '8px 24px',
+            color: isLoggedIn && heroCount > 0 ? '#0a0a12' : '#555',
+            fontFamily: "'LifeCraft', 'Cinzel', serif",
+            fontSize: '0.95rem', fontWeight: 700, letterSpacing: 3,
+            opacity: hasSave && heroCount === 0 ? 0.4 : 1,
+            cursor: hasSave && heroCount === 0 ? 'not-allowed' : 'pointer',
+            userSelect: 'none',
+          }}
+        >
+          {hasSave && heroCount === 0 ? 'NO HEROES' : hasSave ? 'CONTINUE' : 'PLAY'}
         </div>
       </div>
     </div>

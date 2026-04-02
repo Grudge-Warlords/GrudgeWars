@@ -908,22 +908,29 @@ const useGameStore = create(persist((set, get) => ({
     if (!hero || hero.backendId) return; // already persisted
     if (!grudgeApi.isAuthenticated()) return; // no auth = skip, local-only
     try {
+      // Send manualAttributes (player-allocated points) — the unified backend
+      // computes final stats as: base(10) + race bonuses + class starting + manual.
       const result = await grudgeApi.characters.create({
         name: hero.name,
         classId: hero.classId,
         raceId: hero.raceId,
-        level: hero.level || 1,
-        attributePoints: hero.attributePoints || {},
-        equipment: hero.equipment || {},
-        unlockedSkills: hero.unlockedSkills || {},
+        manualAttributes: hero.attributePoints || {},
+        gameOrigin: 'grudge-wars',
       });
-      if (result?.id) {
-        // Store the backend ID on the local hero
+      if (result?.character?.id) {
+        // Store the backend ID + cNFT data on the local hero
         const updatedRoster = state.heroRoster.map(h =>
-          h.id === localHeroId ? { ...h, backendId: result.id } : h
+          h.id === localHeroId ? {
+            ...h,
+            backendId: result.character.id,
+            prefabId: result.character.prefabId || null,
+            cnft: result.cnft || null,
+            faction: result.faction || null,
+            grudgeId: result.grudgeId || null,
+          } : h
         );
         set({ heroRoster: updatedRoster });
-        console.log(`[gameStore] Character ${hero.name} persisted to backend: ${result.id}`);
+        console.log(`[gameStore] Character ${hero.name} persisted + cNFT minted: ${result.character.id}`);
       }
     } catch (err) {
       console.warn(`[gameStore] createHeroOnBackend(${localHeroId}) failed:`, err.message);
