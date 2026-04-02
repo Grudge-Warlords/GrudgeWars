@@ -638,7 +638,8 @@ export function registerCraftingRoutes(app) {
       }
 
       // Calculate profession XP gained
-      const baseXp = 10 * tier;
+      // Smooth scaling: base 15 + tier multiplier + small bonus per tier squared
+      const baseXp = 15 + (tier * 12) + (tier * tier * 3);
       const profXpGained = baseXp * quantity;
 
       // Update character profession progression
@@ -762,8 +763,16 @@ export function registerCraftingRoutes(app) {
       const currentXp = current.rows[0].xp || 0;
       const newXp = currentXp + xpAmount;
 
-      // Simple level calculation: level = floor(sqrt(xp / 100)) + 1, cap at 100
-      const newLevel = Math.min(100, Math.floor(Math.sqrt(newXp / 100)) + 1);
+      // Smooth profession level curve — no forced gaps
+      // Level N requires: 50 * N * (N + 1) total XP
+      // Level 1=0, 2=150, 5=1500, 10=5500, 25=32500, 50=127500, 100=505000
+      // This gives steady progression where each level takes ~2x the previous
+      function calcProfLevel(xp) {
+        // Solve 50*L*(L+1) = xp → L = (-1 + sqrt(1 + xp/12.5)) / 2
+        const L = (-1 + Math.sqrt(1 + xp / 12.5)) / 2;
+        return Math.min(100, Math.max(1, Math.floor(L) + 1));
+      }
+      const newLevel = calcProfLevel(newXp);
 
       await suiteQuery(
         `UPDATE characters SET ${profXpCol} = $1, ${profLevelCol} = $2, updated_at = NOW()
