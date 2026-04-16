@@ -1,0 +1,1006 @@
+{
+  "blood": [
+    {
+      "file": "blood_splash_1.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_1.png",
+      "w": 768,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 8,
+      "name": "blood_splash_1"
+    },
+    {
+      "file": "blood_splash_10.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_10.png",
+      "w": 768,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 8,
+      "name": "blood_splash_10"
+    },
+    {
+      "file": "blood_splash_2.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_2.png",
+      "w": 576,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 6,
+      "name": "blood_splash_2"
+    },
+    {
+      "file": "blood_splash_3.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_3.png",
+      "w": 672,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 7,
+      "name": "blood_splash_3"
+    },
+    {
+      "file": "blood_splash_4.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_4.png",
+      "w": 672,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 7,
+      "name": "blood_splash_4"
+    },
+    {
+      "file": "blood_splash_5.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_5.png",
+      "w": 768,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 8,
+      "name": "blood_splash_5"
+    },
+    {
+      "file": "blood_splash_6.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_6.png",
+      "w": 864,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 9,
+      "name": "blood_splash_6"
+    },
+    {
+      "file": "blood_splash_7.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_7.png",
+      "w": 576,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 6,
+      "name": "blood_splash_7"
+    },
+    {
+      "file": "blood_splash_8.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_8.png",
+      "w": 864,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 9,
+      "name": "blood_splash_8"
+    },
+    {
+      "file": "blood_splash_9.png",
+      "path": "/sprites/grudge-box/fx/blood/blood_splash_9.png",
+      "w": 768,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 8,
+      "name": "blood_splash_9"
+    }
+  ],
+  "explosions": [
+    {
+      "file": "epic_explosion_001_large_orange.png",
+      "path": "/sprites/grudge-box/fx/explosions/epic_explosion_001_large_orange.png",
+      "w": 1664,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 13,
+      "name": "epic_explosion_001_large_orange"
+    },
+    {
+      "file": "epic_explosion_002_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/explosions/epic_explosion_002_large_yellow.png",
+      "w": 2880,
+      "h": 192,
+      "fw": 192,
+      "fh": 192,
+      "frames": 15,
+      "name": "epic_explosion_002_large_yellow"
+    },
+    {
+      "file": "stylized_explosion_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/explosions/stylized_explosion_001_large_yellow.png",
+      "w": 864,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 9,
+      "name": "stylized_explosion_001_large_yellow"
+    },
+    {
+      "file": "stylized_explosion_002_large_violet.png",
+      "path": "/sprites/grudge-box/fx/explosions/stylized_explosion_002_large_violet.png",
+      "w": 960,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 10,
+      "name": "stylized_explosion_002_large_violet"
+    },
+    {
+      "file": "stylized_explosion_003_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/explosions/stylized_explosion_003_large_yellow.png",
+      "w": 1792,
+      "h": 96,
+      "fw": 128,
+      "fh": 96,
+      "frames": 14,
+      "name": "stylized_explosion_003_large_yellow"
+    },
+    {
+      "file": "symmetrical_explosion_001_large_orange.png",
+      "path": "/sprites/grudge-box/fx/explosions/symmetrical_explosion_001_large_orange.png",
+      "w": 512,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 8,
+      "name": "symmetrical_explosion_001_large_orange"
+    },
+    {
+      "file": "symmetrical_explosion_002_large_orange.png",
+      "path": "/sprites/grudge-box/fx/explosions/symmetrical_explosion_002_large_orange.png",
+      "w": 704,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 11,
+      "name": "symmetrical_explosion_002_large_orange"
+    },
+    {
+      "file": "symmetrical_explosion_004_large_orange.png",
+      "path": "/sprites/grudge-box/fx/explosions/symmetrical_explosion_004_large_orange.png",
+      "w": 1152,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 12,
+      "name": "symmetrical_explosion_004_large_orange"
+    }
+  ],
+  "impacts": [
+    {
+      "file": "directional_impact_001_large_blue.png",
+      "path": "/sprites/grudge-box/fx/impacts/directional_impact_001_large_blue.png",
+      "w": 448,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 7,
+      "name": "directional_impact_001_large_blue"
+    },
+    {
+      "file": "directional_impact_002_large_white.png",
+      "path": "/sprites/grudge-box/fx/impacts/directional_impact_002_large_white.png",
+      "w": 980,
+      "h": 50,
+      "fw": 50,
+      "fh": 50,
+      "frames": 19,
+      "name": "directional_impact_002_large_white"
+    },
+    {
+      "file": "directional_impact_003_large_violet.png",
+      "path": "/sprites/grudge-box/fx/impacts/directional_impact_003_large_violet.png",
+      "w": 480,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 6,
+      "name": "directional_impact_003_large_violet"
+    },
+    {
+      "file": "directional_impact_004_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/impacts/directional_impact_004_large_yellow.png",
+      "w": 400,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 5,
+      "name": "directional_impact_004_large_yellow"
+    },
+    {
+      "file": "symmetrical_impact_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/impacts/symmetrical_impact_001_large_yellow.png",
+      "w": 672,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 7,
+      "name": "symmetrical_impact_001_large_yellow"
+    },
+    {
+      "file": "symmetrical_impact_002_large_blue.png",
+      "path": "/sprites/grudge-box/fx/impacts/symmetrical_impact_002_large_blue.png",
+      "w": 960,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 10,
+      "name": "symmetrical_impact_002_large_blue"
+    },
+    {
+      "file": "symmetrical_impact_003_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/impacts/symmetrical_impact_003_large_yellow.png",
+      "w": 672,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 7,
+      "name": "symmetrical_impact_003_large_yellow"
+    },
+    {
+      "file": "symmetrical_impact_004_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/impacts/symmetrical_impact_004_large_yellow.png",
+      "w": 768,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 8,
+      "name": "symmetrical_impact_004_large_yellow"
+    },
+    {
+      "file": "symmetrical_impact_006_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/impacts/symmetrical_impact_006_large_yellow.png",
+      "w": 1280,
+      "h": 160,
+      "fw": 160,
+      "fh": 160,
+      "frames": 8,
+      "name": "symmetrical_impact_006_large_yellow"
+    }
+  ],
+  "lightning": [
+    {
+      "file": "lightning_burst_001_large_violet.png",
+      "path": "/sprites/grudge-box/fx/lightning/lightning_burst_001_large_violet.png",
+      "w": 512,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 8,
+      "name": "lightning_burst_001_large_violet"
+    },
+    {
+      "file": "lightning_burst_002_large_violet.png",
+      "path": "/sprites/grudge-box/fx/lightning/lightning_burst_002_large_violet.png",
+      "w": 576,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 9,
+      "name": "lightning_burst_002_large_violet"
+    },
+    {
+      "file": "lightning_burst_003_large_violet.png",
+      "path": "/sprites/grudge-box/fx/lightning/lightning_burst_003_large_violet.png",
+      "w": 960,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 10,
+      "name": "lightning_burst_003_large_violet"
+    },
+    {
+      "file": "lightning_strike_001_large_violet.png",
+      "path": "/sprites/grudge-box/fx/lightning/lightning_strike_001_large_violet.png",
+      "w": 896,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 7,
+      "name": "lightning_strike_001_large_violet"
+    }
+  ],
+  "magic": [
+    {
+      "file": "directional_bubble_burst_001_large_green.png",
+      "path": "/sprites/grudge-box/fx/magic/directional_bubble_burst_001_large_green.png",
+      "w": 5120,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 40,
+      "name": "directional_bubble_burst_001_large_green"
+    },
+    {
+      "file": "directional_coin_burst_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/magic/directional_coin_burst_001_large_yellow.png",
+      "w": 3968,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 31,
+      "name": "directional_coin_burst_001_large_yellow"
+    },
+    {
+      "file": "directional_music_burst_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/magic/directional_music_burst_001_large_red.png",
+      "w": 2688,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 21,
+      "name": "directional_music_burst_001_large_red"
+    },
+    {
+      "file": "directional_music_burst_002_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/magic/directional_music_burst_002_large_yellow.png",
+      "w": 2176,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 17,
+      "name": "directional_music_burst_002_large_yellow"
+    },
+    {
+      "file": "round_heart_burst_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/magic/round_heart_burst_001_large_red.png",
+      "w": 2944,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 23,
+      "name": "round_heart_burst_001_large_red"
+    },
+    {
+      "file": "round_light_burst_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/magic/round_light_burst_001_large_yellow.png",
+      "w": 2304,
+      "h": 144,
+      "fw": 144,
+      "fh": 144,
+      "frames": 16,
+      "name": "round_light_burst_001_large_yellow"
+    },
+    {
+      "file": "round_sparkle_burst_001_large_blue.png",
+      "path": "/sprites/grudge-box/fx/magic/round_sparkle_burst_001_large_blue.png",
+      "w": 896,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 14,
+      "name": "round_sparkle_burst_001_large_blue"
+    },
+    {
+      "file": "round_sparkle_burst_002_large_green.png",
+      "path": "/sprites/grudge-box/fx/magic/round_sparkle_burst_002_large_green.png",
+      "w": 1152,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 18,
+      "name": "round_sparkle_burst_002_large_green"
+    },
+    {
+      "file": "round_sparkle_burst_003_large_red.png",
+      "path": "/sprites/grudge-box/fx/magic/round_sparkle_burst_003_large_red.png",
+      "w": 1088,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 17,
+      "name": "round_sparkle_burst_003_large_red"
+    }
+  ],
+  "scifi": [
+    {
+      "file": "scifi_charge_up_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/scifi/scifi_charge_up_001_large_yellow.png",
+      "w": 1152,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 12,
+      "name": "scifi_charge_up_001_large_yellow"
+    },
+    {
+      "file": "scifi_heartbeat_fast_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/scifi/scifi_heartbeat_fast_001_large_yellow.png",
+      "w": 1408,
+      "h": 32,
+      "fw": 32,
+      "fh": 32,
+      "frames": 44,
+      "name": "scifi_heartbeat_fast_001_large_yellow"
+    },
+    {
+      "file": "scifi_heartbeat_flatline_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/scifi/scifi_heartbeat_flatline_001_large_red.png",
+      "w": 1408,
+      "h": 32,
+      "fw": 32,
+      "fh": 32,
+      "frames": 44,
+      "name": "scifi_heartbeat_flatline_001_large_red"
+    },
+    {
+      "file": "scifi_heartbeat_slow_001_large_green.png",
+      "path": "/sprites/grudge-box/fx/scifi/scifi_heartbeat_slow_001_large_green.png",
+      "w": 1408,
+      "h": 32,
+      "fw": 32,
+      "fh": 32,
+      "frames": 44,
+      "name": "scifi_heartbeat_slow_001_large_green"
+    },
+    {
+      "file": "scifi_spark_burst_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/scifi/scifi_spark_burst_001_large_yellow.png",
+      "w": 1536,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 12,
+      "name": "scifi_spark_burst_001_large_yellow"
+    },
+    {
+      "file": "scifi_warp_001_large_green.png",
+      "path": "/sprites/grudge-box/fx/scifi/scifi_warp_001_large_green.png",
+      "w": 1280,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 10,
+      "name": "scifi_warp_001_large_green"
+    },
+    {
+      "file": "scifi_warp_002_large_red.png",
+      "path": "/sprites/grudge-box/fx/scifi/scifi_warp_002_large_red.png",
+      "w": 960,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 10,
+      "name": "scifi_warp_002_large_red"
+    },
+    {
+      "file": "scifi_warp_003_large_blue.png",
+      "path": "/sprites/grudge-box/fx/scifi/scifi_warp_003_large_blue.png",
+      "w": 1536,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 12,
+      "name": "scifi_warp_003_large_blue"
+    }
+  ],
+  "smoke": [
+    {
+      "file": "directional_smoke_burst_001_large_white.png",
+      "path": "/sprites/grudge-box/fx/smoke/directional_smoke_burst_001_large_white.png",
+      "w": 1344,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 21,
+      "name": "directional_smoke_burst_001_large_white"
+    },
+    {
+      "file": "stylized_skull_smoke_burst_001_large_white.png",
+      "path": "/sprites/grudge-box/fx/smoke/stylized_skull_smoke_burst_001_large_white.png",
+      "w": 768,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 12,
+      "name": "stylized_skull_smoke_burst_001_large_white"
+    },
+    {
+      "file": "symmetrical_smoke_burst_001_large_brown.png",
+      "path": "/sprites/grudge-box/fx/smoke/symmetrical_smoke_burst_001_large_brown.png",
+      "w": 640,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 10,
+      "name": "symmetrical_smoke_burst_001_large_brown"
+    }
+  ],
+  "spells": [
+    {
+      "file": "spell_absorb_001_large_violet.png",
+      "path": "/sprites/grudge-box/fx/spells/spell_absorb_001_large_violet.png",
+      "w": 3968,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 31,
+      "name": "spell_absorb_001_large_violet"
+    },
+    {
+      "file": "spell_attack_up_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/spells/spell_attack_up_001_large_red.png",
+      "w": 2304,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 18,
+      "name": "spell_attack_up_001_large_red"
+    },
+    {
+      "file": "spell_death_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/spells/spell_death_001_large_red.png",
+      "w": 3200,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 50,
+      "name": "spell_death_001_large_red"
+    },
+    {
+      "file": "spell_defense_up_001_large_blue.png",
+      "path": "/sprites/grudge-box/fx/spells/spell_defense_up_001_large_blue.png",
+      "w": 2304,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 18,
+      "name": "spell_defense_up_001_large_blue"
+    },
+    {
+      "file": "spell_haste_001_large_green.png",
+      "path": "/sprites/grudge-box/fx/spells/spell_haste_001_large_green.png",
+      "w": 3712,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 29,
+      "name": "spell_haste_001_large_green"
+    },
+    {
+      "file": "spell_heal_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/spells/spell_heal_001_large_red.png",
+      "w": 2048,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 16,
+      "name": "spell_heal_001_large_red"
+    },
+    {
+      "file": "spell_poison_001_large_green.png",
+      "path": "/sprites/grudge-box/fx/spells/spell_poison_001_large_green.png",
+      "w": 2176,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 17,
+      "name": "spell_poison_001_large_green"
+    }
+  ],
+  "splatters": [
+    {
+      "file": "burst_splatter_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/splatters/burst_splatter_001_large_red.png",
+      "w": 640,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 10,
+      "name": "burst_splatter_001_large_red"
+    },
+    {
+      "file": "directional_splatter_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/splatters/directional_splatter_001_large_red.png",
+      "w": 512,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 8,
+      "name": "directional_splatter_001_large_red"
+    }
+  ],
+  "symbols": [
+    {
+      "file": "symbol_alert_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_alert_001_large_red.png",
+      "w": 1120,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 14,
+      "name": "symbol_alert_001_large_red"
+    },
+    {
+      "file": "symbol_alert_002_large_red.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_alert_002_large_red.png",
+      "w": 1280,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 16,
+      "name": "symbol_alert_002_large_red"
+    },
+    {
+      "file": "symbol_alert_text_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_alert_text_001_large_red.png",
+      "w": 4608,
+      "h": 96,
+      "fw": 96,
+      "fh": 96,
+      "frames": 48,
+      "name": "symbol_alert_text_001_large_red"
+    },
+    {
+      "file": "symbol_failure_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_failure_001_large_red.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_failure_001_large_red"
+    },
+    {
+      "file": "symbol_place_1st_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_place_1st_001_large_yellow.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_place_1st_001_large_yellow"
+    },
+    {
+      "file": "symbol_place_2nd_001_large_green.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_place_2nd_001_large_green.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_place_2nd_001_large_green"
+    },
+    {
+      "file": "symbol_place_3rd_001_large_orange.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_place_3rd_001_large_orange.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_place_3rd_001_large_orange"
+    },
+    {
+      "file": "symbol_place_4th_001_large_blue.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_place_4th_001_large_blue.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_place_4th_001_large_blue"
+    },
+    {
+      "file": "symbol_place_5th_001_large_violet.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_place_5th_001_large_violet.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_place_5th_001_large_violet"
+    },
+    {
+      "file": "symbol_place_6th_001_large_blue.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_place_6th_001_large_blue.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_place_6th_001_large_blue"
+    },
+    {
+      "file": "symbol_place_7th_001_large_violet.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_place_7th_001_large_violet.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_place_7th_001_large_violet"
+    },
+    {
+      "file": "symbol_place_8th_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_place_8th_001_large_red.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_place_8th_001_large_red"
+    },
+    {
+      "file": "symbol_rank_A_001_large_green.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_rank_A_001_large_green.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_rank_A_001_large_green"
+    },
+    {
+      "file": "symbol_rank_B_001_large_orange.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_rank_B_001_large_orange.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_rank_B_001_large_orange"
+    },
+    {
+      "file": "symbol_rank_C_001_large_blue.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_rank_C_001_large_blue.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_rank_C_001_large_blue"
+    },
+    {
+      "file": "symbol_rank_D_001_large_violet.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_rank_D_001_large_violet.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_rank_D_001_large_violet"
+    },
+    {
+      "file": "symbol_rank_F_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_rank_F_001_large_red.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_rank_F_001_large_red"
+    },
+    {
+      "file": "symbol_rank_S_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_rank_S_001_large_yellow.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_rank_S_001_large_yellow"
+    },
+    {
+      "file": "symbol_success_001_large_green.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_success_001_large_green.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_success_001_large_green"
+    },
+    {
+      "file": "symbol_thumbs_down_001_large_red.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_thumbs_down_001_large_red.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_thumbs_down_001_large_red"
+    },
+    {
+      "file": "symbol_thumbs_up_001_large_blue.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_thumbs_up_001_large_blue.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_thumbs_up_001_large_blue"
+    },
+    {
+      "file": "symbol_warning_001_large_yellow.png",
+      "path": "/sprites/grudge-box/fx/symbols/symbol_warning_001_large_yellow.png",
+      "w": 4800,
+      "h": 80,
+      "fw": 80,
+      "fh": 80,
+      "frames": 60,
+      "name": "symbol_warning_001_large_yellow"
+    }
+  ],
+  "legacy": [
+    {
+      "file": "Explosion1.png",
+      "path": "/sprites/grudge-box/fx/Explosion1.png",
+      "w": 640,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 10,
+      "name": "Explosion1"
+    },
+    {
+      "file": "Explosion2.png",
+      "path": "/sprites/grudge-box/fx/Explosion2.png",
+      "w": 1280,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 10,
+      "name": "Explosion2"
+    },
+    {
+      "file": "Explosion3.png",
+      "path": "/sprites/grudge-box/fx/Explosion3.png",
+      "w": 2560,
+      "h": 256,
+      "fw": 256,
+      "fh": 256,
+      "frames": 10,
+      "name": "Explosion3"
+    },
+    {
+      "file": "Explosion4.png",
+      "path": "/sprites/grudge-box/fx/Explosion4.png",
+      "w": 640,
+      "h": 64,
+      "fw": 64,
+      "fh": 64,
+      "frames": 10,
+      "name": "Explosion4"
+    },
+    {
+      "file": "Explosion5.png",
+      "path": "/sprites/grudge-box/fx/Explosion5.png",
+      "w": 1280,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 10,
+      "name": "Explosion5"
+    },
+    {
+      "file": "Explosion6.png",
+      "path": "/sprites/grudge-box/fx/Explosion6.png",
+      "w": 2560,
+      "h": 256,
+      "fw": 256,
+      "fh": 256,
+      "frames": 10,
+      "name": "Explosion6"
+    },
+    {
+      "file": "Fire_big.png",
+      "path": "/sprites/grudge-box/fx/Fire_big.png",
+      "w": 2176,
+      "h": 128,
+      "fw": 128,
+      "fh": 128,
+      "frames": 17,
+      "name": "Fire_big"
+    },
+    {
+      "file": "Fire_small.png",
+      "path": "/sprites/grudge-box/fx/Fire_small.png",
+      "w": 448,
+      "h": 32,
+      "fw": 32,
+      "fh": 32,
+      "frames": 14,
+      "name": "Fire_small"
+    }
+  ],
+  "fighters": [
+    {
+      "file": "Black.png",
+      "path": "/sprites/grudge-box/fighters/Black.png",
+      "w": 1536,
+      "h": 1536,
+      "fw": 64,
+      "fh": 64,
+      "frames": 24,
+      "name": "Black"
+    },
+    {
+      "file": "Blue.png",
+      "path": "/sprites/grudge-box/fighters/Blue.png",
+      "w": 1536,
+      "h": 1536,
+      "fw": 64,
+      "fh": 64,
+      "frames": 24,
+      "name": "Blue"
+    },
+    {
+      "file": "Green.png",
+      "path": "/sprites/grudge-box/fighters/Green.png",
+      "w": 1536,
+      "h": 1536,
+      "fw": 64,
+      "fh": 64,
+      "frames": 24,
+      "name": "Green"
+    },
+    {
+      "file": "Purple.png",
+      "path": "/sprites/grudge-box/fighters/Purple.png",
+      "w": 1536,
+      "h": 1536,
+      "fw": 64,
+      "fh": 64,
+      "frames": 24,
+      "name": "Purple"
+    },
+    {
+      "file": "Red.png",
+      "path": "/sprites/grudge-box/fighters/Red.png",
+      "w": 1536,
+      "h": 1536,
+      "fw": 64,
+      "fh": 64,
+      "frames": 24,
+      "name": "Red"
+    },
+    {
+      "file": "Violet.png",
+      "path": "/sprites/grudge-box/fighters/Violet.png",
+      "w": 1536,
+      "h": 1536,
+      "fw": 64,
+      "fh": 64,
+      "frames": 24,
+      "name": "Violet"
+    },
+    {
+      "file": "White.png",
+      "path": "/sprites/grudge-box/fighters/White.png",
+      "w": 1536,
+      "h": 1536,
+      "fw": 64,
+      "fh": 64,
+      "frames": 24,
+      "name": "White"
+    },
+    {
+      "file": "Yellow.png",
+      "path": "/sprites/grudge-box/fighters/Yellow.png",
+      "w": 1536,
+      "h": 1536,
+      "fw": 64,
+      "fh": 64,
+      "frames": 24,
+      "name": "Yellow"
+    }
+  ]
+}

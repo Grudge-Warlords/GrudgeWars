@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Jost:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --deep: #050a18; --abyss: #0a1128; --midnight: #0e1630;
+  --teal: #06b6d4; --cyan: #22d3ee; --purple: #a855f7;
+  --gold: #f59e0b; --red: #ef4444; --green: #22c55e;
+  --pink: #ec4899; --orange: #f97316; --slate: #94a3b8;
+  --text: #e2e8f0; --dim: #94a3b8;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--deep); color: var(--text);
+  overflow-x: hidden; line-height: 1.6;
+}
+h1, h2, h3, h4, h5 { font-family: 'Cinzel', serif; line-height: 1.2; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--deep); }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--teal); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px; border-radius: 8px;
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.95rem;
+  text-decoration: none; cursor: pointer; border: none;
+  transition: all 0.3s; letter-spacing: 1px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--teal), var(--purple));
+  color: #fff; box-shadow: 0 4px 16px rgba(6,182,212,0.35);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(6,182,212,0.5); }
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), var(--orange));
+  color: #000; box-shadow: 0 4px 16px rgba(245,158,11,0.35);
+}
+.btn-ghost {
+  background: rgba(255,255,255,0.05); color: var(--cyan);
+  border: 1px solid rgba(6,182,212,0.3);
+}
+.btn-ghost:hover { background: rgba(6,182,212,0.1); }
+
+/* Game frame wrapper */
+.game-frame { width: 100vw; height: 100vh; position: fixed; inset: 0; }
+.game-frame iframe, .game-frame canvas { width: 100%; height: 100%; border: none; }
+.game-frame-back {
+  position: fixed; top: 12px; left: 12px; z-index: 100;
+  background: rgba(5,10,24,0.85); border: 1px solid rgba(6,182,212,0.2);
+  color: var(--cyan); padding: 8px 16px; border-radius: 8px;
+  font-family: 'Cinzel', serif; font-size: 0.8rem; cursor: pointer;
+  backdrop-filter: blur(8px); transition: all 0.3s;
+}
+.game-frame-back:hover { background: rgba(6,182,212,0.15); border-color: var(--cyan); }
+
+/* Fullscreen game container */
+.game-container {
+  position: fixed; inset: 0; background: var(--deep);
+  display: flex; flex-direction: column;
+}
+.game-container > div { flex: 1; }

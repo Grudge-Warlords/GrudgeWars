@@ -2,6 +2,7 @@ export const classDefinitions = {
   warrior: {
     name: 'Bruiser',
     icon: 'crossed_swords',
+    emblem: '/sprites/emblems/warrior.png',
     color: '#ef4444',
     description: 'A fearless frontline fighter specializing in raw power and deepwater defense.',
     lore: 'Bred in the crushing depths of the Hadal Trench, Warriors are the backbone of any war party. Their strength and endurance are unmatched in the deep.',
@@ -19,6 +20,7 @@ export const classDefinitions = {
   mage: {
     name: 'Mystic',
     icon: 'crystal',
+    emblem: '/sprites/emblems/mage.png',
     color: '#8b5cf6',
     description: 'Master of current magic and root healing arts.',
     lore: 'Drawing power from volcanic vents and ancient root ley lines, Mage Priests wield destructive current magic alongside sacred healing — a balance few can master.',
@@ -34,6 +36,7 @@ export const classDefinitions = {
   worge: {
     name: 'Vesselist',
     icon: 'wolf',
+    emblem: '/sprites/emblems/worge.png',
     color: '#d97706',
     description: 'A shapeshifter who wields current and storm magic, then transforms into a devastating lake predator.',
     lore: 'Worges swim between forms — scholars of current and grove in mortal guise, unstoppable predators in beast form. Their conch and spine channel primal water energies until the wild within is unleashed.',
@@ -54,6 +57,7 @@ export const classDefinitions = {
   ranger: {
     name: 'Scraper',
     icon: 'bow',
+    emblem: '/sprites/emblems/ranger.png',
     color: '#22c55e',
     description: 'A deadly marksman with precise long-range attacks from the kelp canopy.',
     lore: 'Silent and patient, Rangers strike from the kelp shadows with lethal precision. Their spines find gaps in even the thickest scales.',

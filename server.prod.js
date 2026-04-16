@@ -21,9 +21,9 @@ const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || process.env.GAME_API_GRUDA;
 const BETA_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID || '1470521372932313283';
-const BOT_CHANNEL_ID = '1472448936735277188';
-const BOT_APP_ID = '1472444305187668009';
-const GUILD_ID = '1335136143112671296';
+const BOT_CHANNEL_ID = process.env.DISCORD_BOT_CHANNEL_ID || '1472448936735277188';
+const BOT_APP_ID = process.env.DISCORD_APP_ID || '1472444305187668009';
+const GUILD_ID = process.env.DISCORD_GUILD_ID || '1335136143112671296';
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
 const pendingStates = new Map();
@@ -38,7 +38,7 @@ function getPublicOrigin(req) {
   if (host && !host.includes('localhost')) {
     return `${proto}://${host}`;
   }
-  const domain = process.env.REPLIT_DOMAINS;
+  const domain = process.env.DEPLOY_DOMAIN || (process.env.REPLIT_DOMAINS && process.env.REPLIT_DOMAINS.split(',')[0].trim());
   if (domain) return `https://${domain}`;
   return `${proto}://${host || 'localhost:5000'}`;
 }
@@ -165,8 +165,8 @@ app.get('/api/discord/invite', async (req, res) => {
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || process.env.DISCORD_GRUDGE_WEBHOOK;
 const DISCORD_WEBHOOK_CHAT = process.env.DISCORD_WEBHOOK_CHAT;
 const DISCORD_WEBHOOK_URL_ANNOUNCE = process.env.DISCORD_WEBHOOK_URL_ANNOUNCE;
-const ANNOUNCE_CHANNEL_ID = '1472449203283431494';
-const CHAT_CHANNEL_ID = '1472457126885462239';
+const ANNOUNCE_CHANNEL_ID = process.env.DISCORD_ANNOUNCE_CHANNEL_ID || '1472449203283431494';
+const CHAT_CHANNEL_ID = process.env.DISCORD_CHAT_CHANNEL_ID || '1472457126885462239';
 const ADMIN_TOKEN = process.env.GAME_API_GRUDA;
 
 function requireAdmin(req, res, next) {
@@ -668,7 +668,7 @@ const COMMAND_RESPONSES = {
     description: 'Dive into the underwater world of Betta Warlords — the flagship RPG from Grudge Studios!',
     color: 0x22d3ee,
     fields: [
-      { name: 'Play Now', value: '[Launch Game](https://bettawarlords.replit.app)', inline: true },
+      { name: 'Play Now', value: '[Launch Game](https://grudgewarlords.com)', inline: true },
       { name: 'Platform', value: 'Web / Mobile PWA', inline: true },
       { name: 'Price', value: 'Free to Play', inline: true },
       { name: 'Features', value: '32 unique Warlord combos, tactical battles, world map exploration, AI-powered dialogue, Discord integration', inline: false },
@@ -810,6 +810,137 @@ app.post('/api/discord/bot/send', requireAdmin, async (req, res) => {
     res.json({ success: true, messageId: result.id });
   } catch (err) {
     console.error('Bot send error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+import OpenAI from 'openai';
+
+const xai = process.env.XAI_API_KEY ? new OpenAI({
+  apiKey: process.env.XAI_API_KEY,
+  baseURL: 'https://api.x.ai/v1',
+}) : null;
+
+const xaiRateLimit = new Map();
+const XAI_RATE_WINDOW = 60000;
+const XAI_RATE_MAX = 10;
+
+function xaiRateLimiter(req, res, next) {
+  if (!xai) return res.status(503).json({ error: 'xAI service unavailable' });
+  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const entry = xaiRateLimit.get(ip);
+  if (entry && now - entry.start < XAI_RATE_WINDOW) {
+    if (entry.count >= XAI_RATE_MAX) return res.status(429).json({ error: 'Rate limit exceeded' });
+    entry.count++;
+  } else {
+    xaiRateLimit.set(ip, { start: now, count: 1 });
+  }
+  next();
+}
+
+app.use('/api/xai', xaiRateLimiter);
+
+const GKO_SYSTEM_PROMPT = `You are the lore master for G.K.O. Boxing, a cyberpunk pixel-art fighting game by Grudge Studios. The world is a neon-lit underground fighting circuit where 8 legendary fighters compete for glory.
+
+Fighters:
+- RAZE (Red) — The Street King, aggressive rushdown brawler, CRIMSON FURY special
+- VOLT (Blue) — Storm Breaker, balanced pyro fighter, STORM BREAKER special  
+- VENOM (Green) — The Jade Fang, counter specialist with poison, VENOM COUNTER special
+- WRAITH (Purple) — Phantom Fist, cybernetic stealth striker, PHANTOM STEP special
+- BLITZ (Yellow) — Golden Thunder, mutant powerhouse, THUNDER BLOW special
+- SHADE (Black) — The Dark Horse, mechanical defensive wall, IRON WALL special
+- GHOST (White) — Pale Revenant, elusive spectral boxer, GHOST RUSH special
+- SURGE (Cyan) — Neon Striker, cyberpunk gunslinger turned brawler, NEON BURST special
+
+Style: gritty, cyberpunk, dramatic. Short punchy prose. No more than 3 paragraphs.`;
+
+app.post('/api/xai/lore', async (req, res) => {
+  try {
+    const { fighterId, fighterName, fighterStyle } = req.body;
+    const completion = await xai.chat.completions.create({
+      model: 'grok-4-1-fast-non-reasoning',
+      messages: [
+        { role: 'system', content: GKO_SYSTEM_PROMPT },
+        { role: 'user', content: `Write the origin story and lore for ${fighterName} (${fighterStyle}). Include their motivation, backstory, and why they fight in the G.K.O. circuit. 2-3 paragraphs, dramatic cyberpunk tone.` },
+      ],
+      max_tokens: 500,
+      temperature: 0.9,
+    });
+    res.json({ lore: completion.choices[0].message.content, fighterId });
+  } catch (err) {
+    console.error('[xAI] Lore error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/xai/commentary', async (req, res) => {
+  try {
+    const { fighter1, fighter2, events } = req.body;
+    const evtStr = (events || []).slice(-5).map(e => `${e.type}: ${e.detail}`).join('\n');
+    const completion = await xai.chat.completions.create({
+      model: 'grok-4-1-fast-non-reasoning',
+      messages: [
+        { role: 'system', content: GKO_SYSTEM_PROMPT + '\nYou are the ringside commentator. Give exciting, short play-by-play commentary (1-2 sentences max).' },
+        { role: 'user', content: `${fighter1} vs ${fighter2}. Recent events:\n${evtStr}\n\nGive a quick commentator line.` },
+      ],
+      max_tokens: 100,
+      temperature: 1.0,
+    });
+    res.json({ commentary: completion.choices[0].message.content });
+  } catch (err) {
+    console.error('[xAI] Commentary error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/xai/campaign', async (req, res) => {
+  try {
+    const { fighterId, chapter, previousEvents } = req.body;
+    const prevStr = (previousEvents || []).join('\n');
+    const completion = await xai.chat.completions.create({
+      model: 'grok-4-1-fast-non-reasoning',
+      messages: [
+        { role: 'system', content: GKO_SYSTEM_PROMPT + '\nYou are writing the campaign story mode. Each chapter has a dramatic narrative intro, the opponent reveal, and stakes. Keep it punchy and dramatic.' },
+        { role: 'user', content: `Fighter: ${fighterId}, Chapter ${chapter || 1}.\nPrevious events: ${prevStr || 'None'}\n\nWrite the chapter intro narrative (2-3 paragraphs), name the opponent, and describe the stakes. Return as JSON: { "narrative": "...", "opponent": "fighter_id", "stakes": "..." }` },
+      ],
+      max_tokens: 600,
+      temperature: 0.85,
+    });
+    const content = completion.choices[0].message.content;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      res.json(jsonMatch ? JSON.parse(jsonMatch[0]) : { narrative: content, opponent: 'raze', stakes: 'Pride' });
+    } catch {
+      res.json({ narrative: content, opponent: 'raze', stakes: 'Pride' });
+    }
+  } catch (err) {
+    console.error('[xAI] Campaign error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/xai/trash-talk', async (req, res) => {
+  try {
+    const { fighterId, opponentId, matchContext } = req.body;
+    const completion = await xai.chat.completions.create({
+      model: 'grok-4-1-fast-non-reasoning',
+      messages: [
+        { role: 'system', content: GKO_SYSTEM_PROMPT + '\nGenerate pre-fight trash talk lines. Short, punchy, in-character. Return as JSON: { "lines": ["...", "...", "..."] }' },
+        { role: 'user', content: `${fighterId} is about to fight ${opponentId}. Context: ${matchContext || 'ranked match'}. Give 3 trash talk lines from ${fighterId}'s perspective.` },
+      ],
+      max_tokens: 200,
+      temperature: 1.0,
+    });
+    const content = completion.choices[0].message.content;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      res.json(jsonMatch ? JSON.parse(jsonMatch[0]) : { lines: [content] });
+    } catch {
+      res.json({ lines: [content] });
+    }
+  } catch (err) {
+    console.error('[xAI] Trash talk error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });

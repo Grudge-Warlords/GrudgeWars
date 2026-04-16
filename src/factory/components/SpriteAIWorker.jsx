@@ -2,10 +2,11 @@ import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import JSZip from 'jszip';
 import {
   isImageFile, isGifFile, isSvgFile, getSpriteFileExtensions,
-  loadImageDimensions, detectGridLayout,
+  loadImageDimensions, detectGridLayout, detectFrameSeparators,
   assembleFramesIntoSheet, removeBackground, normalizeFrameSize,
-  detectDuplicateFrames, suggestAnimationSpeed,
+  detectDuplicateFrames, suggestAnimationSpeed, extractColorPalette,
 } from '../utils/spriteProcessing.js';
+import { puterAuth, puterAI, puterFS, isPuterAvailable } from '../../utils/puterService.js';
 
 const ANIM_KEYWORDS = {
   idle: ['idle', 'stand', 'breathe', 'rest', 'wait'],
@@ -77,21 +78,25 @@ Return ONLY a valid JSON object with this format:
   return null;
 }
 
-function SpritePreview({ spriteData, animKey, scale = 2 }) {
+function SpritePreview({ spriteData, animKey, scale = 2, squareViewport = false, showZoom = false }) {
   const [frame, setFrame] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState(() => suggestAnimationSpeed(animKey));
+  const [zoom, setZoom] = useState(scale);
   const intervalRef = useRef(null);
+  const canvasRef = useRef(null);
+  const imgRef = useRef(null);
 
   const anim = spriteData?.[animKey];
   const totalFrames = anim?.frames || 1;
   const frameWidth = anim?.frameWidth || spriteData?.frameWidth || 100;
   const frameHeight = anim?.frameHeight || spriteData?.frameHeight || 100;
-  const displayWidth = frameWidth * scale;
-  const displayHeight = frameHeight * scale;
   const isVertical = anim?.type === 'vertical_strip';
   const isGrid = anim?.type === 'grid';
   const gridCols = anim?.gridCols || totalFrames;
+  const isSvg = anim?.src && (anim.src.includes('.svg') || anim.isSvg);
+
+  const viewSize = squareViewport ? Math.max(frameWidth, frameHeight) * zoom : null;
 
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -105,49 +110,75 @@ function SpritePreview({ spriteData, animKey, scale = 2 }) {
     return () => clearInterval(intervalRef.current);
   }, [playing, totalFrames, speed, animKey]);
 
+  useEffect(() => {
+    if (!anim?.src || isSvg) return;
+    const img = new Image();
+    img.onload = () => { imgRef.current = img; };
+    img.src = anim.src;
+  }, [anim?.src, isSvg]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img || isSvg) return;
+
+    const dw = frameWidth * zoom;
+    const dh = frameHeight * zoom;
+    const cw = squareViewport ? viewSize : dw;
+    const ch = squareViewport ? viewSize : dh;
+    canvas.width = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    const checkSize = 8;
+    for (let y = 0; y < ch; y += checkSize) {
+      for (let x = 0; x < cw; x += checkSize) {
+        const isLight = ((Math.floor(x / checkSize) + Math.floor(y / checkSize)) % 2) === 0;
+        ctx.fillStyle = isLight ? 'rgba(60,60,60,0.5)' : 'rgba(40,40,40,0.5)';
+        ctx.fillRect(x, y, checkSize, checkSize);
+      }
+    }
+
+    let sx = 0, sy = 0;
+    if (isGrid) {
+      sx = (frame % gridCols) * frameWidth;
+      sy = Math.floor(frame / gridCols) * frameHeight;
+    } else if (isVertical) {
+      sy = frame * frameHeight;
+    } else {
+      sx = frame * frameWidth;
+    }
+
+    const ox = squareViewport ? Math.floor((cw - dw) / 2) : 0;
+    const oy = squareViewport ? Math.floor((ch - dh) / 2) : 0;
+    ctx.drawImage(img, sx, sy, frameWidth, frameHeight, ox, oy, dw, dh);
+  }, [frame, zoom, anim?.src, frameWidth, frameHeight, isGrid, isVertical, gridCols, totalFrames, isSvg, squareViewport, viewSize]);
+
   if (!anim) return <div style={{ color: '#999', padding: 8 }}>No animation data</div>;
 
-  let bgPosX = 0, bgPosY = 0, bgSizeW, bgSizeH;
-  if (isGrid) {
-    const col = frame % gridCols;
-    const row = Math.floor(frame / gridCols);
-    bgPosX = -col * displayWidth;
-    bgPosY = -row * displayHeight;
-    const gridRows = Math.ceil(totalFrames / gridCols);
-    bgSizeW = gridCols * displayWidth;
-    bgSizeH = gridRows * displayHeight;
-  } else if (isVertical) {
-    bgPosX = 0;
-    bgPosY = -frame * displayHeight;
-    bgSizeW = displayWidth;
-    bgSizeH = totalFrames * displayHeight;
-  } else {
-    bgPosX = -frame * displayWidth;
-    bgPosY = 0;
-    bgSizeW = totalFrames * displayWidth;
-    bgSizeH = displayHeight;
-  }
-
-  const isSvg = anim.src && (anim.src.includes('.svg') || anim.isSvg);
+  const displayWidth = squareViewport ? viewSize : frameWidth * zoom;
+  const displayHeight = squareViewport ? viewSize : frameHeight * zoom;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
       {isSvg ? (
         <img src={anim.src} alt="svg sprite" style={{
-          width: displayWidth, height: displayHeight, imageRendering: 'auto',
+          width: frameWidth * zoom, height: frameHeight * zoom, imageRendering: 'auto',
           border: '1px solid rgba(255,255,255,0.1)', borderRadius: 4, backgroundColor: 'rgba(0,0,0,0.3)',
         }} />
       ) : (
-        <div style={{
-          width: displayWidth, height: displayHeight,
-          imageRendering: 'pixelated',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: 4,
-          background: `url(${anim.src}) no-repeat ${bgPosX}px ${bgPosY}px / ${bgSizeW}px ${bgSizeH}px`,
-          backgroundColor: 'rgba(0,0,0,0.3)',
-        }} />
+        <canvas
+          ref={canvasRef}
+          style={{
+            width: displayWidth, height: displayHeight,
+            imageRendering: 'pixelated',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 4,
+          }}
+        />
       )}
-      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
         <button onClick={() => setPlaying(!playing)} style={miniBtn}>
           {playing ? '⏸' : '▶'}
         </button>
@@ -163,7 +194,21 @@ function SpritePreview({ spriteData, animKey, scale = 2 }) {
           <option value={200}>Slow</option>
           <option value={400}>Very Slow</option>
         </select>
+        {showZoom && (
+          <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            {[1, 2, 4, 8].map(z => (
+              <button key={z} onClick={() => setZoom(z)} style={zoom === z ? { ...miniBtn, background: 'rgba(212,168,67,0.3)', borderColor: 'rgba(212,168,67,0.5)' } : miniBtn}>
+                {z}x
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+      {squareViewport && (
+        <div style={{ fontSize: 10, color: '#888' }}>
+          {frameWidth}x{frameHeight}px · {zoom}x zoom
+        </div>
+      )}
     </div>
   );
 }
@@ -213,8 +258,21 @@ export default function SpriteAIWorker() {
   const [slicerTarget, setSlicerTarget] = useState(null);
   const [slicerCols, setSlicerCols] = useState(4);
   const [slicerRows, setSlicerRows] = useState(4);
+  const [aiReview, setAiReview] = useState(null);
+  const [aiReviewLoading, setAiReviewLoading] = useState(false);
+  const [colorPalettes, setColorPalettes] = useState({});
+  const [undoStack, setUndoStack] = useState([]);
+  const [showSheetOverlay, setShowSheetOverlay] = useState(false);
+  const [generatePrompt, setGeneratePrompt] = useState('');
+  const [generateLoading, setGenerateLoading] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [analyzeResult, setAnalyzeResult] = useState(null);
+  const [analyzeLoading, setAnalyzeLoading] = useState(false);
+  const [puterSignedIn, setPuterSignedIn] = useState(false);
+  const [cloudSaveStatus, setCloudSaveStatus] = useState('');
   const fileInputRef = useRef(null);
   const looseFileInputRef = useRef(null);
+  const quickImportRef = useRef(null);
   const blobUrlsRef = useRef([]);
 
   useEffect(() => {
@@ -223,6 +281,143 @@ export default function SpriteAIWorker() {
       blobUrlsRef.current = [];
     };
   }, []);
+
+  useEffect(() => {
+    if (isPuterAvailable()) {
+      try {
+        setPuterSignedIn(puterAuth.isSignedIn());
+      } catch { setPuterSignedIn(false); }
+    }
+  }, []);
+
+  const ensurePuterAuth = useCallback(async () => {
+    if (!isPuterAvailable()) {
+      setProgress('Puter.js SDK not available');
+      return false;
+    }
+    if (puterAuth.isSignedIn()) {
+      setPuterSignedIn(true);
+      return true;
+    }
+    try {
+      await puterAuth.signIn();
+      setPuterSignedIn(true);
+      return true;
+    } catch (e) {
+      setProgress('Puter sign-in cancelled or failed');
+      return false;
+    }
+  }, []);
+
+  const handleGenerateSprite = useCallback(async () => {
+    if (!generatePrompt.trim()) return;
+    const authed = await ensurePuterAuth();
+    if (!authed) return;
+    setGenerateLoading(true);
+    setProgress('Generating sprite from text prompt...');
+    try {
+      const result = await puterAI.txt2img(generatePrompt.trim());
+      if (result) {
+        let imgUrl;
+        if (result instanceof Blob) {
+          imgUrl = URL.createObjectURL(result);
+          blobUrlsRef.current.push(imgUrl);
+        } else if (typeof result === 'string') {
+          imgUrl = result;
+        } else if (result.url) {
+          imgUrl = result.url;
+        } else if (result.src) {
+          imgUrl = result.src;
+        }
+        setGeneratedImage({ url: imgUrl, prompt: generatePrompt.trim(), blob: result instanceof Blob ? result : null });
+        setProgress('Sprite generated successfully!');
+      } else {
+        setProgress('No image returned from AI');
+      }
+    } catch (err) {
+      setProgress('Generation failed: ' + err.message);
+    } finally {
+      setGenerateLoading(false);
+    }
+  }, [generatePrompt, ensurePuterAuth]);
+
+  const handleAnalyzeSprite = useCallback(async (groupKey, animKey) => {
+    const authed = await ensurePuterAuth();
+    if (!authed) return;
+    const anim = spriteGroups[groupKey]?.animations[animKey];
+    if (!anim?.src) return;
+    setAnalyzeLoading(true);
+    setAnalyzeResult(null);
+    setProgress(`Analyzing sprite "${animKey}" with AI...`);
+    try {
+      const result = await puterAI.img2txt(anim.src);
+      const text = typeof result === 'string' ? result : result?.text || result?.description || JSON.stringify(result);
+      setAnalyzeResult({ groupKey, animKey, text });
+      setProgress('Sprite analysis complete');
+    } catch (err) {
+      setProgress('Analysis failed: ' + err.message);
+    } finally {
+      setAnalyzeLoading(false);
+    }
+  }, [spriteGroups, ensurePuterAuth]);
+
+  const handleSaveToCloud = useCallback(async (groupKey, animKey) => {
+    const authed = await ensurePuterAuth();
+    if (!authed) return;
+    const group = spriteGroups[groupKey];
+    const anim = group?.animations[animKey];
+    if (!anim?.blob) {
+      setProgress('No blob data available for this sprite');
+      return;
+    }
+    setCloudSaveStatus('saving');
+    setProgress(`Saving "${animKey}" to Puter cloud...`);
+    try {
+      const dirPath = `/sprites/${group.entityName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+      try { await puterFS.mkdir(dirPath); } catch {}
+      const ext = anim.originalFormat === 'svg' ? 'svg' : 'png';
+      const filePath = `${dirPath}/${animKey}.${ext}`;
+      await puterFS.write(filePath, anim.blob);
+      setCloudSaveStatus('saved');
+      setProgress(`Saved to ${filePath}`);
+      setTimeout(() => setCloudSaveStatus(''), 3000);
+    } catch (err) {
+      setCloudSaveStatus('error');
+      setProgress('Cloud save failed: ' + err.message);
+      setTimeout(() => setCloudSaveStatus(''), 3000);
+    }
+  }, [spriteGroups, ensurePuterAuth]);
+
+  const handleExportAllToCloud = useCallback(async () => {
+    const authed = await ensurePuterAuth();
+    if (!authed) return;
+    setCloudSaveStatus('saving');
+    setProgress('Exporting all sprites to Puter cloud...');
+    try {
+      let saved = 0;
+      for (const [folder, group] of Object.entries(spriteGroups)) {
+        const dirPath = `/sprites/${group.entityName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+        try { await puterFS.mkdir(dirPath); } catch {}
+        for (const [animKey, anim] of Object.entries(group.animations)) {
+          if (!anim.blob) continue;
+          const ext = anim.originalFormat === 'svg' ? 'svg' : 'png';
+          await puterFS.write(`${dirPath}/${animKey}.${ext}`, anim.blob);
+          saved++;
+          setProgress(`Saving sprites... (${saved} files)`);
+        }
+      }
+      if (exportedJSON) {
+        await puterFS.write('/sprites/spriteMap_config.json', new Blob([exportedJSON], { type: 'application/json' }));
+      }
+      setCloudSaveStatus('saved');
+      setProgress(`Exported ${saved} sprite files to Puter cloud`);
+      setTimeout(() => setCloudSaveStatus(''), 3000);
+    } catch (err) {
+      setCloudSaveStatus('error');
+      setProgress('Export failed: ' + err.message);
+      setTimeout(() => setCloudSaveStatus(''), 3000);
+    }
+  }, [spriteGroups, exportedJSON, ensurePuterAuth]);
 
   const processFiles = useCallback(async (fileEntries) => {
     setAnalyzing(true);
@@ -487,6 +682,24 @@ export default function SpriteAIWorker() {
     if (looseFileInputRef.current) looseFileInputRef.current.value = '';
   }, [processFiles]);
 
+  const handleImportGenerated = useCallback(async () => {
+    if (!generatedImage?.url) return;
+    let blob = generatedImage.blob;
+    if (!blob) {
+      try {
+        const resp = await fetch(generatedImage.url);
+        blob = await resp.blob();
+      } catch (err) {
+        setProgress('Failed to fetch generated image: ' + err.message);
+        return;
+      }
+    }
+    const name = `generated_${Date.now()}.png`;
+    const fileEntries = [{ path: name, name, folder: 'ai_generated', blob }];
+    await processFiles(fileEntries);
+    setGeneratedImage(null);
+  }, [generatedImage, processFiles]);
+
   const updateAnimCategory = useCallback((groupKey, oldAnim, newAnim) => {
     setSpriteGroups(prev => {
       const g = { ...prev };
@@ -604,6 +817,159 @@ export default function SpriteAIWorker() {
     setProgress(`Normalized all frames to ${targetW}x${targetH}`);
   }, [spriteGroups]);
 
+  const pushUndo = useCallback((label) => {
+    const blobMap = {};
+    for (const [folder, group] of Object.entries(spriteGroups)) {
+      blobMap[folder] = {};
+      for (const [animKey, anim] of Object.entries(group.animations)) {
+        blobMap[folder][animKey] = { blob: anim.blob, src: anim.src };
+      }
+    }
+    setUndoStack(prev => [...prev.slice(-9), {
+      groups: JSON.parse(JSON.stringify(spriteGroups, (k, v) => k === 'blob' ? undefined : v)),
+      blobMap,
+      label,
+      timestamp: Date.now(),
+    }]);
+  }, [spriteGroups]);
+
+  const handleUndo = useCallback(() => {
+    if (undoStack.length === 0) return;
+    const last = undoStack[undoStack.length - 1];
+    setUndoStack(prev => prev.slice(0, -1));
+    const restored = last.groups;
+    for (const [folder, folderBlobs] of Object.entries(last.blobMap)) {
+      if (!restored[folder]) continue;
+      for (const [animKey, blobData] of Object.entries(folderBlobs)) {
+        if (restored[folder].animations[animKey]) {
+          restored[folder].animations[animKey].blob = blobData.blob;
+          restored[folder].animations[animKey].src = blobData.src;
+        }
+      }
+    }
+    setSpriteGroups(restored);
+    setProgress(`Undone: ${last.label}`);
+  }, [undoStack]);
+
+  const handleQuickImport = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !isImageFile(file.name)) return;
+    const fileEntries = [{ path: file.name, name: file.name, folder: 'quick_import', blob: file }];
+    await processFiles(fileEntries);
+    if (quickImportRef.current) quickImportRef.current.value = '';
+  }, [processFiles]);
+
+  const handleExtractPalette = useCallback(async (groupKey, animKey) => {
+    const anim = spriteGroups[groupKey]?.animations[animKey];
+    if (!anim?.blob) return;
+    setProgress(`Extracting colors from ${animKey}...`);
+    const palette = await extractColorPalette(anim.blob);
+    setColorPalettes(prev => ({ ...prev, [`${groupKey}::${animKey}`]: palette }));
+    setProgress(`Found ${palette.length} dominant colors`);
+  }, [spriteGroups]);
+
+  const handleAiReview = useCallback(async (groupKey) => {
+    const group = spriteGroups[groupKey];
+    if (!group) return;
+    if (!(typeof window !== 'undefined' && window.puter)) {
+      setProgress('Puter.js AI not available for review');
+      return;
+    }
+    setAiReviewLoading(true);
+    setProgress('Running AI sprite review...');
+    try {
+      const animSummary = Object.entries(group.animations).map(([key, anim]) => ({
+        name: key,
+        frames: anim.frames,
+        frameWidth: anim.frameWidth,
+        frameHeight: anim.frameHeight,
+        fullWidth: anim.fullWidth,
+        fullHeight: anim.fullHeight,
+        layout: anim.type,
+        gridCols: anim.gridCols,
+        gridRows: anim.gridRows,
+        format: anim.originalFormat,
+        speed: anim.suggestedSpeed,
+      }));
+
+      const prompt = `You are a pixel art sprite sheet expert reviewing sprite data for an RPG game engine.
+
+Entity: "${group.entityName}" (${group.entityType})
+Frame target: ${group.frameWidth}x${group.frameHeight}
+
+Animations:
+${JSON.stringify(animSummary, null, 2)}
+
+Analyze each animation and provide a JSON response with this exact format:
+{
+  "overall": "brief overall assessment",
+  "suggestions": [
+    {
+      "animKey": "animation_name",
+      "issue": "what's wrong",
+      "fix": "what to do",
+      "severity": "high|medium|low",
+      "action": "adjust_frames|adjust_grid|remove_bg|change_speed|normalize|none"
+    }
+  ],
+  "recommendedFrameSize": {"width": N, "height": N},
+  "missingAnimations": ["idle", "walk"]
+}
+
+Check for: wrong frame counts (e.g., sheet 512x64 with frameWidth 64 should be 8 frames not 4), mismatched frame sizes, missing key animations (idle/walk/attack/hurt/death), unusual speeds, possible layout misdetection. Only flag real issues.`;
+
+      const resp = await puter.ai.chat(prompt, { model: 'gpt-4o-mini' });
+      const text = typeof resp === 'string' ? resp : resp?.message?.content || '';
+      const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const review = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+        setAiReview({ groupKey, ...review });
+        setProgress('AI review complete');
+      } else {
+        setAiReview({ groupKey, overall: text, suggestions: [] });
+        setProgress('AI review returned non-structured response');
+      }
+    } catch (err) {
+      setProgress('AI review failed: ' + err.message);
+      setAiReview(null);
+    } finally {
+      setAiReviewLoading(false);
+    }
+  }, [spriteGroups]);
+
+  const applyAiSuggestion = useCallback((suggestion) => {
+    if (!aiReview?.groupKey) return;
+    const groupKey = aiReview.groupKey;
+    const animKey = suggestion.animKey;
+    pushUndo('AI fix: ' + suggestion.fix);
+
+    if (suggestion.action === 'adjust_frames' && suggestion.recommendedFrames) {
+      updateFrameCount(groupKey, animKey, suggestion.recommendedFrames);
+    } else if (suggestion.action === 'adjust_grid' && suggestion.recommendedCols) {
+      updateGridDimensions(groupKey, animKey, suggestion.recommendedCols, suggestion.recommendedRows || 1);
+    } else if (suggestion.action === 'change_speed' && suggestion.recommendedSpeed) {
+      setSpriteGroups(prev => {
+        const g = { ...prev };
+        const group = { ...g[groupKey], animations: { ...g[groupKey].animations } };
+        group.animations[animKey] = { ...group.animations[animKey], suggestedSpeed: suggestion.recommendedSpeed };
+        g[groupKey] = group;
+        return g;
+      });
+    } else if (suggestion.action === 'remove_bg') {
+      handleRemoveBackground(groupKey, animKey);
+    }
+    setProgress(`Applied: ${suggestion.fix}`);
+  }, [aiReview, pushUndo, updateFrameCount, updateGridDimensions, handleRemoveBackground]);
+
+  const handleDownloadSheet = useCallback((groupKey, animKey) => {
+    const anim = spriteGroups[groupKey]?.animations[animKey];
+    if (!anim?.src) return;
+    const a = document.createElement('a');
+    a.href = anim.src;
+    a.download = `${spriteGroups[groupKey].entityName}_${animKey}.png`;
+    a.click();
+  }, [spriteGroups]);
+
   const handleFindDuplicates = useCallback(async (groupKey, animKey) => {
     const anim = spriteGroups[groupKey]?.animations[animKey];
     if (!anim?.blob || anim.frames <= 1) return;
@@ -699,6 +1065,12 @@ export default function SpriteAIWorker() {
           </div>
         </div>
         <div style={styles.headerRight}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginRight: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: puterSignedIn ? '#4ade80' : isPuterAvailable() ? '#fbbf24' : '#ef4444', display: 'inline-block' }} />
+            <span style={{ fontSize: 10, color: puterSignedIn ? '#4ade80' : '#999' }}>
+              {puterSignedIn ? 'Puter' : isPuterAvailable() ? 'Not signed in' : 'No SDK'}
+            </span>
+          </div>
           <button
             onClick={() => looseFileInputRef.current?.click()}
             style={{ ...styles.uploadBtn, background: 'linear-gradient(135deg, #4a7c59 0%, #2d6a4f 100%)' }}
@@ -733,29 +1105,43 @@ export default function SpriteAIWorker() {
       {groupKeys.length > 0 && (
         <div style={styles.toolbar}>
           <div style={styles.viewTabs}>
-            {['groups', 'viewport', 'slicer', 'export'].map(mode => (
+            {['groups', 'viewport', 'slicer', 'review', 'generate', 'export'].map(mode => (
               <button
                 key={mode}
                 onClick={() => setViewMode(mode)}
                 style={viewMode === mode ? styles.tabActive : styles.tab}
               >
-                {mode === 'groups' ? '📁 Groups' : mode === 'viewport' ? '🎬 Preview' : mode === 'slicer' ? '✂️ Slicer' : '📄 Export'}
+                {mode === 'groups' ? '📁 Groups' : mode === 'viewport' ? '🎬 Preview' : mode === 'slicer' ? '✂️ Slicer' : mode === 'review' ? '🤖 AI Review' : mode === 'generate' ? '✨ AI Generate' : '📄 Export'}
               </button>
             ))}
           </div>
-          <span style={styles.stats}>
-            {groupKeys.length} groups · {extractedFiles.length} files
-          </span>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            {undoStack.length > 0 && (
+              <button onClick={handleUndo} style={{ ...styles.toolBtn, color: '#fbbf24' }}>
+                ↩ Undo
+              </button>
+            )}
+            <button onClick={() => quickImportRef.current?.click()} style={styles.toolBtn}>
+              ⚡ Quick Import
+            </button>
+            <input ref={quickImportRef} type="file" accept={getSpriteFileExtensions()} onChange={handleQuickImport} style={{ display: 'none' }} />
+            <span style={styles.stats}>
+              {groupKeys.length} groups · {extractedFiles.length} files
+            </span>
+          </div>
         </div>
       )}
 
-      {groupKeys.length === 0 && !analyzing && (
+      {groupKeys.length === 0 && !analyzing && viewMode !== 'generate' && (
         <div style={styles.emptyState}>
           <div style={styles.emptyIcon}>📦</div>
           <h3 style={styles.emptyTitle}>Drop a sprite pack to get started</h3>
           <p style={styles.emptyDesc}>
             Upload a ZIP or select individual files. The AI will auto-detect characters, animations, layouts, and frame counts.
           </p>
+          <button onClick={() => setViewMode('generate')} style={{ ...styles.generateBtn, marginBottom: 16 }}>
+            ✨ Or Generate Sprites with AI
+          </button>
           <div style={styles.formatInfo}>
             <div style={styles.formatItem}>
               <strong>Formats:</strong> PNG, GIF, SVG, WebP, JPEG, BMP
@@ -783,18 +1169,30 @@ export default function SpriteAIWorker() {
             {groupKeys.map(key => {
               const g = spriteGroups[key];
               const animCount = Object.keys(g.animations).length;
+              const firstAnim = Object.values(g.animations)[0];
               return (
                 <div
                   key={key}
                   onClick={() => { setSelectedGroup(key); setSelectedAnim(Object.keys(g.animations)[0] || 'idle'); }}
                   style={selectedGroup === key ? styles.sidebarItemActive : styles.sidebarItem}
                 >
-                  <div style={styles.sidebarItemName}>{g.entityName}</div>
-                  <div style={styles.sidebarItemMeta}>
-                    <span style={{ ...styles.typeBadge, background: TYPE_COLORS[g.entityType] || '#4a3d6a' }}>
-                      {g.entityType}
-                    </span>
-                    <span style={styles.animCount}>{animCount} anims</span>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {firstAnim?.src && !firstAnim.isSvg && (
+                      <div style={{
+                        width: 32, height: 32, borderRadius: 4, overflow: 'hidden', flexShrink: 0,
+                        background: `url(${firstAnim.src}) no-repeat 0 0 / ${firstAnim.frameWidth <= 32 ? 'contain' : `${32}px ${32}px`}`,
+                        backgroundColor: 'rgba(0,0,0,0.3)', imageRendering: 'pixelated',
+                      }} />
+                    )}
+                    <div style={{ overflow: 'hidden' }}>
+                      <div style={styles.sidebarItemName}>{g.entityName}</div>
+                      <div style={styles.sidebarItemMeta}>
+                        <span style={{ ...styles.typeBadge, background: TYPE_COLORS[g.entityType] || '#4a3d6a' }}>
+                          {g.entityType}
+                        </span>
+                        <span style={styles.animCount}>{animCount} anims</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
@@ -881,7 +1279,7 @@ export default function SpriteAIWorker() {
 
                         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                           {anim.blob && !anim.isSvg && (
-                            <button onClick={() => handleRemoveBackground(selectedGroup, animKey)} style={styles.miniToolBtn}>
+                            <button onClick={() => { pushUndo('Remove BG: ' + animKey); handleRemoveBackground(selectedGroup, animKey); }} style={styles.miniToolBtn}>
                               🎨 Remove BG
                             </button>
                           )}
@@ -893,7 +1291,39 @@ export default function SpriteAIWorker() {
                           <button onClick={() => handleOpenSlicer(selectedGroup, animKey)} style={styles.miniToolBtn}>
                             ✂️ Slice
                           </button>
+                          {anim.blob && (
+                            <button onClick={() => handleExtractPalette(selectedGroup, animKey)} style={styles.miniToolBtn}>
+                              🎨 Colors
+                            </button>
+                          )}
+                          {anim.src && (
+                            <button onClick={() => handleDownloadSheet(selectedGroup, animKey)} style={styles.miniToolBtn}>
+                              💾 Save
+                            </button>
+                          )}
+                          <button onClick={() => handleAnalyzeSprite(selectedGroup, animKey)} style={styles.miniToolBtn} disabled={analyzeLoading}>
+                            🔬 Analyze
+                          </button>
+                          {anim.blob && (
+                            <button onClick={() => handleSaveToCloud(selectedGroup, animKey)} style={{ ...styles.miniToolBtn, color: '#60a5fa' }}>
+                              ☁️ Cloud
+                            </button>
+                          )}
                         </div>
+
+                        {analyzeResult && analyzeResult.groupKey === selectedGroup && analyzeResult.animKey === animKey && (
+                          <div style={{ background: 'rgba(96,165,250,0.1)', borderRadius: 4, padding: 6, fontSize: 10, color: '#93c5fd' }}>
+                            {analyzeResult.text}
+                          </div>
+                        )}
+
+                        {colorPalettes[`${selectedGroup}::${animKey}`] && (
+                          <div style={{ display: 'flex', gap: 2, padding: '2px 4px', flexWrap: 'wrap' }}>
+                            {colorPalettes[`${selectedGroup}::${animKey}`].map((c, i) => (
+                              <div key={i} title={c.hex} style={{ width: 16, height: 16, borderRadius: 2, background: c.hex, border: '1px solid rgba(255,255,255,0.2)' }} />
+                            ))}
+                          </div>
+                        )}
 
                         {dupes && dupes.length > 0 && (
                           <div style={{ background: 'rgba(250,200,50,0.1)', borderRadius: 4, padding: 6, fontSize: 10, color: '#fac832' }}>
@@ -942,25 +1372,51 @@ export default function SpriteAIWorker() {
                 ))}
               </div>
             )}
+            <button onClick={() => setShowSheetOverlay(!showSheetOverlay)} style={showSheetOverlay ? styles.animBtnActive : styles.animBtnNormal}>
+              {showSheetOverlay ? '🎬 Animation' : '🗺️ Full Sheet'}
+            </button>
           </div>
 
           <div style={styles.viewport}>
-            <div style={styles.viewportBg}>
-              {currentGroup && currentGroup.animations[selectedAnim] && (
-                <SpritePreview
-                  spriteData={{ frameWidth: currentGroup.animations[selectedAnim].frameWidth, frameHeight: currentGroup.animations[selectedAnim].frameHeight, [selectedAnim]: currentGroup.animations[selectedAnim] }}
-                  animKey={selectedAnim}
-                  scale={Math.min(4, 240 / (currentGroup.animations[selectedAnim]?.frameWidth || 100))}
-                />
-              )}
-            </div>
+            {showSheetOverlay && currentGroup?.animations[selectedAnim]?.src ? (
+              <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%', overflow: 'auto' }}>
+                <img src={currentGroup.animations[selectedAnim].src} alt="full sheet" style={{ maxWidth: '100%', maxHeight: 500, imageRendering: 'pixelated', display: 'block' }} />
+                <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+                  {(() => {
+                    const anim = currentGroup.animations[selectedAnim];
+                    const cols = anim.gridCols || anim.frames || 1;
+                    const rows = anim.gridRows || 1;
+                    const lines = [];
+                    for (let i = 1; i < cols; i++) {
+                      lines.push(<line key={`vc${i}`} x1={`${(i / cols) * 100}%`} y1="0" x2={`${(i / cols) * 100}%`} y2="100%" stroke="rgba(224,201,127,0.5)" strokeWidth="1" strokeDasharray="3,3" />);
+                    }
+                    for (let i = 1; i < rows; i++) {
+                      lines.push(<line key={`hr${i}`} x1="0" y1={`${(i / rows) * 100}%`} x2="100%" y2={`${(i / rows) * 100}%`} stroke="rgba(224,201,127,0.5)" strokeWidth="1" strokeDasharray="3,3" />);
+                    }
+                    return lines;
+                  })()}
+                </svg>
+              </div>
+            ) : (
+              <div style={styles.viewportBg}>
+                {currentGroup && currentGroup.animations[selectedAnim] && (
+                  <SpritePreview
+                    spriteData={{ frameWidth: currentGroup.animations[selectedAnim].frameWidth, frameHeight: currentGroup.animations[selectedAnim].frameHeight, [selectedAnim]: currentGroup.animations[selectedAnim] }}
+                    animKey={selectedAnim}
+                    scale={Math.min(4, 280 / Math.max(currentGroup.animations[selectedAnim]?.frameWidth || 100, currentGroup.animations[selectedAnim]?.frameHeight || 100))}
+                    squareViewport
+                    showZoom
+                  />
+                )}
+              </div>
+            )}
 
             {currentGroup && (
               <div style={styles.viewportInfo}>
                 <div><strong>{currentGroup.entityName}</strong> — {selectedAnim}</div>
                 <div style={{ fontSize: 12, color: '#aaa' }}>
-                  {currentGroup.animations[selectedAnim]?.frames} frames ·
-                  {currentGroup.animations[selectedAnim]?.frameWidth}x{currentGroup.animations[selectedAnim]?.frameHeight}px ·
+                  {currentGroup.animations[selectedAnim]?.frames} frames ·{' '}
+                  {currentGroup.animations[selectedAnim]?.frameWidth}x{currentGroup.animations[selectedAnim]?.frameHeight}px ·{' '}
                   {LAYOUT_LABELS[currentGroup.animations[selectedAnim]?.type] || currentGroup.animations[selectedAnim]?.type}
                   {currentGroup.animations[selectedAnim]?.originalFormat && ` · ${currentGroup.animations[selectedAnim].originalFormat.toUpperCase()}`}
                   {currentGroup.animations[selectedAnim]?.suggestedSpeed && ` · ${currentGroup.animations[selectedAnim].suggestedSpeed}ms`}
@@ -969,12 +1425,107 @@ export default function SpriteAIWorker() {
             )}
           </div>
 
-          {currentGroup && (
+          {currentGroup && !showSheetOverlay && (
             <div style={styles.stripPreview}>
               <div style={styles.stripLabel}>Full Sheet</div>
               <div style={styles.stripContainer}>
                 <img src={currentGroup.animations[selectedAnim]?.src} alt="sprite sheet" style={styles.stripImage} />
               </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {viewMode === 'review' && groupKeys.length > 0 && (
+        <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <select
+              value={selectedGroup || ''}
+              onChange={e => setSelectedGroup(e.target.value)}
+              style={styles.viewportSelect}
+            >
+              {groupKeys.map(key => <option key={key} value={key}>{spriteGroups[key].entityName}</option>)}
+            </select>
+            <button
+              onClick={() => selectedGroup && handleAiReview(selectedGroup)}
+              disabled={aiReviewLoading || !selectedGroup}
+              style={styles.generateBtn}
+            >
+              {aiReviewLoading ? '⏳ Analyzing...' : '🤖 Run AI Review'}
+            </button>
+            {currentGroup && (
+              <span style={{ fontSize: 12, color: '#888' }}>
+                {Object.keys(currentGroup.animations).length} animations · {currentGroup.entityType}
+              </span>
+            )}
+          </div>
+
+          {aiReview && aiReview.groupKey === selectedGroup && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ background: 'rgba(212,168,67,0.1)', border: '1px solid rgba(212,168,67,0.3)', borderRadius: 8, padding: 16 }}>
+                <div style={{ color: '#e0c97f', fontFamily: 'Cinzel, serif', fontSize: 14, marginBottom: 8 }}>Overall Assessment</div>
+                <div style={{ color: '#ccc', fontSize: 13, lineHeight: 1.5 }}>{aiReview.overall}</div>
+              </div>
+
+              {aiReview.missingAnimations?.length > 0 && (
+                <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: 12 }}>
+                  <div style={{ color: '#f87171', fontSize: 12, marginBottom: 4 }}>Missing Animations</div>
+                  <div style={{ color: '#fca5a5', fontSize: 13 }}>{aiReview.missingAnimations.join(', ')}</div>
+                </div>
+              )}
+
+              {aiReview.recommendedFrameSize && (
+                <div style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: 8, padding: 12 }}>
+                  <div style={{ color: '#60a5fa', fontSize: 12, marginBottom: 4 }}>Recommended Frame Size</div>
+                  <div style={{ color: '#93c5fd', fontSize: 13 }}>{aiReview.recommendedFrameSize.width}x{aiReview.recommendedFrameSize.height}px</div>
+                </div>
+              )}
+
+              {aiReview.suggestions?.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ color: '#e0c97f', fontFamily: 'Cinzel, serif', fontSize: 14 }}>Suggestions</div>
+                  {aiReview.suggestions.map((s, i) => (
+                    <div key={i} style={{
+                      background: s.severity === 'high' ? 'rgba(239,68,68,0.08)' : s.severity === 'medium' ? 'rgba(251,191,36,0.08)' : 'rgba(74,222,128,0.08)',
+                      border: `1px solid ${s.severity === 'high' ? 'rgba(239,68,68,0.3)' : s.severity === 'medium' ? 'rgba(251,191,36,0.3)' : 'rgba(74,222,128,0.3)'}`,
+                      borderRadius: 8, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12,
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+                          <span style={{ fontSize: 11, padding: '1px 6px', borderRadius: 4, background: 'rgba(255,255,255,0.1)', color: '#eee' }}>{s.animKey}</span>
+                          <span style={{
+                            fontSize: 10, padding: '1px 6px', borderRadius: 4,
+                            background: s.severity === 'high' ? 'rgba(239,68,68,0.3)' : s.severity === 'medium' ? 'rgba(251,191,36,0.3)' : 'rgba(74,222,128,0.3)',
+                            color: s.severity === 'high' ? '#f87171' : s.severity === 'medium' ? '#fbbf24' : '#4ade80',
+                          }}>{s.severity}</span>
+                        </div>
+                        <div style={{ color: '#eee', fontSize: 13, marginBottom: 2 }}>{s.issue}</div>
+                        <div style={{ color: '#aaa', fontSize: 12 }}>{s.fix}</div>
+                      </div>
+                      {s.action && s.action !== 'none' && (
+                        <button onClick={() => applyAiSuggestion(s)} style={{ ...styles.miniToolBtn, color: '#4ade80', borderColor: 'rgba(74,222,128,0.3)' }}>
+                          Apply Fix
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {aiReview.suggestions?.length === 0 && (
+                <div style={{ textAlign: 'center', padding: 30, color: '#4ade80', fontSize: 14 }}>
+                  No issues found! Your sprite setup looks good.
+                </div>
+              )}
+            </div>
+          )}
+
+          {!aiReview && !aiReviewLoading && (
+            <div style={{ textAlign: 'center', padding: 40, color: '#888', fontSize: 14 }}>
+              <p>Select a sprite group and click "Run AI Review" to get AI-powered analysis of your sprite sheets.</p>
+              <p style={{ fontSize: 12, color: '#666', marginTop: 8 }}>
+                The AI checks frame counts, layout detection, missing animations, speed settings, and suggests fixes.
+              </p>
             </div>
           )}
         </div>
@@ -1026,6 +1577,74 @@ export default function SpriteAIWorker() {
         </div>
       )}
 
+      {viewMode === 'generate' && (
+        <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 600 }}>
+            <h3 style={{ margin: 0, color: '#e0c97f', fontFamily: 'Cinzel, serif', fontSize: 16 }}>
+              Generate Sprite from Text
+            </h3>
+            <p style={{ margin: 0, fontSize: 12, color: '#999' }}>
+              Describe the sprite you want to create and AI will generate it for you.
+            </p>
+            <textarea
+              value={generatePrompt}
+              onChange={e => setGeneratePrompt(e.target.value)}
+              placeholder="e.g., pixel art warrior character idle animation sprite sheet, 4 frames, transparent background, 64x64"
+              style={{
+                background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 8, color: '#eee', padding: 12, fontSize: 13,
+                minHeight: 80, resize: 'vertical', fontFamily: 'inherit',
+              }}
+            />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={handleGenerateSprite}
+                disabled={generateLoading || !generatePrompt.trim()}
+                style={{
+                  ...styles.generateBtn,
+                  opacity: generateLoading || !generatePrompt.trim() ? 0.5 : 1,
+                }}
+              >
+                {generateLoading ? '⏳ Generating...' : '✨ Generate Sprite'}
+              </button>
+            </div>
+          </div>
+
+          {generatedImage && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+              <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', padding: 20, display: 'inline-block' }}>
+                <img
+                  src={generatedImage.url}
+                  alt="Generated sprite"
+                  style={{ maxWidth: 400, maxHeight: 400, imageRendering: 'pixelated', display: 'block' }}
+                />
+              </div>
+              <div style={{ fontSize: 12, color: '#888' }}>
+                Prompt: "{generatedImage.prompt}"
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={handleImportGenerated} style={styles.generateBtn}>
+                  📥 Import to Workspace
+                </button>
+                <button onClick={() => setGeneratedImage(null)} style={styles.copyBtn}>
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!generatedImage && !generateLoading && (
+            <div style={{ textAlign: 'center', padding: 40, color: '#666' }}>
+              <div style={{ fontSize: 48, marginBottom: 12, opacity: 0.4 }}>✨</div>
+              <p style={{ fontSize: 13 }}>Enter a prompt above to generate a sprite using AI image generation.</p>
+              <p style={{ fontSize: 11, color: '#555', marginTop: 8 }}>
+                Tip: Include "pixel art", "sprite sheet", frame count, and "transparent background" for best results.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {viewMode === 'export' && groupKeys.length > 0 && (
         <div style={styles.exportContainer}>
           <div style={styles.exportHeader}>
@@ -1036,6 +1655,9 @@ export default function SpriteAIWorker() {
               <>
                 <button onClick={copyJSON} style={styles.copyBtn}>📋 Copy JSON</button>
                 <button onClick={downloadJSON} style={styles.downloadBtn}>💾 Download</button>
+                <button onClick={handleExportAllToCloud} style={{ ...styles.downloadBtn, background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }} disabled={cloudSaveStatus === 'saving'}>
+                  {cloudSaveStatus === 'saving' ? '⏳ Saving...' : '☁️ Export to Puter'}
+                </button>
               </>
             )}
           </div>
@@ -1206,10 +1828,10 @@ const styles = {
   },
   viewport: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 },
   viewportBg: {
-    background: 'repeating-conic-gradient(rgba(255,255,255,0.03) 0% 25%, transparent 0% 50%) 0 0 / 20px 20px',
+    background: 'rgba(0,0,0,0.3)',
     borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)',
     padding: 40, display: 'flex', justifyContent: 'center', alignItems: 'center',
-    minHeight: 200, width: '100%',
+    minHeight: 320, minWidth: 320, aspectRatio: '1', maxWidth: 500, margin: '0 auto',
   },
   viewportInfo: { textAlign: 'center', color: '#eee', fontSize: 14 },
   stripPreview: {

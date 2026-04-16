@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import GBuxAccess from './GBuxAccess.jsx';
+import { CinematicCanvas } from '../../components/landing/CinematicTrailer';
 
 export default function GBuxPage() {
   const [userId, setUserId] = useState(null);
+  const [loopKey, setLoopKey] = useState(0);
 
   useEffect(() => {
     const style = document.createElement('style');
@@ -27,8 +29,17 @@ export default function GBuxPage() {
       minHeight: '100vh',
       background: 'linear-gradient(180deg, #0a0a0f 0%, #0f0f1a 50%, #0a0a0f 100%)',
       padding: '40px 20px',
+      position: 'relative',
+      overflow: 'hidden',
     }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <CinematicCanvas key={loopKey} trailerKey="underwater" playing={true} onEnd={() => setLoopKey(k => k + 1)} />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.8) 0%, rgba(15, 15, 26, 0.75) 50%, rgba(10, 10, 15, 0.8) 100%)',
+        }} />
+      </div>
+      <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <a href="/" style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',

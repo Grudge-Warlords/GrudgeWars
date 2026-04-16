@@ -5,6 +5,9 @@ import { GamePreview } from './GamePreview.jsx';
 import { AIEditor } from './AIEditor.jsx';
 import { deployToPuter } from '../utils/puterDeploy.js';
 import SpriteAIWorker from './SpriteAIWorker.jsx';
+import { SHADOW_KNIGHTS_SPEC } from '../schema/shadowKnightsSpec.js';
+import { STARBOUND_CORSAIRS_SPEC } from '../schema/starboundCorsairsSpec.js';
+import { CinematicCanvas } from '../../components/landing/CinematicTrailer';
 
 const STEPS = [
   { id: 'theme', label: 'Theme & Setting' },
@@ -70,6 +73,7 @@ export function FactoryWizard() {
   const [showPreview, setShowPreview] = useState(false);
   const [showSpriteWorker, setShowSpriteWorker] = useState(false);
   const [generatedImages, setGeneratedImages] = useState({});
+  const [loopKey, setLoopKey] = useState(0);
 
   useEffect(() => {
     const style = document.createElement('style');
@@ -520,8 +524,36 @@ export function FactoryWizard() {
             {!gameSpec && (
               <div style={{ textAlign: 'center' }}>
                 <button style={styles.btn('primary')} onClick={handleGenerate} disabled={generating}>
-                  {generating ? 'Generating...' : 'Generate Game'}
+                  {generating ? 'Generating...' : 'Generate with AI'}
                 </button>
+                <div style={{ margin: '24px 0 12px', color: '#64748b', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px' }}>or load a pre-built demo</div>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {[
+                    { spec: SHADOW_KNIGHTS_SPEC, label: 'Shadow Knights', desc: 'Dark medieval fantasy', color: '#8b5cf6', icon: '🗡️' },
+                    { spec: STARBOUND_CORSAIRS_SPEC, label: 'Starbound Corsairs', desc: 'Space pirate adventure', color: '#22d3ee', icon: '🚀' },
+                  ].map(demo => (
+                    <button
+                      key={demo.label}
+                      onClick={() => { setGameSpec(demo.spec); setProgress(null); }}
+                      disabled={generating}
+                      style={{
+                        padding: '14px 24px', borderRadius: '12px',
+                        border: `2px solid ${demo.color}33`,
+                        background: `${demo.color}0d`,
+                        color: demo.color, cursor: 'pointer',
+                        fontSize: '14px', fontWeight: '700',
+                        fontFamily: "'Jost', sans-serif",
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
+                        transition: 'all 0.2s',
+                        minWidth: '180px',
+                      }}
+                    >
+                      <span style={{ fontSize: '24px' }}>{demo.icon}</span>
+                      <span>{demo.label}</span>
+                      <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '400' }}>{demo.desc}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -558,7 +590,7 @@ export function FactoryWizard() {
                 <button style={styles.btn('secondary')} onClick={async () => {
                   if (window.puter) {
                     try {
-                      await puter.kv.set('factory_' + Date.now(), JSON.stringify(gameSpec));
+                      await window.puter.kv.set('factory_' + Date.now(), JSON.stringify(gameSpec));
                       alert('Saved to Puter cloud!');
                     } catch(e) { alert('Save failed: ' + e.message); }
                   } else {
@@ -634,7 +666,15 @@ export function FactoryWizard() {
   }
 
   return (
-    <div style={styles.container}>
+    <div style={{ ...styles.container, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <CinematicCanvas key={loopKey} trailerKey="fantasy" playing={true} onEnd={() => setLoopKey(k => k + 1)} />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, rgba(10, 10, 26, 0.8), rgba(26, 26, 46, 0.75))',
+        }} />
+      </div>
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <style>{`
         @keyframes progressPulse {
           0%, 100% { width: 30%; }
@@ -667,6 +707,7 @@ export function FactoryWizard() {
             <button style={styles.btn('primary')} onClick={() => setStep(step + 1)}>Next</button>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

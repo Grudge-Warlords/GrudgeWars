@@ -1,0 +1,3028 @@
+{
+  "generatedAt": "2026-04-15T12:50:36.894Z",
+  "roots": {
+    "root": "F:\\RPG-MODULAR\\RPG-MODULAR",
+    "publicDir": "F:\\RPG-MODULAR\\RPG-MODULAR\\public",
+    "attachedDir": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets",
+    "storageDir": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage",
+    "archivesDir": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\archives\\attached",
+    "extractedDir": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached",
+    "manifestsDir": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\manifests",
+    "catalogDir": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\catalog",
+    "uploadDir": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\uploads",
+    "objectStoreDir": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\object-store\\grudge-studio"
+  },
+  "summaries": {
+    "public": {
+      "scope": "public",
+      "fileCount": 11716,
+      "totalBytes": 1040278063,
+      "byExt": {
+        ".png": 11441,
+        ".mp3": 24,
+        ".html": 4,
+        ".otf": 1,
+        ".webp": 1,
+        ".gif": 6,
+        ".aseprite": 1,
+        ".svg": 2,
+        ".json": 2,
+        "(none)": 5,
+        ".ai": 3,
+        ".eps": 147,
+        ".scml": 12,
+        ".pdf": 3,
+        ".txt": 4,
+        ".psd": 49,
+        ".url": 1,
+        ".js": 1,
+        ".mp4": 9
+      },
+      "byTopLevel": {
+        "attached_assets": 6,
+        "audio": 4,
+        "backgrounds": 134,
+        "content": 2,
+        "dungeon-crawler": 1331,
+        "effects": 77,
+        "embed": 1,
+        "footsies": 21,
+        "game-index.html": 1,
+        "grudge-logo.png": 1,
+        "icons": 560,
+        "images": 289,
+        "logo.png": 1,
+        "manifest.json": 1,
+        "map_nodes": 20,
+        "platformer": 59,
+        "sprites": 5790,
+        "sprites-attacks": 3401,
+        "sw.js": 1,
+        "ui": 3,
+        "videos": 11,
+        "_headers": 1,
+        "_redirects": 1
+      }
+    },
+    "extracted": {
+      "scope": "extracted",
+      "fileCount": 0,
+      "totalBytes": 0,
+      "byExt": {},
+      "byTopLevel": {}
+    },
+    "archives": {
+      "scope": "archives",
+      "fileCount": 131,
+      "totalBytes": 1857090064,
+      "byExt": {
+        ".zip": 130,
+        ".rar": 1
+      },
+      "byCategory": {
+        "characters": 36,
+        "weapons": 5,
+        "misc": 32,
+        "effects": 29,
+        "ui": 13,
+        "environment": 15,
+        "audio": 1
+      }
+    }
+  },
+  "conflicts": [],
+  "archives": [
+    {
+      "name": "2D_SL_Knight_v1.0_1776132133451.zip",
+      "ext": ".zip",
+      "size": 507532,
+      "category": "characters",
+      "slug": "2d-sl-knight-v1-0-1776132133451",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\2D_SL_Knight_v1.0_1776132133451.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\2d-sl-knight-v1-0-1776132133451"
+    },
+    {
+      "name": "4_directional_character_1776131273405.zip",
+      "ext": ".zip",
+      "size": 37177,
+      "category": "characters",
+      "slug": "4-directional-character-1776131273405",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\4_directional_character_1776131273405.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\4-directional-character-1776131273405"
+    },
+    {
+      "name": "Arrows_and_Sling_Bullets_1776134445339.zip",
+      "ext": ".zip",
+      "size": 1928,
+      "category": "weapons",
+      "slug": "arrows-and-sling-bullets-1776134445339",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\Arrows_and_Sling_Bullets_1776134445339.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\weapons\\arrows-and-sling-bullets-1776134445339"
+    },
+    {
+      "name": "attributes_1771056361123.zip",
+      "ext": ".zip",
+      "size": 8837076,
+      "category": "misc",
+      "slug": "attributes-1771056361123",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\attributes_1771056361123.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\attributes-1771056361123"
+    },
+    {
+      "name": "BloodMoonTower_free_version_(1)_1774676805821.zip",
+      "ext": ".zip",
+      "size": 34361,
+      "category": "effects",
+      "slug": "bloodmoontower-free-version-1-1774676805821",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\BloodMoonTower_free_version_(1)_1774676805821.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\bloodmoontower-free-version-1-1774676805821"
+    },
+    {
+      "name": "BloodMoonTower_free_version_1774676819994.zip",
+      "ext": ".zip",
+      "size": 34361,
+      "category": "effects",
+      "slug": "bloodmoontower-free-version-1774676819994",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\BloodMoonTower_free_version_1774676819994.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\bloodmoontower-free-version-1774676819994"
+    },
+    {
+      "name": "coremotion_1774738902186.zip",
+      "ext": ".zip",
+      "size": 980489,
+      "category": "misc",
+      "slug": "coremotion-1774738902186",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\coremotion_1774738902186.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\coremotion-1774738902186"
+    },
+    {
+      "name": "craftpix-081238-zombie-tds-tilesets-soil-stones-plants-water-d_1773059422327.zip",
+      "ext": ".zip",
+      "size": 128209189,
+      "category": "characters",
+      "slug": "craftpix-081238-zombie-tds-tilesets-soil-stones-plants-water-d-1773059422327",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-081238-zombie-tds-tilesets-soil-stones-plants-water-d_1773059422327.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-081238-zombie-tds-tilesets-soil-stones-plants-water-d-1773059422327"
+    },
+    {
+      "name": "craftpix-262795-tds-modern-hero-weapons-and-props_(1)_1775955280810.zip",
+      "ext": ".zip",
+      "size": 739221,
+      "category": "characters",
+      "slug": "craftpix-262795-tds-modern-hero-weapons-and-props-1-1775955280810",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-262795-tds-modern-hero-weapons-and-props_(1)_1775955280810.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-262795-tds-modern-hero-weapons-and-props-1-1775955280810"
+    },
+    {
+      "name": "craftpix-262795-tds-modern-hero-weapons-and-props_(2)_1776124729392.zip",
+      "ext": ".zip",
+      "size": 739221,
+      "category": "characters",
+      "slug": "craftpix-262795-tds-modern-hero-weapons-and-props-2-1776124729392",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-262795-tds-modern-hero-weapons-and-props_(2)_1776124729392.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-262795-tds-modern-hero-weapons-and-props-2-1776124729392"
+    },
+    {
+      "name": "craftpix-262795-tds-modern-hero-weapons-and-props_(3)_1776124719300.zip",
+      "ext": ".zip",
+      "size": 739221,
+      "category": "characters",
+      "slug": "craftpix-262795-tds-modern-hero-weapons-and-props-3-1776124719300",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-262795-tds-modern-hero-weapons-and-props_(3)_1776124719300.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-262795-tds-modern-hero-weapons-and-props-3-1776124719300"
+    },
+    {
+      "name": "craftpix-324410-tds-zombie-character-sprite_1773059425523.zip",
+      "ext": ".zip",
+      "size": 93873773,
+      "category": "characters",
+      "slug": "craftpix-324410-tds-zombie-character-sprite-1773059425523",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-324410-tds-zombie-character-sprite_1773059425523.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-324410-tds-zombie-character-sprite-1773059425523"
+    },
+    {
+      "name": "craftpix-524587-rpg-skill-icons-for-asassin_1772970284122.zip",
+      "ext": ".zip",
+      "size": 40284855,
+      "category": "ui",
+      "slug": "craftpix-524587-rpg-skill-icons-for-asassin-1772970284122",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-524587-rpg-skill-icons-for-asassin_1772970284122.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-524587-rpg-skill-icons-for-asassin-1772970284122"
+    },
+    {
+      "name": "craftpix-611156-ruin-bosses-pixel-art-character-pack_1772939060304.zip",
+      "ext": ".zip",
+      "size": 362381,
+      "category": "characters",
+      "slug": "craftpix-611156-ruin-bosses-pixel-art-character-pack-1772939060304",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-611156-ruin-bosses-pixel-art-character-pack_1772939060304.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-611156-ruin-bosses-pixel-art-character-pack-1772939060304"
+    },
+    {
+      "name": "craftpix-617771-pixel-art-sci-fi-character-avatar-icons_(2)_1776131982821.zip",
+      "ext": ".zip",
+      "size": 2845744,
+      "category": "characters",
+      "slug": "craftpix-617771-pixel-art-sci-fi-character-avatar-icons-2-1776131982821",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-617771-pixel-art-sci-fi-character-avatar-icons_(2)_1776131982821.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-617771-pixel-art-sci-fi-character-avatar-icons-2-1776131982821"
+    },
+    {
+      "name": "craftpix-637211-pixel-art-space-pirates-2d-game-sprites_1772970142401.zip",
+      "ext": ".zip",
+      "size": 6324787,
+      "category": "misc",
+      "slug": "craftpix-637211-pixel-art-space-pirates-2d-game-sprites-1772970142401",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-637211-pixel-art-space-pirates-2d-game-sprites_1772970142401.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-637211-pixel-art-space-pirates-2d-game-sprites-1772970142401"
+    },
+    {
+      "name": "craftpix-654123-pixel-art-space-trap-game-asset-pack_1772970135943.zip",
+      "ext": ".zip",
+      "size": 7260821,
+      "category": "misc",
+      "slug": "craftpix-654123-pixel-art-space-trap-game-asset-pack-1772970135943",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-654123-pixel-art-space-trap-game-asset-pack_1772970135943.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-654123-pixel-art-space-trap-game-asset-pack-1772970135943"
+    },
+    {
+      "name": "craftpix-671189-10-magic-sprite-sheet-effects-pixel-art_(1)_1776124722072.zip",
+      "ext": ".zip",
+      "size": 293201,
+      "category": "effects",
+      "slug": "craftpix-671189-10-magic-sprite-sheet-effects-pixel-art-1-1776124722072",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-671189-10-magic-sprite-sheet-effects-pixel-art_(1)_1776124722072.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-671189-10-magic-sprite-sheet-effects-pixel-art-1-1776124722072"
+    },
+    {
+      "name": "craftpix-671189-10-magic-sprite-sheet-effects-pixel-art_(1)_1776130728917.zip",
+      "ext": ".zip",
+      "size": 293201,
+      "category": "effects",
+      "slug": "craftpix-671189-10-magic-sprite-sheet-effects-pixel-art-1-1776130728917",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-671189-10-magic-sprite-sheet-effects-pixel-art_(1)_1776130728917.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-671189-10-magic-sprite-sheet-effects-pixel-art-1-1776130728917"
+    },
+    {
+      "name": "craftpix-671189-10-magic-sprite-sheet-effects-pixel-art_1776122807063.zip",
+      "ext": ".zip",
+      "size": 293201,
+      "category": "effects",
+      "slug": "craftpix-671189-10-magic-sprite-sheet-effects-pixel-art-1776122807063",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-671189-10-magic-sprite-sheet-effects-pixel-art_1776122807063.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-671189-10-magic-sprite-sheet-effects-pixel-art-1776122807063"
+    },
+    {
+      "name": "craftpix-671189-10-magic-sprite-sheet-effects-pixel-art_1776122830115.zip",
+      "ext": ".zip",
+      "size": 293201,
+      "category": "effects",
+      "slug": "craftpix-671189-10-magic-sprite-sheet-effects-pixel-art-1776122830115",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-671189-10-magic-sprite-sheet-effects-pixel-art_1776122830115.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-671189-10-magic-sprite-sheet-effects-pixel-art-1776122830115"
+    },
+    {
+      "name": "craftpix-676151-free-stone-3d-low-poly-models_(1)_1773625315530.zip",
+      "ext": ".zip",
+      "size": 298089,
+      "category": "environment",
+      "slug": "craftpix-676151-free-stone-3d-low-poly-models-1-1773625315530",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-676151-free-stone-3d-low-poly-models_(1)_1773625315530.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-676151-free-stone-3d-low-poly-models-1-1773625315530"
+    },
+    {
+      "name": "craftpix-724167-tds-modern-tilesets-environment_(1)_1775955277778.zip",
+      "ext": ".zip",
+      "size": 3725832,
+      "category": "environment",
+      "slug": "craftpix-724167-tds-modern-tilesets-environment-1-1775955277778",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-724167-tds-modern-tilesets-environment_(1)_1775955277778.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-724167-tds-modern-tilesets-environment-1-1775955277778"
+    },
+    {
+      "name": "craftpix-771611-pixel-art-alien-spaceship-2d-game-sprites_1772970133500.zip",
+      "ext": ".zip",
+      "size": 4562395,
+      "category": "misc",
+      "slug": "craftpix-771611-pixel-art-alien-spaceship-2d-game-sprites-1772970133500",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-771611-pixel-art-alien-spaceship-2d-game-sprites_1772970133500.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-771611-pixel-art-alien-spaceship-2d-game-sprites-1772970133500"
+    },
+    {
+      "name": "craftpix-781105-underground-mine-character-spritesheets-pixel-_1772939089423.zip",
+      "ext": ".zip",
+      "size": 253443,
+      "category": "characters",
+      "slug": "craftpix-781105-underground-mine-character-spritesheets-pixel-1772939089423",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-781105-underground-mine-character-spritesheets-pixel-_1772939089423.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-781105-underground-mine-character-spritesheets-pixel-1772939089423"
+    },
+    {
+      "name": "craftpix-781190-desert-bosses-pixel-art-character-pack_1772939072042.zip",
+      "ext": ".zip",
+      "size": 456919,
+      "category": "characters",
+      "slug": "craftpix-781190-desert-bosses-pixel-art-character-pack-1772939072042",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-781190-desert-bosses-pixel-art-character-pack_1772939072042.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-781190-desert-bosses-pixel-art-character-pack-1772939072042"
+    },
+    {
+      "name": "craftpix-852098-free-tds-modern-gui-pixel-art_(1)_1775955275554.zip",
+      "ext": ".zip",
+      "size": 2117411,
+      "category": "ui",
+      "slug": "craftpix-852098-free-tds-modern-gui-pixel-art-1-1775955275554",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-852098-free-tds-modern-gui-pixel-art_(1)_1775955275554.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-852098-free-tds-modern-gui-pixel-art-1-1775955275554"
+    },
+    {
+      "name": "craftpix-852098-free-tds-modern-gui-pixel-art_(2)_1775955269239.zip",
+      "ext": ".zip",
+      "size": 2117411,
+      "category": "ui",
+      "slug": "craftpix-852098-free-tds-modern-gui-pixel-art-2-1775955269239",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-852098-free-tds-modern-gui-pixel-art_(2)_1775955269239.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-852098-free-tds-modern-gui-pixel-art-2-1775955269239"
+    },
+    {
+      "name": "craftpix-852098-free-tds-modern-gui-pixel-art_(3)_1776124735578.zip",
+      "ext": ".zip",
+      "size": 2117411,
+      "category": "ui",
+      "slug": "craftpix-852098-free-tds-modern-gui-pixel-art-3-1776124735578",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-852098-free-tds-modern-gui-pixel-art_(3)_1776124735578.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-852098-free-tds-modern-gui-pixel-art-3-1776124735578"
+    },
+    {
+      "name": "craftpix-852098-free-tds-modern-gui-pixel-art_1774676826425.zip",
+      "ext": ".zip",
+      "size": 2117411,
+      "category": "ui",
+      "slug": "craftpix-852098-free-tds-modern-gui-pixel-art-1774676826425",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-852098-free-tds-modern-gui-pixel-art_1774676826425.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-852098-free-tds-modern-gui-pixel-art-1774676826425"
+    },
+    {
+      "name": "craftpix-881716-free-pixel-art-sci-fi-icons-pack_1772970140481.zip",
+      "ext": ".zip",
+      "size": 1836288,
+      "category": "ui",
+      "slug": "craftpix-881716-free-pixel-art-sci-fi-icons-pack-1772970140481",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-881716-free-pixel-art-sci-fi-icons-pack_1772970140481.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-881716-free-pixel-art-sci-fi-icons-pack-1772970140481"
+    },
+    {
+      "name": "craftpix-891100-2d-top-down-tank-game-assets_1776120288021.zip",
+      "ext": ".zip",
+      "size": 19607913,
+      "category": "misc",
+      "slug": "craftpix-891100-2d-top-down-tank-game-assets-1776120288021",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-891100-2d-top-down-tank-game-assets_1776120288021.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-891100-2d-top-down-tank-game-assets-1776120288021"
+    },
+    {
+      "name": "craftpix-896711-snow-bosses-game-character-pixel-art-pack_1772939064736.zip",
+      "ext": ".zip",
+      "size": 432238,
+      "category": "characters",
+      "slug": "craftpix-896711-snow-bosses-game-character-pixel-art-pack-1772939064736",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-896711-snow-bosses-game-character-pixel-art-pack_1772939064736.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-896711-snow-bosses-game-character-pixel-art-pack-1772939064736"
+    },
+    {
+      "name": "craftpix-896711-snow-bosses-game-character-pixel-art-pack_1772939067108.zip",
+      "ext": ".zip",
+      "size": 432238,
+      "category": "characters",
+      "slug": "craftpix-896711-snow-bosses-game-character-pixel-art-pack-1772939067108",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-896711-snow-bosses-game-character-pixel-art-pack_1772939067108.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-896711-snow-bosses-game-character-pixel-art-pack-1772939067108"
+    },
+    {
+      "name": "craftpix-899111-pixel-art-space-2d-game-backgrounds_1772970138404.zip",
+      "ext": ".zip",
+      "size": 18184510,
+      "category": "environment",
+      "slug": "craftpix-899111-pixel-art-space-2d-game-backgrounds-1772970138404",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-899111-pixel-art-space-2d-game-backgrounds_1772970138404.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-899111-pixel-art-space-2d-game-backgrounds-1772970138404"
+    },
+    {
+      "name": "craftpix-976411-free-objects-and-items-for-2d-tank-game_1776120284884.zip",
+      "ext": ".zip",
+      "size": 10754742,
+      "category": "environment",
+      "slug": "craftpix-976411-free-objects-and-items-for-2d-tank-game-1776120284884",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-976411-free-objects-and-items-for-2d-tank-game_1776120284884.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-976411-free-objects-and-items-for-2d-tank-game-1776120284884"
+    },
+    {
+      "name": "craftpix-981123-pixel-art-spaceship-2d-game-sprites_1776121023637.zip",
+      "ext": ".zip",
+      "size": 11655821,
+      "category": "misc",
+      "slug": "craftpix-981123-pixel-art-spaceship-2d-game-sprites-1776121023637",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-981123-pixel-art-spaceship-2d-game-sprites_1776121023637.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-981123-pixel-art-spaceship-2d-game-sprites-1776121023637"
+    },
+    {
+      "name": "craftpix-991101-free-pixel-art-enemy-spaceship-2d-sprites_(1)_1776121029859.zip",
+      "ext": ".zip",
+      "size": 4565689,
+      "category": "characters",
+      "slug": "craftpix-991101-free-pixel-art-enemy-spaceship-2d-sprites-1-1776121029859",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-991101-free-pixel-art-enemy-spaceship-2d-sprites_(1)_1776121029859.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-991101-free-pixel-art-enemy-spaceship-2d-sprites-1-1776121029859"
+    },
+    {
+      "name": "craftpix-991101-free-pixel-art-enemy-spaceship-2d-sprites_1776121033731.zip",
+      "ext": ".zip",
+      "size": 4565689,
+      "category": "characters",
+      "slug": "craftpix-991101-free-pixel-art-enemy-spaceship-2d-sprites-1776121033731",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-991101-free-pixel-art-enemy-spaceship-2d-sprites_1776121033731.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-991101-free-pixel-art-enemy-spaceship-2d-sprites-1776121033731"
+    },
+    {
+      "name": "craftpix-net-133065-demon-invasion-pixel-art-game-assets-pack_1772939057818.zip",
+      "ext": ".zip",
+      "size": 376693,
+      "category": "misc",
+      "slug": "craftpix-net-133065-demon-invasion-pixel-art-game-assets-pack-1772939057818",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-133065-demon-invasion-pixel-art-game-assets-pack_1772939057818.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-133065-demon-invasion-pixel-art-game-assets-pack-1772939057818"
+    },
+    {
+      "name": "craftpix-net-149019-rpg-ui-elements_1772970144525.zip",
+      "ext": ".zip",
+      "size": 5111330,
+      "category": "ui",
+      "slug": "craftpix-net-149019-rpg-ui-elements-1772970144525",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-149019-rpg-ui-elements_1772970144525.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-net-149019-rpg-ui-elements-1772970144525"
+    },
+    {
+      "name": "craftpix-net-154211-animated-ads-cyberpunk-pixel-art_1773059292883.zip",
+      "ext": ".zip",
+      "size": 939978,
+      "category": "misc",
+      "slug": "craftpix-net-154211-animated-ads-cyberpunk-pixel-art-1773059292883",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-154211-animated-ads-cyberpunk-pixel-art_1773059292883.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-154211-animated-ads-cyberpunk-pixel-art-1773059292883"
+    },
+    {
+      "name": "craftpix-net-169442-free-2d-top-down-pixel-dungeon-asset-pack_1775955255313.zip",
+      "ext": ".zip",
+      "size": 1520228,
+      "category": "environment",
+      "slug": "craftpix-net-169442-free-2d-top-down-pixel-dungeon-asset-pack-1775955255313",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-169442-free-2d-top-down-pixel-dungeon-asset-pack_1775955255313.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-169442-free-2d-top-down-pixel-dungeon-asset-pack-1775955255313"
+    },
+    {
+      "name": "craftpix-net-180537-free-swordsman-1-3-level-pixel-top-down-sp_1773625277193.zip",
+      "ext": ".zip",
+      "size": 4317041,
+      "category": "weapons",
+      "slug": "craftpix-net-180537-free-swordsman-1-3-level-pixel-top-down-sp-1773625277193",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-180537-free-swordsman-1-3-level-pixel-top-down-sp_1773625277193.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\weapons\\craftpix-net-180537-free-swordsman-1-3-level-pixel-top-down-sp-1773625277193"
+    },
+    {
+      "name": "craftpix-net-200380-free-pixel-art-plants-for-farm_1773625297497.zip",
+      "ext": ".zip",
+      "size": 844055,
+      "category": "misc",
+      "slug": "craftpix-net-200380-free-pixel-art-plants-for-farm-1773625297497",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-200380-free-pixel-art-plants-for-farm_1773625297497.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-200380-free-pixel-art-plants-for-farm-1773625297497"
+    },
+    {
+      "name": "craftpix-net-218811-free-medieval-bandit-4-direction-character_1774666187380.zip",
+      "ext": ".zip",
+      "size": 124820270,
+      "category": "characters",
+      "slug": "craftpix-net-218811-free-medieval-bandit-4-direction-character-1774666187380",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-218811-free-medieval-bandit-4-direction-character_1774666187380.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-218811-free-medieval-bandit-4-direction-character-1774666187380"
+    },
+    {
+      "name": "craftpix-net-228980-free-top-down-goblin-character-sprite_1774666183422.zip",
+      "ext": ".zip",
+      "size": 141196220,
+      "category": "characters",
+      "slug": "craftpix-net-228980-free-top-down-goblin-character-sprite-1774666183422",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-228980-free-top-down-goblin-character-sprite_1774666183422.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-228980-free-top-down-goblin-character-sprite-1774666183422"
+    },
+    {
+      "name": "craftpix-net-229181-top-down-skeleton-characters-pack-wizard-k_1774666177936.zip",
+      "ext": ".zip",
+      "size": 117362258,
+      "category": "characters",
+      "slug": "craftpix-net-229181-top-down-skeleton-characters-pack-wizard-k-1774666177936",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-229181-top-down-skeleton-characters-pack-wizard-k_1774666177936.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-229181-top-down-skeleton-characters-pack-wizard-k-1774666177936"
+    },
+    {
+      "name": "craftpix-net-229181-top-down-skeleton-characters-pack-wizard-k_1774666180202.zip",
+      "ext": ".zip",
+      "size": 117362258,
+      "category": "characters",
+      "slug": "craftpix-net-229181-top-down-skeleton-characters-pack-wizard-k-1774666180202",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-229181-top-down-skeleton-characters-pack-wizard-k_1774666180202.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-229181-top-down-skeleton-characters-pack-wizard-k-1774666180202"
+    },
+    {
+      "name": "craftpix-net-237444-fire-pixel-art-animation-sprites_1772939033640.zip",
+      "ext": ".zip",
+      "size": 276078,
+      "category": "effects",
+      "slug": "craftpix-net-237444-fire-pixel-art-animation-sprites-1772939033640",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-237444-fire-pixel-art-animation-sprites_1772939033640.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-237444-fire-pixel-art-animation-sprites-1772939033640"
+    },
+    {
+      "name": "craftpix-net-240581-warforge-mobile-ui_1772970168684.zip",
+      "ext": ".zip",
+      "size": 70468717,
+      "category": "ui",
+      "slug": "craftpix-net-240581-warforge-mobile-ui-1772970168684",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-240581-warforge-mobile-ui_1772970168684.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-net-240581-warforge-mobile-ui-1772970168684"
+    },
+    {
+      "name": "craftpix-net-255707-free-field-enemies-pixel-art-for-tower-def_1776120105604.zip",
+      "ext": ".zip",
+      "size": 635533,
+      "category": "environment",
+      "slug": "craftpix-net-255707-free-field-enemies-pixel-art-for-tower-def-1776120105604",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-255707-free-field-enemies-pixel-art-for-tower-def_1776120105604.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-255707-free-field-enemies-pixel-art-for-tower-def-1776120105604"
+    },
+    {
+      "name": "craftpix-net-267805-swamp-enemies-top-down-pixel-art_1776120102854.zip",
+      "ext": ".zip",
+      "size": 329078,
+      "category": "misc",
+      "slug": "craftpix-net-267805-swamp-enemies-top-down-pixel-art-1776120102854",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-267805-swamp-enemies-top-down-pixel-art_1776120102854.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-267805-swamp-enemies-top-down-pixel-art-1776120102854"
+    },
+    {
+      "name": "craftpix-net-270676-11-free-pixel-art-explosion-sprites_1771434630065.zip",
+      "ext": ".zip",
+      "size": 12020219,
+      "category": "effects",
+      "slug": "craftpix-net-270676-11-free-pixel-art-explosion-sprites-1771434630065",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-270676-11-free-pixel-art-explosion-sprites_1771434630065.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-270676-11-free-pixel-art-explosion-sprites-1771434630065"
+    },
+    {
+      "name": "craftpix-net-284465-free-predator-plant-mobs-pixel-art-pack_1773625325371.zip",
+      "ext": ".zip",
+      "size": 4069128,
+      "category": "misc",
+      "slug": "craftpix-net-284465-free-predator-plant-mobs-pixel-art-pack-1773625325371",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-284465-free-predator-plant-mobs-pixel-art-pack_1773625325371.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-284465-free-predator-plant-mobs-pixel-art-pack-1773625325371"
+    },
+    {
+      "name": "craftpix-net-298079-top-down-dungeon-pixel-tileset-for-rpg-and_1773625279229.zip",
+      "ext": ".zip",
+      "size": 1291771,
+      "category": "environment",
+      "slug": "craftpix-net-298079-top-down-dungeon-pixel-tileset-for-rpg-and-1773625279229",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-298079-top-down-dungeon-pixel-tileset-for-rpg-and_1773625279229.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-298079-top-down-dungeon-pixel-tileset-for-rpg-and-1773625279229"
+    },
+    {
+      "name": "craftpix-net-299679-swordsman-7-9-level-pixel-top-down-sprite-_1776122777426.zip",
+      "ext": ".zip",
+      "size": 8679140,
+      "category": "weapons",
+      "slug": "craftpix-net-299679-swordsman-7-9-level-pixel-top-down-sprite-1776122777426",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-299679-swordsman-7-9-level-pixel-top-down-sprite-_1776122777426.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\weapons\\craftpix-net-299679-swordsman-7-9-level-pixel-top-down-sprite-1776122777426"
+    },
+    {
+      "name": "craftpix-net-299679-swordsman-7-9-level-pixel-top-down-sprite-_1776124340762.zip",
+      "ext": ".zip",
+      "size": 8679140,
+      "category": "weapons",
+      "slug": "craftpix-net-299679-swordsman-7-9-level-pixel-top-down-sprite-1776124340762",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-299679-swordsman-7-9-level-pixel-top-down-sprite-_1776124340762.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\weapons\\craftpix-net-299679-swordsman-7-9-level-pixel-top-down-sprite-1776124340762"
+    },
+    {
+      "name": "craftpix-net-320288-rpg-and-mmo-ui-4_1772970171707.zip",
+      "ext": ".zip",
+      "size": 123774952,
+      "category": "ui",
+      "slug": "craftpix-net-320288-rpg-and-mmo-ui-4-1772970171707",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-320288-rpg-and-mmo-ui-4_1772970171707.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-net-320288-rpg-and-mmo-ui-4-1772970171707"
+    },
+    {
+      "name": "craftpix-net-358572-explosion-vector-sprite-effects_1776120301980.zip",
+      "ext": ".zip",
+      "size": 27892198,
+      "category": "effects",
+      "slug": "craftpix-net-358572-explosion-vector-sprite-effects-1776120301980",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-358572-explosion-vector-sprite-effects_1776120301980.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-358572-explosion-vector-sprite-effects-1776120301980"
+    },
+    {
+      "name": "craftpix-net-363992-free-top-down-orc-game-character-pixel-art_1773625334864.zip",
+      "ext": ".zip",
+      "size": 6829119,
+      "category": "characters",
+      "slug": "craftpix-net-363992-free-top-down-orc-game-character-pixel-art-1773625334864",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-363992-free-top-down-orc-game-character-pixel-art_1773625334864.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-363992-free-top-down-orc-game-character-pixel-art-1773625334864"
+    },
+    {
+      "name": "craftpix-net-384116-bar-street-bosses-pixel-art_1772939037170.zip",
+      "ext": ".zip",
+      "size": 484649,
+      "category": "environment",
+      "slug": "craftpix-net-384116-bar-street-bosses-pixel-art-1772939037170",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-384116-bar-street-bosses-pixel-art_1772939037170.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-384116-bar-street-bosses-pixel-art-1772939037170"
+    },
+    {
+      "name": "craftpix-net-393827-top-down-pixel-gnolls-character-pack_1773625299652.zip",
+      "ext": ".zip",
+      "size": 4156971,
+      "category": "characters",
+      "slug": "craftpix-net-393827-top-down-pixel-gnolls-character-pack-1773625299652",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-393827-top-down-pixel-gnolls-character-pack_1773625299652.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-393827-top-down-pixel-gnolls-character-pack-1773625299652"
+    },
+    {
+      "name": "craftpix-net-404608-beholder-monsters-top-down-pixel-art-sprit_1773625341462.zip",
+      "ext": ".zip",
+      "size": 5503730,
+      "category": "misc",
+      "slug": "craftpix-net-404608-beholder-monsters-top-down-pixel-art-sprit-1773625341462",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-404608-beholder-monsters-top-down-pixel-art-sprit_1773625341462.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-404608-beholder-monsters-top-down-pixel-art-sprit-1773625341462"
+    },
+    {
+      "name": "craftpix-net-417326-underground-fighting-arena-pixel-asset-pac_1776117189057.zip",
+      "ext": ".zip",
+      "size": 859510,
+      "category": "misc",
+      "slug": "craftpix-net-417326-underground-fighting-arena-pixel-asset-pac-1776117189057",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-417326-underground-fighting-arena-pixel-asset-pac_1776117189057.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-417326-underground-fighting-arena-pixel-asset-pac-1776117189057"
+    },
+    {
+      "name": "craftpix-net-440623-free-pixel-magic-sprite-effects-pack_1776124725608.zip",
+      "ext": ".zip",
+      "size": 550688,
+      "category": "effects",
+      "slug": "craftpix-net-440623-free-pixel-magic-sprite-effects-pack-1776124725608",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-440623-free-pixel-magic-sprite-effects-pack_1776124725608.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-440623-free-pixel-magic-sprite-effects-pack-1776124725608"
+    },
+    {
+      "name": "craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk_(1_1774669148117.zip",
+      "ext": ".zip",
+      "size": 1079606,
+      "category": "characters",
+      "slug": "craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk-1-1774669148117",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk_(1_1774669148117.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk-1-1774669148117"
+    },
+    {
+      "name": "craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk_1773031778437.zip",
+      "ext": ".zip",
+      "size": 1079606,
+      "category": "characters",
+      "slug": "craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk-1773031778437",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk_1773031778437.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk-1773031778437"
+    },
+    {
+      "name": "craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk_1773031783319.zip",
+      "ext": ".zip",
+      "size": 1079606,
+      "category": "characters",
+      "slug": "craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk-1773031783319",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk_1773031783319.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk-1773031783319"
+    },
+    {
+      "name": "craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk_1773058479158.zip",
+      "ext": ".zip",
+      "size": 1079606,
+      "category": "characters",
+      "slug": "craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk-1773058479158",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk_1773058479158.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-456469-pixel-fighters-asset-pack-for-cyberpunk-1773058479158"
+    },
+    {
+      "name": "craftpix-net-461336-gun-constructor-pixel-art_1776124347863.zip",
+      "ext": ".zip",
+      "size": 186553,
+      "category": "weapons",
+      "slug": "craftpix-net-461336-gun-constructor-pixel-art-1776124347863",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-461336-gun-constructor-pixel-art_1776124347863.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\weapons\\craftpix-net-461336-gun-constructor-pixel-art-1776124347863"
+    },
+    {
+      "name": "craftpix-net-490676-top-down-graveyard-monsters-pixel-art-spri_1776124469450.zip",
+      "ext": ".zip",
+      "size": 542309,
+      "category": "misc",
+      "slug": "craftpix-net-490676-top-down-graveyard-monsters-pixel-art-spri-1776124469450",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-490676-top-down-graveyard-monsters-pixel-art-spri_1776124469450.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-490676-top-down-graveyard-monsters-pixel-art-spri-1776124469450"
+    },
+    {
+      "name": "craftpix-net-501088-free-slash-sprite-cartoon-effects_1773043358958.zip",
+      "ext": ".zip",
+      "size": 22663717,
+      "category": "effects",
+      "slug": "craftpix-net-501088-free-slash-sprite-cartoon-effects-1773043358958",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-501088-free-slash-sprite-cartoon-effects_1773043358958.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-501088-free-slash-sprite-cartoon-effects-1773043358958"
+    },
+    {
+      "name": "craftpix-net-501088-free-slash-sprite-cartoon-effects_1773045960431.zip",
+      "ext": ".zip",
+      "size": 22663717,
+      "category": "effects",
+      "slug": "craftpix-net-501088-free-slash-sprite-cartoon-effects-1773045960431",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-501088-free-slash-sprite-cartoon-effects_1773045960431.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-501088-free-slash-sprite-cartoon-effects-1773045960431"
+    },
+    {
+      "name": "craftpix-net-501088-free-slash-sprite-cartoon-effects_1776120292381.zip",
+      "ext": ".zip",
+      "size": 22663717,
+      "category": "effects",
+      "slug": "craftpix-net-501088-free-slash-sprite-cartoon-effects-1776120292381",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-501088-free-slash-sprite-cartoon-effects_1776120292381.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-501088-free-slash-sprite-cartoon-effects-1776120292381"
+    },
+    {
+      "name": "craftpix-net-508187-magic-effects-pixel-art-asset-pack-4_1776130792511.zip",
+      "ext": ".zip",
+      "size": 310420,
+      "category": "effects",
+      "slug": "craftpix-net-508187-magic-effects-pixel-art-asset-pack-4-1776130792511",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-508187-magic-effects-pixel-art-asset-pack-4_1776130792511.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-508187-magic-effects-pixel-art-asset-pack-4-1776130792511"
+    },
+    {
+      "name": "craftpix-net-511851-obstacle-game-asset-pack_1776132988805.zip",
+      "ext": ".zip",
+      "size": 5155640,
+      "category": "environment",
+      "slug": "craftpix-net-511851-obstacle-game-asset-pack-1776132988805",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-511851-obstacle-game-asset-pack_1776132988805.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-511851-obstacle-game-asset-pack-1776132988805"
+    },
+    {
+      "name": "craftpix-net-511851-obstacle-game-asset-pack_1776134459183.zip",
+      "ext": ".zip",
+      "size": 5155640,
+      "category": "environment",
+      "slug": "craftpix-net-511851-obstacle-game-asset-pack-1776134459183",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-511851-obstacle-game-asset-pack_1776134459183.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-511851-obstacle-game-asset-pack-1776134459183"
+    },
+    {
+      "name": "craftpix-net-519977-underwater-main-enemies-pixel-sprite-pack_1771434490601.zip",
+      "ext": ".zip",
+      "size": 489816,
+      "category": "misc",
+      "slug": "craftpix-net-519977-underwater-main-enemies-pixel-sprite-pack-1771434490601",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-519977-underwater-main-enemies-pixel-sprite-pack_1771434490601.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-519977-underwater-main-enemies-pixel-sprite-pack-1771434490601"
+    },
+    {
+      "name": "craftpix-net-526500-smoke-effects-pixel-art_1773043365715.zip",
+      "ext": ".zip",
+      "size": 39181373,
+      "category": "effects",
+      "slug": "craftpix-net-526500-smoke-effects-pixel-art-1773043365715",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-526500-smoke-effects-pixel-art_1773043365715.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-526500-smoke-effects-pixel-art-1773043365715"
+    },
+    {
+      "name": "craftpix-net-538115-blood-splash-sprite-effects-asset-pack_1774671589372.zip",
+      "ext": ".zip",
+      "size": 22319746,
+      "category": "effects",
+      "slug": "craftpix-net-538115-blood-splash-sprite-effects-asset-pack-1774671589372",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-538115-blood-splash-sprite-effects-asset-pack_1774671589372.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-538115-blood-splash-sprite-effects-asset-pack-1774671589372"
+    },
+    {
+      "name": "craftpix-net-541373-lab-bosses-pixel-art_1772939052483.zip",
+      "ext": ".zip",
+      "size": 380324,
+      "category": "misc",
+      "slug": "craftpix-net-541373-lab-bosses-pixel-art-1772939052483",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-541373-lab-bosses-pixel-art_1772939052483.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-541373-lab-bosses-pixel-art-1772939052483"
+    },
+    {
+      "name": "craftpix-net-550902-police-cyberpunk-characters-pixel-art_1772939049908.zip",
+      "ext": ".zip",
+      "size": 274864,
+      "category": "characters",
+      "slug": "craftpix-net-550902-police-cyberpunk-characters-pixel-art-1772939049908",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-550902-police-cyberpunk-characters-pixel-art_1772939049908.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-550902-police-cyberpunk-characters-pixel-art-1772939049908"
+    },
+    {
+      "name": "craftpix-net-550920-zombie-4-direction-pixel-character-sprite-_1775955265751.zip",
+      "ext": ".zip",
+      "size": 2558218,
+      "category": "characters",
+      "slug": "craftpix-net-550920-zombie-4-direction-pixel-character-sprite-1775955265751",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-550920-zombie-4-direction-pixel-character-sprite-_1775955265751.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-550920-zombie-4-direction-pixel-character-sprite-1775955265751"
+    },
+    {
+      "name": "craftpix-net-560683-magic-sprite-effects-vector-pack_1776120299341.zip",
+      "ext": ".zip",
+      "size": 27201027,
+      "category": "effects",
+      "slug": "craftpix-net-560683-magic-sprite-effects-vector-pack-1776120299341",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-560683-magic-sprite-effects-vector-pack_1776120299341.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-560683-magic-sprite-effects-vector-pack-1776120299341"
+    },
+    {
+      "name": "craftpix-net-624156-swamp-top-down-tileset-pixel-art_1773625293223.zip",
+      "ext": ".zip",
+      "size": 13093668,
+      "category": "environment",
+      "slug": "craftpix-net-624156-swamp-top-down-tileset-pixel-art-1773625293223",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-624156-swamp-top-down-tileset-pixel-art_1773625293223.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-624156-swamp-top-down-tileset-pixel-art-1773625293223"
+    },
+    {
+      "name": "craftpix-net-625807-golem-pixel-art-top-down-sprite-pack_1773625321365.zip",
+      "ext": ".zip",
+      "size": 5744055,
+      "category": "misc",
+      "slug": "craftpix-net-625807-golem-pixel-art-top-down-sprite-pack-1773625321365",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-625807-golem-pixel-art-top-down-sprite-pack_1773625321365.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-625807-golem-pixel-art-top-down-sprite-pack-1773625321365"
+    },
+    {
+      "name": "craftpix-net-625807-golem-pixel-art-top-down-sprite-pack_1775955261739.zip",
+      "ext": ".zip",
+      "size": 5744055,
+      "category": "misc",
+      "slug": "craftpix-net-625807-golem-pixel-art-top-down-sprite-pack-1775955261739",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-625807-golem-pixel-art-top-down-sprite-pack_1775955261739.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-625807-golem-pixel-art-top-down-sprite-pack-1775955261739"
+    },
+    {
+      "name": "craftpix-net-668008-free-bridges-top-down-pixel-art-asset-pack_1776124333072.zip",
+      "ext": ".zip",
+      "size": 1019261,
+      "category": "environment",
+      "slug": "craftpix-net-668008-free-bridges-top-down-pixel-art-asset-pack-1776124333072",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-668008-free-bridges-top-down-pixel-art-asset-pack_1776124333072.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-668008-free-bridges-top-down-pixel-art-asset-pack-1776124333072"
+    },
+    {
+      "name": "craftpix-net-669945-battle-mecha-sprites-pixel-art-pack_1772939055299.zip",
+      "ext": ".zip",
+      "size": 861112,
+      "category": "misc",
+      "slug": "craftpix-net-669945-battle-mecha-sprites-pixel-art-pack-1772939055299",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-669945-battle-mecha-sprites-pixel-art-pack_1772939055299.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-669945-battle-mecha-sprites-pixel-art-pack-1772939055299"
+    },
+    {
+      "name": "craftpix-net-710530-goblin-pixel-art-character-sprite-pack_1773625323227.zip",
+      "ext": ".zip",
+      "size": 3157912,
+      "category": "characters",
+      "slug": "craftpix-net-710530-goblin-pixel-art-character-sprite-pack-1773625323227",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-710530-goblin-pixel-art-character-sprite-pack_1773625323227.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-710530-goblin-pixel-art-character-sprite-pack-1773625323227"
+    },
+    {
+      "name": "craftpix-net-720017-mega-boss-for-tiny-platformer-pixel-sprite_1776122125271.zip",
+      "ext": ".zip",
+      "size": 1518450,
+      "category": "misc",
+      "slug": "craftpix-net-720017-mega-boss-for-tiny-platformer-pixel-sprite-1776122125271",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-720017-mega-boss-for-tiny-platformer-pixel-sprite_1776122125271.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-720017-mega-boss-for-tiny-platformer-pixel-sprite-1776122125271"
+    },
+    {
+      "name": "craftpix-net-724953-bombs-and-explosions-pixel-art-set_1772939035123.zip",
+      "ext": ".zip",
+      "size": 264733,
+      "category": "effects",
+      "slug": "craftpix-net-724953-bombs-and-explosions-pixel-art-set-1772939035123",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-724953-bombs-and-explosions-pixel-art-set_1772939035123.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-724953-bombs-and-explosions-pixel-art-set-1772939035123"
+    },
+    {
+      "name": "craftpix-net-741016-pixel-blacksmith-house-interior-and-exteri_1776122773820.zip",
+      "ext": ".zip",
+      "size": 1558391,
+      "category": "environment",
+      "slug": "craftpix-net-741016-pixel-blacksmith-house-interior-and-exteri-1776122773820",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-741016-pixel-blacksmith-house-interior-and-exteri_1776122773820.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-741016-pixel-blacksmith-house-interior-and-exteri-1776122773820"
+    },
+    {
+      "name": "craftpix-net-741016-pixel-blacksmith-house-interior-and-exteri_1776122824250.zip",
+      "ext": ".zip",
+      "size": 1558391,
+      "category": "environment",
+      "slug": "craftpix-net-741016-pixel-blacksmith-house-interior-and-exteri-1776122824250",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-741016-pixel-blacksmith-house-interior-and-exteri_1776122824250.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-741016-pixel-blacksmith-house-interior-and-exteri-1776122824250"
+    },
+    {
+      "name": "craftpix-net-741764-free-skill-32x32-icons-for-cyberpunk-game_1772939029473.zip",
+      "ext": ".zip",
+      "size": 2454460,
+      "category": "ui",
+      "slug": "craftpix-net-741764-free-skill-32x32-icons-for-cyberpunk-game-1772939029473",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-741764-free-skill-32x32-icons-for-cyberpunk-game_1772939029473.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-net-741764-free-skill-32x32-icons-for-cyberpunk-game-1772939029473"
+    },
+    {
+      "name": "craftpix-net-743043-pixel-art-slime-enemies-top-down-sprite-pa_1773625329838.zip",
+      "ext": ".zip",
+      "size": 2419260,
+      "category": "misc",
+      "slug": "craftpix-net-743043-pixel-art-slime-enemies-top-down-sprite-pa-1773625329838",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-743043-pixel-art-slime-enemies-top-down-sprite-pa_1773625329838.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-743043-pixel-art-slime-enemies-top-down-sprite-pa-1773625329838"
+    },
+    {
+      "name": "craftpix-net-760946-free-underwater-enemies-pixel-art-characte_1771434484227.zip",
+      "ext": ".zip",
+      "size": 775672,
+      "category": "misc",
+      "slug": "craftpix-net-760946-free-underwater-enemies-pixel-art-characte-1771434484227",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-760946-free-underwater-enemies-pixel-art-characte_1771434484227.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-760946-free-underwater-enemies-pixel-art-characte-1771434484227"
+    },
+    {
+      "name": "craftpix-net-801184-free-clouds-pixel-art-asset-pack_1771434463537.zip",
+      "ext": ".zip",
+      "size": 1089001,
+      "category": "misc",
+      "slug": "craftpix-net-801184-free-clouds-pixel-art-asset-pack-1771434463537",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-801184-free-clouds-pixel-art-asset-pack_1771434463537.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-801184-free-clouds-pixel-art-asset-pack-1771434463537"
+    },
+    {
+      "name": "craftpix-net-805745-free-magic-and-traps-top-down-pixel-art-as_1773043362450.zip",
+      "ext": ".zip",
+      "size": 1091456,
+      "category": "effects",
+      "slug": "craftpix-net-805745-free-magic-and-traps-top-down-pixel-art-as-1773043362450",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-805745-free-magic-and-traps-top-down-pixel-art-as_1773043362450.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-805745-free-magic-and-traps-top-down-pixel-art-as-1773043362450"
+    },
+    {
+      "name": "craftpix-net-809047-free-animated-magic-book-pixel-art-asset-p_1776124497194.zip",
+      "ext": ".zip",
+      "size": 2006721,
+      "category": "effects",
+      "slug": "craftpix-net-809047-free-animated-magic-book-pixel-art-asset-p-1776124497194",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-809047-free-animated-magic-book-pixel-art-asset-p_1776124497194.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-809047-free-animated-magic-book-pixel-art-asset-p-1776124497194"
+    },
+    {
+      "name": "craftpix-net-809571-mega-boss-for-pixel-platformer-character-p_1772939091504.zip",
+      "ext": ".zip",
+      "size": 1159165,
+      "category": "characters",
+      "slug": "craftpix-net-809571-mega-boss-for-pixel-platformer-character-p-1772939091504",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-809571-mega-boss-for-pixel-platformer-character-p_1772939091504.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-809571-mega-boss-for-pixel-platformer-character-p-1772939091504"
+    },
+    {
+      "name": "craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-_1773037744714.zip",
+      "ext": ".zip",
+      "size": 2614603,
+      "category": "misc",
+      "slug": "craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-1773037744714",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-_1773037744714.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-1773037744714"
+    },
+    {
+      "name": "craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-_1773043355924.zip",
+      "ext": ".zip",
+      "size": 2614603,
+      "category": "misc",
+      "slug": "craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-1773043355924",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-_1773043355924.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-1773043355924"
+    },
+    {
+      "name": "craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-_1773045802646.zip",
+      "ext": ".zip",
+      "size": 2614603,
+      "category": "misc",
+      "slug": "craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-1773045802646",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-_1773045802646.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-814823-free-roguelike-shoot-em-up-pixel-art-game-1773045802646"
+    },
+    {
+      "name": "craftpix-net-823313-residential-area-enemies-pixel-art-pack_1772939039226.zip",
+      "ext": ".zip",
+      "size": 323921,
+      "category": "misc",
+      "slug": "craftpix-net-823313-residential-area-enemies-pixel-art-pack-1772939039226",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-823313-residential-area-enemies-pixel-art-pack_1772939039226.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\craftpix-net-823313-residential-area-enemies-pixel-art-pack-1772939039226"
+    },
+    {
+      "name": "craftpix-net-836879-cartoon-fire-flame-animation-sprite-set_1776120295953.zip",
+      "ext": ".zip",
+      "size": 16996460,
+      "category": "effects",
+      "slug": "craftpix-net-836879-cartoon-fire-flame-animation-sprite-set-1776120295953",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-836879-cartoon-fire-flame-animation-sprite-set_1776120295953.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-836879-cartoon-fire-flame-animation-sprite-set-1776120295953"
+    },
+    {
+      "name": "craftpix-net-864630-top-down-fire-and-explosion-sprites-pixel-_1774668827499.zip",
+      "ext": ".zip",
+      "size": 14109104,
+      "category": "effects",
+      "slug": "craftpix-net-864630-top-down-fire-and-explosion-sprites-pixel-1774668827499",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-864630-top-down-fire-and-explosion-sprites-pixel-_1774668827499.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-864630-top-down-fire-and-explosion-sprites-pixel-1774668827499"
+    },
+    {
+      "name": "craftpix-net-864630-top-down-fire-and-explosion-sprites-pixel-_1775955271745.zip",
+      "ext": ".zip",
+      "size": 14109104,
+      "category": "effects",
+      "slug": "craftpix-net-864630-top-down-fire-and-explosion-sprites-pixel-1775955271745",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-864630-top-down-fire-and-explosion-sprites-pixel-_1775955271745.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-864630-top-down-fire-and-explosion-sprites-pixel-1775955271745"
+    },
+    {
+      "name": "craftpix-net-870078-top-down-pixel-skeletons-character-sprite-_1773625284199.zip",
+      "ext": ".zip",
+      "size": 2163773,
+      "category": "characters",
+      "slug": "craftpix-net-870078-top-down-pixel-skeletons-character-sprite-1773625284199",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-870078-top-down-pixel-skeletons-character-sprite-_1773625284199.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-870078-top-down-pixel-skeletons-character-sprite-1773625284199"
+    },
+    {
+      "name": "craftpix-net-870078-top-down-pixel-skeletons-character-sprite-_1775955256831.zip",
+      "ext": ".zip",
+      "size": 2163773,
+      "category": "characters",
+      "slug": "craftpix-net-870078-top-down-pixel-skeletons-character-sprite-1775955256831",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-870078-top-down-pixel-skeletons-character-sprite-_1775955256831.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-870078-top-down-pixel-skeletons-character-sprite-1775955256831"
+    },
+    {
+      "name": "craftpix-net-894297-top-down-pixel-ghost-character-sprite-pack_1775955259014.zip",
+      "ext": ".zip",
+      "size": 3039496,
+      "category": "characters",
+      "slug": "craftpix-net-894297-top-down-pixel-ghost-character-sprite-pack-1775955259014",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-894297-top-down-pixel-ghost-character-sprite-pack_1775955259014.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-894297-top-down-pixel-ghost-character-sprite-pack-1775955259014"
+    },
+    {
+      "name": "craftpix-net-894297-top-down-pixel-ghost-character-sprite-pack_1776122771067.zip",
+      "ext": ".zip",
+      "size": 3039496,
+      "category": "characters",
+      "slug": "craftpix-net-894297-top-down-pixel-ghost-character-sprite-pack-1776122771067",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-894297-top-down-pixel-ghost-character-sprite-pack_1776122771067.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-894297-top-down-pixel-ghost-character-sprite-pack-1776122771067"
+    },
+    {
+      "name": "craftpix-net-894687-free-gui-for-cyberpunk-pixel-art_1773059184738.zip",
+      "ext": ".zip",
+      "size": 3086499,
+      "category": "ui",
+      "slug": "craftpix-net-894687-free-gui-for-cyberpunk-pixel-art-1773059184738",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-894687-free-gui-for-cyberpunk-pixel-art_1773059184738.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-net-894687-free-gui-for-cyberpunk-pixel-art-1773059184738"
+    },
+    {
+      "name": "craftpix-net-934618-free-top-down-ruins-pixel-art_1773625295204.zip",
+      "ext": ".zip",
+      "size": 8546548,
+      "category": "ui",
+      "slug": "craftpix-net-934618-free-top-down-ruins-pixel-art-1773625295204",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-934618-free-top-down-ruins-pixel-art_1773625295204.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\craftpix-net-934618-free-top-down-ruins-pixel-art-1773625295204"
+    },
+    {
+      "name": "craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do_1773625274538.zip",
+      "ext": ".zip",
+      "size": 5845748,
+      "category": "characters",
+      "slug": "craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do-1773625274538",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do_1773625274538.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do-1773625274538"
+    },
+    {
+      "name": "craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do_1776122781219.zip",
+      "ext": ".zip",
+      "size": 5845748,
+      "category": "characters",
+      "slug": "craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do-1776122781219",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do_1776122781219.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do-1776122781219"
+    },
+    {
+      "name": "craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do_1776124336813.zip",
+      "ext": ".zip",
+      "size": 5845748,
+      "category": "characters",
+      "slug": "craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do-1776124336813",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do_1776124336813.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\characters\\craftpix-net-934911-swordsman-level-4-6-pixel-character-top-do-1776124336813"
+    },
+    {
+      "name": "craftpix-net-936590-free-futuristic-game-music-and-sound-effec_1776124462222.zip",
+      "ext": ".zip",
+      "size": 96245584,
+      "category": "audio",
+      "slug": "craftpix-net-936590-free-futuristic-game-music-and-sound-effec-1776124462222",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-936590-free-futuristic-game-music-and-sound-effec_1776124462222.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\audio\\craftpix-net-936590-free-futuristic-game-music-and-sound-effec-1776124462222"
+    },
+    {
+      "name": "craftpix-net-965938-free-effects-for-platformer-pixel-art-pack_1772939032061.zip",
+      "ext": ".zip",
+      "size": 588981,
+      "category": "effects",
+      "slug": "craftpix-net-965938-free-effects-for-platformer-pixel-art-pack-1772939032061",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-965938-free-effects-for-platformer-pixel-art-pack_1772939032061.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\craftpix-net-965938-free-effects-for-platformer-pixel-art-pack-1772939032061"
+    },
+    {
+      "name": "craftpix-net-974061-free-rocks-and-stones-top-down-pixel-art_1773625286678.zip",
+      "ext": ".zip",
+      "size": 1917432,
+      "category": "environment",
+      "slug": "craftpix-net-974061-free-rocks-and-stones-top-down-pixel-art-1773625286678",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\craftpix-net-974061-free-rocks-and-stones-top-down-pixel-art_1773625286678.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\environment\\craftpix-net-974061-free-rocks-and-stones-top-down-pixel-art-1773625286678"
+    },
+    {
+      "name": "FREE_Adventurer_2D_Pixel_Art_1776134448860.zip",
+      "ext": ".zip",
+      "size": 94481,
+      "category": "misc",
+      "slug": "free-adventurer-2d-pixel-art-1776134448860",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\FREE_Adventurer_2D_Pixel_Art_1776134448860.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\free-adventurer-2d-pixel-art-1776134448860"
+    },
+    {
+      "name": "Legacy_Collection_1776132504693.zip",
+      "ext": ".zip",
+      "size": 20967783,
+      "category": "misc",
+      "slug": "legacy-collection-1776132504693",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\Legacy_Collection_1776132504693.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\legacy-collection-1776132504693"
+    },
+    {
+      "name": "Magic-Cliffs-Gamekit_1776132501849.zip",
+      "ext": ".zip",
+      "size": 4642655,
+      "category": "effects",
+      "slug": "magic-cliffs-gamekit-1776132501849",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\Magic-Cliffs-Gamekit_1776132501849.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\magic-cliffs-gamekit-1776132501849"
+    },
+    {
+      "name": "monster_rts_1776148395112.rar",
+      "ext": ".rar",
+      "size": 14021154,
+      "category": "misc",
+      "slug": "monster-rts-1776148395112",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\monster_rts_1776148395112.rar",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\monster-rts-1776148395112"
+    },
+    {
+      "name": "RTS_and_FPS_Sound_Effects_Asset_Pack_1776147864150.zip",
+      "ext": ".zip",
+      "size": 20225609,
+      "category": "effects",
+      "slug": "rts-and-fps-sound-effects-asset-pack-1776147864150",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\RTS_and_FPS_Sound_Effects_Asset_Pack_1776147864150.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\rts-and-fps-sound-effects-asset-pack-1776147864150"
+    },
+    {
+      "name": "Super_Pixel_Effects_Gigapack_(Free_Version)_v2.0.0_1774671834926.zip",
+      "ext": ".zip",
+      "size": 7440498,
+      "category": "effects",
+      "slug": "super-pixel-effects-gigapack-free-version-v2-0-0-1774671834926",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\Super_Pixel_Effects_Gigapack_(Free_Version)_v2.0.0_1774671834926.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\super-pixel-effects-gigapack-free-version-v2-0-0-1774671834926"
+    },
+    {
+      "name": "Super_Pixel_Effects_Gigapack_(Free_Version)_v2.0.0_1774676799416.zip",
+      "ext": ".zip",
+      "size": 7440498,
+      "category": "effects",
+      "slug": "super-pixel-effects-gigapack-free-version-v2-0-0-1774676799416",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\Super_Pixel_Effects_Gigapack_(Free_Version)_v2.0.0_1774676799416.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\super-pixel-effects-gigapack-free-version-v2-0-0-1774676799416"
+    },
+    {
+      "name": "ui4_1773058819984.zip",
+      "ext": ".zip",
+      "size": 179559253,
+      "category": "ui",
+      "slug": "ui4-1773058819984",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\ui4_1773058819984.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\ui\\ui4-1773058819984"
+    },
+    {
+      "name": "underwater-main-enemies-pixel-sprite-pack_1771434494348.zip",
+      "ext": ".zip",
+      "size": 489816,
+      "category": "misc",
+      "slug": "underwater-main-enemies-pixel-sprite-pack-1771434494348",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\underwater-main-enemies-pixel-sprite-pack_1771434494348.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\misc\\underwater-main-enemies-pixel-sprite-pack-1771434494348"
+    },
+    {
+      "name": "Warped_shooting_fx_files_1776149219100.zip",
+      "ext": ".zip",
+      "size": 15778482,
+      "category": "effects",
+      "slug": "warped-shooting-fx-files-1776149219100",
+      "sourcePath": "F:\\RPG-MODULAR\\RPG-MODULAR\\attached_assets\\Warped_shooting_fx_files_1776149219100.zip",
+      "extractTarget": "F:\\RPG-MODULAR\\RPG-MODULAR\\storage\\extracted\\attached\\effects\\warped-shooting-fx-files-1776149219100"
+    }
+  ],
+  "samplePublicFiles": [
+    {
+      "name": "BarbarianIcon_1770649105100.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\attached_assets\\BarbarianIcon_1770649105100.png",
+      "relativePath": "attached_assets/BarbarianIcon_1770649105100.png",
+      "size": 162716
+    },
+    {
+      "name": "DwarveIcon_1770649105100.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\attached_assets\\DwarveIcon_1770649105100.png",
+      "relativePath": "attached_assets/DwarveIcon_1770649105100.png",
+      "size": 112698
+    },
+    {
+      "name": "ElfIcon_1770649105101.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\attached_assets\\ElfIcon_1770649105101.png",
+      "relativePath": "attached_assets/ElfIcon_1770649105101.png",
+      "size": 119464
+    },
+    {
+      "name": "HumanIcon_1770649105101.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\attached_assets\\HumanIcon_1770649105101.png",
+      "relativePath": "attached_assets/HumanIcon_1770649105101.png",
+      "size": 148524
+    },
+    {
+      "name": "OrcIcon_1770649105098.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\attached_assets\\OrcIcon_1770649105098.png",
+      "relativePath": "attached_assets/OrcIcon_1770649105098.png",
+      "size": 116683
+    },
+    {
+      "name": "UndeadIcon_1770649105099.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\attached_assets\\UndeadIcon_1770649105099.png",
+      "relativePath": "attached_assets/UndeadIcon_1770649105099.png",
+      "size": 102880
+    },
+    {
+      "name": "elevate_your_mind.mp3",
+      "ext": ".mp3",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\audio\\elevate_your_mind.mp3",
+      "relativePath": "audio/elevate_your_mind.mp3",
+      "size": 2989915
+    },
+    {
+      "name": "intro_theme.mp3",
+      "ext": ".mp3",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\audio\\intro_theme.mp3",
+      "relativePath": "audio/intro_theme.mp3",
+      "size": 2890858
+    },
+    {
+      "name": "scene_theme.mp3",
+      "ext": ".mp3",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\audio\\scene_theme.mp3",
+      "relativePath": "audio/scene_theme.mp3",
+      "size": 2989915
+    },
+    {
+      "name": "youth_thinker.mp3",
+      "ext": ".mp3",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\audio\\youth_thinker.mp3",
+      "relativePath": "audio/youth_thinker.mp3",
+      "size": 2890858
+    },
+    {
+      "name": "abyssal_depths.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\abyssal_depths.png",
+      "relativePath": "backgrounds/abyssal_depths.png",
+      "size": 968947
+    },
+    {
+      "name": "abyss_throne_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\abyss_throne_battle.png",
+      "relativePath": "backgrounds/abyss_throne_battle.png",
+      "size": 1273952
+    },
+    {
+      "name": "arena.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\arena.png",
+      "relativePath": "backgrounds/arena.png",
+      "size": 3180467
+    },
+    {
+      "name": "arena_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\arena_battle.png",
+      "relativePath": "backgrounds/arena_battle.png",
+      "size": 2467687
+    },
+    {
+      "name": "bg_elf.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\bg_elf.png",
+      "relativePath": "backgrounds/bg_elf.png",
+      "size": 2409686
+    },
+    {
+      "name": "bg_undead.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\bg_undead.png",
+      "relativePath": "backgrounds/bg_undead.png",
+      "size": 2115199
+    },
+    {
+      "name": "bg_warrior.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\bg_warrior.png",
+      "relativePath": "backgrounds/bg_warrior.png",
+      "size": 2369587
+    },
+    {
+      "name": "biolume_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\biolume_battle.png",
+      "relativePath": "backgrounds/biolume_battle.png",
+      "size": 1585111
+    },
+    {
+      "name": "blight_hollow.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\blight_hollow.png",
+      "relativePath": "backgrounds/blight_hollow.png",
+      "size": 1289297
+    },
+    {
+      "name": "blood_canyon.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\blood_canyon.png",
+      "relativePath": "backgrounds/blood_canyon.png",
+      "size": 1374649
+    },
+    {
+      "name": "boss_autumn.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\boss_autumn.png",
+      "relativePath": "backgrounds/boss_autumn.png",
+      "size": 580627
+    },
+    {
+      "name": "boss_blue.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\boss_blue.png",
+      "relativePath": "backgrounds/boss_blue.png",
+      "size": 548810
+    },
+    {
+      "name": "boss_green.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\boss_green.png",
+      "relativePath": "backgrounds/boss_green.png",
+      "size": 483723
+    },
+    {
+      "name": "boss_mountain.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\boss_mountain.png",
+      "relativePath": "backgrounds/boss_mountain.png",
+      "size": 2659645
+    },
+    {
+      "name": "boss_red.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\boss_red.png",
+      "relativePath": "backgrounds/boss_red.png",
+      "size": 529801
+    },
+    {
+      "name": "boss_walkup_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\boss_walkup_ocean.png",
+      "relativePath": "backgrounds/boss_walkup_ocean.png",
+      "size": 1261156
+    },
+    {
+      "name": "camp_shop.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\camp_shop.png",
+      "relativePath": "backgrounds/camp_shop.png",
+      "size": 2796212
+    },
+    {
+      "name": "card_beach.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_beach.png",
+      "relativePath": "backgrounds/card_beach.png",
+      "size": 149018
+    },
+    {
+      "name": "card_blue_betta.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_blue_betta.png",
+      "relativePath": "backgrounds/card_blue_betta.png",
+      "size": 1544795
+    },
+    {
+      "name": "card_dark.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_dark.png",
+      "relativePath": "backgrounds/card_dark.png",
+      "size": 104135
+    },
+    {
+      "name": "card_divine.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_divine.png",
+      "relativePath": "backgrounds/card_divine.png",
+      "size": 56159
+    },
+    {
+      "name": "card_gold_betta.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_gold_betta.png",
+      "relativePath": "backgrounds/card_gold_betta.png",
+      "size": 1765370
+    },
+    {
+      "name": "card_green_betta.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_green_betta.png",
+      "relativePath": "backgrounds/card_green_betta.png",
+      "size": 1851355
+    },
+    {
+      "name": "card_green_hills.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_green_hills.png",
+      "relativePath": "backgrounds/card_green_hills.png",
+      "size": 294924
+    },
+    {
+      "name": "card_orange_betta.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_orange_betta.png",
+      "relativePath": "backgrounds/card_orange_betta.png",
+      "size": 1379939
+    },
+    {
+      "name": "card_pink_betta.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_pink_betta.png",
+      "relativePath": "backgrounds/card_pink_betta.png",
+      "size": 1565177
+    },
+    {
+      "name": "card_purple_betta.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_purple_betta.png",
+      "relativePath": "backgrounds/card_purple_betta.png",
+      "size": 1619802
+    },
+    {
+      "name": "card_red_betta.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_red_betta.png",
+      "relativePath": "backgrounds/card_red_betta.png",
+      "size": 1548906
+    },
+    {
+      "name": "card_white_betta.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\card_white_betta.png",
+      "relativePath": "backgrounds/card_white_betta.png",
+      "size": 1192244
+    },
+    {
+      "name": "character_create.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\character_create.png",
+      "relativePath": "backgrounds/character_create.png",
+      "size": 2588609
+    },
+    {
+      "name": "character_create_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\character_create_ocean.png",
+      "relativePath": "backgrounds/character_create_ocean.png",
+      "size": 1651042
+    },
+    {
+      "name": "coral_reef_city.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\coral_reef_city.png",
+      "relativePath": "backgrounds/coral_reef_city.png",
+      "size": 1804511
+    },
+    {
+      "name": "corrupted_spire.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\corrupted_spire.png",
+      "relativePath": "backgrounds/corrupted_spire.png",
+      "size": 1269567
+    },
+    {
+      "name": "crystal_caves.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\crystal_caves.png",
+      "relativePath": "backgrounds/crystal_caves.png",
+      "size": 1205232
+    },
+    {
+      "name": "cursed_ruins.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\cursed_ruins.png",
+      "relativePath": "backgrounds/cursed_ruins.png",
+      "size": 1987581
+    },
+    {
+      "name": "dark_forest.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\dark_forest.png",
+      "relativePath": "backgrounds/dark_forest.png",
+      "size": 1262854
+    },
+    {
+      "name": "deep_trench.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\deep_trench.png",
+      "relativePath": "backgrounds/deep_trench.png",
+      "size": 1552526
+    },
+    {
+      "name": "deep_trench_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\deep_trench_battle.png",
+      "relativePath": "backgrounds/deep_trench_battle.png",
+      "size": 1327886
+    },
+    {
+      "name": "demon_gate.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\demon_gate.png",
+      "relativePath": "backgrounds/demon_gate.png",
+      "size": 3283783
+    },
+    {
+      "name": "dragon_peaks.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\dragon_peaks.png",
+      "relativePath": "backgrounds/dragon_peaks.png",
+      "size": 1253716
+    },
+    {
+      "name": "crystal_cavern.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\shadow-knights\\crystal_cavern.png",
+      "relativePath": "backgrounds/factory/shadow-knights/crystal_cavern.png",
+      "size": 1564077
+    },
+    {
+      "name": "duskfall_nexus.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\shadow-knights\\duskfall_nexus.png",
+      "relativePath": "backgrounds/factory/shadow-knights/duskfall_nexus.png",
+      "size": 1604227
+    },
+    {
+      "name": "ember_forge.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\shadow-knights\\ember_forge.png",
+      "relativePath": "backgrounds/factory/shadow-knights/ember_forge.png",
+      "size": 1628313
+    },
+    {
+      "name": "shadow_ruins.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\shadow-knights\\shadow_ruins.png",
+      "relativePath": "backgrounds/factory/shadow-knights/shadow_ruins.png",
+      "size": 1145178
+    },
+    {
+      "name": "umbral_forest.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\shadow-knights\\umbral_forest.png",
+      "relativePath": "backgrounds/factory/shadow-knights/umbral_forest.png",
+      "size": 1651718
+    },
+    {
+      "name": "alien_planet.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\starbound-corsairs\\alien_planet.png",
+      "relativePath": "backgrounds/factory/starbound-corsairs/alien_planet.png",
+      "size": 1588818
+    },
+    {
+      "name": "asteroid_belt.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\starbound-corsairs\\asteroid_belt.png",
+      "relativePath": "backgrounds/factory/starbound-corsairs/asteroid_belt.png",
+      "size": 1680774
+    },
+    {
+      "name": "nebula_field.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\starbound-corsairs\\nebula_field.png",
+      "relativePath": "backgrounds/factory/starbound-corsairs/nebula_field.png",
+      "size": 1402607
+    },
+    {
+      "name": "rift_anomaly.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\starbound-corsairs\\rift_anomaly.png",
+      "relativePath": "backgrounds/factory/starbound-corsairs/rift_anomaly.png",
+      "size": 1724056
+    },
+    {
+      "name": "space_station.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\factory\\starbound-corsairs\\space_station.png",
+      "relativePath": "backgrounds/factory/starbound-corsairs/space_station.png",
+      "size": 1718682
+    },
+    {
+      "name": "frozen_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\frozen_battle.png",
+      "relativePath": "backgrounds/frozen_battle.png",
+      "size": 1766583
+    },
+    {
+      "name": "frozen_depths.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\frozen_depths.png",
+      "relativePath": "backgrounds/frozen_depths.png",
+      "size": 1529508
+    },
+    {
+      "name": "hall_of_odin.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\hall_of_odin.png",
+      "relativePath": "backgrounds/hall_of_odin.png",
+      "size": 1224227
+    },
+    {
+      "name": "haunted_marsh.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\haunted_marsh.png",
+      "relativePath": "backgrounds/haunted_marsh.png",
+      "size": 1377240
+    },
+    {
+      "name": "hero_creation_bg.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\hero_creation_bg.png",
+      "relativePath": "backgrounds/hero_creation_bg.png",
+      "size": 2719573
+    },
+    {
+      "name": "hero_creation_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\hero_creation_ocean.png",
+      "relativePath": "backgrounds/hero_creation_ocean.png",
+      "size": 1500070
+    },
+    {
+      "name": "infernal_arena.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\infernal_arena.png",
+      "relativePath": "backgrounds/infernal_arena.png",
+      "size": 2953988
+    },
+    {
+      "name": "kelp_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\kelp_battle.png",
+      "relativePath": "backgrounds/kelp_battle.png",
+      "size": 1620281
+    },
+    {
+      "name": "kelp_forest.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\kelp_forest.png",
+      "relativePath": "backgrounds/kelp_forest.png",
+      "size": 1746983
+    },
+    {
+      "name": "lava_boss_walkup.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\lava_boss_walkup.png",
+      "relativePath": "backgrounds/lava_boss_walkup.png",
+      "size": 530012
+    },
+    {
+      "name": "lava_dungeon_path.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\lava_dungeon_path.png",
+      "relativePath": "backgrounds/lava_dungeon_path.png",
+      "size": 493618
+    },
+    {
+      "name": "lava_texture.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\lava_texture.png",
+      "relativePath": "backgrounds/lava_texture.png",
+      "size": 2214890
+    },
+    {
+      "name": "maelstrom_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\maelstrom_battle.png",
+      "relativePath": "backgrounds/maelstrom_battle.png",
+      "size": 1448473
+    },
+    {
+      "name": "main_menu_bg.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\main_menu_bg.png",
+      "relativePath": "backgrounds/main_menu_bg.png",
+      "size": 3247814
+    },
+    {
+      "name": "maw_of_madra.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\maw_of_madra.png",
+      "relativePath": "backgrounds/maw_of_madra.png",
+      "size": 1276497
+    },
+    {
+      "name": "mystic_grove.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\mystic_grove.png",
+      "relativePath": "backgrounds/mystic_grove.png",
+      "size": 1476869
+    },
+    {
+      "name": "ocean_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\ocean_battle.png",
+      "relativePath": "backgrounds/ocean_battle.png",
+      "size": 1561977
+    },
+    {
+      "name": "ocean_battle_new.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\ocean_battle_new.png",
+      "relativePath": "backgrounds/ocean_battle_new.png",
+      "size": 1580857
+    },
+    {
+      "name": "ocean_palace.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\ocean_palace.png",
+      "relativePath": "backgrounds/ocean_palace.png",
+      "size": 1746494
+    },
+    {
+      "name": "ocean_title_bg.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\ocean_title_bg.png",
+      "relativePath": "backgrounds/ocean_title_bg.png",
+      "size": 1406432
+    },
+    {
+      "name": "ocean_world_map.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\ocean_world_map.png",
+      "relativePath": "backgrounds/ocean_world_map.png",
+      "size": 1891582
+    },
+    {
+      "name": "portal_arena.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\portal_arena.png",
+      "relativePath": "backgrounds/portal_arena.png",
+      "size": 438056
+    },
+    {
+      "name": "portal_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\portal_ocean.png",
+      "relativePath": "backgrounds/portal_ocean.png",
+      "size": 1584702
+    },
+    {
+      "name": "purple_dungeon.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\purple_dungeon.png",
+      "relativePath": "backgrounds/purple_dungeon.png",
+      "size": 480767
+    },
+    {
+      "name": "reef_hunt_bg.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\reef_hunt_bg.png",
+      "relativePath": "backgrounds/reef_hunt_bg.png",
+      "size": 2210275
+    },
+    {
+      "name": "sanctum_of_omni.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\sanctum_of_omni.png",
+      "relativePath": "backgrounds/sanctum_of_omni.png",
+      "size": 1492592
+    },
+    {
+      "name": "scene_camp.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\scene_camp.png",
+      "relativePath": "backgrounds/scene_camp.png",
+      "size": 547641
+    },
+    {
+      "name": "scene_camp_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\scene_camp_ocean.png",
+      "relativePath": "backgrounds/scene_camp_ocean.png",
+      "size": 1669639
+    },
+    {
+      "name": "scene_dungeon.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\scene_dungeon.png",
+      "relativePath": "backgrounds/scene_dungeon.png",
+      "size": 498682
+    },
+    {
+      "name": "scene_dungeon_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\scene_dungeon_ocean.png",
+      "relativePath": "backgrounds/scene_dungeon_ocean.png",
+      "size": 1383242
+    },
+    {
+      "name": "scene_field.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\scene_field.png",
+      "relativePath": "backgrounds/scene_field.png",
+      "size": 527898
+    },
+    {
+      "name": "scene_field_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\scene_field_ocean.png",
+      "relativePath": "backgrounds/scene_field_ocean.png",
+      "size": 1789063
+    },
+    {
+      "name": "scene_trading.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\scene_trading.png",
+      "relativePath": "backgrounds/scene_trading.png",
+      "size": 586255
+    },
+    {
+      "name": "scene_trading_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\scene_trading_ocean.png",
+      "relativePath": "backgrounds/scene_trading_ocean.png",
+      "size": 2023029
+    },
+    {
+      "name": "shadow_citadel.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\shadow_citadel.png",
+      "relativePath": "backgrounds/shadow_citadel.png",
+      "size": 1262854
+    },
+    {
+      "name": "shadow_forest.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\shadow_forest.png",
+      "relativePath": "backgrounds/shadow_forest.png",
+      "size": 1050972
+    },
+    {
+      "name": "shipwreck_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\shipwreck_battle.png",
+      "relativePath": "backgrounds/shipwreck_battle.png",
+      "size": 1713227
+    },
+    {
+      "name": "shipwreck_graveyard.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\shipwreck_graveyard.png",
+      "relativePath": "backgrounds/shipwreck_graveyard.png",
+      "size": 1645930
+    },
+    {
+      "name": "space_battle_1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\space_battle_1.png",
+      "relativePath": "backgrounds/space_battle_1.png",
+      "size": 193063
+    },
+    {
+      "name": "space_battle_2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\space_battle_2.png",
+      "relativePath": "backgrounds/space_battle_2.png",
+      "size": 121474
+    },
+    {
+      "name": "space_battle_3.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\space_battle_3.png",
+      "relativePath": "backgrounds/space_battle_3.png",
+      "size": 231650
+    },
+    {
+      "name": "space_battle_4.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\space_battle_4.png",
+      "relativePath": "backgrounds/space_battle_4.png",
+      "size": 31347
+    },
+    {
+      "name": "space_battle_5.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\space_battle_5.png",
+      "relativePath": "backgrounds/space_battle_5.png",
+      "size": 74983
+    },
+    {
+      "name": "space_battle_6.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\space_battle_6.png",
+      "relativePath": "backgrounds/space_battle_6.png",
+      "size": 18783
+    },
+    {
+      "name": "storm_ruins.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\storm_ruins.png",
+      "relativePath": "backgrounds/storm_ruins.png",
+      "size": 2961322
+    },
+    {
+      "name": "sunken_temple.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\sunken_temple.png",
+      "relativePath": "backgrounds/sunken_temple.png",
+      "size": 1261203
+    },
+    {
+      "name": "sunken_temple_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\sunken_temple_battle.png",
+      "relativePath": "backgrounds/sunken_temple_battle.png",
+      "size": 1744164
+    },
+    {
+      "name": "tab_abilities.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_abilities.png",
+      "relativePath": "backgrounds/tab_abilities.png",
+      "size": 1716647
+    },
+    {
+      "name": "tab_abilities_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_abilities_ocean.png",
+      "relativePath": "backgrounds/tab_abilities_ocean.png",
+      "size": 1585442
+    },
+    {
+      "name": "tab_attributes.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_attributes.png",
+      "relativePath": "backgrounds/tab_attributes.png",
+      "size": 1612353
+    },
+    {
+      "name": "tab_attributes_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_attributes_ocean.png",
+      "relativePath": "backgrounds/tab_attributes_ocean.png",
+      "size": 1477116
+    },
+    {
+      "name": "tab_gear.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_gear.png",
+      "relativePath": "backgrounds/tab_gear.png",
+      "size": 1890333
+    },
+    {
+      "name": "tab_gear_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_gear_ocean.png",
+      "relativePath": "backgrounds/tab_gear_ocean.png",
+      "size": 1875595
+    },
+    {
+      "name": "tab_skills.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_skills.png",
+      "relativePath": "backgrounds/tab_skills.png",
+      "size": 1808405
+    },
+    {
+      "name": "tab_skills_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_skills_ocean.png",
+      "relativePath": "backgrounds/tab_skills_ocean.png",
+      "size": 1525653
+    },
+    {
+      "name": "tab_stats.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_stats.png",
+      "relativePath": "backgrounds/tab_stats.png",
+      "size": 1489769
+    },
+    {
+      "name": "tab_stats_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tab_stats_ocean.png",
+      "relativePath": "backgrounds/tab_stats_ocean.png",
+      "size": 1374342
+    },
+    {
+      "name": "tavern_bg.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tavern_bg.png",
+      "relativePath": "backgrounds/tavern_bg.png",
+      "size": 392237
+    },
+    {
+      "name": "tavern_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\tavern_ocean.png",
+      "relativePath": "backgrounds/tavern_ocean.png",
+      "size": 1988419
+    },
+    {
+      "name": "thornwood_pass.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\thornwood_pass.png",
+      "relativePath": "backgrounds/thornwood_pass.png",
+      "size": 1547767
+    },
+    {
+      "name": "trade_day.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\trade_day.png",
+      "relativePath": "backgrounds/trade_day.png",
+      "size": 3054394
+    },
+    {
+      "name": "trade_night.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\trade_night.png",
+      "relativePath": "backgrounds/trade_night.png",
+      "size": 3034932
+    },
+    {
+      "name": "training_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\training_ocean.png",
+      "relativePath": "backgrounds/training_ocean.png",
+      "size": 1720026
+    },
+    {
+      "name": "verdant_plains.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\verdant_plains.png",
+      "relativePath": "backgrounds/verdant_plains.png",
+      "size": 1253716
+    },
+    {
+      "name": "void_threshold.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\void_threshold.png",
+      "relativePath": "backgrounds/void_threshold.png",
+      "size": 1338789
+    },
+    {
+      "name": "void_throne.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\void_throne.png",
+      "relativePath": "backgrounds/void_throne.png",
+      "size": 3027722
+    },
+    {
+      "name": "volcanic_battle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\volcanic_battle.png",
+      "relativePath": "backgrounds/volcanic_battle.png",
+      "size": 1495253
+    },
+    {
+      "name": "volcanic_battle_clean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\volcanic_battle_clean.png",
+      "relativePath": "backgrounds/volcanic_battle_clean.png",
+      "size": 1553050
+    },
+    {
+      "name": "volcanic_battle_overlay.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\volcanic_battle_overlay.png",
+      "relativePath": "backgrounds/volcanic_battle_overlay.png",
+      "size": 1358038
+    },
+    {
+      "name": "volcanic_field.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\volcanic_field.png",
+      "relativePath": "backgrounds/volcanic_field.png",
+      "size": 2813639
+    },
+    {
+      "name": "volcanic_vent.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\volcanic_vent.png",
+      "relativePath": "backgrounds/volcanic_vent.png",
+      "size": 1275617
+    },
+    {
+      "name": "wc_blue.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_blue.png",
+      "relativePath": "backgrounds/wc_blue.png",
+      "size": 1817278
+    },
+    {
+      "name": "wc_blue_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_blue_ocean.png",
+      "relativePath": "backgrounds/wc_blue_ocean.png",
+      "size": 1521916
+    },
+    {
+      "name": "wc_gold.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_gold.png",
+      "relativePath": "backgrounds/wc_gold.png",
+      "size": 565409
+    },
+    {
+      "name": "wc_gold_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_gold_ocean.png",
+      "relativePath": "backgrounds/wc_gold_ocean.png",
+      "size": 1492707
+    },
+    {
+      "name": "wc_green.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_green.png",
+      "relativePath": "backgrounds/wc_green.png",
+      "size": 587883
+    },
+    {
+      "name": "wc_green_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_green_ocean.png",
+      "relativePath": "backgrounds/wc_green_ocean.png",
+      "size": 1580121
+    },
+    {
+      "name": "wc_purple.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_purple.png",
+      "relativePath": "backgrounds/wc_purple.png",
+      "size": 542964
+    },
+    {
+      "name": "wc_purple_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_purple_ocean.png",
+      "relativePath": "backgrounds/wc_purple_ocean.png",
+      "size": 1641661
+    },
+    {
+      "name": "wc_red.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_red.png",
+      "relativePath": "backgrounds/wc_red.png",
+      "size": 528704
+    },
+    {
+      "name": "wc_red_ocean.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\wc_red_ocean.png",
+      "relativePath": "backgrounds/wc_red_ocean.png",
+      "size": 1563831
+    },
+    {
+      "name": "whispering_caverns.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\whispering_caverns.png",
+      "relativePath": "backgrounds/whispering_caverns.png",
+      "size": 1176526
+    },
+    {
+      "name": "winter_arena.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\winter_arena.png",
+      "relativePath": "backgrounds/winter_arena.png",
+      "size": 2977620
+    },
+    {
+      "name": "world_map.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\backgrounds\\world_map.png",
+      "relativePath": "backgrounds/world_map.png",
+      "size": 3512965
+    },
+    {
+      "name": "gorgon-lore.html",
+      "ext": ".html",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\content\\play\\gorgon-lore.html",
+      "relativePath": "content/play/gorgon-lore.html",
+      "size": 42890
+    },
+    {
+      "name": "grudabeta.html",
+      "ext": ".html",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\content\\play\\grudabeta.html",
+      "relativePath": "content/play/grudabeta.html",
+      "size": 58147
+    },
+    {
+      "name": "Altar_Idle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\animated\\Altar_Idle.png",
+      "relativePath": "dungeon-crawler/animated/Altar_Idle.png",
+      "size": 1552
+    },
+    {
+      "name": "Altar_Start.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\animated\\Altar_Start.png",
+      "relativePath": "dungeon-crawler/animated/Altar_Start.png",
+      "size": 1409
+    },
+    {
+      "name": "Portal1_Idle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\animated\\Portal1_Idle.png",
+      "relativePath": "dungeon-crawler/animated/Portal1_Idle.png",
+      "size": 2427
+    },
+    {
+      "name": "Portal1_Start.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\animated\\Portal1_Start.png",
+      "relativePath": "dungeon-crawler/animated/Portal1_Start.png",
+      "size": 3376
+    },
+    {
+      "name": "Portal2_Idle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\animated\\Portal2_Idle.png",
+      "relativePath": "dungeon-crawler/animated/Portal2_Idle.png",
+      "size": 2666
+    },
+    {
+      "name": "Portal2_Start.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\animated\\Portal2_Start.png",
+      "relativePath": "dungeon-crawler/animated/Portal2_Start.png",
+      "size": 3621
+    },
+    {
+      "name": "Arrows_4-Types-DiagonalDesign_9x9pixelsEach.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\arrows\\Arrows_4-Types-DiagonalDesign_9x9pixelsEach.png",
+      "relativePath": "dungeon-crawler/arrows/Arrows_4-Types-DiagonalDesign_9x9pixelsEach.png",
+      "size": 196
+    },
+    {
+      "name": "Arrows_4-Types_10x5pixelsEach.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\arrows\\Arrows_4-Types_10x5pixelsEach.png",
+      "relativePath": "dungeon-crawler/arrows/Arrows_4-Types_10x5pixelsEach.png",
+      "size": 166
+    },
+    {
+      "name": "sling_bullets_4-Types_non-outlined_5x5pixelsEach.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\arrows\\sling_bullets_4-Types_non-outlined_5x5pixelsEach.png",
+      "relativePath": "dungeon-crawler/arrows/sling_bullets_4-Types_non-outlined_5x5pixelsEach.png",
+      "size": 138
+    },
+    {
+      "name": "sling_bullets_4-Types_outlined_5x5pixelsEach.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\arrows\\sling_bullets_4-Types_outlined_5x5pixelsEach.png",
+      "relativePath": "dungeon-crawler/arrows/sling_bullets_4-Types_outlined_5x5pixelsEach.png",
+      "size": 160
+    },
+    {
+      "name": "sling_bullet_simpleAnimated_non-outlined_2x2pixelsEach.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\arrows\\sling_bullet_simpleAnimated_non-outlined_2x2pixelsEach.png",
+      "relativePath": "dungeon-crawler/arrows/sling_bullet_simpleAnimated_non-outlined_2x2pixelsEach.png",
+      "size": 92
+    },
+    {
+      "name": "sling_bullet_simpleAnimated_outlined_4x4pixelsEach.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\arrows\\sling_bullet_simpleAnimated_outlined_4x4pixelsEach.png",
+      "relativePath": "dungeon-crawler/arrows/sling_bullet_simpleAnimated_outlined_4x4pixelsEach.png",
+      "size": 118
+    },
+    {
+      "name": "1_1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\1_1.png",
+      "relativePath": "dungeon-crawler/effects/1_1.png",
+      "size": 1434
+    },
+    {
+      "name": "1_2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\1_2.png",
+      "relativePath": "dungeon-crawler/effects/1_2.png",
+      "size": 1525
+    },
+    {
+      "name": "1_3.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\1_3.png",
+      "relativePath": "dungeon-crawler/effects/1_3.png",
+      "size": 1568
+    },
+    {
+      "name": "2_1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\2_1.png",
+      "relativePath": "dungeon-crawler/effects/2_1.png",
+      "size": 1476
+    },
+    {
+      "name": "2_2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\2_2.png",
+      "relativePath": "dungeon-crawler/effects/2_2.png",
+      "size": 1562
+    },
+    {
+      "name": "2_3.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\2_3.png",
+      "relativePath": "dungeon-crawler/effects/2_3.png",
+      "size": 1561
+    },
+    {
+      "name": "3_1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\3_1.png",
+      "relativePath": "dungeon-crawler/effects/3_1.png",
+      "size": 1292
+    },
+    {
+      "name": "3_2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\3_2.png",
+      "relativePath": "dungeon-crawler/effects/3_2.png",
+      "size": 1594
+    },
+    {
+      "name": "3_3.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\3_3.png",
+      "relativePath": "dungeon-crawler/effects/3_3.png",
+      "size": 1690
+    },
+    {
+      "name": "4_1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\4_1.png",
+      "relativePath": "dungeon-crawler/effects/4_1.png",
+      "size": 1253
+    },
+    {
+      "name": "4_2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\4_2.png",
+      "relativePath": "dungeon-crawler/effects/4_2.png",
+      "size": 1275
+    },
+    {
+      "name": "4_3.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\4_3.png",
+      "relativePath": "dungeon-crawler/effects/4_3.png",
+      "size": 1272
+    },
+    {
+      "name": "5_1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\5_1.png",
+      "relativePath": "dungeon-crawler/effects/5_1.png",
+      "size": 1277
+    },
+    {
+      "name": "5_2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\5_2.png",
+      "relativePath": "dungeon-crawler/effects/5_2.png",
+      "size": 1302
+    },
+    {
+      "name": "5_3.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\5_3.png",
+      "relativePath": "dungeon-crawler/effects/5_3.png",
+      "size": 1318
+    },
+    {
+      "name": "6_1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\6_1.png",
+      "relativePath": "dungeon-crawler/effects/6_1.png",
+      "size": 1201
+    },
+    {
+      "name": "6_2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\6_2.png",
+      "relativePath": "dungeon-crawler/effects/6_2.png",
+      "size": 1249
+    },
+    {
+      "name": "6_3.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\6_3.png",
+      "relativePath": "dungeon-crawler/effects/6_3.png",
+      "size": 1264
+    },
+    {
+      "name": "7_1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\7_1.png",
+      "relativePath": "dungeon-crawler/effects/7_1.png",
+      "size": 1248
+    },
+    {
+      "name": "7_2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\7_2.png",
+      "relativePath": "dungeon-crawler/effects/7_2.png",
+      "size": 1591
+    },
+    {
+      "name": "7_3.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\7_3.png",
+      "relativePath": "dungeon-crawler/effects/7_3.png",
+      "size": 1596
+    },
+    {
+      "name": "8_1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\8_1.png",
+      "relativePath": "dungeon-crawler/effects/8_1.png",
+      "size": 1379
+    },
+    {
+      "name": "8_2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\8_2.png",
+      "relativePath": "dungeon-crawler/effects/8_2.png",
+      "size": 1409
+    },
+    {
+      "name": "8_3.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\effects\\8_3.png",
+      "relativePath": "dungeon-crawler/effects/8_3.png",
+      "size": 1399
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\1\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/1/DeathSD.png",
+      "size": 1381
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\1\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/1/DeathSU.png",
+      "size": 1348
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\1\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/1/RunSD.png",
+      "size": 1402
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\1\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/1/RunSU.png",
+      "size": 1377
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\2\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/2/DeathSD.png",
+      "size": 1412
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\2\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/2/DeathSU.png",
+      "size": 1448
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\2\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/2/RunSD.png",
+      "size": 1445
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\2\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/2/RunSU.png",
+      "size": 1381
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\3\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/3/DeathSD.png",
+      "size": 1430
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\3\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/3/DeathSU.png",
+      "size": 1405
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\3\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/3/RunSD.png",
+      "size": 1552
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\3\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/3/RunSU.png",
+      "size": 1528
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\4\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/4/DeathSD.png",
+      "size": 1241
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\4\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/4/DeathSU.png",
+      "size": 1234
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\4\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/4/RunSD.png",
+      "size": 1295
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\4\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/4/RunSU.png",
+      "size": 1263
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\5\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/5/DeathSD.png",
+      "size": 1392
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\5\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/5/DeathSU.png",
+      "size": 1349
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\5\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/5/RunSD.png",
+      "size": 1459
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\5\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/5/RunSU.png",
+      "size": 1420
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\6\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/6/DeathSD.png",
+      "size": 1377
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\6\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/6/DeathSU.png",
+      "size": 1379
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\6\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/6/RunSD.png",
+      "size": 1448
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\6\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/6/RunSU.png",
+      "size": 1434
+    },
+    {
+      "name": "AttackSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\bandit\\AttackSD.png",
+      "relativePath": "dungeon-crawler/enemies/bandit/AttackSD.png",
+      "size": 9931
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\bandit\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/bandit/DeathSD.png",
+      "size": 5420
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\bandit\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/bandit/DeathSU.png",
+      "size": 5420
+    },
+    {
+      "name": "RunLeft.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\bandit\\RunLeft.png",
+      "relativePath": "dungeon-crawler/enemies/bandit/RunLeft.png",
+      "size": 6639
+    },
+    {
+      "name": "RunRight.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\bandit\\RunRight.png",
+      "relativePath": "dungeon-crawler/enemies/bandit/RunRight.png",
+      "size": 6577
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\bandit\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/bandit/RunSD.png",
+      "size": 6704
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\bandit\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/bandit/RunSU.png",
+      "size": 6240
+    },
+    {
+      "name": "Boom1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\Boom1.png",
+      "relativePath": "dungeon-crawler/enemies/Boom1.png",
+      "size": 1611
+    },
+    {
+      "name": "Boom2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\Boom2.png",
+      "relativePath": "dungeon-crawler/enemies/Boom2.png",
+      "size": 1574
+    },
+    {
+      "name": "DropPod1.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\DropPod1.png",
+      "relativePath": "dungeon-crawler/enemies/DropPod1.png",
+      "size": 1160
+    },
+    {
+      "name": "DropPod2.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\DropPod2.png",
+      "relativePath": "dungeon-crawler/enemies/DropPod2.png",
+      "size": 1157
+    },
+    {
+      "name": "Dust.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\Dust.png",
+      "relativePath": "dungeon-crawler/enemies/Dust.png",
+      "size": 848
+    },
+    {
+      "name": "attack.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\attack.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/attack.png",
+      "size": 27934
+    },
+    {
+      "name": "AttackSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\AttackSD.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/AttackSD.png",
+      "size": 9835
+    },
+    {
+      "name": "death.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\death.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/death.png",
+      "size": 26713
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/DeathSD.png",
+      "size": 5626
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/DeathSU.png",
+      "size": 5626
+    },
+    {
+      "name": "idle.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\idle.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/idle.png",
+      "size": 24179
+    },
+    {
+      "name": "run.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\run.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/run.png",
+      "size": 28220
+    },
+    {
+      "name": "RunLeft.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\RunLeft.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/RunLeft.png",
+      "size": 6040
+    },
+    {
+      "name": "RunRight.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\RunRight.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/RunRight.png",
+      "size": 6009
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/RunSD.png",
+      "size": 7114
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\goblin\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/goblin/RunSU.png",
+      "size": 6362
+    },
+    {
+      "name": "Icon_01.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\icons\\Icon_01.png",
+      "relativePath": "dungeon-crawler/enemies/icons/Icon_01.png",
+      "size": 379
+    },
+    {
+      "name": "Icon_02.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\icons\\Icon_02.png",
+      "relativePath": "dungeon-crawler/enemies/icons/Icon_02.png",
+      "size": 430
+    },
+    {
+      "name": "Icon_03.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\icons\\Icon_03.png",
+      "relativePath": "dungeon-crawler/enemies/icons/Icon_03.png",
+      "size": 368
+    },
+    {
+      "name": "Icon_04.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\icons\\Icon_04.png",
+      "relativePath": "dungeon-crawler/enemies/icons/Icon_04.png",
+      "size": 358
+    },
+    {
+      "name": "Icon_05.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\icons\\Icon_05.png",
+      "relativePath": "dungeon-crawler/enemies/icons/Icon_05.png",
+      "size": 384
+    },
+    {
+      "name": "Icon_06.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\icons\\Icon_06.png",
+      "relativePath": "dungeon-crawler/enemies/icons/Icon_06.png",
+      "size": 355
+    },
+    {
+      "name": "AttackSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_archer\\AttackSD.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_archer/AttackSD.png",
+      "size": 7819
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_archer\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_archer/DeathSD.png",
+      "size": 5918
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_archer\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_archer/DeathSU.png",
+      "size": 5918
+    },
+    {
+      "name": "RunLeft.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_archer\\RunLeft.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_archer/RunLeft.png",
+      "size": 6340
+    },
+    {
+      "name": "RunRight.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_archer\\RunRight.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_archer/RunRight.png",
+      "size": 6555
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_archer\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_archer/RunSD.png",
+      "size": 7173
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_archer\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_archer/RunSU.png",
+      "size": 6374
+    },
+    {
+      "name": "AttackSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_wizard\\AttackSD.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_wizard/AttackSD.png",
+      "size": 10128
+    },
+    {
+      "name": "DeathSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_wizard\\DeathSD.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_wizard/DeathSD.png",
+      "size": 5972
+    },
+    {
+      "name": "DeathSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_wizard\\DeathSU.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_wizard/DeathSU.png",
+      "size": 5972
+    },
+    {
+      "name": "RunLeft.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_wizard\\RunLeft.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_wizard/RunLeft.png",
+      "size": 7325
+    },
+    {
+      "name": "RunRight.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_wizard\\RunRight.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_wizard/RunRight.png",
+      "size": 7371
+    },
+    {
+      "name": "RunSD.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_wizard\\RunSD.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_wizard/RunSD.png",
+      "size": 7284
+    },
+    {
+      "name": "RunSU.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\skeleton_wizard\\RunSU.png",
+      "relativePath": "dungeon-crawler/enemies/skeleton_wizard/RunSU.png",
+      "size": 6279
+    },
+    {
+      "name": "Target.png",
+      "ext": ".png",
+      "fullPath": "F:\\RPG-MODULAR\\RPG-MODULAR\\public\\dungeon-crawler\\enemies\\Target.png",
+      "relativePath": "dungeon-crawler/enemies/Target.png",
+      "size": 1097
+    }
+  ],
+  "sampleExtractedFiles": []
+}

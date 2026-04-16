@@ -1,0 +1,18 @@
+{
+  "scope": "archives",
+  "fileCount": 131,
+  "totalBytes": 1857090064,
+  "byExt": {
+    ".zip": 130,
+    ".rar": 1
+  },
+  "byCategory": {
+    "characters": 36,
+    "weapons": 5,
+    "misc": 32,
+    "effects": 29,
+    "ui": 13,
+    "environment": 15,
+    "audio": 1
+  }
+}

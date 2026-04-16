@@ -1,6 +1,4 @@
 const VIDEOS = [
-  '/videos/bg-clear.mp4',
-  '/videos/bg-blur.mp4',
   '/images/loading.gif',
 ];
 
@@ -34,6 +32,7 @@ function loadVideo(src) {
       resolve(videoCache[src]);
       return;
     }
+    let resolved = false;
     const video = document.createElement('video');
     video.muted = true;
     video.loop = true;
@@ -42,6 +41,8 @@ function loadVideo(src) {
     video.src = src;
 
     const done = () => {
+      if (resolved) return;
+      resolved = true;
       videoCache[src] = video;
       resolve(video);
     };
@@ -50,7 +51,7 @@ function loadVideo(src) {
     video.addEventListener('error', done, { once: true });
     video.load();
 
-    setTimeout(done, 8000);
+    setTimeout(done, 3000);
   });
 }
 
@@ -60,8 +61,11 @@ function loadImage(src) {
       resolve(imageCache[src]);
       return;
     }
+    let resolved = false;
     const img = new Image();
     const done = () => {
+      if (resolved) return;
+      resolved = true;
       imageCache[src] = img;
       resolve(img);
     };
@@ -69,7 +73,7 @@ function loadImage(src) {
     img.onerror = done;
     img.src = src;
 
-    setTimeout(done, 8000);
+    setTimeout(done, 3000);
   });
 }
 

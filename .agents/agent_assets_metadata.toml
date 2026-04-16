@@ -1,0 +1,140 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Cmx-Xgn_XMLj913qsFVir"
+uri = "file://public/sprites/grudge-box/poses/raze_high.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Ly-Z5fN0FkmaWPlBk8tD-"
+uri = "file://public/sprites/grudge-box/poses/raze_low.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "JfDZIibHT2TTDIQcTIE6_"
+uri = "file://public/sprites/grudge-box/poses/volt_high.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "zgu3yNVa12-py6rznXLc0"
+uri = "file://public/sprites/grudge-box/poses/volt_low.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "T2-XVSqoMf-nUdCsXsQr-"
+uri = "file://public/sprites/grudge-box/poses/venom_high.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "UpK5A56fLlJgsJSPioiSK"
+uri = "file://public/sprites/grudge-box/poses/venom_low.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Cq-efadIaRzejS7Z9MseZ"
+uri = "file://public/sprites/grudge-box/poses/wraith_high.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "iCE2QUemYkevdKPla9IZ2"
+uri = "file://public/sprites/grudge-box/poses/wraith_low.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "6tAT9J-9bMefG33BDNPF-"
+uri = "file://public/sprites/grudge-box/poses/blitz_high.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "qZiDrLDuKd6VAUIET3Arc"
+uri = "file://public/sprites/grudge-box/poses/blitz_low.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "9w0gglfQYITO7NJlzzmtD"
+uri = "file://public/sprites/grudge-box/poses/shade_high.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ZPV0ZApecY1L9oG89KRhs"
+uri = "file://public/sprites/grudge-box/poses/shade_low.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "zegjmr2QMOQmungGh6MXt"
+uri = "file://public/sprites/grudge-box/poses/ghost_high.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "q9rASfVQ38wHJWcy9RibW"
+uri = "file://public/sprites/grudge-box/poses/ghost_low.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "IMj9aOOwZox2AGDieEqiD"
+uri = "file://public/sprites/grudge-box/poses/surge_high.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "PXeD24a5WEMtqvhXcwJUe"
+uri = "file://public/sprites/grudge-box/poses/surge_low.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "sdE4aGSMXrtf8pCXemOET"
+uri = "file://public/sprites/grudge-box/ui/menu_bg.png"
+type = "image"
+title = "cyberpunk boxing menu background"
+
+[[generated]]
+id = "KJ7fqhvxLuls4K_OP_hrM"
+uri = "file://public/sprites/grudge-box/ui/select_bg.png"
+type = "image"
+title = "fighter select screen background"
+
+[[generated]]
+id = "G0cRGOW3-Q92qPrDcgOq_"
+uri = "file://public/sprites/grudge-box/ui/stage_pit.png"
+type = "image"
+title = "The Pit stage preview"
+
+[[generated]]
+id = "LyAg6MPtcR3odOWBqdRi0"
+uri = "file://public/sprites/grudge-box/ui/stage_skyline.png"
+type = "image"
+title = "Skyline stage preview"
+
+[[generated]]
+id = "L4KHi4eIk2a1E7q6wQFiA"
+uri = "file://public/sprites/grudge-box/ui/stage_alley.png"
+type = "image"
+title = "Back Alley stage preview"
+
+[[generated]]
+id = "HsNvy5uP_gbkcEODmCv1d"
+uri = "file://public/sprites/grudge-box/ui/stage_arena.png"
+type = "image"
+title = "Grand Arena stage preview"
+
+[[generated]]
+id = "MXBKLzIoWeoQG-FXp7mSK"
+uri = "file://public/sprites/grudge-box/ui/stage_factory.png"
+type = "image"
+title = "Iron Works stage preview"

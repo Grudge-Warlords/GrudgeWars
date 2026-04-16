@@ -1,0 +1,18 @@
+{
+  "bucket": "grudge-studio",
+  "basePublicUrl": "https://assets.grudge-studio.com",
+  "apiBase": "/api/assets",
+  "namespaces": {
+    "public": "public/*",
+    "archives": "archives/attached/*",
+    "extracted": "attached/extracted/*",
+    "manifests": "manifests/*"
+  },
+  "localRoots": {
+    "public": "public",
+    "attached": "attached_assets",
+    "extracted": "storage/extracted/attached",
+    "manifests": "storage/manifests",
+    "uploads": "storage/uploads"
+  }
+}

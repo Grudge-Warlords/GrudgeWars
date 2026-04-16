@@ -111,10 +111,11 @@ The game uses Grudge Studios login systems. Three auth methods, all producing a 
 ### Key Directories
 ```
 src/components/     — React components (TitleScreen, BattleScreen, WorldMap, LobbyScreen, etc.)
-src/stores/         — Zustand game store (gameStore.js)
-src/data/           — Game data (spriteMap, lore, chapters, skills, heroBestItems, classDefinitions)
-src/utils/          — Utilities (puterService, aiDialogueService, audio)
+src/stores/         — Zustand game store (gameStore.js ~2873 lines)
+src/data/           — Game data (spriteMap, lore, chapters, skills, heroBestItems, classDefinitions, spriteConstants.js, spriteRegistry.js)
+src/utils/          — Utilities (puterService, aiDialogueService, audio, battleLogic.js)
 src/hooks/          — Custom hooks (usePuterAI)
+src/factory/data/   — Factory game data (factoryBattleSprites.js, objectStoreService.js)
 public/images/      — All game art assets
   /races/           — 8 betta breed sprites
   /enemies/         — 30+ enemy sprites
@@ -123,9 +124,34 @@ public/images/      — All game art assets
   /attributes/      — 8 attribute icons
   /spell_icons/     — Painterly skill/spell icons
   /skills/          — Skill tree icons
+public/sprites/     — 147 sprite directories + loose resource sprites (trees, rocks, wheat, etc. used by WorldMap.jsx)
 public/backgrounds/ — Battle background images (12+)
 public/game-index.html — Standalone promotional landing page (NOT React)
 ```
+
+### Battle Logic Module (`src/utils/battleLogic.js`)
+Extracted from gameStore.js for maintainability and testability. Contains all pure battle computation helpers:
+- `createHeroBattleUnit(hero)` — Builds a battle-ready unit from hero data with stats, abilities, passive procs
+- `calculateAttackDamage(attacker, defender, ability)` — Full damage pipeline (evasion, defense, crits, blocks, drain, row modifiers)
+- `applyEffectToTarget(target, effect, sourceName, log)` — Applies status effects (DOTs, stun, sleep, confuse, debuffs)
+- `applyPassiveProcs(attacker, target, result, log, ability)` — Triggers passive skill procs (extra attacks, random debuffs, multi-DOTs)
+- `chooseAIAction(unit, allUnits)` — AI decision-making for auto-fight (heals, buffs, transforms, attacks, row movement)
+- `getFormationPositions(count, side)` — Formation layout positions for player/enemy teams
+- `assignRowsAndPositions(playerTeam, enemyUnits)` — Assigns tactical rows and visual positions
+- `recalcRowPositions(units)` — Recalculates positions after unit deaths
+- `getHeroStatsWithBonuses(hero)` — Computes hero stats with skill/equipment/enchant/best-item bonuses
+- `getHeroSkillBonuses(hero)` — Extracts stat bonuses from unlocked skill tree nodes
+- `getSkillTreeAbilities(hero)` — Gets granted abilities from skill tree progression
+- `floorTo2(n)` — Utility for 2-decimal floor
+
+### Shared Sprite Constants (`src/data/spriteConstants.js`)
+Single source of truth for sprite paths and frame dimensions used by both `spriteRegistry.js` and `factoryBattleSprites.js`:
+- `SPRITE_BASE_PATH` — Base path `/sprites`
+- `FRAME_SIZES` — Standard dimensions (STANDARD 100x100, SMALL 48x48, MEDIUM 72x72, LARGE 96x96, HERO 128x96, etc.)
+- `SPRITE_CATEGORIES`, `SPRITE_GENRES`, `SPRITE_TYPES` — Enum constants
+- `HERO_FOLDERS`, `FANTASY_ENEMY_FOLDERS`, `SCIFI_ENEMY_FOLDERS`, etc. — Folder name lists
+- `STAGE_BACKGROUNDS`, `GRUDGE_BOX_PORTRAIT_PATH`, `GRUDGE_BOX_FIGHTER_PATH` — Grudge Box asset paths
+- `spritePath(folder)`, `spriteAnimPath(folder, animFile)` — Path builder utilities
 
 ### Screen Flow
 Title Screen → Intro Cinematic → Game Lobby → Character Creation → World Map → Location Views → Battle Screens. Farewell screen on logout.
@@ -234,6 +260,27 @@ Title Screen → Intro Cinematic → Game Lobby → Character Creation → World
 - **Harvest Resources:** Coral, shells, algae, crystals
 - **Reef Hunt Mini-game:** Canvas-based collecting/harvesting mini-game
 
+### Crypt Crawlers (`/dungeon-crawler`)
+- **Component:** `src/components/DungeonCrawler.jsx` — single-file canvas game
+- **Map Generation:** BSP-based room placement on 70×70 grid, room sizes 5-14 tiles, 2-3 tile wide corridors with extra connectivity links
+- **Equipment System:** 3 slots (Body, Lower, Weapon), each providing 2 skills to the hotbar
+  - Body (skills 1-2): Tattered Vest / Chain Mail / Plate Armor
+  - Lower (skills 3-4): Worn Boots / Greaves / Shadow Treads
+  - Weapon (skills 5-6): Dagger / Broadsword / War Axe / Arcane Staff / Longbow / Shadow Cannon
+  - Each weapon also has a right-click Special ability
+- **Hotkeys:** 1-6 skills, 7 items, 8/Tab equipment panel, 9/Esc pause, LMB primary attack (skill 5), RMB weapon special
+- **Skill Types:** melee, melee_arc, ranged, ranged_multi, ranged_burst, aoe, ground_aoe, aoe_proj, dash, dash_atk, teleport, heal, buff, shield, speed, dot, spin
+- **Equipment Drops:** Enemies drop equipment (12% chance) and potions (20% chance) on death, tier scales with floor
+- **Enemies:** 6 types (Slime, Skeleton, Goblin, Demon, Wraith, Dragon) with HP scaling per floor, poison/stun support
+- **Traps:** Spikes (periodic), Lightning (periodic), Barrels (proximity-triggered AOE, damages enemies too)
+- **Buffs:** Speed, Defense, Damage multiplier, Shield (absorb HP)
+- **Assets:** `public/dungeon-crawler/` — hero, enemies, tiles (40), weapons (9), projectiles (22), traps, effects, XP items, portals
+- **GUI Assets:** CraftPix cyberpunk pack at `gui/cyberpunk/` (82 frames, 20 skill icons, 8 health + 8 energy bars, 4 cursors, number sprites, 10 button sets, pixel font)
+- **GUI Assets:** RPG UI4 pack at `gui/rpg/` (action bar, unit frames, tooltips, windows)
+- **UI Data:** `src/data/uiPacks.js` — registry of GUI packs for AI builder reference
+- **Custom Assets:** `gui/crypt-logo.png` (horned helmet logo), `gui/crosshair.png` (custom cursor)
+- **Visual Effects:** Projectile trails, AOE zone rendering, slash/smoke VFX, enemy poison/stun tinting, shield glow, trap indicators, loot glow, damage numbers
+
 ### Chapter System
 - 8 chapters following Three Vessels narrative arc
 - Objectives: create heroes, explore zones, defeat bosses, unlock skills
@@ -282,8 +329,113 @@ Title Screen → Intro Cinematic → Game Lobby → Character Creation → World
 - Sprite sheets: vertical strips → convert to horizontal for SpriteAnimation
 - Card art: `public/images/cards/` with vessel-aligned color variants (blue/green/red)
 
+### Game Factory Sprite System (`public/sprites/`)
+147 sprite directories organized by category. Managed via `src/factory/data/factoryBattleSprites.js` (imports `SPRITE_BASE_PATH` from `src/data/spriteConstants.js`).
+
+**Sprite Resolution Flow:** Enemy name → keyword matching → sprite category → game-specific pool → resolved sprite data with frame dimensions and animation sources.
+
+**Helper Functions:**
+- `make(folder, opts)` — Standard lowercase filenames (idle.png, attack1.png, etc.)
+- `makeCP(folder, opts)` — CraftPix capitalized filenames (Idle.png, Attack.png, etc.)
+- `makeBoss72(folder, prefix, opts)` — 72px fantasy boss format (Prefix_idle.png)
+- `makeMine48(folder, prefix, opts)` — 48px mine enemy format (Prefix_attack.png)
+- `makeCP48/makeCP96` — CraftPix shortcuts at specific frame sizes
+
+**Shadow Knights (Fantasy) Enemy Sprites:**
+- Defaults: skeleton, skeleton-archer, armored-skeleton, greatsword-skeleton, evil-wizard, werewolf, slime
+- Mine creatures (48px): wisp, mimic, bear, spider, toadman, toadman-voodoo
+- Demon invasion (48px): event-boss (Summoner), minions (Demon1)
+- Ruin bosses (72px): ancient, wild-boar, viking
+- Desert bosses (72px): anubis, manticore, revived-statue
+- Snow bosses (72px): ancient-mech, frost-ooze, magic-bear
+- Original boss: boss-demon (288x160px)
+
+**Starbound Corsairs (Sci-fi) Enemy Sprites:**
+- Defaults: orc, arcane-archer, armored-orc, crystal-mauler, barbarian-mage, slime
+- Cyber police (48px): officer, sergeant, chef, patrol, drone, cannon
+- Gang members (48px): brigand, shooter, wallbreaker, shockbot, battledrone, stepper-cannon
+- Battle mechas (96px): scout, assault, heavy
+- Street bosses (96px): brawler, pyro, bomber (use Attack1.png)
+- Lab bosses (72px): mutant, cyborg, mech (use Capitalized filenames)
+- Original boss: frost-guardian (192x128px)
+
+**Underwater Sprites (Betta Warlords future use):**
+- Sea creatures (48px): eel, crab, archer, jellyfish, anglerfish, shark
+- Sea bosses (96px): kraken, leviathan
+
+**VFX Sprites:** slash, fire, fire_anim, flame_small, ice, poison, lightning, heal, shield, magic, explosion, bomb, blood, spark
+
+**Keyword Mapping:** enemyNameKeywords maps ~60+ keywords to sprite categories. bossKeywords provides game-specific boss sprite selection.
+
+**Cyberpunk Skill Icons:** 560 icons at `public/sprites/ui/cyber-icons/` (32x32, Skillicon{1-14}_{01-40}.png), 15 frames at `public/sprites/ui/cyber-frames/`
+
 ### Auth Best Practices
 - Always check `isPuterAvailable()` before showing Puter buttons
 - Handle all three auth paths (Discord/Puter/Guest) gracefully
 - `grudge-session` is the single source of truth for current user
 - Clean up session on logout from both localStorage and Puter
+
+## 3D Motion Reference Repo (3dmotion)
+
+Cloned at `/tmp/3dmotion` from `github.com/MolochDaGod/3dmotion.git`. A pnpm monorepo containing:
+
+### Artifacts
+- **zombie-shooter** — React Three Fiber (R3F) + Rapier physics survival shooter. Full 3D game with TPS/FPS/action camera modes, 7 weapon types (pistol/rifle/sword/axe/staff/bow/shield), 4 skills per weapon, magic spell system, A* navmesh zombie AI, combo melee, dodge/roll, crouch, terrain heightfield, graveyard environment with 21 ruin props, post-processing (Bloom/Vignette/DOF/ChromaticAberration).
+- **grudge-pipeline** — Meshy AI Studio for 3D character generation pipeline.
+- **mockup-sandbox** — Component mockup previews.
+- **api-server** — Shared Express 5 backend with PostgreSQL + Drizzle ORM.
+
+### Key 3D Assets (in zombie-shooter/public/models/)
+- `mutant.gltf` + `mutant.bin` + `mutant.jpg` — Mutant enemy model with animations: idle, running, punch, punchStart, punchEnd, fist, jumpAttack, jumpAttackStart, jumpAttackEnd, dash, hit, knockDown, jump
+- `character/corsair-king.fbx` — Player character mesh (Mixamo-compatible rig)
+- `environment/boss.glb` + `boss.png` — Boss creature model
+- `animations/` — FBX animation packs: pistol (15 clips), rifle (12), melee (14 + combos), staff (12), bow (16), shield-sword (12), shared (dodge/react/fall)
+- `props/weapons/` — FBX weapon meshes: sword, axe, pistol, rifle, bow, shield, staff variants
+- `graveyard/fbx/` — 21 ruin prop models + texture atlas
+- `rifle8way/` — 8-directional rifle animations
+
+### Architecture Patterns (for future 3D game work)
+1. **R3F + Rapier stack**: `@react-three/fiber`, `@react-three/rapier`, `@react-three/drei`, `@react-three/postprocessing`
+2. **Collision layers**: Bitmask groups (WORLD=0x1, PLAYER=0x2, ZOMBIE=0x4, PROJECTILE=0x8) with `interactionGroups(membership, filter)` helper
+3. **Capsule collider**: `CapsuleCollider` + `KinematicPositionBased` for player controller
+4. **Zombie AI**: Rapier sensor sphere for aggro detection (no physics push), A* navmesh pathfinding via Web Worker, state machine (idle→wander→run→attack→hit→dead)
+5. **fadeToAction pattern**: `prev.fadeOut(fadeIn); action.reset().setEffectiveTimeScale(ts).setEffectiveWeight(1).fadeIn(fadeIn).play()`
+6. **Animation finish → FSM**: `mixer.addEventListener('finished', onFinished)` drives state transitions
+7. **Weapon bone tracking**: Attach Object3D to weapon-tip bone, `getWorldPosition`/`getWorldQuaternion` every frame for hitbox sync
+8. **Zustand stores**: useGameStore (game state, camera, weapons, spells), useCharacterStore (stats/progression), useEditorStore (debug), useSettingsStore (quality presets)
+9. **Weapon config registry**: Centralized `WEAPON_CONFIGS` record with damage, attackSpeed, range, hitArc, knockback, combo, projectile, trail, camera shake per weapon
+10. **Skill system**: 4 skills per weapon, each with animation, cooldown, manaCost, damage, range, arcDeg, hitShape (capsule/sphere/ray), effect type
+11. **Asset manifest**: Single `manifest.ts` centralizes all public-folder asset paths
+
+## Dungeon Generator Reference (Adrian104/Dungeon-Generator)
+
+Cloned at `/tmp/dungeon-generator` from `github.com/Adrian104/Dungeon-Generator.git`. A C++17 BSP-based procedural 2D dungeon generator library, MIT licensed.
+
+### Algorithm Pipeline
+1. **BSP Tree** — Recursively divides map space into binary cells. Splits along longest axis with configurable randomness (`m_spaceSizeRandomness`). Produces `Tag` objects at cell corners.
+2. **Room Placement** — Places rooms within leaf cells. Supports double rooms (L-shaped/T-shaped) via `m_doubleRoomProb`. Sparse areas reduce room density (`m_sparseAreaDens/Prob/Depth`).
+3. **Vertex Graph** — Combines `Tag` objects into `Vertex` nodes with 4-directional links (N/E/S/W). Uses radix sort on tag positions for efficient merge.
+4. **A* Pathfinding** — Traverses BSP tree postorder, connecting rooms in sibling cells via A* on the vertex graph. Extra paths via `m_extraPathCount/Depth`. Heuristic: Euclidean distance × `m_heuristicFactor`. Path cost reduction via `m_pathCostFactor`.
+5. **Vertex Optimization** — Removes unused vertices, merges pass-through vertices (straight E-W or N-S paths) to reduce output size.
+6. **Output** — `rooms[]` (Rect: x,y,w,h), `entrances[]` (Point: x,y), `paths[]` (start Point + shift Vec).
+
+### Key Input Parameters
+- `m_seed` — xoshiro256+ PRNG (seeded via SplitMix64)
+- `m_width/height` — Map dimensions (e.g. 800×800)
+- `m_minDepth/maxDepth` — BSP recursion depth (e.g. 7-8 → ~128-256 leaf cells)
+- `m_minRoomSize/maxRoomSize` — Room size as fraction of cell (0.45-0.75)
+- `m_doubleRoomProb` — Probability of L/T-shaped composite rooms (0.35)
+- `m_sparseAreaDepth/Dens/Prob` — Room density reduction in certain BSP branches
+- `m_heuristicFactor/pathCostFactor` — A* tuning for path generation
+- `m_extraPathCount/Depth` — Additional cross-branch connections
+- `m_generateFewerPaths` — Optimize away redundant corridors
+- `m_spaceInterdistance` — Corridor width spacing
+
+### Relevance to Crypt Crawlers
+Our Crypt Crawlers game already uses BSP dungeon generation. This reference provides a more sophisticated implementation with:
+- Double/composite rooms (L-shaped structures)
+- Sparse area density control
+- A* pathfinding between rooms (vs our simpler corridor carving)
+- Vertex graph optimization to minimize corridor geometry
+- Seed-based deterministic generation
+- Configurable heuristic and path cost factors for varied dungeon layouts

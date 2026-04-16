@@ -1,0 +1,12 @@
+name = "rpg-maker-studio-proxy"
+main = "worker.js"
+compatibility_date = "2026-04-01"
+
+# The route is configured in the Cloudflare dashboard:
+#   Pattern: grudge-studio.com/rpg-maker-studio*
+#   Zone:    grudge-studio.com
+#
+# Alternatively, uncomment and fill in your zone_id:
+# [routes]
+# pattern = "grudge-studio.com/rpg-maker-studio*"
+# zone_id = "<YOUR_ZONE_ID>"

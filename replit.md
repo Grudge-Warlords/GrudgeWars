@@ -1,77 +1,178 @@
-# Betta Warlords
+# Grudge Studios Gaming Platform
 
 ## Overview
-Betta Warlords is an underwater freshwater adventure turn-based RPG built using React, Vite, and Zustand. It features multi-hero tactical battles with betta fish species, allowing players to create and manage a roster of heroes from 8 betta fish species and 4 classes, offering 32 unique Warlord combinations. The game is set in a vast underwater freshwater world with root groves, deep trenches, volcanic vents, and frozen depths. The project aims to provide a rich, immersive gaming experience with a unique aquatic theme and strategic combat. Bettas are freshwater fish — all world-building uses lake/river/freshwater terminology, never ocean/saltwater.
+Grudge Studios is a multi-game browser gaming platform built with React 19, Vite, and Zustand. The flagship title is **Betta Warlords**, a turn-based RPG set in an underwater freshwater world with tactical battles featuring multi-hero teams of unique Betta fish. The project serves as the exclusive entry point to Grudge Studios' universal currency (GBuX), compressed NFT (cNFT) breeding, and underlying infrastructure. It also includes the "Game Factory," an AI-powered RPG generator. The platform hosts 6 playable mini-games, a social hub, avatar designer, and an integrated Discord bot.
 
 ## User Preferences
-I want the agent to use clear and concise language. I prefer iterative development with small, testable changes. Before making any significant architectural changes or adding new external dependencies, please ask for my approval. Ensure all code adheres to modern React practices and maintains a consistent styling approach.
+- Clear and concise language. Iterative development with small, testable changes.
+- Ask before significant architectural changes or adding new external dependencies.
+- Modern React practices, consistent styling. Do NOT use `public/logo.png` — use `/grudge-logo.png`.
+- Colors: #050a18, #06b6d4, #22d3ee, #a855f7, #f59e0b, #ef4444. Fonts: Cinzel/Jost/MedievalSharp.
+
+## Project Structure
+```
+/
+├── src/
+│   ├── App.jsx                    # Root router (path-based, no react-router)
+│   ├── main.jsx                   # React DOM entry
+│   ├── index.css                  # Global styles + CSS variables
+│   ├── components/
+│   │   ├── games/                 # 6 standalone game components
+│   │   │   ├── ShadowOps.jsx      # Top-down survival shooter
+│   │   │   ├── GrudgeFootsies.jsx # 1v1 fighting game
+│   │   │   ├── GrudgeBox.jsx      # GKO Boxing
+│   │   │   ├── DungeonCrawler.jsx # Crypt Crawlers
+│   │   │   ├── PlatformRunner.jsx # Warlord's Gauntlet
+│   │   │   └── ReefHuntMiniGame.jsx # Grove Hunt
+│   │   ├── landing/               # Landing page, title screen, video, cinematic
+│   │   ├── battle/                # RPG battle system
+│   │   ├── character/             # Character creation, sheets, skill trees
+│   │   ├── map/                   # World map, locations, scenes
+│   │   ├── social/                # Social hub, Discord auth, arena, account
+│   │   ├── avatar/                # Avatar designer (pixel art engine)
+│   │   ├── crafting/              # Crafting, training
+│   │   ├── ui/                    # Shared UI (header, tooltips, error boundary, settings)
+│   │   ├── admin/                 # Admin tools (sprite viewer, map, battle debug)
+│   │   ├── sprites/               # Sprite animation components
+│   │   └── lore/                  # Lore & dialogue system
+│   ├── data/                      # Game data, effect sprites, UI sprites
+│   │   └── effectSprites.js       # Shared sprite effect system (40+ effect types)
+│   ├── engine/                    # PixiJS rendering engine
+│   ├── factory/                   # Game Factory (AI RPG generator)
+│   ├── hooks/                     # Custom React hooks (useRouteSync, etc.)
+│   ├── providers/                 # Context providers
+│   ├── services/                  # Backend services (gbuxService, etc.)
+│   ├── stores/                    # Zustand stores (gameStore)
+│   └── utils/                     # Asset manager, helpers
+├── server.js                      # Express backend (Discord bot, GBuX API, port 3001)
+├── public/                        # Static assets
+│   ├── sprites/                   # RPG sprites (characters, emblems, enemies)
+│   │   └── shadow-ops/            # Shadow Ops player/enemy sprite sheets
+│   ├── effects/                   # VFX sprite frames (500+ PNGs)
+│   ├── footsies/                  # Grudge Footsies sprite sheets
+│   ├── dungeon-crawler/           # Crypt Crawlers assets (sprites, sounds, tilesets)
+│   ├── platformer/                # Warlord's Gauntlet assets (heroes, enemies, fx)
+│   ├── audio/                     # Music and sound effects
+│   ├── backgrounds/               # Background images
+│   ├── images/                    # UI images, loading screens
+│   ├── icons/                     # UI icons
+│   ├── videos/                    # Intro/cinematic videos
+│   ├── ui/                        # UI sprite sheets
+│   └── grudge-logo.png            # Primary logo (use this, not logo.png)
+├── vite.config.js                 # Vite config (SPA, proxy /api to :3001)
+├── vite.config.puter.js           # Alternate Vite config for Puter deployment
+└── package.json                   # Dependencies and scripts
+```
+
+## Routes
+| Path | Component | Type |
+|------|-----------|------|
+| `/` | LandingPage | Landing |
+| `/play` | GameApp (RPG) | Fullscreen |
+| `/shadow-ops` | ShadowOps | Fullscreen game |
+| `/grudge-footsies` | GrudgeFootsies | Fullscreen game |
+| `/gko-boxing` or `/grudge-box` | GrudgeBox | Fullscreen game |
+| `/dungeon-crawler` | DungeonCrawler | Fullscreen game |
+| `/warlords-gauntlet` | PlatformRunner | Fullscreen game |
+| `/avatar` | AvatarDesigner | Fullscreen |
+| `/social` | SocialHub | Standard |
+| `/arena` | ArenaPage | Standard |
+| `/crafting` | CraftingPage | Standard |
+| `/factory` | FactoryWizard | Standard |
+| `/gbux` | GBuxPage | Standard |
+| `/demo/shadow-knights` | DemoGame | Standard |
+| `/demo/starbound-corsairs` | DemoGame | Standard |
+| `/discordauth` | DiscordAuth | No header |
+| `/admin*` | Admin tools | No header |
 
 ## System Architecture
-The application is a React 19 frontend developed with Vite, with an Express backend (server.js) for Discord OAuth and API routes. State management uses a single Zustand store. Styling primarily utilizes inline styles and CSS variables, with a responsive design system supporting multiple breakpoints for mobile playability. Deployment uses autoscale with `server.prod.js` serving both API and static build from `dist/`.
+**Frontend:** React 19 + Vite (SPA, client-side routing via `window.location.pathname`). Zustand for state management. Inline styles + CSS variables. Games are lazy-loaded with `React.lazy()` + `Suspense`.
 
-**UI/UX Decisions:**
-- **Theme:** Underwater freshwater world with betta fish characters, using a color palette of Teal, Cyan, Purple, and Deep Blue.
-- **Typography & Visuals:** Uses Cinzel (headings) and Jost (body) fonts. Features pixel art sprites with smooth bobbing animations, particle and beam effects, a 2D world map with zoom/pan, parallax backgrounds in mini-games, and painterly spell icons. UI elements include an ornate game frame, custom RPG bottom bar, and class-specific buff overlays.
-- **Screen Flow:** Landing Page (`/` — Game Factory engine showcase with Grudge Studios branding, "Create Your Game" and "Play Betta Warlords" CTAs) → Game Factory (`/factory` — 6-step wizard) OR Betta Warlords (`/play` — Title Screen → Intro Cinematic → Game Lobby → Character Creation → World Map → Location Views → Battle Screens). A farewell screen is displayed on logout.
-- **Mobile Responsiveness:** Fully playable on mobile dimensions (360px-480px+) with optimized components and touch targets.
+**Backend:** Express server on port 3001. Handles Discord OAuth, Discord bot interactions, GBuX wallet API (Crossmint/Solana), and slash commands. Frontend proxies `/api/*` requests to the backend via Vite dev server config.
 
-**Technical Implementations:**
-- **Character System:** 32 unique Warlord combinations from 8 betta species and 4 classes, each with 8 attributes and 0-20 level progression. Includes IBC-inspired lore for breeds and skill trees re-themed with freshwater/underwater names.
-- **Battle System:** Multi-unit tactical combat with speed-based initiative and 4-row positioning (front/mid-front/mid-back/back). Features Forward/Back tactical movement, Guardian passive intercepts, animated class buff overlays, big-hit secondary VFX for crits and high damage (>30), BubbleEmitter ambient effects, and transformation scaling (Bear 3.0x, Demon 2.8x, Elite 2.7x), pixel art explosion impact VFX (11 types: fire, circle, blue, nuclear, gas, etc.) from individual frame PNGs in `public/images/effects/explosions/`. Comprehensive skill effect handling: bleed/burn/poison DOTs, stun/sleep/confuse CC, lower_defense/lower_attack debuffs, execute threshold damage, armor piercing, secondary effects, cleanse, and passive proc system from skill trees.
-- **Sprite System:** `SpriteAnimation` component handles pixel art animations with equipment overlays, special transformation effects, and smooth swimming bobbing. Includes a wide array of animated sprites for heroes, bosses (e.g., Gorgon Sirens), and various aquatic creatures.
-- **World Map:** RTS-style 2D underwater map with zoom/pan, featuring 32 unlockable locations across 5 freshwater terrain regions. Utilizes A* pathfinding, auto-generated wander areas for hero idle animations, and auto-generated curved road paths between connected nodes. Location popups use TCG card art style with pixel art card backgrounds, vessel connection badges, and lore quotes.
-- **Deep Lore System:** Three Vessels of Magic — Betta (Fire of Will), Gorgons (Weight of Law), Plankton (Light of Unity). Game catalyst: the Plankton Magic went silent, shattering the Root Crown and driving the three Gorgon Sirens (Scylla, Medusa, Charybdis) mad. Each location has lore entries with quotes and vessel connections. Data: `src/data/lore.js`. TCG card art assets in `public/images/cards/`.
-- **Mini-games:** Includes a "Grove Hunt" canvas-based mini-game with collecting, predators, and resource harvesting, integrating directly into the game's economy.
-- **Audio System:** Web Audio API for synthesized combat sounds and adaptive background music.
-- **Economy:** Pearl gain from battles, and a harvest system for resources like root, shells, algae, and crystals.
-- **AI Dialogue System:** Real AI-powered hero dialogue via Puter.js free AI. Each hero has unique personality (UUID/SHA identity), conversation history logged to Puter KV, player style tracking (battles, exploration, trades, healing, boss attempts). AI generates contextual dialogue based on game state, zone, triggers, and ally conversations. Enriched with real betta splendens wiki knowledge for authentic fish personalities. Features: response deduplication (never repeats same sentence), 40% chance of terse 6-7 word responses, per-hero 90s cooldown with 2-per-3min rate limiting, best-item preference system per hero (weapon/ring/relic with happiness dialogue and +1 all stats bonus). **Player-initiated chat** via Party Log input sends messages to random party hero for AI response. Fallback to template dialogue when AI unavailable. Service: `src/utils/aiDialogueService.js`, item prefs: `src/data/heroBestItems.js`.
-- **Chapter/Story Progression:** 8-chapter story system following the Three Vessels narrative arc. Each chapter has objectives (create heroes, explore zones, defeat bosses, unlock skills) with progress tracking, pearl/XP rewards, and lore reveals. Vessel-focused color theming. Data: `src/data/chapters.js`. Component: `src/components/ChapterTracker.jsx`.
-- **Intro Video:** Fullscreen intro cinematic plays on first load with assets loading in background. Skip button appears once assets are ready. Tap-to-play fallback for mobile autoplay restrictions.
-- **Discord Integration:** Backend server handles Discord login and webhook broadcasting for in-game events.
-- **Save System:** Uses `localStorage` for game state persistence, with cloud save via Puter KV.
+**Rendering:** Canvas-based 2D games (no WebGL required for mini-games). PixiJS used for the RPG battle system. All mini-games render to `<canvas>` with `requestAnimationFrame` loops.
 
-## Grudge Studios
-Betta Warlords is the first and flagship title of **Grudge Studios**. The game is made FOR the Betta community and runs on Grudge Studios infrastructure.
-- **Auth:** Uses Grudge Studios login systems (Discord OAuth + Puter.js authentication)
-- **GBuX:** Universal currency (Solana SPL token) across all Grudge Studios titles and AI tools. Token-gated access system with 3 pricing tiers ($10/1000, $25/3000, $50/7500 GBuX). **Live token pricing** fetched from DexScreener and Jupiter APIs using `GBUX_TOKEN_ADDRESS`, with 60s caching. Package prices dynamically adjust to real token value when available, falling back to static USD prices. Frontend shows live price bar (price, market cap, 24h volume, source). Feature costs: AI generation (100), deployment (200), AI editor (50), image generation (75), custom theme (150). Backend service: `src/services/gbuxService.js`. Frontend: `src/services/gbuxClient.js`, `src/factory/components/GBuxAccess.jsx`, `src/factory/components/GBuxPage.jsx` (`/gbux` route). Server-side Crossmint wallets, GRENCH admin wallet for SPL transfers. Auth: Discord userId verification on sensitive routes.
-- **Free AI:** Grudge Studios provides free AI via Puter.js for hero dialogue, battle narration, lore generation, NPC personalities
-- **cNFT Breeding:** Compressed NFT system for on-chain Warlord assets (8 breeds x 4 classes = 32 base types)
-- **Exclusive Gateway:** Betta Warlords is the ONLY entry point to early-stage GBuX, cNFT breeding, and Grudge Studios systems
-- **Grudge Logo:** `public/images/grudge_logo.png` — pirate skull with gold horned frame, gold/orange scheme
-- **Promotional Website:** `public/game-index.html` — standalone landing page with PWA install, Web2/Web3 positioning, cNFT/GBuX/Grudge sections
-- **PWA:** `public/manifest.json` + `public/sw.js` for installable app experience across all platforms
+**Persistence:** `localStorage` for game saves (gun configs, coins, unlocked parts, high scores). Puter KV for cloud saves. Zustand for runtime state.
 
-## Game Factory System (NEW)
-The Game Factory is an AI-powered RPG generator that lives alongside Betta Warlords at `/factory`. It abstracts the game's systems into a universal template and lets anyone generate a completely new RPG with a different theme.
+## Mini-Games
 
-**Architecture:**
-- **Schema:** `src/factory/schema/gameTemplate.js` — Universal GameTemplate JSON schema defining races, classes, enemies, equipment, skills, lore, chapters, world map, assets
-- **Reference Spec:** `src/factory/schema/bettaWarlordSpec.js` — Betta Warlords mapped to the template schema as a reference implementation
-- **Form Wizard:** `src/factory/components/FactoryWizard.jsx` — 6-step wizard (Theme, Races, Classes, World/Lore, Art/Style, Generate)
-- **AI Content Generator:** `src/factory/generators/specGenerator.js` — Uses Puter.js free AI (gpt-4o-mini) to generate all game content from form inputs
-- **Game Preview:** `src/factory/components/GamePreview.jsx` — 13-tab preview of generated game data (Overview, Races, Classes, Enemies, Bosses, Lore, Chapters, World Map, Equipment, Play Battle, Grudge Stories, Sprite Worker, Raw JSON)
-- **Sprite AI Worker:** `src/factory/components/SpriteAIWorker.jsx` — Universal sprite import/processing tool. Supports PNG, GIF, SVG, WebP, JPEG, BMP. ZIP upload or loose file import. AI-powered classification via Puter.js. Auto-detects horizontal strips, vertical strips, grids, and individual frames. Features: Groups view (sidebar + detail editor), Preview viewport (animation playback), Custom Slicer (visual grid overlay with manual cols/rows), Export view (spriteMap JSON with layout types and animation speeds). Tools per sprite: background removal, duplicate frame detection, custom slicing. Auto-assembles folders of individual frame PNGs into sprite sheets. Frame normalization to target size. Accessible from FactoryWizard header button and GamePreview tab.
-- **Sprite Processing Utils:** `src/factory/utils/spriteProcessing.js` — Canvas-based utilities for grid layout detection, GIF frame extraction, background removal (corner-pixel sampling), frame normalization, duplicate frame detection (pixel comparison), frame-to-sheet assembly, and custom sheet slicing.
-- **AI Editor:** `src/factory/components/AIEditor.jsx` — Chat-based interface to modify generated game via natural language prompts
-- **Puter Deploy:** `src/factory/utils/puterDeploy.js` — One-click deployment of generated game to Puter.com with built-in AI editor
+### Shadow Ops (`/shadow-ops`)
+Top-down survival shooter. WASD movement, mouse aim, wave-based combat.
+- **Canvas:** 960x640 viewport, 2400x1600 arena, 64px tiles
+- **Player:** 9-tier sprite progression (Swordsman lvl1-3, lvl4-9), 64px frames, 1.5x scale
+- **Weapons:** 5 base types (Pistol, Shotgun, Rifle, SMG, Plasma) + Gun Constructor (custom weapons from 200 parts across 5 categories x 10 variants x 4 color tiers)
+- **Enemies:** 11 types (skeleton, slime, orc, goblin, gnoll, beholder, golem, predator-plant, skeleton-archer, dark-mage, fire-imp) with directional sprite sheets. AI raycasting line-of-sight — ranged enemies strafe to find LOS instead of shooting through walls.
+- **Abilities (7):** Shockwave [E], Poison Cloud [F], Fire Ring [R], Teleport [X], Blade Storm [C], Armor Mode [V], Super Flash [Z]
+- **Combat:** Dash melee (Space into enemies = impact damage + knockback + stun), grenades (right-click), dual gun loadout (1/2/Q swap)
+- **Progression:** Upgrade cards on level-up, coin economy, boss waves every 5 rounds
+- **Allies:** Combat Drone, Auto-Turret, Heal Bot
+- **Save key:** `shadowops_gunconfig` (localStorage)
 
-**Features:**
-- 8 preset themes (Medieval Knights, Space Pirates, Samurai Cats, Cyberpunk, Mushroom Kingdom, Dinosaur Tribes, Pirate Seas, Steampunk)
-- AI generates: races with stat bonuses, classes with abilities, enemies with tiered difficulty, bosses with lore, world map with regions/locations, chapters with objectives, equipment system, skill trees, dialogue templates
-- Real-time color palette customization
-- Download spec as JSON, save to Puter cloud, deploy to Puter site
-- AI editor supports commands like "add a race", "make bosses harder", "change color palette"
+### Grudge Footsies (`/grudge-footsies`)
+1v1 fighting game with skeleton-based avatar rendering.
+- **Canvas:** 960x540, CHAR_SCALE=1.05, GROUND_Y=430
+- **Rendering:** Skeleton keyframe system (14 joints), `drawSegment()` tapered limbs with joint balls. Avatar parts drawn at skeleton positions. Footsies sprite sheet as optional semi-transparent reference layer (T toggle, `[`/`]` opacity).
+- **Combat:** No health bar — one Special hit ends the round. Guard bar (3 blocks). Normal-to-special cancel on hit. Hold+release for specials.
+- **Controls:** A/D move, J attack (hold for special), back to guard
+- **AI:** 3 randomized CPU opponents with unique styles
 
-## Agent Skills
-Comprehensive project knowledge is stored in `.agents/skills/betta-warlords-project/SKILL.md`. This covers architecture, game systems, lore, breeds, classes, Grudge Studios relationship, and all technical patterns.
+### G.K.O. Boxing (`/gko-boxing`)
+1v1 cyberpunk boxing with matter.js ragdoll physics, 8 fighters, multi-bar HP, knockdown system.
+
+### Crypt Crawlers (`/dungeon-crawler`)
+Top-down dungeon crawler with BSP procedural generation, 10 enemy types, 2 playable characters, mega boss system, equipment/skills.
+
+### Warlord's Gauntlet (`/warlords-gauntlet`)
+2D side-scrolling action platformer with 3 heroes, combo attacks, procedural level generation, parallax backgrounds.
+
+### Grove Hunt
+Canvas-based resource harvesting mini-game (accessed within RPG flow).
+
+## Development
+
+### Running Locally
+```bash
+npm install
+npm run dev          # Vite dev server on port 5000
+npm run start        # Express/Discord server on port 3001
+```
+
+### Build
+```bash
+npm run build        # Outputs to dist/
+npm run preview      # Preview production build
+```
+
+### Environment Variables (Backend)
+- `DISCORD_PUBLIC_KEY` — Discord app public key
+- `DISCORD_CLIENT_ID` — Discord OAuth client ID
+- `DISCORD_CLIENT_SECRET` — Discord OAuth client secret
+- `DISCORD_BOT_TOKEN` / `GAME_API_GRUDA` — Discord bot token
+- `DISCORD_CHANNEL_ID` — Beta channel ID
+- `DISCORD_BOT_CHANNEL_ID` — Bot channel ID
+- `DISCORD_APP_ID` — Discord application ID
+- `DISCORD_GUILD_ID` — Discord guild ID
+- `XAI_API_KEY` — xAI/Grok API key
+
+### Workflows (Replit)
+| Workflow | Command | Port |
+|----------|---------|------|
+| Start application | `npx --yes vite --host 0.0.0.0 --port 5000` | 5000 |
+| Discord API Server | `node server.js` | 3001 |
 
 ## External Dependencies
-- **React:** Frontend library.
-- **Vite:** Development server and build tool.
-- **Zustand:** State management library.
-- **Express:** Backend server.
-- **discord.js:** Discord API client library.
-- **Google Fonts:** For Cinzel and Jost fonts.
-- **Web Audio API:** For in-game audio.
-- **Puter.js:** Free AI, cloud saves (KV), and authentication.
-- **JSZip:** ZIP file extraction for Sprite AI Worker.
+- **React 19** — Frontend library
+- **Vite 7** — Dev server and build tool
+- **Zustand** — State management
+- **Express 5** — Backend server
+- **discord.js** — Discord bot/API client
+- **matter-js** — 2D physics (GKO Boxing)
+- **PixiJS** — WebGL 2D rendering (RPG battles)
+- **three.js** — 3D rendering (future use)
+- **framer-motion** — React animations
+- **@solana/web3.js + spl-token + wallet-adapter** — Solana/GBuX wallet integration
+- **openai SDK** — xAI Grok API client
+- **jszip** — ZIP file extraction
+- **Puter.js** — Free AI, cloud saves, authentication (loaded via CDN)
+- **Google Fonts** — Cinzel, Jost, MedievalSharp typography
+- **Web Audio API** — Synthesized combat sounds and adaptive music

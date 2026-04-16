@@ -13,7 +13,17 @@ import {
   getPricingWithLivePrice,
   PRICING,
   FEATURE_COSTS,
+  CROSSMINT_PROJECT_ID,
 } from './src/services/gbuxService.js';
+import {
+  ASSET_DIRS,
+  assetStorageConfig,
+  buildAssetCatalog,
+  buildUploadManifest,
+  detectAssetConflicts,
+  ensureAssetStorageLayout,
+  readAssetManifest,
+} from './src/services/assetStorageService.js';
 
 const app = express();
 const DISCORD_PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY;
@@ -21,8 +31,10 @@ const DISCORD_PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY;
 const ALLOWED_ORIGINS = [
   'http://localhost:5000',
   'http://127.0.0.1:5000',
-  `https://${process.env.REPLIT_DEV_DOMAIN || ''}`,
-  `https://${(process.env.REPLIT_DOMAINS || '').split(',')[0]}`,
+  'https://grudgewarlords.com',
+  'https://grudge-studio.com',
+  process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : '',
+  process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}` : '',
 ].filter(o => o && o !== 'https://');
 
 app.use((req, res, next) => {
@@ -48,10 +60,74 @@ const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || process.env.GAME_API_GRUDA;
 const BETA_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID || '1470521372932313283';
-const BOT_CHANNEL_ID = '1472448936735277188';
-const BOT_APP_ID = '1472444305187668009';
-const GUILD_ID = '1335136143112671296';
+const BOT_CHANNEL_ID = process.env.DISCORD_BOT_CHANNEL_ID || '1472448936735277188';
+const BOT_APP_ID = process.env.DISCORD_APP_ID || '1472444305187668009';
+const GUILD_ID = process.env.DISCORD_GUILD_ID || '1335136143112671296';
 const PORT = 3001;
+ensureAssetStorageLayout();
+
+// Local asset and object-storage mirrors for development/admin use.
+app.use('/api/assets/local/public', express.static(ASSET_DIRS.publicDir));
+app.use('/api/assets/local/extracted', express.static(ASSET_DIRS.extractedDir));
+app.use('/api/assets/local/manifests', express.static(ASSET_DIRS.manifestsDir));
+
+app.get('/api/assets/catalog', (req, res) => {
+  try {
+    const catalog = buildAssetCatalog({ write: true });
+    res.json(catalog);
+  } catch (err) {
+    console.error('[assets] catalog error:', err.message);
+    res.status(500).json({ error: 'Could not build asset catalog' });
+  }
+});
+
+app.get('/api/assets/upload-plan', (req, res) => {
+  try {
+    const manifest = buildUploadManifest({ write: true });
+    res.json(manifest);
+  } catch (err) {
+    console.error('[assets] upload manifest error:', err.message);
+    res.status(500).json({ error: 'Could not build upload manifest' });
+  }
+});
+
+app.get('/api/assets/conflicts', (req, res) => {
+  try {
+    res.json({
+      generatedAt: new Date().toISOString(),
+      conflicts: detectAssetConflicts(),
+    });
+  } catch (err) {
+    console.error('[assets] conflict scan error:', err.message);
+    res.status(500).json({ error: 'Could not scan asset conflicts' });
+  }
+});
+
+app.get('/api/assets/storage/config', (req, res) => {
+  res.json(assetStorageConfig());
+});
+
+app.get('/api/assets/manifests/:name', (req, res) => {
+  const manifest = readAssetManifest(req.params.name);
+  if (!manifest) return res.status(404).json({ error: 'Manifest not found' });
+  res.json(manifest);
+});
+
+app.post('/api/assets/reindex', requireAdmin, (req, res) => {
+  try {
+    const catalog = buildAssetCatalog({ write: true });
+    const uploadManifest = buildUploadManifest({ write: true });
+    res.json({
+      success: true,
+      catalogGeneratedAt: catalog.generatedAt,
+      uploadEntries: uploadManifest.entries.length,
+      conflicts: catalog.conflicts.length,
+    });
+  } catch (err) {
+    console.error('[assets] reindex error:', err.message);
+    res.status(500).json({ error: 'Could not rebuild asset indexes' });
+  }
+});
 
 const pendingStates = new Map();
 
@@ -62,7 +138,7 @@ function getPublicOrigin(req) {
   if (host && !host.includes('localhost')) {
     return `${proto}://${host}`;
   }
-  const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS;
+  const domain = process.env.DEPLOY_DOMAIN || process.env.REPLIT_DEV_DOMAIN || (process.env.REPLIT_DOMAINS && process.env.REPLIT_DOMAINS.split(',')[0].trim());
   if (domain) return `https://${domain}`;
   return `${proto}://${host || 'localhost:5000'}`;
 }
@@ -188,8 +264,8 @@ app.get('/api/discord/invite', async (req, res) => {
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || process.env.DISCORD_GRUDGE_WEBHOOK;
 const DISCORD_WEBHOOK_CHAT = process.env.DISCORD_WEBHOOK_CHAT;
 const DISCORD_WEBHOOK_URL_ANNOUNCE = process.env.DISCORD_WEBHOOK_URL_ANNOUNCE;
-const ANNOUNCE_CHANNEL_ID = '1472449203283431494';
-const CHAT_CHANNEL_ID = '1472457126885462239';
+const ANNOUNCE_CHANNEL_ID = process.env.DISCORD_ANNOUNCE_CHANNEL_ID || '1472449203283431494';
+const CHAT_CHANNEL_ID = process.env.DISCORD_CHAT_CHANNEL_ID || '1472457126885462239';
 const ADMIN_TOKEN = process.env.GAME_API_GRUDA;
 
 function requireAdmin(req, res, next) {
@@ -257,7 +333,7 @@ app.post('/api/discord/webhook/update', requireAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Webhook update error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -283,7 +359,7 @@ app.post('/api/discord/webhook/patch', requireAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Webhook patch error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -308,7 +384,7 @@ app.post('/api/discord/webhook/challenge', requireAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Webhook challenge error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -333,7 +409,7 @@ app.post('/api/discord/webhook/event', requireAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Webhook event error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -357,7 +433,7 @@ app.post('/api/discord/webhook/lore', requireAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Webhook lore error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -381,7 +457,7 @@ app.post('/api/discord/webhook/tip', requireAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Webhook tip error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -405,7 +481,7 @@ app.post('/api/discord/webhook/custom', requireAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Webhook custom error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -438,7 +514,7 @@ app.post('/api/discord/webhook/arena', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Arena webhook error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -475,7 +551,7 @@ app.post('/api/discord/activity-token', async (req, res) => {
     res.json({ access_token: tokenData.access_token, user });
   } catch (err) {
     console.error('[Activity] Error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -656,7 +732,7 @@ app.post('/api/discord/webhook/announce', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Announce webhook error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -692,7 +768,7 @@ const COMMAND_RESPONSES = {
     description: 'Dive into the underwater world of Betta Warlords — the flagship RPG from Grudge Studios!',
     color: 0x22d3ee,
     fields: [
-      { name: 'Play Now', value: '[Launch Game](https://bettawarlords.replit.app)', inline: true },
+      { name: 'Play Now', value: '[Launch Game](https://grudgewarlords.com)', inline: true },
       { name: 'Platform', value: 'Web / Mobile PWA', inline: true },
       { name: 'Price', value: 'Free to Play', inline: true },
       { name: 'Features', value: '32 unique Warlord combos, tactical battles, world map exploration, AI-powered dialogue, Discord integration', inline: false },
@@ -840,7 +916,43 @@ app.post('/api/discord/bot/send', requireAdmin, async (req, res) => {
     res.json({ success: true, messageId: result.id });
   } catch (err) {
     console.error('Bot send error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/crossmint/config', (req, res) => {
+  res.json({
+    projectId: CROSSMINT_PROJECT_ID || null,
+    chain: 'solana',
+    environment: 'production',
+  });
+});
+
+const walletVerifyLimiter = {};
+app.post('/api/wallet/verify', async (req, res) => {
+  const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+  if (walletVerifyLimiter[clientIp] && (now - walletVerifyLimiter[clientIp].last) < 5000 && walletVerifyLimiter[clientIp].count >= 10) {
+    return res.status(429).json({ error: 'Too many requests' });
+  }
+  if (!walletVerifyLimiter[clientIp] || (now - walletVerifyLimiter[clientIp].last) > 60000) {
+    walletVerifyLimiter[clientIp] = { count: 0, last: now };
+  }
+  walletVerifyLimiter[clientIp].count++;
+  walletVerifyLimiter[clientIp].last = now;
+
+  const { walletAddress } = req.body;
+  if (!walletAddress || typeof walletAddress !== 'string' || walletAddress.length < 32 || walletAddress.length > 44) {
+    return res.status(400).json({ error: 'Invalid wallet address' });
+  }
+  if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(walletAddress)) {
+    return res.status(400).json({ error: 'Invalid Solana address format' });
+  }
+  try {
+    const balance = await getGbuxBalance(walletAddress);
+    res.json({ verified: true, walletAddress, balance });
+  } catch (e) {
+    res.status(400).json({ error: 'Could not verify wallet' });
   }
 });
 
@@ -892,7 +1004,7 @@ app.post('/api/gbux/wallet/create', requireUserId, async (req, res) => {
     return res.json({ wallet, balance: 0, existing: false });
   } catch (err) {
     console.error('[GBuX] Wallet create error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -904,7 +1016,7 @@ app.get('/api/gbux/wallet/:userId', async (req, res) => {
     res.json({ wallet, balance });
   } catch (err) {
     console.error('[GBuX] Wallet fetch error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -914,7 +1026,7 @@ app.get('/api/gbux/balance/:address', async (req, res) => {
     res.json({ address: req.params.address, balance });
   } catch (err) {
     console.error('[GBuX] Balance error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -952,7 +1064,7 @@ app.post('/api/gbux/purchase', requireUserId, async (req, res) => {
     });
   } catch (err) {
     console.error('[GBuX] Purchase error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -964,7 +1076,7 @@ app.post('/api/gbux/check-access', async (req, res) => {
     res.json(access);
   } catch (err) {
     console.error('[GBuX] Access check error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -976,7 +1088,7 @@ app.post('/api/gbux/deduct', requireUserId, async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error('[GBuX] Deduct error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -986,7 +1098,7 @@ app.get('/api/gbux/admin/balance', requireAdmin, async (req, res) => {
     res.json(balance);
   } catch (err) {
     console.error('[GBuX] Admin balance error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -998,12 +1110,304 @@ app.post('/api/gbux/transfer', requireAdmin, async (req, res) => {
     res.json({ success: true, signature, amount });
   } catch (err) {
     console.error('[GBuX] Transfer error:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
+import OpenAI from 'openai';
+
+const xai = process.env.XAI_API_KEY ? new OpenAI({
+  apiKey: process.env.XAI_API_KEY,
+  baseURL: 'https://api.x.ai/v1',
+}) : null;
+
+const xaiRateLimit = new Map();
+const XAI_RATE_WINDOW = 60000;
+const XAI_RATE_MAX = 10;
+
+function xaiRateLimiter(req, res, next) {
+  if (!xai) return res.status(503).json({ error: 'xAI service unavailable' });
+  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const entry = xaiRateLimit.get(ip);
+  if (entry && now - entry.start < XAI_RATE_WINDOW) {
+    if (entry.count >= XAI_RATE_MAX) return res.status(429).json({ error: 'Rate limit exceeded' });
+    entry.count++;
+  } else {
+    xaiRateLimit.set(ip, { start: now, count: 1 });
+  }
+  next();
+}
+
+app.use('/api/xai', xaiRateLimiter);
+
+const GKO_SYSTEM_PROMPT = `You are the lore master for G.K.O. Boxing, a cyberpunk pixel-art fighting game by Grudge Studios. The world is a neon-lit underground fighting circuit where 8 legendary fighters compete for glory.
+
+Fighters:
+- RAZE (Red) — The Street King, aggressive rushdown brawler, CRIMSON FURY special
+- VOLT (Blue) — Storm Breaker, balanced pyro fighter, STORM BREAKER special  
+- VENOM (Green) — The Jade Fang, counter specialist with poison, VENOM COUNTER special
+- WRAITH (Purple) — Phantom Fist, cybernetic stealth striker, PHANTOM STEP special
+- BLITZ (Yellow) — Golden Thunder, mutant powerhouse, THUNDER BLOW special
+- SHADE (Black) — The Dark Horse, mechanical defensive wall, IRON WALL special
+- GHOST (White) — Pale Revenant, elusive spectral boxer, GHOST RUSH special
+- SURGE (Cyan) — Neon Striker, cyberpunk gunslinger turned brawler, NEON BURST special
+
+Style: gritty, cyberpunk, dramatic. Short punchy prose. No more than 3 paragraphs.`;
+
+app.post('/api/xai/lore', async (req, res) => {
+  try {
+    const { fighterId, fighterName, fighterStyle } = req.body;
+    const completion = await xai.chat.completions.create({
+      model: 'grok-4-1-fast-non-reasoning',
+      messages: [
+        { role: 'system', content: GKO_SYSTEM_PROMPT },
+        { role: 'user', content: `Write the origin story and lore for ${fighterName} (${fighterStyle}). Include their motivation, backstory, and why they fight in the G.K.O. circuit. 2-3 paragraphs, dramatic cyberpunk tone.` },
+      ],
+      max_tokens: 500,
+      temperature: 0.9,
+    });
+    res.json({ lore: completion.choices[0].message.content, fighterId });
+  } catch (err) {
+    console.error('[xAI] Lore error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/xai/commentary', async (req, res) => {
+  try {
+    const { fighter1, fighter2, events } = req.body;
+    const evtStr = (events || []).slice(-5).map(e => `${e.type}: ${e.detail}`).join('\n');
+    const completion = await xai.chat.completions.create({
+      model: 'grok-4-1-fast-non-reasoning',
+      messages: [
+        { role: 'system', content: GKO_SYSTEM_PROMPT + '\nYou are the ringside commentator. Give exciting, short play-by-play commentary (1-2 sentences max).' },
+        { role: 'user', content: `${fighter1} vs ${fighter2}. Recent events:\n${evtStr}\n\nGive a quick commentator line.` },
+      ],
+      max_tokens: 100,
+      temperature: 1.0,
+    });
+    res.json({ commentary: completion.choices[0].message.content });
+  } catch (err) {
+    console.error('[xAI] Commentary error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/xai/campaign', async (req, res) => {
+  try {
+    const { fighterId, chapter, previousEvents } = req.body;
+    const prevStr = (previousEvents || []).join('\n');
+    const completion = await xai.chat.completions.create({
+      model: 'grok-4-1-fast-non-reasoning',
+      messages: [
+        { role: 'system', content: GKO_SYSTEM_PROMPT + '\nYou are writing the campaign story mode. Each chapter has a dramatic narrative intro, the opponent reveal, and stakes. Keep it punchy and dramatic.' },
+        { role: 'user', content: `Fighter: ${fighterId}, Chapter ${chapter || 1}.\nPrevious events: ${prevStr || 'None'}\n\nWrite the chapter intro narrative (2-3 paragraphs), name the opponent, and describe the stakes. Return as JSON: { "narrative": "...", "opponent": "fighter_id", "stakes": "..." }` },
+      ],
+      max_tokens: 600,
+      temperature: 0.85,
+    });
+    const content = completion.choices[0].message.content;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      res.json(jsonMatch ? JSON.parse(jsonMatch[0]) : { narrative: content, opponent: 'raze', stakes: 'Pride' });
+    } catch {
+      res.json({ narrative: content, opponent: 'raze', stakes: 'Pride' });
+    }
+  } catch (err) {
+    console.error('[xAI] Campaign error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/xai/trash-talk', async (req, res) => {
+  try {
+    const { fighterId, opponentId, matchContext } = req.body;
+    const completion = await xai.chat.completions.create({
+      model: 'grok-4-1-fast-non-reasoning',
+      messages: [
+        { role: 'system', content: GKO_SYSTEM_PROMPT + '\nGenerate pre-fight trash talk lines. Short, punchy, in-character. Return as JSON: { "lines": ["...", "...", "..."] }' },
+        { role: 'user', content: `${fighterId} is about to fight ${opponentId}. Context: ${matchContext || 'ranked match'}. Give 3 trash talk lines from ${fighterId}'s perspective.` },
+      ],
+      max_tokens: 200,
+      temperature: 1.0,
+    });
+    const content = completion.choices[0].message.content;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      res.json(jsonMatch ? JSON.parse(jsonMatch[0]) : { lines: [content] });
+    } catch {
+      res.json({ lines: [content] });
+    }
+  } catch (err) {
+    console.error('[xAI] Trash talk error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ============================================================================
+// UNIFIED ACCOUNT SYSTEM — Auth, Account, Save, GBuX
+// ============================================================================
+
+// In-memory account store (replace with DB in production)
+const accounts = new Map();
+
+function getOrCreateAccount(grudgeId, defaults = {}) {
+  if (!accounts.has(grudgeId)) {
+    accounts.set(grudgeId, {
+      grudgeId,
+      username: defaults.username || 'Player',
+      accountLevel: defaults.accountLevel || 'pleb',
+      gbuxBalance: 0,
+      characters: [],
+      gameProgress: {},
+      discordId: defaults.discordId || null,
+      puterId: defaults.puterId || null,
+      walletAddress: defaults.walletAddress || null,
+      createdAt: Date.now(),
+    });
+  }
+  return accounts.get(grudgeId);
+}
+
+// Unified Puter auth endpoint
+app.post('/api/auth/puter', (req, res) => {
+  const { puterUuid, puterUsername } = req.body;
+  if (!puterUuid) return res.status(400).json({ error: 'Missing puterUuid' });
+
+  const grudgeId = `grudge_${puterUuid}`;
+  const token = Buffer.from(JSON.stringify({ grudgeId, iat: Date.now() })).toString('base64');
+  const account = getOrCreateAccount(grudgeId, { username: puterUsername || 'Player', puterId: puterUuid });
+
+  res.json({
+    success: true,
+    token,
+    sessionToken: token,
+    grudgeId,
+    username: account.username,
+    user: {
+      grudgeId,
+      username: account.username,
+      accountLevel: account.accountLevel,
+      gbuxBalance: account.gbuxBalance,
+    },
+  });
+});
+
+// Credential login (simplified)
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body;
+  if (!username) return res.status(400).json({ error: 'Missing username' });
+
+  const grudgeId = `grudge_cred_${username.toLowerCase()}`;
+  const token = Buffer.from(JSON.stringify({ grudgeId, iat: Date.now() })).toString('base64');
+  const account = getOrCreateAccount(grudgeId, { username });
+
+  res.json({ success: true, token, sessionToken: token, grudgeId, username: account.username, user: account });
+});
+
+// Registration
+app.post('/api/auth/register', (req, res) => {
+  const { username, password, email } = req.body;
+  if (!username) return res.status(400).json({ error: 'Missing username' });
+
+  const grudgeId = `grudge_cred_${username.toLowerCase()}`;
+  if (accounts.has(grudgeId)) return res.status(409).json({ error: 'Username taken' });
+
+  const token = Buffer.from(JSON.stringify({ grudgeId, iat: Date.now() })).toString('base64');
+  const account = getOrCreateAccount(grudgeId, { username });
+
+  res.json({ success: true, token, sessionToken: token, grudgeId, username: account.username, user: account });
+});
+
+// Token verify
+app.get('/api/auth/verify', (req, res) => {
+  const token = req.headers['x-session-token'] || req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ valid: false });
+  try {
+    const data = JSON.parse(Buffer.from(token, 'base64').toString());
+    const account = accounts.get(data.grudgeId);
+    res.json({ valid: true, grudgeId: data.grudgeId, username: account?.username });
+  } catch {
+    res.status(401).json({ valid: false });
+  }
+});
+
+// Get full account
+app.get('/api/account/me', (req, res) => {
+  const token = req.headers['x-session-token'] || req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    const data = JSON.parse(Buffer.from(token, 'base64').toString());
+    const account = accounts.get(data.grudgeId);
+    if (!account) return res.status(404).json({ error: 'Account not found' });
+    res.json(account);
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+// Save game progress
+app.post('/api/account/save', (req, res) => {
+  const token = req.headers['x-session-token'] || req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    const data = JSON.parse(Buffer.from(token, 'base64').toString());
+    const account = accounts.get(data.grudgeId);
+    if (!account) return res.status(404).json({ error: 'Account not found' });
+    const { gameSlug, progress } = req.body;
+    if (!gameSlug) return res.status(400).json({ error: 'Missing gameSlug' });
+    account.gameProgress[gameSlug] = { ...account.gameProgress[gameSlug], ...progress, updatedAt: Date.now() };
+    res.json({ success: true, gameProgress: account.gameProgress });
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+// GBuX balance
+app.get('/api/gbux/balance', (req, res) => {
+  const token = req.headers['x-session-token'] || req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    const data = JSON.parse(Buffer.from(token, 'base64').toString());
+    const account = accounts.get(data.grudgeId);
+    res.json({ balance: account?.gbuxBalance || 0 });
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+// Earn GBuX
+app.post('/api/gbux/earn', (req, res) => {
+  const token = req.headers['x-session-token'] || req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    const data = JSON.parse(Buffer.from(token, 'base64').toString());
+    const account = accounts.get(data.grudgeId);
+    if (!account) return res.status(404).json({ error: 'Account not found' });
+    const { amount, reason } = req.body;
+    const earned = Math.min(Math.max(0, Number(amount) || 0), 1000); // cap at 1000 per call
+    account.gbuxBalance += earned;
+    console.log(`[GBuX] ${account.username} earned ${earned} GBuX for: ${reason}`);
+    res.json({ success: true, balance: account.gbuxBalance, earned });
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+// Wallet auth endpoint
+app.post('/api/auth/wallet', (req, res) => {
+  const { wallet_address } = req.body;
+  if (!wallet_address) return res.status(400).json({ error: 'Missing wallet_address' });
+  const grudgeId = `grudge_wallet_${wallet_address.substring(0, 16)}`;
+  const token = Buffer.from(JSON.stringify({ grudgeId, iat: Date.now() })).toString('base64');
+  const account = getOrCreateAccount(grudgeId, { username: `Wallet_${wallet_address.substring(0, 6)}`, walletAddress: wallet_address });
+  res.json({ success: true, token, sessionToken: token, grudgeId, username: account.username, user: account });
+});
+
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Discord API server running on port ${PORT}`);
+  console.log(`Grudge Studio API server running on port ${PORT}`);
   console.log('[GBuX] Token service initialized');
+  console.log('[Auth] Unified account system ready');
   registerSlashCommands();
 });

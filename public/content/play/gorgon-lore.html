@@ -1,0 +1,1454 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Gorgon Sirens - Abyssia Lore Slideshow</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Georgia", serif;
+        background: #000;
+        color: #e0f2fe;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Main embed container */
+      .embed-wrapper {
+        width: 100%;
+        max-width: 1920px;
+        height: 100vh;
+        max-height: 1080px;
+        position: relative;
+        background: linear-gradient(
+          180deg,
+          #0a1628 0%,
+          #1a2332 50%,
+          #0d1b2a 100%
+        );
+        overflow: hidden;
+        box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
+      }
+
+      .embed-wrapper::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image:
+          url("https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1920&q=80"),
+          linear-gradient(
+            180deg,
+            rgba(10, 22, 40, 0.9) 0%,
+            rgba(13, 27, 42, 0.95) 100%
+          );
+        background-size: cover;
+        background-position: center;
+        background-blend-mode: overlay;
+        pointer-events: none;
+        z-index: 1;
+        animation: ambientPulse 8s ease-in-out infinite;
+      }
+
+      .embed-wrapper::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 50%,
+            rgba(6, 182, 212, 0.12) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 80%,
+            rgba(167, 139, 250, 0.12) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 20%,
+            rgba(34, 211, 238, 0.08) 0%,
+            transparent 40%
+          );
+        pointer-events: none;
+        z-index: 1;
+        animation: ambientFloat 12s ease-in-out infinite;
+      }
+
+      @keyframes ambientFloat {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      @keyframes ambientPulse {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .slideshow-container {
+        position: relative;
+        max-width: 100%;
+        height: 100vh;
+        z-index: 2;
+      }
+
+      .slide {
+        display: none;
+        width: 100%;
+        height: 100%;
+        padding: 40px 60px;
+        overflow-y: auto;
+        animation: fadeIn 0.8s ease-in-out;
+      }
+
+      .slide.active {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .slide-content {
+        max-width: 1200px;
+        width: 95%;
+        max-height: 85vh;
+        background-image:
+          linear-gradient(
+            135deg,
+            rgba(10, 22, 40, 0.95) 0%,
+            rgba(26, 35, 50, 0.9) 100%
+          ),
+          url("https://images.unsplash.com/photo-1579547945413-497e1b99dac0?w=1920&q=80");
+        background-size: cover, cover;
+        background-position: center, center;
+        background-blend-mode: normal, overlay;
+        padding: 40px 50px;
+        border-radius: 20px;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.8),
+          inset 0 0 100px rgba(34, 211, 238, 0.08),
+          0 0 40px rgba(167, 139, 250, 0.2);
+        border: 2px solid rgba(34, 211, 238, 0.3);
+        position: relative;
+        overflow: auto;
+      }
+
+      .slide-content::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 10px,
+          rgba(34, 211, 238, 0.02) 10px,
+          rgba(34, 211, 238, 0.02) 20px
+        );
+        animation: slidePattern 20s linear infinite;
+        pointer-events: none;
+      }
+
+      /* Custom scrollbar for slide-content */
+      .slide-content::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .slide-content::-webkit-scrollbar-track {
+        background: rgba(10, 22, 40, 0.5);
+        border-radius: 4px;
+      }
+
+      .slide-content::-webkit-scrollbar-thumb {
+        background: rgba(34, 211, 238, 0.4);
+        border-radius: 4px;
+      }
+
+      .slide-content::-webkit-scrollbar-thumb:hover {
+        background: rgba(34, 211, 238, 0.6);
+      }
+
+      @keyframes slidePattern {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(50px, 50px);
+        }
+      }
+
+      /* Navigation */
+      .nav-button {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(
+          135deg,
+          rgba(167, 139, 250, 0.4) 0%,
+          rgba(34, 211, 238, 0.3) 100%
+        );
+        color: #e0f2fe;
+        border: 2px solid rgba(167, 139, 250, 0.6);
+        padding: 25px 20px;
+        font-size: 28px;
+        cursor: pointer;
+        border-radius: 12px;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        -webkit-backdrop-filter: blur(15px);
+        backdrop-filter: blur(15px);
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.5),
+          0 0 20px rgba(167, 139, 250, 0.3),
+          inset 0 0 20px rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-button:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(167, 139, 250, 0.7) 0%,
+          rgba(34, 211, 238, 0.5) 100%
+        );
+        border-color: #a78bfa;
+        box-shadow:
+          0 15px 40px rgba(167, 139, 250, 0.5),
+          0 0 40px rgba(167, 139, 250, 0.6),
+          inset 0 0 30px rgba(255, 255, 255, 0.2);
+        transform: translateY(-50%) scale(1.05);
+      }
+
+      .nav-button:active {
+        transform: translateY(-50%) scale(0.95);
+      }
+
+      .prev {
+        left: 20px;
+      }
+      .next {
+        right: 20px;
+      }
+
+      .slide-counter {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(
+          135deg,
+          rgba(10, 22, 40, 0.95) 0%,
+          rgba(26, 35, 50, 0.9) 100%
+        );
+        padding: 12px 35px;
+        border-radius: 30px;
+        border: 2px solid rgba(34, 211, 238, 0.4);
+        z-index: 1000;
+        font-size: 15px;
+        color: #94a3b8;
+        -webkit-backdrop-filter: blur(15px);
+        backdrop-filter: blur(15px);
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.5),
+          0 0 20px rgba(34, 211, 238, 0.2),
+          inset 0 0 20px rgba(34, 211, 238, 0.05);
+        font-weight: bold;
+        letter-spacing: 2px;
+      }
+
+      /* Title Slide */
+      .title-slide h1 {
+        font-size: 3.2em;
+        background: linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 30px;
+        text-align: center;
+        line-height: 1.2;
+        text-shadow: 0 0 40px rgba(34, 211, 238, 0.3);
+      }
+
+      .title-slide .subtitle {
+        font-size: 1.6em;
+        color: #94a3b8;
+        font-style: italic;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .title-slide .magic-tag {
+        display: inline-block;
+        padding: 15px 40px;
+        background: linear-gradient(
+          135deg,
+          rgba(167, 139, 250, 0.2) 0%,
+          rgba(34, 211, 238, 0.15) 100%
+        );
+        border: 2px solid #a78bfa;
+        border-radius: 30px;
+        color: #c4b5fd;
+        font-size: 1.1em;
+        margin-top: 20px;
+        box-shadow:
+          0 10px 30px rgba(167, 139, 250, 0.3),
+          inset 0 0 20px rgba(167, 139, 250, 0.1);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: bold;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .title-slide .magic-tag::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 200%;
+        }
+      }
+
+      /* Content Typography */
+      h2 {
+        font-size: 2.2em;
+        background: linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 25px;
+        text-align: center;
+      }
+
+      h3 {
+        font-size: 1.5em;
+        color: #a78bfa;
+        margin-bottom: 18px;
+        margin-top: 25px;
+      }
+
+      h4 {
+        font-size: 1.2em;
+        color: #06b6d4;
+        margin-bottom: 12px;
+        margin-top: 18px;
+      }
+
+      p {
+        font-size: 1.05em;
+        line-height: 1.7;
+        margin-bottom: 16px;
+        color: #cbd5e1;
+      }
+
+      /* Vessel Cards */
+      .vessels-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin: 25px 0;
+        max-width: 100%;
+      }
+
+      .vessel-card {
+        padding: 25px;
+        border-radius: 15px;
+        border: 2px solid;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.05) 0%,
+          rgba(255, 255, 255, 0.02) 100%
+        );
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .vessel-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("https://images.unsplash.com/photo-1579547945413-497e1b99dac0?w=800&q=60");
+        background-size: cover;
+        opacity: 0.05;
+        z-index: 0;
+      }
+
+      .vessel-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .vessel-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .vessel-card.betta {
+        border-color: rgba(239, 68, 68, 0.5);
+      }
+      .vessel-card.betta:hover {
+        box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3);
+      }
+
+      .vessel-card.gorgon {
+        border-color: rgba(167, 139, 250, 0.5);
+      }
+      .vessel-card.gorgon:hover {
+        box-shadow: 0 10px 40px rgba(167, 139, 250, 0.3);
+      }
+
+      .vessel-card.plankton {
+        border-color: rgba(34, 211, 238, 0.5);
+      }
+      .vessel-card.plankton:hover {
+        box-shadow: 0 10px 40px rgba(34, 211, 238, 0.3);
+      }
+
+      .vessel-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.5),
+          inset 0 0 20px rgba(255, 255, 255, 0.1);
+      }
+
+      .vessel-card.betta .vessel-icon {
+        background: radial-gradient(
+          circle,
+          rgba(239, 68, 68, 0.4) 0%,
+          rgba(239, 68, 68, 0.1) 100%
+        );
+        border: 3px solid #ef4444;
+        background-image: url("https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=200&q=80");
+        background-size: cover;
+        background-blend-mode: overlay;
+      }
+
+      .vessel-card.gorgon .vessel-icon {
+        background: radial-gradient(
+          circle,
+          rgba(167, 139, 250, 0.4) 0%,
+          rgba(167, 139, 250, 0.1) 100%
+        );
+        border: 3px solid #a78bfa;
+        background-image: url("https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=200&q=80");
+        background-size: cover;
+        background-blend-mode: overlay;
+      }
+
+      .vessel-card.plankton .vessel-icon {
+        background: radial-gradient(
+          circle,
+          rgba(34, 211, 238, 0.4) 0%,
+          rgba(34, 211, 238, 0.1) 100%
+        );
+        border: 3px solid #22d3ee;
+        background-image: url("https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=200&q=80");
+        background-size: cover;
+        background-blend-mode: overlay;
+      }
+
+      .vessel-icon::after {
+        content: "";
+        position: absolute;
+        inset: -5px;
+        border-radius: 50%;
+        background: inherit;
+        filter: blur(10px);
+        opacity: 0.5;
+        z-index: -1;
+        animation: iconPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes iconPulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.8;
+        }
+      }
+
+      .vessel-name {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .vessel-card.betta .vessel-name {
+        color: #ef4444;
+      }
+      .vessel-card.gorgon .vessel-name {
+        color: #a78bfa;
+      }
+      .vessel-card.plankton .vessel-name {
+        color: #22d3ee;
+      }
+
+      .vessel-status {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 0.85em;
+        margin-top: 15px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 1px solid;
+        box-shadow:
+          0 5px 15px rgba(0, 0, 0, 0.3),
+          inset 0 0 10px rgba(255, 255, 255, 0.1);
+      }
+
+      .vessel-card.betta .vessel-status {
+        background: linear-gradient(
+          135deg,
+          rgba(239, 68, 68, 0.3) 0%,
+          rgba(239, 68, 68, 0.2) 100%
+        );
+        color: #fca5a5;
+        border-color: rgba(239, 68, 68, 0.5);
+      }
+
+      .vessel-card.gorgon .vessel-status {
+        background: linear-gradient(
+          135deg,
+          rgba(167, 139, 250, 0.3) 0%,
+          rgba(167, 139, 250, 0.2) 100%
+        );
+        color: #c4b5fd;
+        border-color: rgba(167, 139, 250, 0.5);
+      }
+
+      .vessel-card.plankton .vessel-status {
+        background: linear-gradient(
+          135deg,
+          rgba(34, 211, 238, 0.3) 0%,
+          rgba(34, 211, 238, 0.2) 100%
+        );
+        color: #67e8f9;
+        border-color: rgba(34, 211, 238, 0.5);
+      }
+
+      /* Image Containers */
+      .image-container {
+        text-align: center;
+        margin: 25px 0;
+        position: relative;
+      }
+
+      .image-container::before {
+        content: "";
+        position: absolute;
+        inset: -20px;
+        background: radial-gradient(
+          circle,
+          rgba(167, 139, 250, 0.2) 0%,
+          transparent 70%
+        );
+        filter: blur(40px);
+        z-index: -1;
+      }
+
+      .image-container img {
+        max-width: 85%;
+        max-height: 400px;
+        height: auto;
+        border-radius: 15px;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.8),
+          0 0 100px rgba(167, 139, 250, 0.4),
+          0 0 60px rgba(34, 211, 238, 0.3),
+          inset 0 0 30px rgba(255, 255, 255, 0.1);
+        border: 4px solid transparent;
+        background:
+          linear-gradient(#0a1628, #0a1628) padding-box,
+          linear-gradient(135deg, #a78bfa, #22d3ee, #a78bfa) border-box;
+        position: relative;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+      }
+
+      /* Gorgon Cards */
+      .gorgon-portrait {
+        max-width: 500px;
+        margin: 0 auto 30px;
+        display: block;
+        border-radius: 15px;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.9),
+          0 0 80px currentColor;
+        border: 4px solid;
+        position: relative;
+        filter: drop-shadow(0 0 20px currentColor);
+      }
+
+      .gorgon-portrait.scylla {
+        border-color: #06b6d4;
+        --glow-color: #06b6d4;
+      }
+      .gorgon-portrait.medusa {
+        border-color: #a78bfa;
+        --glow-color: #a78bfa;
+      }
+      .gorgon-portrait.charybdis {
+        border-color: #c084fc;
+        --glow-color: #c084fc;
+      }
+
+      .boss-title {
+        font-size: 1.3em;
+        text-align: center;
+        font-style: italic;
+        color: #94a3b8;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px rgba(148, 163, 184, 0.5);
+        letter-spacing: 1px;
+      }
+
+      .location-tag {
+        text-align: center;
+        display: block;
+        padding: 12px 25px;
+        border-radius: 30px;
+        margin: 20px auto;
+        max-width: 450px;
+        font-size: 1em;
+        border: 2px solid;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow:
+          0 5px 20px rgba(0, 0, 0, 0.5),
+          inset 0 0 15px rgba(255, 255, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .location-tag::before {
+        content: "⚔";
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2em;
+      }
+
+      .location-tag.scylla {
+        background: rgba(6, 182, 212, 0.15);
+        color: #22d3ee;
+        border-color: rgba(6, 182, 212, 0.4);
+      }
+
+      .location-tag.medusa {
+        background: rgba(167, 139, 250, 0.15);
+        color: #c4b5fd;
+        border-color: rgba(167, 139, 250, 0.4);
+      }
+
+      .location-tag.charybdis {
+        background: rgba(196, 132, 252, 0.15);
+        color: #e9d5ff;
+        border-color: rgba(196, 132, 252, 0.4);
+      }
+
+      .encounter-box {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.6) 0%,
+          rgba(26, 35, 50, 0.4) 100%
+        );
+        padding: 25px;
+        border-radius: 12px;
+        margin: 25px 0;
+        border-left: 4px solid;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.6),
+          inset 0 0 20px rgba(255, 255, 255, 0.03);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .encounter-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          currentColor,
+          transparent
+        );
+        opacity: 0.5;
+      }
+
+      .encounter-box.scylla {
+        border-left-color: #06b6d4;
+      }
+      .encounter-box.medusa {
+        border-left-color: #a78bfa;
+      }
+      .encounter-box.charybdis {
+        border-left-color: #c084fc;
+      }
+
+      .taunt {
+        font-style: italic;
+        font-size: 1.2em;
+        padding: 25px 30px;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.7) 0%,
+          rgba(26, 35, 50, 0.5) 100%
+        );
+        border-left: 5px solid;
+        margin: 20px 0;
+        border-radius: 8px;
+        color: #f1f5f9;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.6),
+          inset 0 0 20px rgba(255, 255, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .taunt::before {
+        content: '"';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        font-size: 4em;
+        opacity: 0.2;
+        font-family: Georgia, serif;
+      }
+
+      .taunt::after {
+        content: '"';
+        position: absolute;
+        right: 10px;
+        bottom: -20px;
+        font-size: 4em;
+        opacity: 0.2;
+        font-family: Georgia, serif;
+      }
+
+      .taunt.scylla {
+        border-left-color: #06b6d4;
+      }
+      .taunt.medusa {
+        border-left-color: #a78bfa;
+      }
+      .taunt.charybdis {
+        border-left-color: #c084fc;
+      }
+
+      /* Progression */
+      .progression-item {
+        background: linear-gradient(
+          135deg,
+          rgba(10, 22, 40, 0.8) 0%,
+          rgba(26, 35, 50, 0.6) 100%
+        );
+        padding: 20px;
+        border-radius: 12px;
+        margin: 15px 0;
+        border: 2px solid rgba(167, 139, 250, 0.3);
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.5),
+          inset 0 0 30px rgba(34, 211, 238, 0.05);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .progression-item::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(167, 139, 250, 0.1),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .progression-item:hover::before {
+        left: 100%;
+      }
+
+      .progression-item h4 {
+        color: #22d3ee;
+        margin-top: 0;
+      }
+
+      .level-badge {
+        display: inline-block;
+        background: linear-gradient(
+          135deg,
+          rgba(239, 68, 68, 0.3) 0%,
+          rgba(239, 68, 68, 0.2) 100%
+        );
+        color: #fca5a5;
+        padding: 6px 18px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        margin-left: 10px;
+        border: 1px solid rgba(239, 68, 68, 0.5);
+        box-shadow:
+          0 0 15px rgba(239, 68, 68, 0.3),
+          inset 0 0 10px rgba(239, 68, 68, 0.1);
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Mystery Clues */
+      .clue-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .clue-list li {
+        background: linear-gradient(
+          135deg,
+          rgba(34, 211, 238, 0.15) 0%,
+          rgba(34, 211, 238, 0.05) 100%
+        );
+        padding: 15px 20px 15px 45px;
+        margin: 12px 0;
+        border-left: 4px solid #22d3ee;
+        border-radius: 8px;
+        font-style: italic;
+        box-shadow:
+          0 5px 15px rgba(0, 0, 0, 0.3),
+          inset 0 0 15px rgba(34, 211, 238, 0.1);
+        position: relative;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .clue-list li:hover {
+        transform: translateX(10px);
+        box-shadow:
+          0 8px 25px rgba(34, 211, 238, 0.3),
+          inset 0 0 20px rgba(34, 211, 238, 0.15);
+      }
+
+      .clue-list li::before {
+        content: "▸ ";
+        margin-right: 10px;
+        color: #22d3ee;
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+
+      /* Scrollbar */
+      .slide::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      .slide::-webkit-scrollbar-track {
+        background: rgba(10, 22, 40, 0.5);
+      }
+
+      .slide::-webkit-scrollbar-thumb {
+        background: rgba(167, 139, 250, 0.5);
+        border-radius: 5px;
+      }
+
+      .slide::-webkit-scrollbar-thumb:hover {
+        background: rgba(167, 139, 250, 0.7);
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .embed-wrapper {
+          max-width: 100%;
+          max-height: none;
+          height: 100vh;
+        }
+
+        .slide {
+          padding: 25px 15px;
+        }
+
+        .slide-content {
+          padding: 25px 20px;
+          max-width: 100%;
+          max-height: 90vh;
+        }
+
+        .title-slide h1 {
+          font-size: 2.2em;
+        }
+
+        .title-slide .subtitle {
+          font-size: 1.3em;
+        }
+
+        h2 {
+          font-size: 1.6em;
+          margin-bottom: 20px;
+        }
+
+        p {
+          font-size: 0.95em;
+          margin-bottom: 14px;
+        }
+
+        .nav-button {
+          padding: 15px 10px;
+          font-size: 20px;
+        }
+
+        .prev {
+          left: 10px;
+        }
+        .next {
+          right: 10px;
+        }
+
+        .vessels-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .vessel-card {
+          padding: 20px;
+        }
+
+        .image-container {
+          max-width: 95%;
+          padding: 15px;
+          margin: 20px 0;
+        }
+
+        .image-container img {
+          max-height: 300px;
+        }
+
+        .progression-item {
+          padding: 18px;
+          margin: 12px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="embed-wrapper">
+      <div class="slideshow-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+          <div class="slide-content title-slide">
+            <h1>The Sunken Kingdom<br />of Abyssia</h1>
+            <p class="subtitle">Where Magic Sleeps in Three Vessels</p>
+            <p class="magic-tag">Weight of Law • The Gorgon Sirens</p>
+          </div>
+        </div>
+
+        <!-- Slide 2: Prologue Part 1 -->
+        <div class="slide">
+          <div class="slide-content">
+            <h2>The Age Before Memory</h2>
+            <p>
+              In the age before memory, when the waters were young and currents
+              still sang, three vessels of magic sustained all life beneath the
+              waves.
+            </p>
+            <p>
+              The <strong style="color: #ef4444">Betta</strong> — fierce,
+              beautiful, and proud — carried the Fire of Will, the spark that
+              drives all creatures to fight, to love, to endure.
+            </p>
+            <p>
+              The <strong style="color: #a78bfa">Gorgons</strong> — ancient
+              serpents of root and stone — held the Weight of Law, the force
+              that keeps the deep in order and the currents in rhythm.
+            </p>
+            <p>
+              And the <strong style="color: #22d3ee">Plankton</strong> —
+              countless, invisible, everywhere — bore the Light of Unity, the
+              quiet magic that binds every living thing to every other.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 3: Prologue Part 2 -->
+        <div class="slide">
+          <div class="slide-content">
+            <h2>The Balance of Ages</h2>
+            <p>
+              For eons, the three magics held the waters in balance. The Betta
+              Warlords built the kingdom of Abyssia atop the Root Crown, a
+              living root throne that channeled all three magics into harmony.
+            </p>
+            <p>
+              The Gorgon Sirens kept vigil at the borders of the deep, their
+              petrifying gaze holding the Abyss at bay.
+            </p>
+            <p>
+              And the Plankton drifted through every current, every cave, every
+              drop of water — a living web of light connecting all things.
+            </p>
+            <h3 style="text-align: center; margin-top: 50px; color: #22d3ee">
+              Then the Plankton Magic went silent.
+            </h3>
+          </div>
+        </div>
+
+        <!-- Slide 4: The Silence -->
+        <div class="slide">
+          <div class="slide-content">
+            <h2>The Silence</h2>
+            <p>
+              No one knows why. No warning, no cataclysm, no final cry. One day
+              the water simply... dimmed.
+            </p>
+            <p>
+              The bioluminescent networks that connected every grove and trench
+              flickered and died. The currents lost their song. Fish that had
+              swum together for millennia scattered in confusion.
+            </p>
+            <p>And in the sudden darkness, something stirred in the Abyss.</p>
+            <p>
+              The Root Crown shattered. The Gorgon Sirens, driven mad by the
+              severed connection, turned hostile — their ancient duty corrupted
+              into blind rage.
+            </p>
+            <p>
+              The Betta Warlords, the last vessels of conscious magic, found
+              themselves alone in darkening waters, hunted by the very
+              guardians who once protected them.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 5: The Three Vessels -->
+        <div class="slide">
+          <div class="slide-content">
+            <h2>The Three Vessels of Magic</h2>
+            <div class="vessels-grid">
+              <div class="vessel-card betta">
+                <div class="vessel-icon"></div>
+                <div class="vessel-name">The Betta — Fire of Will</div>
+                <p>
+                  The Betta fish carry the oldest conscious magic in the waters.
+                  Each of the eight breeds channels a different aspect of Will —
+                  from the Halfmoon's protective resolve to the Crowntail's
+                  fierce ambition. When a Betta Warlord fights, they don't just
+                  swing a weapon; they burn with the accumulated determination
+                  of every ancestor who refused to yield.
+                </p>
+                <div class="vessel-status">Active — You are the last hope</div>
+              </div>
+              <div class="vessel-card gorgon">
+                <div class="vessel-icon"></div>
+                <div class="vessel-name">The Gorgons — Weight of Law</div>
+                <p>
+                  Three Gorgon Sirens once maintained the natural order of the
+                  deep: Scylla of the Shallows, Medusa of the Mid-waters, and
+                  Charybdis of the Abyss. Their petrifying gaze was not cruelty
+                  but justice — they turned only those who threatened the
+                  balance to stone. But when the Plankton Magic severed their
+                  connection to the web of life, the Gorgons lost their ability
+                  to distinguish friend from foe.
+                </p>
+                <div class="vessel-status">
+                  Corrupted — Must be defeated or restored
+                </div>
+              </div>
+              <div class="vessel-card plankton">
+                <div class="vessel-icon"></div>
+                <div class="vessel-name">The Plankton — Light of Unity</div>
+                <p>
+                  The most mysterious and powerful of the three magics. Plankton
+                  are everywhere in the waters — in every drop of water, every
+                  breath, every current. Their magic was the connective tissue
+                  of all life, a living network of bioluminescent light that let
+                  every creature in the waters feel the heartbeat of every other.
+                  When the Plankton Magic went silent, it was as if the waters
+                  itself went blind and deaf.
+                </p>
+                <div class="vessel-status">Silent — The great mystery</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 6: The Three Sisters -->
+        <div class="slide">
+          <div class="slide-content">
+            <h2>The Maddened Guardians</h2>
+            <div class="image-container">
+              <img
+                src="https://i.imgur.com/j0J8QhT.png"
+                alt="The Three Gorgon Sisters"
+              />
+            </div>
+            <p style="text-align: center; font-size: 1.15em; margin-top: 25px">
+              The three Gorgon Sirens once maintained the natural order of the
+              deep — Scylla guarding the shallows, Medusa the twilight borders,
+              and Charybdis the abyss.
+            </p>
+            <p style="text-align: center">
+              When the Plankton Magic went silent, the sisters lost their
+              connection to the web of life and to each other. Each was driven
+              mad in her own way: Scylla by fury, Medusa by grief, Charybdis by
+              the terrible truth she witnessed.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 7: The Revelation -->
+        <div class="slide">
+          <div class="slide-content">
+            <h2>The Truth Revealed</h2>
+            <p
+              style="
+                font-size: 1.3em;
+                color: #c4b5fd;
+                text-align: center;
+                font-style: italic;
+                margin: 40px 0;
+              "
+            >
+              When Charybdis falls, she speaks clearly for the first time in
+              centuries:
+            </p>
+
+            <div class="taunt charybdis" style="font-size: 1.15em">
+              "The Plankton didn't die. They chose to withdraw. Something was
+              coming — something that feeds on Unity itself. They severed the
+              web to starve it. But it found another way to feed... through us.
+              Through our rage. Through our grief."
+            </div>
+
+            <p
+              style="
+                text-align: center;
+                font-size: 1.4em;
+                margin-top: 50px;
+                color: #ef4444;
+              "
+            >
+              <strong>The Cacodaemon.</strong>
+            </p>
+
+            <p style="text-align: center; font-size: 1.2em; color: #cbd5e1">
+              It is here. It has always been here. And it is so, so hungry.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 11: Story Progression -->
+        <div class="slide">
+          <div class="slide-content">
+            <h2>The Path of the Warlord</h2>
+
+            <div class="progression-item">
+              <h4>
+                Phase I: The Shallows Darken
+                <span class="level-badge">Level 7-9</span>
+              </h4>
+              <p>
+                <strong>Boss:</strong> Scylla •
+                <strong>Location:</strong> Shipwreck Hollow
+              </p>
+              <p>
+                Scylla's fury has turned the once-peaceful shallows into a
+                killing ground. Coral statues of her victims line the seafloor.
+                You must face her winged wrath to claim the first Crown fragment
+                and prove yourself worthy of the deeper waters.
+              </p>
+            </div>
+
+            <div class="progression-item">
+              <h4>
+                Phase II: The Twilight Weeps
+                <span class="level-badge">Level 14-17</span>
+              </h4>
+              <p>
+                <strong>Boss:</strong> Medusa •
+                <strong>Location:</strong> Shadow Citadel
+              </p>
+              <p>
+                Medusa's grief has built a fortress of the petrified dead. Her
+                tears are cursed pearls. Her blade has ended champions for
+                centuries. To reach the second Crown fragment, you must survive
+                her gaze and perhaps remind her of the guardian she once was.
+              </p>
+            </div>
+
+            <div class="progression-item">
+              <h4>
+                Phase III: The Abyss Speaks
+                <span class="level-badge">Level 20</span>
+              </h4>
+              <p>
+                <strong>Boss:</strong> Charybdis •
+                <strong>Location:</strong> The Devourer's Maw
+              </p>
+              <p>
+                Charybdis holds the final truth — why the Plankton Magic went
+                silent. But she has hidden it behind madness, grief, and the
+                consuming fury of the Maw. Defeating her doesn't just earn a
+                Crown fragment — it reveals the real enemy: the Cacodaemon, the
+                creature that feeds on severed connections, the reason the
+                Plankton withdrew.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 12: The Plankton Mystery -->
+        <div class="slide">
+          <div class="slide-content">
+            <h2>The Silence of the Plankton</h2>
+            <p
+              style="text-align: center; font-size: 1.2em; margin-bottom: 40px"
+            >
+              The central mystery of Betta Warlords: Why did the Plankton Magic
+              — the Light of Unity that connected every living thing in the
+              waters — suddenly go silent?
+            </p>
+
+            <p>
+              Throughout the game, players discover fragments of the truth:
+              ancient inscriptions on the Root Crown, whispered memories from
+              the Gorgon Sirens, and strange bioluminescent echoes in the
+              deepest trenches that suggest the Plankton didn't die — they chose
+              to withdraw.
+            </p>
+
+            <h3 style="color: #22d3ee; margin-top: 40px">
+              Clues to the Mystery:
+            </h3>
+            <ul class="clue-list">
+              <li>
+                The Root Crown's inscriptions speak of a "Fourth Vessel" that
+                was never meant to awaken.
+              </li>
+              <li>
+                Charybdis's mad ravings mention "the light that ate itself."
+              </li>
+              <li>
+                In the deepest part of the Hadal Trench, Plankton still glow —
+                but they spell out a single word in an ancient script.
+              </li>
+              <li>
+                The Abyss King isn't conquering the waters — he's filling a
+                vacuum the Plankton left behind.
+              </li>
+              <li>
+                Each Root Crown fragment restored causes a brief, blinding
+                flash of Plankton light — as if they're watching.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Slide 10: Final Slide -->
+        <div class="slide">
+          <div class="slide-content title-slide">
+            <h1 style="font-size: 2.8em; margin-bottom: 25px">
+              Your Quest Awaits
+            </h1>
+            <p
+              style="
+                font-size: 1.2em;
+                text-align: center;
+                margin: 30px 0 25px 0;
+              "
+            >
+              Gather your Warlords. Restore the fragments of the Root Crown.
+              Face the maddened Gorgons. Discover why the Plankton Magic fell
+              silent.
+            </p>
+            <p
+              style="
+                font-size: 1.3em;
+                text-align: center;
+                color: #ef4444;
+                margin-top: 30px;
+                margin-bottom: 30px;
+              "
+            >
+              <strong>Before the Abyss devours everything.</strong>
+            </p>
+            <div class="image-container" style="margin-top: 25px">
+              <img
+                src="https://i.imgur.com/j0J8QhT.png"
+                alt="The Three Gorgon Sisters"
+                style="max-width: 100%; max-height: 300px"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <button class="nav-button prev" onclick="changeSlide(-1)">
+        &#10094;
+      </button>
+      <button class="nav-button next" onclick="changeSlide(1)">&#10095;</button>
+
+      <!-- Slide Counter -->
+      <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">13</span>
+      </div>
+
+      <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll(".slide");
+        const totalSlides = slides.length;
+
+        document.getElementById("total-slides").textContent = totalSlides;
+
+        function showSlide(n) {
+          if (n >= totalSlides) {
+            currentSlide = 0;
+          } else if (n < 0) {
+            currentSlide = totalSlides - 1;
+          } else {
+            currentSlide = n;
+          }
+
+          slides.forEach((slide, index) => {
+            slide.classList.remove("active");
+            if (index === currentSlide) {
+              slide.classList.add("active");
+              slide.scrollTop = 0; // Reset scroll position
+            }
+          });
+
+          document.getElementById("current-slide").textContent =
+            currentSlide + 1;
+        }
+
+        function changeSlide(direction) {
+          showSlide(currentSlide + direction);
+        }
+
+        // Keyboard navigation
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowLeft") {
+            changeSlide(-1);
+          } else if (e.key === "ArrowRight" || e.key === " ") {
+            e.preventDefault();
+            changeSlide(1);
+          } else if (e.key === "Home") {
+            showSlide(0);
+          } else if (e.key === "End") {
+            showSlide(totalSlides - 1);
+          }
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener("touchstart", (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener("touchend", (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+        });
+
+        function handleSwipe() {
+          if (touchEndX < touchStartX - 50) {
+            changeSlide(1); // Swipe left
+          }
+          if (touchEndX > touchStartX + 50) {
+            changeSlide(-1); // Swipe right
+          }
+        }
+
+        // Initialize
+        showSlide(0);
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,512 @@
+import React, { useState } from 'react';
+import useGameStore from '../../stores/gameStore';
+import { classDefinitions } from '../../data/classes';
+import { raceDefinitions, raceList } from '../../data/races';
+import { attributeDefinitions } from '../../data/attributes';
+import SpriteAnimation from '../ui/SpriteAnimation';
+import WorgeMorphPreview from '../ui/WorgeMorphPreview';
+import { getPlayerSprite } from '../../data/spriteMap';
+import useIsMobile from '../../hooks/useIsMobile';
+
+const stepLabels = ['Name', 'Breed', 'Class', 'Attributes'];
+
+const RACE_BG = {
+  blue_betta: '/backgrounds/card_blue_betta.png',
+  purple_betta: '/backgrounds/card_purple_betta.png',
+  green_betta: '/backgrounds/card_green_betta.png',
+  white_betta: '/backgrounds/card_white_betta.png',
+  red_betta: '/backgrounds/card_red_betta.png',
+  gold_betta: '/backgrounds/card_gold_betta.png',
+  orange_betta: '/backgrounds/card_red_betta.png',
+  pink_betta: '/backgrounds/card_purple_betta.png',
+};
+
+export default function CharacterCreate() {
+  const isMobile = useIsMobile();
+  const {
+    setScreen, setPlayerName, selectRace, selectClass,
+    playerClass, playerRace, playerName,
+    attributePoints, baseAttributePoints, unspentPoints, allocatePoint, deallocatePoint, startGame,
+  } = useGameStore();
+
+  const [step, setStep] = useState(1);
+  const [nameInput, setNameInput] = useState('');
+  const [selectedRace, setSelectedRace] = useState(null);
+  const [selectedFaction, setSelectedFaction] = useState(null);
+
+  const handleStep1 = () => {
+    if (nameInput.trim()) {
+      setPlayerName(nameInput.trim());
+      setStep(2);
+    }
+  };
+
+  const handleStep2 = () => {
+    if (selectedRace) {
+      selectRace(selectedRace);
+      setStep(3);
+    }
+  };
+
+  const handleStep3 = () => {
+    if (selectedFaction) {
+      selectClass(selectedFaction);
+      setStep(4);
+    }
+  };
+
+  const handleStart = () => {
+    if (playerClass) startGame();
+  };
+
+  const goBack = (toStep) => {
+    if (toStep <= 3) {
+      setSelectedFaction(null);
+      selectClass(null);
+    }
+    if (toStep <= 2) {
+      setSelectedRace(null);
+      selectRace(null);
+    }
+    setStep(toStep);
+  };
+
+  const selectedRaceDef = selectedRace ? raceDefinitions[selectedRace] : null;
+  const selectedCls = selectedFaction ? classDefinitions[selectedFaction] : null;
+
+  return (
+    <div style={{
+      width: '100%', height: '100%', overflow: 'auto',
+      background: 'radial-gradient(circle at 50% 0%, rgba(110,231,183,0.05), transparent 50%), rgba(11,16,32,0.75)',
+      position: 'relative',
+    }}>
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+        backgroundImage: 'url(/backgrounds/character_create.png)',
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        opacity: 0.35, zIndex: 0, pointerEvents: 'none',
+      }} />
+      <header style={{
+        background: 'linear-gradient(135deg, rgba(14,22,48,0.8), rgba(20,26,43,0.6))',
+        borderBottom: '2px solid var(--border)', padding: isMobile ? '10px 12px' : '14px 20px', textAlign: 'center',
+        position: 'relative', zIndex: 1,
+      }}>
+        <h1 className="font-cinzel" style={{ color: 'var(--accent)', fontSize: isMobile ? '1.1rem' : '1.4rem', marginBottom: isMobile ? 6 : 10 }}>
+          Create Your Warlord
+        </h1>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
+          {stepLabels.map((label, i) => {
+            const s = i + 1;
+            const active = step === s;
+            const done = step > s;
+            return (
+              <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                {i > 0 && <div style={{ width: 16, height: 2, background: done ? 'var(--accent)' : 'var(--border)' }} />}
+                <div style={{
+                  width: 24, height: 24, borderRadius: '50%',
+                  background: done ? 'var(--accent)' : active ? 'var(--gold)' : 'var(--border)',
+                  color: done || active ? '#0b1020' : 'var(--muted)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 700, fontSize: '0.7rem', transition: 'all 0.3s'
+                }}>{done ? '✓' : s}</div>
+                <span style={{
+                  color: active ? 'var(--text)' : done ? 'var(--accent)' : 'var(--muted)',
+                  fontSize: '0.75rem', fontWeight: active ? 600 : 400
+                }}>{label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </header>
+
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: isMobile ? 10 : 20, position: 'relative', zIndex: 1 }}>
+
+        {step === 1 && (
+          <div style={{ animation: 'fadeIn 0.4s ease', textAlign: 'center', paddingTop: 40 }}>
+            <h2 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '1.3rem', marginBottom: 20 }}>
+              Name Your Warlord
+            </h2>
+            <input
+              type="text" value={nameInput}
+              onChange={e => setNameInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleStep1()}
+              placeholder="Enter your name..."
+              maxLength={20} autoFocus
+              style={{
+                background: 'rgba(14,22,48,0.8)', border: '2px solid var(--border)',
+                borderRadius: 10, padding: isMobile ? '12px 16px' : '14px 28px', fontSize: isMobile ? '1rem' : '1.2rem',
+                color: 'var(--text)', textAlign: 'center', width: isMobile ? '100%' : 340,
+                maxWidth: isMobile ? 'calc(100vw - 40px)' : 'none',
+                outline: 'none', fontFamily: "'Jost', sans-serif"
+              }}
+              onFocus={e => e.target.style.borderColor = 'var(--accent)'}
+              onBlur={e => e.target.style.borderColor = 'var(--border)'}
+            />
+            <div style={{ marginTop: 30 }}>
+              <button onClick={handleStep1} disabled={!nameInput.trim()} style={{
+                background: nameInput.trim() ? 'linear-gradient(135deg, var(--accent), #10b981)' : 'var(--border)',
+                border: 'none', borderRadius: 10, padding: isMobile ? '12px 36px' : '14px 50px',
+                color: nameInput.trim() ? '#0b1020' : 'var(--muted)',
+                fontWeight: 700, fontSize: '1rem', cursor: nameInput.trim() ? 'pointer' : 'not-allowed',
+                fontFamily: "'Cinzel', serif", letterSpacing: 1, transition: 'all 0.3s',
+                minHeight: isMobile ? 36 : 'auto',
+              }}>Continue</button>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div style={{ animation: 'fadeIn 0.4s ease' }}>
+            <h2 className="font-cinzel" style={{ color: 'var(--gold)', textAlign: 'center', marginBottom: 6, fontSize: '1.3rem' }}>
+              Choose Your Breed
+            </h2>
+            <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.8rem', marginBottom: 20 }}>
+              8 Breeds &times; 4 Classes = 32 Warlord Combinations
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? 8 : 12 }}>
+              {raceList.map(race => {
+                const isSelected = selectedRace === race.id;
+                return (
+                  <div key={race.id} onClick={() => setSelectedRace(race.id)} style={{
+                    backgroundImage: `linear-gradient(135deg, ${isSelected ? race.color + '35' : 'rgba(20,26,43,0.85)'}, rgba(11,16,32,0.88)), url(${RACE_BG[race.id] || RACE_BG.blue_betta})`,
+                    backgroundSize: 'cover', backgroundPosition: 'center',
+                    border: `2px solid ${isSelected ? race.color : race.color + '30'}`,
+                    borderRadius: 12, padding: isMobile ? 12 : 16, cursor: 'pointer',
+                    transition: 'all 0.25s', textAlign: 'center', position: 'relative',
+                    boxShadow: isSelected ? `0 0 20px ${race.color}25, inset 0 0 30px ${race.color}08` : 'none',
+                    transform: isSelected ? 'scale(1.03)' : 'scale(1)',
+                    minHeight: isMobile ? 120 : 160,
+                  }}
+                  onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = race.color + '80'; e.currentTarget.style.transform = 'translateY(-2px)'; }}}
+                  onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = race.color + '30'; e.currentTarget.style.transform = 'none'; }}}
+                  >
+                    {isSelected && <div style={{
+                      position: 'absolute', top: 6, right: 8, color: race.color, fontSize: '0.8rem', fontWeight: 700
+                    }}>&#10003;</div>}
+                    <img src={race.icon} alt={race.name} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', marginBottom: 6 }} />
+                    <h3 className="font-cinzel" style={{ color: race.color, marginBottom: 4, fontSize: '1rem' }}>{race.name}</h3>
+                    <p style={{ color: 'var(--muted)', fontSize: '0.73rem', marginBottom: 6, lineHeight: 1.4 }}>{race.description}</p>
+                    <div style={{
+                      background: 'rgba(0,0,0,0.3)', borderRadius: 6, padding: '4px 8px',
+                      fontSize: '0.65rem', color: race.color, display: 'inline-block'
+                    }}>
+                      {race.passive}
+                    </div>
+                    <div style={{
+                      marginTop: 6, fontSize: '0.6rem', color: 'var(--muted)', fontStyle: 'italic', opacity: 0.7
+                    }}>
+                      Trait: {race.trait}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{
+              marginTop: 16, background: 'rgba(14,22,48,0.8)',
+              border: `1px solid ${selectedRaceDef ? selectedRaceDef.color + '40' : 'var(--border)'}`,
+              borderRadius: 10, padding: 14, textAlign: 'center',
+              minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              {selectedRaceDef ? (
+                <p style={{ color: 'var(--text)', fontSize: '0.8rem', fontStyle: 'italic', opacity: 0.8, margin: 0 }}>
+                  "{selectedRaceDef.lore}"
+                </p>
+              ) : (
+                <p style={{ color: 'var(--muted)', fontSize: '0.8rem', fontStyle: 'italic', opacity: 0.5, margin: 0 }}>
+                  Select a breed to learn more
+                </p>
+              )}
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: 20, display: 'flex', justifyContent: 'center', gap: 12 }}>
+              <button onClick={() => goBack(1)} style={{
+                background: 'var(--border)', border: 'none', borderRadius: 10,
+                padding: '12px 28px', color: 'var(--text)', fontWeight: 600,
+                cursor: 'pointer', fontSize: '0.9rem'
+              }}>Back</button>
+              <button onClick={handleStep2} disabled={!selectedRace} style={{
+                background: selectedRace ? 'linear-gradient(135deg, var(--accent), #10b981)' : 'var(--border)',
+                border: 'none', borderRadius: 10, padding: '12px 40px',
+                color: selectedRace ? '#0b1020' : 'var(--muted)',
+                fontWeight: 700, fontSize: '1rem', cursor: selectedRace ? 'pointer' : 'not-allowed',
+                fontFamily: "'Cinzel', serif", letterSpacing: 1, transition: 'all 0.3s'
+              }}>Continue</button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div style={{ animation: 'fadeIn 0.4s ease' }}>
+            <div style={{ textAlign: 'center', marginBottom: 16 }}>
+              <h2 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '1.3rem', marginBottom: 4 }}>
+                Choose Your Class
+              </h2>
+              {selectedRaceDef && (
+                <span style={{
+                  background: `${selectedRaceDef.color}20`, border: `1px solid ${selectedRaceDef.color}40`,
+                  padding: '3px 12px', borderRadius: 20, fontSize: '0.75rem', color: selectedRaceDef.color
+                }}>
+                  <img src={selectedRaceDef.icon} alt={selectedRaceDef.name} style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover', verticalAlign: 'middle', marginRight: 4 }} />{selectedRaceDef.name}
+                </span>
+              )}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? 8 : 14 }}>
+              {Object.entries(classDefinitions).map(([id, cls]) => {
+                const isSelected = selectedFaction === id;
+                const previewAttrs = { ...cls.startingAttributes };
+                if (selectedRaceDef) {
+                  Object.entries(selectedRaceDef.bonuses).forEach(([attr, val]) => {
+                    if (previewAttrs[attr] !== undefined) previewAttrs[attr] += val;
+                  });
+                }
+                return (
+                  <div key={id} onClick={() => setSelectedFaction(id)} style={{
+                    background: isSelected
+                      ? `linear-gradient(135deg, ${cls.color}20, ${cls.color}10)`
+                      : 'linear-gradient(135deg, rgba(20,26,43,0.95), rgba(20,26,43,0.7))',
+                    border: `2px solid ${isSelected ? cls.color : cls.color + '40'}`,
+                    borderRadius: 14, padding: 14, cursor: 'pointer',
+                    transition: 'all 0.25s', textAlign: 'center', position: 'relative',
+                    boxShadow: isSelected ? `0 0 20px ${cls.color}30, inset 0 0 30px ${cls.color}10` : 'none',
+                    transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                  }}
+                  onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = cls.color; e.currentTarget.style.transform = 'translateY(-3px)'; }}}
+                  onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = `${cls.color}40`; e.currentTarget.style.transform = 'none'; }}}
+                  >
+                    {isSelected && <div style={{
+                      position: 'absolute', top: 6, right: 10, color: cls.color, fontSize: '0.9rem', fontWeight: 700
+                    }}>&#10003;</div>}
+                    <div style={{
+                      position: 'relative',
+                      width: 120, height: 120, margin: '0 auto 8px',
+                      borderRadius: 14,
+                      overflow: 'hidden',
+                    }}>
+                      {cls.emblem && (
+                        <img src={cls.emblem} alt={`${cls.name} emblem`} style={{
+                          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                          objectFit: 'cover', borderRadius: 14,
+                          opacity: isSelected ? 0.9 : 0.5,
+                          filter: isSelected ? `drop-shadow(0 0 8px ${cls.color})` : 'grayscale(0.3)',
+                          transition: 'all 0.3s',
+                        }} onError={(e) => { e.target.style.display = 'none'; }} />
+                      )}
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        background: `radial-gradient(ellipse at center, transparent 40%, rgba(5,10,24,0.7) 100%)`,
+                        pointerEvents: 'none',
+                      }} />
+                      <div style={{
+                        position: 'relative', width: '100%', height: '100%',
+                        display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
+                        zIndex: 2,
+                      }}>
+                        {id === 'worge' ? (
+                          <WorgeMorphPreview raceId={selectedRace} scale={0.9} speed={150} />
+                        ) : (
+                          <SpriteAnimation spriteData={getPlayerSprite(id, selectedRace)} animation="idle" scale={0.9} speed={150} />
+                        )}
+                      </div>
+                    </div>
+                    <div style={{
+                      display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center', marginBottom: 6
+                    }}>
+                      {Object.entries(previewAttrs).filter(([, v]) => v > 0).map(([attr, val]) => (
+                        <span key={attr} style={{
+                          background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: 4,
+                          fontSize: '0.6rem', color: 'var(--accent)'
+                        }}>{attr.slice(0, 3)} {val}</span>
+                      ))}
+                    </div>
+                    <h3 className="font-cinzel" style={{ color: cls.color, marginBottom: 4, fontSize: '1rem' }}>{cls.name}</h3>
+                    <p style={{ color: 'var(--muted)', fontSize: '0.75rem', marginBottom: 0 }}>{cls.description}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{
+              marginTop: 16, background: 'rgba(14,22,48,0.8)',
+              border: `1px solid ${selectedCls ? selectedCls.color + '40' : 'var(--border)'}`,
+              borderRadius: 10, padding: 14,
+              minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14,
+              position: 'relative', overflow: 'hidden',
+            }}>
+              {selectedCls ? (
+                <>
+                  {selectedCls.emblem && (
+                    <img src={selectedCls.emblem} alt="" style={{
+                      width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
+                      border: `2px solid ${selectedCls.color}40`,
+                      filter: `drop-shadow(0 0 6px ${selectedCls.color}60)`,
+                    }} onError={(e) => { e.target.style.display = 'none'; }} />
+                  )}
+                  <p style={{ color: 'var(--text)', fontSize: '0.8rem', fontStyle: 'italic', opacity: 0.8, margin: 0, textAlign: 'left' }}>
+                    "{selectedCls.lore}"
+                  </p>
+                </>
+              ) : (
+                <p style={{ color: 'var(--muted)', fontSize: '0.8rem', fontStyle: 'italic', opacity: 0.5, margin: 0, textAlign: 'center' }}>
+                  Select a class to learn more
+                </p>
+              )}
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: 20, display: 'flex', justifyContent: 'center', gap: 12 }}>
+              <button onClick={() => goBack(2)} style={{
+                background: 'var(--border)', border: 'none', borderRadius: 10,
+                padding: '12px 28px', color: 'var(--text)', fontWeight: 600,
+                cursor: 'pointer', fontSize: '0.9rem'
+              }}>Back</button>
+              <button onClick={handleStep3} disabled={!selectedFaction} style={{
+                background: selectedFaction ? 'linear-gradient(135deg, var(--accent), #10b981)' : 'var(--border)',
+                border: 'none', borderRadius: 10, padding: '12px 40px',
+                color: selectedFaction ? '#0b1020' : 'var(--muted)',
+                fontWeight: 700, fontSize: '1rem', cursor: selectedFaction ? 'pointer' : 'not-allowed',
+                fontFamily: "'Cinzel', serif", letterSpacing: 1, transition: 'all 0.3s'
+              }}>Continue</button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && playerClass && (() => {
+          const cls = classDefinitions[playerClass];
+          const raceDef = playerRace ? raceDefinitions[playerRace] : null;
+          return (
+          <div style={{ animation: 'fadeIn 0.4s ease' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 20, marginBottom: 20,
+              background: 'linear-gradient(135deg, rgba(14,22,48,0.9), rgba(20,26,43,0.7))',
+              border: `2px solid ${cls.color}40`, borderRadius: 14, padding: isMobile ? 12 : 18,
+              flexWrap: 'wrap', justifyContent: 'center'
+            }}>
+              <div style={{
+                position: 'relative',
+                width: isMobile ? 80 : 120, height: isMobile ? 80 : 120, borderRadius: 14,
+                background: `radial-gradient(circle, ${cls.color}15, transparent)`,
+                border: `2px solid ${cls.color}30`,
+                display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+                flexShrink: 0,
+                overflow: 'hidden',
+              }}>
+                {cls.emblem && (
+                  <img src={cls.emblem} alt="" style={{
+                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                    objectFit: 'cover', opacity: 0.3, borderRadius: 14,
+                  }} onError={(e) => { e.target.style.display = 'none'; }} />
+                )}
+                <div style={{ position: 'relative', zIndex: 2 }}>
+                  <SpriteAnimation spriteData={getPlayerSprite(playerClass, playerRace)} animation="idle" scale={1.1} speed={150} />
+                </div>
+              </div>
+              <div style={{ flex: 1, minWidth: 180, textAlign: 'center' }}>
+                <h2 className="font-cinzel" style={{ color: 'var(--gold)', fontSize: '1.2rem', marginBottom: 4 }}>
+                  {playerName}
+                </h2>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 8 }}>
+                  {raceDef && (
+                    <span style={{
+                      background: `${raceDef.color}20`, border: `1px solid ${raceDef.color}40`,
+                      padding: '3px 10px', borderRadius: 20, fontSize: '0.75rem', color: raceDef.color
+                    }}><img src={raceDef.icon} alt={raceDef.name} style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover', verticalAlign: 'middle', marginRight: 4 }} />{raceDef.name}</span>
+                  )}
+                  <span style={{
+                    background: `${cls.color}20`, border: `1px solid ${cls.color}40`,
+                    padding: '3px 10px', borderRadius: 20, fontSize: '0.75rem', color: cls.color
+                  }}>{cls.icon} {cls.name}</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: 6 }}>
+                  Base stats: 20 from Breed + Class
+                </div>
+                <div style={{
+                  background: unspentPoints === 0 ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
+                  border: `2px solid ${unspentPoints === 0 ? 'var(--success)' : 'var(--gold)'}`,
+                  borderRadius: 10, padding: '6px 16px', display: 'inline-block'
+                }}>
+                  <span style={{
+                    fontSize: '1.1rem', fontWeight: 700,
+                    color: unspentPoints === 0 ? 'var(--success)' : 'var(--gold)'
+                  }}>{unspentPoints}</span>
+                  <span style={{ color: 'var(--muted)', fontSize: '0.7rem', marginLeft: 6 }}>points to allocate</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', gap: isMobile ? 8 : 10 }}>
+              {Object.entries(attributeDefinitions).map(([name, def]) => {
+                const base = (baseAttributePoints && baseAttributePoints[name]) || 0;
+                const current = attributePoints[name];
+                const added = current - base;
+                const canRemove = current > base;
+                return (
+                <div key={name} style={{
+                  background: 'rgba(20,26,43,0.8)', border: '1px solid var(--border)',
+                  borderRadius: 10, padding: 12, borderLeft: `4px solid ${def.color}`
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                      <img src={def.icon} alt={name} style={{ width: 22, height: 22, imageRendering: 'pixelated', verticalAlign: 'middle', marginRight: 4 }} />{name}
+                    </span>
+                    <span style={{ fontFamily: 'monospace', fontSize: '1.05rem' }}>
+                      <span style={{ color: 'var(--muted)' }}>{base}</span>
+                      {added > 0 && <span style={{ color: 'var(--accent)', fontWeight: 700 }}> +{added}</span>}
+                      <span style={{ color: 'var(--text)', fontWeight: 700, marginLeft: 6 }}>= {current}</span>
+                    </span>
+                  </div>
+                  <div style={{ color: 'var(--muted)', fontSize: '0.7rem', marginBottom: 6 }}>{def.description}</div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <button onClick={() => deallocatePoint(name)} style={{
+                      width: isMobile ? 36 : 30, height: isMobile ? 36 : 30, borderRadius: '50%',
+                      background: canRemove ? 'var(--danger)' : 'var(--border)',
+                      border: 'none', color: 'white', fontWeight: 700, fontSize: '1rem',
+                      cursor: canRemove ? 'pointer' : 'not-allowed', opacity: canRemove ? 1 : 0.4,
+                      minWidth: 36, minHeight: 36,
+                    }}>-</button>
+                    <div style={{
+                      flex: 1, height: 8, background: 'var(--border)', borderRadius: 4, overflow: 'hidden', position: 'relative'
+                    }}>
+                      <div style={{
+                        width: `${(base / 20) * 100}%`, height: '100%',
+                        background: `${def.color}50`,
+                        borderRadius: 4, position: 'absolute'
+                      }} />
+                      <div style={{
+                        width: `${(current / 20) * 100}%`, height: '100%',
+                        background: `linear-gradient(90deg, ${def.color}, ${def.color}80)`,
+                        borderRadius: 4, transition: 'width 0.2s', position: 'relative'
+                      }} />
+                    </div>
+                    <button onClick={() => allocatePoint(name)} style={{
+                      width: isMobile ? 36 : 30, height: isMobile ? 36 : 30, borderRadius: '50%',
+                      background: unspentPoints > 0 ? 'var(--success)' : 'var(--border)',
+                      border: 'none', color: 'white', fontWeight: 700, fontSize: '1rem',
+                      cursor: unspentPoints > 0 ? 'pointer' : 'not-allowed', opacity: unspentPoints > 0 ? 1 : 0.4,
+                      minWidth: 36, minHeight: 36,
+                    }}>+</button>
+                  </div>
+                </div>
+                );
+              })}
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: 24, display: 'flex', justifyContent: 'center', gap: 12 }}>
+              <button onClick={() => goBack(3)} style={{
+                background: 'var(--border)', border: 'none', borderRadius: 10,
+                padding: '12px 28px', color: 'var(--text)', fontWeight: 600,
+                cursor: 'pointer', fontSize: '0.9rem'
+              }}>Back</button>
+              <button onClick={handleStart} style={{
+                background: 'linear-gradient(135deg, var(--accent), #10b981)',
+                border: 'none', borderRadius: 10, padding: '14px 50px',
+                color: '#0b1020', fontWeight: 700, fontSize: '1.05rem',
+                cursor: 'pointer', fontFamily: "'Cinzel', serif", letterSpacing: 1
+              }}>Begin Adventure</button>
+            </div>
+          </div>
+          );
+        })()}
+      </div>
+    </div>
+  );
+}

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { puterAI, puterFS, puterAuth, isPuterAvailable } from '../../utils/puterService';
 
 export function AIEditor({ spec, onUpdate, onBack }) {
   const [messages, setMessages] = useState([
@@ -6,13 +7,113 @@ export function AIEditor({ spec, onUpdate, onBack }) {
   ]);
   const [input, setInput] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
+  const [authStatus, setAuthStatus] = useState({ checked: false, signedIn: false, user: null });
+  const [saveStatus, setSaveStatus] = useState('');
   const chatRef = useRef(null);
   const palette = spec.meta?.colorPalette || {};
   const fonts = spec.meta?.fonts || {};
 
+  const models = [
+    { value: 'gpt-5-nano', label: 'GPT-5 Nano' },
+    { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
+    { value: 'claude-sonnet-4', label: 'Claude Sonnet' },
+  ];
+
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
   }, [messages]);
+
+  useEffect(() => {
+    async function checkAuth() {
+      if (!isPuterAvailable()) {
+        setAuthStatus({ checked: true, signedIn: false, user: null });
+        return;
+      }
+      try {
+        const signedIn = puterAuth.isSignedIn();
+        const user = signedIn ? await puterAuth.getUser() : null;
+        setAuthStatus({ checked: true, signedIn, user });
+      } catch {
+        setAuthStatus({ checked: true, signedIn: false, user: null });
+      }
+    }
+    checkAuth();
+  }, []);
+
+  const handleSignIn = async () => {
+    try {
+      await puterAuth.signIn();
+      const user = await puterAuth.getUser();
+      setAuthStatus({ checked: true, signedIn: true, user });
+    } catch (e) {
+      console.warn('Sign in failed:', e);
+    }
+  };
+
+  const handleSaveToCloud = async () => {
+    if (!authStatus.signedIn) {
+      await handleSignIn();
+      if (!puterAuth.isSignedIn()) return;
+    }
+    setSaveStatus('saving');
+    try {
+      const gameName = (spec.meta?.gameName || 'game').replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+      const path = `/game-factory/${gameName}.json`;
+      try { await puterFS.mkdir('/game-factory'); } catch {}
+      await puterFS.write(path, JSON.stringify(spec, null, 2));
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus(''), 3000);
+    } catch (err) {
+      setSaveStatus('error');
+      console.error('Save failed:', err);
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const handleLoadFromCloud = async () => {
+    if (!authStatus.signedIn) {
+      await handleSignIn();
+      if (!puterAuth.isSignedIn()) return;
+    }
+    setSaveStatus('loading');
+    try {
+      const gameName = (spec.meta?.gameName || 'game').replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+      const path = `/game-factory/${gameName}.json`;
+      const blob = await puterFS.read(path);
+      const text = await blob.text();
+      const loaded = JSON.parse(text);
+      onUpdate(loaded);
+      setSaveStatus('loaded');
+      setMessages(prev => [...prev, { role: 'assistant', content: `Loaded game spec "${loaded.meta?.gameName || gameName}" from Puter cloud!` }]);
+      setTimeout(() => setSaveStatus(''), 3000);
+    } catch (err) {
+      setSaveStatus('error');
+      console.error('Load failed:', err);
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const handleExportToPuter = async () => {
+    if (!authStatus.signedIn) {
+      await handleSignIn();
+      if (!puterAuth.isSignedIn()) return;
+    }
+    setSaveStatus('exporting');
+    try {
+      const gameName = (spec.meta?.gameName || 'game').replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+      const exportPath = `/game-exports/${gameName}_${Date.now()}.json`;
+      try { await puterFS.mkdir('/game-exports'); } catch {}
+      await puterFS.write(exportPath, JSON.stringify(spec, null, 2));
+      setSaveStatus('exported');
+      setMessages(prev => [...prev, { role: 'assistant', content: `Exported game spec to Puter filesystem at: ${exportPath}` }]);
+      setTimeout(() => setSaveStatus(''), 3000);
+    } catch (err) {
+      setSaveStatus('error');
+      console.error('Export failed:', err);
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
 
   const processCommand = useCallback(async (userMsg) => {
     setProcessing(true);
@@ -46,16 +147,54 @@ Analyze the request and return a JSON object with:
 Return ONLY valid JSON.`;
 
       let aiResult = null;
-      if (typeof window !== 'undefined' && window.puter) {
+      if (isPuterAvailable()) {
         try {
-          const resp = await puter.ai.chat(prompt, { model: 'gpt-4o-mini' });
-          const text = typeof resp === 'string' ? resp : resp?.message?.content || '';
-          const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || text.match(/[\[{][\s\S]*[\]}]/);
+          let fullText = '';
+          const stream = await puterAI.chatStream(prompt, { model: selectedModel });
+
+          if (stream && typeof stream[Symbol.asyncIterator] === 'function') {
+            setMessages(prev => [...prev, { role: 'assistant', content: '', streaming: true }]);
+            for await (const chunk of stream) {
+              const text = chunk?.text || chunk?.message?.content || chunk?.toString?.() || '';
+              fullText += text;
+              setMessages(prev => {
+                const updated = [...prev];
+                const last = updated[updated.length - 1];
+                if (last?.streaming) {
+                  last.content = fullText;
+                }
+                return updated;
+              });
+            }
+            setMessages(prev => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              if (last?.streaming) {
+                delete last.streaming;
+              }
+              return updated;
+            });
+          } else {
+            const resp = stream;
+            fullText = typeof resp === 'string' ? resp : resp?.message?.content || '';
+          }
+
+          const jsonMatch = fullText.match(/```(?:json)?\s*([\s\S]*?)```/) || fullText.match(/[\[{][\s\S]*[\]}]/);
           if (jsonMatch) {
             aiResult = JSON.parse(jsonMatch[1] || jsonMatch[0]);
           }
         } catch(e) {
-          console.warn('AI parse failed:', e);
+          console.warn('AI stream/parse failed, trying non-stream:', e);
+          try {
+            const resp = await puterAI.chat(prompt, { model: selectedModel });
+            const text = typeof resp === 'string' ? resp : resp?.message?.content || '';
+            const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || text.match(/[\[{][\s\S]*[\]}]/);
+            if (jsonMatch) {
+              aiResult = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+            }
+          } catch(e2) {
+            console.warn('AI fallback also failed:', e2);
+          }
         }
       }
 
@@ -72,9 +211,15 @@ Return ONLY valid JSON.`;
       response = `I encountered an error: ${err.message}. Try rephrasing your request.`;
     }
 
-    setMessages(prev => [...prev, { role: 'assistant', content: response || "I've processed your request. Check the preview to see changes!" }]);
+    setMessages(prev => {
+      const last = prev[prev.length - 1];
+      if (last?.role === 'assistant' && !last.streaming) {
+        return prev;
+      }
+      return [...prev, { role: 'assistant', content: response || "I've processed your request. Check the preview to see changes!" }];
+    });
     setProcessing(false);
-  }, [spec, onUpdate]);
+  }, [spec, onUpdate, selectedModel]);
 
   const handleSend = useCallback(() => {
     if (!input.trim() || processing) return;
@@ -99,6 +244,20 @@ Return ONLY valid JSON.`;
       alignItems: 'center',
       padding: '16px 20px',
       borderBottom: '1px solid #334155',
+      flexWrap: 'wrap',
+      gap: '8px',
+    },
+    headerLeft: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      flexWrap: 'wrap',
+    },
+    headerRight: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      flexWrap: 'wrap',
     },
     title: {
       fontFamily: `'${fonts.heading || 'Cinzel'}', serif`,
@@ -114,11 +273,57 @@ Return ONLY valid JSON.`;
       cursor: 'pointer',
       fontSize: '13px',
     },
+    modelSelect: {
+      padding: '6px 10px',
+      borderRadius: '8px',
+      border: '1px solid #334155',
+      background: '#1e293b',
+      color: '#e2e8f0',
+      fontSize: '12px',
+      cursor: 'pointer',
+      outline: 'none',
+    },
+    authIndicator: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px',
+      padding: '4px 10px',
+      borderRadius: '12px',
+      background: authStatus.signedIn ? '#065f4620' : '#7f1d1d20',
+      border: `1px solid ${authStatus.signedIn ? '#10b981' : '#ef4444'}40`,
+      fontSize: '11px',
+      color: authStatus.signedIn ? '#10b981' : '#ef4444',
+    },
+    authDot: {
+      width: '6px',
+      height: '6px',
+      borderRadius: '50%',
+      background: authStatus.signedIn ? '#10b981' : '#ef4444',
+    },
+    cloudBtn: {
+      padding: '6px 12px',
+      borderRadius: '8px',
+      border: '1px solid #334155',
+      background: '#1e293b',
+      color: '#94a3b8',
+      fontSize: '11px',
+      cursor: 'pointer',
+    },
+    exportBtn: {
+      padding: '6px 12px',
+      borderRadius: '8px',
+      border: 'none',
+      background: `linear-gradient(135deg, ${palette.primary || '#6366f1'}, ${palette.secondary || '#8b5cf6'})`,
+      color: '#fff',
+      fontSize: '11px',
+      fontWeight: '600',
+      cursor: 'pointer',
+    },
     chatArea: {
       flex: 1,
       padding: '20px',
       overflowY: 'auto',
-      maxHeight: 'calc(100vh - 160px)',
+      maxHeight: 'calc(100vh - 200px)',
     },
     message: (role) => ({
       maxWidth: '80%',
@@ -178,6 +383,19 @@ Return ONLY valid JSON.`;
       fontSize: '11px',
       cursor: 'pointer',
     },
+    toolbar: {
+      display: 'flex',
+      gap: '6px',
+      padding: '8px 20px',
+      alignItems: 'center',
+      borderBottom: '1px solid #1e293b',
+      flexWrap: 'wrap',
+    },
+    saveStatusText: {
+      fontSize: '11px',
+      color: saveStatus === 'error' ? '#ef4444' : '#10b981',
+      marginLeft: '4px',
+    },
   };
 
   const quickActions = [
@@ -189,22 +407,73 @@ Return ONLY valid JSON.`;
     'Rename the currency',
   ];
 
+  const saveStatusLabels = {
+    saving: 'Saving...',
+    saved: '✓ Saved to cloud',
+    loading: 'Loading...',
+    loaded: '✓ Loaded from cloud',
+    exporting: 'Exporting...',
+    exported: '✓ Exported to Puter',
+    error: '✗ Operation failed',
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h2 style={styles.title}>AI Game Editor - {spec.meta?.gameName}</h2>
-        <button style={styles.backBtn} onClick={onBack}>Back to Factory</button>
+        <div style={styles.headerLeft}>
+          <h2 style={styles.title}>AI Game Editor - {spec.meta?.gameName}</h2>
+          <div style={styles.authIndicator}>
+            <div style={styles.authDot} />
+            {authStatus.signedIn
+              ? (authStatus.user?.username || 'Signed In')
+              : 'Not connected'}
+          </div>
+          {!authStatus.signedIn && isPuterAvailable() && (
+            <button style={styles.cloudBtn} onClick={handleSignIn}>Sign In</button>
+          )}
+        </div>
+        <div style={styles.headerRight}>
+          <button style={styles.backBtn} onClick={onBack}>Back to Factory</button>
+        </div>
+      </div>
+
+      <div style={styles.toolbar}>
+        <select
+          style={styles.modelSelect}
+          value={selectedModel}
+          onChange={e => setSelectedModel(e.target.value)}
+        >
+          {models.map(m => (
+            <option key={m.value} value={m.value}>{m.label}</option>
+          ))}
+        </select>
+
+        <button style={styles.cloudBtn} onClick={handleSaveToCloud}>
+          💾 Save to Cloud
+        </button>
+        <button style={styles.cloudBtn} onClick={handleLoadFromCloud}>
+          📂 Load from Cloud
+        </button>
+        <button style={styles.exportBtn} onClick={handleExportToPuter}>
+          🚀 Export to Puter
+        </button>
+
+        {saveStatus && (
+          <span style={styles.saveStatusText}>
+            {saveStatusLabels[saveStatus] || saveStatus}
+          </span>
+        )}
       </div>
 
       <div style={styles.chatArea} ref={chatRef}>
         {messages.map((msg, i) => (
           <div key={i} style={styles.message(msg.role)}>
             {msg.role === 'user' && <div style={{ fontSize: '10px', color: palette.primary, marginBottom: '4px' }}>You</div>}
-            {msg.role === 'assistant' && <div style={{ fontSize: '10px', color: palette.secondary, marginBottom: '4px' }}>AI Editor</div>}
+            {msg.role === 'assistant' && <div style={{ fontSize: '10px', color: palette.secondary, marginBottom: '4px' }}>AI Editor {msg.streaming ? '(streaming...)' : ''}</div>}
             {msg.content}
           </div>
         ))}
-        {processing && (
+        {processing && !messages[messages.length - 1]?.streaming && (
           <div style={styles.message('assistant')}>
             <div style={{ color: palette.primary }}>Thinking...</div>
           </div>

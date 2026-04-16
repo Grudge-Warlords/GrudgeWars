@@ -67,6 +67,27 @@ export const puterAI = {
     const resp = await puterAI.chat(prompt);
     return typeof resp === 'string' ? resp : resp?.message?.content || resp?.toString() || '';
   },
+
+  async txt2img(prompt, options = {}) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.ai.txt2img(prompt, options);
+    return result;
+  },
+
+  async img2txt(image) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.ai.img2txt(image);
+    return result;
+  },
+
+  async txt2speech(text, options = {}) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.ai.txt2speech(text, options);
+    return result;
+  },
 };
 
 export const puterKV = {
@@ -105,6 +126,87 @@ export const puterKV = {
       const keys = await p.kv.list();
       return keys || [];
     } catch { return []; }
+  },
+};
+
+export const puterFS = {
+  async write(path, data) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.fs.write(path, data);
+    return result;
+  },
+
+  async read(path) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.fs.read(path);
+    return result;
+  },
+
+  async mkdir(path) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.fs.mkdir(path);
+    return result;
+  },
+
+  async delete(path) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.fs.delete(path);
+    return result;
+  },
+
+  async readdir(path) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.fs.readdir(path);
+    return result;
+  },
+
+  async getReadURL(path) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.fs.getReadURL(path);
+    return result;
+  },
+};
+
+export const puterApps = {
+  async create(name, options = {}) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.apps.create(name, options);
+    return result;
+  },
+
+  async list() {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.apps.list();
+    return result;
+  },
+
+  async get(name) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.apps.get(name);
+    return result;
+  },
+
+  async update(name, options = {}) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.apps.update(name, options);
+    return result;
+  },
+
+  async delete(name) {
+    const p = getPuter();
+    if (!p) throw new Error('Puter SDK not loaded');
+    const result = await p.apps.delete(name);
+    return result;
   },
 };
 

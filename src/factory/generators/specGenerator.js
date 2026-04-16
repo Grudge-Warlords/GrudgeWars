@@ -190,6 +190,8 @@ async function generateClasses(form, onProgress) {
   const classNames = splitCommaSafe(form.classNames);
   const count = form.classCount;
 
+  const abilityEffects = ['bleed', 'burn', 'poison', 'stun', 'lower_defense', 'lower_attack'];
+
   const prompt = `You are a game designer. Create ${count} character classes for an RPG with theme "${form.theme}" set in "${form.setting}".
 ${classNames.length > 0 ? `Use these names: ${classNames.join(', ')}. Add more if needed to reach ${count}.` : `Invent ${count} unique class names.`}
 Combat style: ${form.combatStyle}.
@@ -203,7 +205,14 @@ For each class, return a JSON array with objects having:
 - transformName (name of their ultimate transformation ability)
 - primaryResource ("Stamina", "Mana", or "Both")
 - abilities: array of 4 abilities, each with:
-  - name, description (short), type (physical/magical/heal/buff/debuff), damageMultiplier (0.8-2.5)
+  - name (thematic, e.g. "Savage Cleave", "Shadow Strike", "Arcane Blast")
+  - description (short)
+  - type (physical/magical/heal/buff)
+  - damageMultiplier (0.8-2.5)
+  - target ("enemy", "self", "all_enemies", or "all_allies")
+  - effect (optional, one of: ${abilityEffects.join(', ')} — add to 1-2 offensive abilities per class)
+
+The first ability should be a basic attack (no cost). Healer classes need at least one heal ability. Tank classes need a self-buff. DPS classes should have at least one AoE (target: all_enemies).
 
 Return ONLY a valid JSON array.`;
 
@@ -253,10 +262,11 @@ Return ONLY a valid JSON array.`;
       manaCost: (ab.type === 'magical' || ab.type === 'heal') ? (j === 0 ? 0 : 20 + j * 10) : 0,
       staminaCost: ab.type === 'physical' ? (j === 0 ? 0 : 15 + j * 5) : 0,
       cooldown: j === 0 ? 0 : j + 1,
-      target: ab.type === 'heal' || ab.type === 'buff' ? 'self' : 'enemy',
+      target: ab.target || (ab.type === 'heal' || ab.type === 'buff' ? 'self' : 'enemy'),
       ...(j === 0 ? { manaGain: isMana ? 8 : 5, staminaGain: isStamina ? 8 : 5 } : {}),
       ...(ab.type === 'heal' ? { healPercent: 0.3 } : {}),
       ...(ab.type === 'buff' ? { effect: { stat: 'damage', multiplier: 1.3, duration: 3 } } : {}),
+      ...(ab.effect && typeof ab.effect === 'string' ? { effect: ab.effect } : {}),
     }));
 
     return {
@@ -330,16 +340,35 @@ Return ONLY valid JSON.`;
 async function generateEnemies(form, lore, onProgress) {
   const enemyCount = 20;
 
+  const spriteKeywordHints = [
+    'wisp', 'spider', 'golem', 'hound', 'knight', 'wraith', 'assassin',
+    'drake', 'sentinel', 'crawler', 'priest', 'gargoyle', 'revenant',
+    'horror', 'serpent', 'herald', 'bear', 'wolf', 'beast', 'stalker',
+    'soldier', 'guard', 'warrior', 'drone', 'grunt', 'pirate', 'hunter',
+    'mech', 'sentry', 'captain', 'corsair', 'sniper', 'shooter', 'titan',
+    'phantom', 'mage', 'sorcerer', 'robot', 'cyborg', 'mutant', 'brute',
+    'archer', 'scout', 'gunner', 'berserker', 'destroyer', 'enforcer',
+  ];
+
+  const effectHints = ['bleed', 'burn', 'poison', 'stun', 'confuse', 'lower_defense', 'lower_attack'];
+
   const prompt = `Create ${enemyCount} enemies for an RPG with theme "${form.theme}" in world "${lore?.title || form.worldName}".
 Setting: ${form.setting}
 
+IMPORTANT: Each enemy name MUST contain one of these creature-type keywords for sprite matching:
+${spriteKeywordHints.join(', ')}
+
+Example good names: "Shadow Stalker", "Void Wraith", "Cyber Drone MK-II", "Ember Knight", "Crystal Sentinel"
+Example bad names: "Xylothrix", "Darkwhisper" (no matching keyword)
+
 Return a JSON array of ${enemyCount} enemies. Each has:
-- name (themed to the setting)
+- name (themed to the setting, MUST include a keyword from the list above)
 - icon (one of: sword, skull, wolf, shield, crystal, fire, nature, lightning)
 - color (hex)
 - tier (1-4, where 1=weak, 4=elite)
 - description (10 words max)
-- abilities: array of 2 abilities, each with name, type (physical/magical/buff), damageMultiplier (0.8-2.0)
+- effect (optional status effect, one of: ${effectHints.join(', ')})
+- abilities: array of 2 abilities, each with name, type (physical/magical/buff), damageMultiplier (0.8-2.0), and optional effect (one of: ${effectHints.join(', ')})
 
 Return ONLY valid JSON array.`;
 
@@ -388,6 +417,7 @@ Return ONLY valid JSON array.`;
         damage: ab.damageMultiplier || 1.0,
         description: `${ab.name || 'An attack'} from ${e.name}`,
         ...(j > 0 ? { cooldown: 3 } : {}),
+        ...(ab.effect ? { effect: ab.effect } : e.effect && j === 1 ? { effect: e.effect } : {}),
       })),
     };
   });
@@ -396,10 +426,18 @@ Return ONLY valid JSON array.`;
 async function generateBosses(form, lore, onProgress) {
   const count = form.bossCount;
 
+  const bossKeywords = [
+    'demon', 'dragon', 'titan', 'guardian', 'horror', 'serpent', 'bear',
+    'knight', 'sentinel', 'golem', 'wraith', 'mech', 'cyborg', 'corsair',
+  ];
+  const effectHints = ['bleed', 'burn', 'poison', 'stun', 'confuse', 'lower_defense', 'lower_attack'];
+
   const prompt = `Create ${count} epic boss enemies for an RPG with theme "${form.theme}".
 ${form.bossTheme ? `Boss theme: ${form.bossTheme}` : ''}
 World: ${lore?.title || form.worldName || 'the realm'}
 ${lore?.factions ? `Factions: ${lore.factions.map(f => f.name).join(', ')}` : ''}
+
+Boss names should ideally contain one of these creature keywords: ${bossKeywords.join(', ')}
 
 For each boss, return a JSON array with:
 - name (epic, memorable name with title)
@@ -408,7 +446,7 @@ For each boss, return a JSON array with:
 - level (boss difficulty 1-20, spread across range)
 - description (2-3 sentences of backstory)
 - lore (1-2 sentences of atmospheric lore)
-- abilities: array of 4 abilities with name, type (physical/magical/buff/debuff), damageMultiplier (1.0-3.0)
+- abilities: array of 4 abilities with name, type (physical/magical/buff/debuff), damageMultiplier (1.0-3.0), and optional effect (one of: ${effectHints.join(', ')})
 
 Return ONLY valid JSON array.`;
 
@@ -463,7 +501,9 @@ Return ONLY valid JSON array.`;
         damage: ab.damageMultiplier || 1.5,
         description: `${ab.name} from ${b.name}`,
         cooldown: j === 0 ? 0 : j + 2,
+        target: ab.type === 'buff' ? 'self' : (j === 2 ? 'all_enemies' : 'enemy'),
         ...(ab.type === 'buff' ? { effect: { stat: 'damage', multiplier: 1.5, duration: 3 } } : {}),
+        ...(ab.effect ? { effect: ab.effect } : {}),
       })),
     };
   });

@@ -12,7 +12,8 @@ try {
   console.error('[GBuX] Invalid GBUX_TOKEN_ADDRESS:', e.message);
 }
 const GRENCH_PUBKEY = new PublicKey(process.env.GRENCH_WALLET_ADDRESS);
-const CROSSMINT_API_KEY = process.env.CROSSMINT_API_KEY;
+const CROSSMINT_API_KEY = process.env.CROSSMINT_SERVER_API_KEY || process.env.CROSSMINT_API_KEY;
+const CROSSMINT_PROJECT_ID = process.env.CROSSMINT_PROJECT_ID || '';
 const CROSSMINT_BASE = 'https://www.crossmint.com/api/v1-alpha2';
 
 let grenchKeypair = null;
@@ -321,4 +322,4 @@ export function getPricingWithLivePrice(tokenPrice) {
   return livePricing;
 }
 
-export { PRICING, FEATURE_COSTS, GBUX_MINT, GRENCH_PUBKEY };
+export { PRICING, FEATURE_COSTS, GBUX_MINT, GRENCH_PUBKEY, CROSSMINT_PROJECT_ID };

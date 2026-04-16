@@ -1,22 +1,33 @@
-export async function deployToPuter(gameSpec) {
-  if (!window.puter) {
+import { puterAuth, puterFS, puterApps, isPuterAvailable } from '../../utils/puterService.js';
+
+async function ensureAuthenticated() {
+  if (!isPuterAvailable()) {
     throw new Error('Puter is not available. Please open this app on puter.com to deploy.');
   }
+  const signedIn = puterAuth.isSignedIn();
+  if (!signedIn) {
+    await puterAuth.signIn();
+  }
+  const user = await puterAuth.getUser();
+  if (!user) {
+    throw new Error('Authentication failed. Please sign in to Puter to deploy.');
+  }
+  return user;
+}
 
-  const gameName = gameSpec.meta?.gameName?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'my-rpg';
+function generateDeployedHtml(gameSpec) {
   const palette = gameSpec.meta?.colorPalette || {};
   const fonts = gameSpec.meta?.fonts || {};
-
   const specJson = JSON.stringify(gameSpec, null, 2);
 
-  const indexHtml = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${gameSpec.meta?.gameName || 'RPG Game'}</title>
   <link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(fonts.heading || 'Cinzel')}:wght@400;700&family=${encodeURIComponent(fonts.body || 'Jost')}:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <script src="https://js.puter.com/v2/"></script>
+  <script src="https://js.puter.com/v2/"><\/script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -113,8 +124,8 @@ export async function deployToPuter(gameSpec) {
       position: fixed;
       bottom: 70px;
       right: 20px;
-      width: 350px;
-      max-height: 500px;
+      width: 380px;
+      max-height: 520px;
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 16px;
@@ -127,6 +138,17 @@ export async function deployToPuter(gameSpec) {
       border-bottom: 1px solid #334155;
       font-weight: 700;
       color: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ai-model-select {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: var(--text);
+      font-size: 11px;
     }
     .ai-chat {
       flex: 1;
@@ -158,6 +180,10 @@ export async function deployToPuter(gameSpec) {
       cursor: pointer;
       font-weight: 700;
     }
+    .ai-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     .msg {
       margin-bottom: 8px;
       padding: 8px 12px;
@@ -175,40 +201,87 @@ export async function deployToPuter(gameSpec) {
       border: 1px solid #334155;
       margin-right: 20%;
     }
+    .msg.streaming {
+      border-color: var(--primary);
+      animation: pulse 1s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .ai-save-row {
+      display: flex;
+      gap: 6px;
+      padding: 4px 12px 8px;
+    }
+    .ai-save-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .ai-save-btn:hover { background: #334155; }
   </style>
 </head>
 <body>
   <div id="app"></div>
   <div class="ai-editor">
-    <button class="ai-btn" onclick="toggleAI()">AI Editor</button>
+    <button class="ai-btn" onclick="toggleAI()">✨ AI Editor</button>
   </div>
   <div class="ai-panel" id="aiPanel">
-    <div class="ai-header">AI Game Editor</div>
+    <div class="ai-header">
+      <span>AI Game Editor</span>
+      <select class="ai-model-select" id="aiModel">
+        <option value="gpt-5-nano">GPT-5 Nano</option>
+        <option value="gpt-4o-mini">GPT-4o Mini</option>
+        <option value="claude-sonnet-4">Claude Sonnet</option>
+      </select>
+    </div>
     <div class="ai-chat" id="aiChat">
-      <div class="msg ai">Welcome! You can edit this game by chatting with me. Try "make bosses harder" or "add a new race".</div>
+      <div class="msg ai">Welcome! Edit your game by chatting with me. Try "make bosses harder", "add a new race called Merfolk", or ask anything about your game.</div>
+    </div>
+    <div class="ai-save-row">
+      <button class="ai-save-btn" onclick="saveSpec()">💾 Save to Cloud</button>
+      <button class="ai-save-btn" onclick="exportSpec()">📥 Export JSON</button>
     </div>
     <div class="ai-input-row">
       <input class="ai-input" id="aiInput" placeholder="Edit your game..." onkeydown="if(event.key==='Enter')sendAI()">
-      <button class="ai-send" onclick="sendAI()">Send</button>
+      <button class="ai-send" id="aiSendBtn" onclick="sendAI()">Send</button>
     </div>
   </div>
 
   <script>
     const GAME_SPEC = ${specJson};
-    
+    let aiSending = false;
+
     function toggleAI() {
       document.getElementById('aiPanel').classList.toggle('open');
     }
-    
+
+    function addMsg(role, text, streaming) {
+      const chat = document.getElementById('aiChat');
+      const div = document.createElement('div');
+      div.className = 'msg ' + role + (streaming ? ' streaming' : '');
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      return div;
+    }
+
     async function sendAI() {
+      if (aiSending) return;
       const input = document.getElementById('aiInput');
       const msg = input.value.trim();
       if (!msg) return;
       input.value = '';
-      
-      const chat = document.getElementById('aiChat');
-      chat.innerHTML += '<div class="msg user">' + msg + '</div>';
-      
+      aiSending = true;
+      document.getElementById('aiSendBtn').disabled = true;
+
+      addMsg('user', msg);
+
       const lower = msg.toLowerCase();
       let changed = false;
       let response = '';
@@ -231,26 +304,65 @@ export async function deployToPuter(gameSpec) {
         response = 'Added race: ' + name;
         changed = true;
       } else {
+        const model = document.getElementById('aiModel').value;
         try {
-          const resp = await puter.ai.chat(
-            'You are a game editor. The user said: "' + msg + '". Current game: ' + GAME_SPEC.meta.gameName + '. Describe what changes you would make in 1-2 sentences.',
-            { model: 'gpt-4o-mini' }
+          const streamResp = await puter.ai.chat(
+            'You are a game editor AI for "' + GAME_SPEC.meta.gameName + '". The user wants to modify their RPG game. User said: "' + msg + '". Respond with what changes you would make in 2-3 sentences. Be specific and helpful.',
+            { model: model, stream: true }
           );
-          response = typeof resp === 'string' ? resp : resp?.message?.content || 'Processed your request!';
+          const msgDiv = addMsg('ai', '', true);
+          let fullText = '';
+          if (streamResp && typeof streamResp[Symbol.asyncIterator] === 'function') {
+            for await (const chunk of streamResp) {
+              const text = chunk?.text || chunk?.message?.content || chunk?.toString?.() || '';
+              fullText += text;
+              msgDiv.textContent = fullText;
+              document.getElementById('aiChat').scrollTop = document.getElementById('aiChat').scrollHeight;
+            }
+          } else {
+            fullText = typeof streamResp === 'string' ? streamResp : streamResp?.message?.content || streamResp?.toString?.() || 'Processed your request!';
+            msgDiv.textContent = fullText;
+          }
+          msgDiv.classList.remove('streaming');
+          aiSending = false;
+          document.getElementById('aiSendBtn').disabled = false;
+          return;
         } catch(e) {
           response = 'Processed: ' + msg;
         }
       }
-      
-      chat.innerHTML += '<div class="msg ai">' + response + '</div>';
+
+      addMsg('ai', response);
       if (changed) render();
-      chat.scrollTop = chat.scrollHeight;
+      aiSending = false;
+      document.getElementById('aiSendBtn').disabled = false;
+    }
+
+    async function saveSpec() {
+      try {
+        const key = 'factory_' + (GAME_SPEC.meta.gameName || 'game').replace(/\\s+/g, '_') + '_' + Date.now();
+        await puter.kv.set(key, JSON.stringify(GAME_SPEC));
+        addMsg('ai', 'Game spec saved to Puter cloud! Key: ' + key);
+      } catch(e) {
+        addMsg('ai', 'Save failed: ' + e.message);
+      }
+    }
+
+    function exportSpec() {
+      const blob = new Blob([JSON.stringify(GAME_SPEC, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (GAME_SPEC.meta.gameName || 'game') + '_spec.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      addMsg('ai', 'Game spec exported as JSON!');
     }
 
     function render() {
       const app = document.getElementById('app');
       let html = '';
-      
+
       html += '<div class="hero">';
       html += '<h1>' + GAME_SPEC.meta.gameName + '</h1>';
       html += '<p>' + (GAME_SPEC.meta.tagline || '') + '</p>';
@@ -328,78 +440,140 @@ export async function deployToPuter(gameSpec) {
     }
 
     render();
-  </script>
+  <\/script>
 </body>
 </html>`;
+}
 
+export async function deployToPuter(gameSpec, onProgress) {
+  const progress = onProgress || (() => {});
+
+  progress({ step: 'auth', message: 'Checking authentication...', percent: 5 });
+  const user = await ensureAuthenticated();
+  progress({ step: 'auth', message: `Authenticated as ${user.username || 'user'}`, percent: 15 });
+
+  const gameName = gameSpec.meta?.gameName?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'my-rpg';
+  const timestamp = Date.now().toString(36);
+  const slug = gameName.slice(0, 30) + '-' + timestamp;
+  const appDir = `/${slug}`;
+
+  progress({ step: 'files', message: 'Creating app directory...', percent: 25 });
   try {
-    const timestamp = Date.now().toString(36);
-    const slug = gameName.slice(0, 30) + '-' + timestamp;
-    const appDir = `/${slug}`;
-    try { await puter.fs.mkdir(appDir); } catch(e) {}
-    
-    await puter.fs.write(`${appDir}/index.html`, indexHtml);
-    await puter.fs.write(`${appDir}/gameSpec.json`, specJson);
+    await puterFS.mkdir(appDir);
+  } catch(e) {}
 
-    let site;
+  progress({ step: 'files', message: 'Generating game HTML...', percent: 35 });
+  const indexHtml = generateDeployedHtml(gameSpec);
+  const specJson = JSON.stringify(gameSpec, null, 2);
+
+  progress({ step: 'files', message: 'Writing index.html...', percent: 50 });
+  await puterFS.write(`${appDir}/index.html`, indexHtml);
+
+  progress({ step: 'files', message: 'Writing gameSpec.json...', percent: 60 });
+  await puterFS.write(`${appDir}/gameSpec.json`, specJson);
+
+  progress({ step: 'hosting', message: 'Creating hosted site...', percent: 75 });
+  let site;
+  try {
+    site = await window.puter.hosting.create(slug, appDir);
+  } catch(hostErr) {
+    progress({ step: 'hosting', message: 'Retrying with alternate slug...', percent: 80 });
+    const fallbackSlug = slug + '-' + Math.random().toString(36).slice(2, 6);
+    const fallbackDir = `/${fallbackSlug}`;
+    try { await puterFS.mkdir(fallbackDir); } catch(e) {}
+    await puterFS.write(`${fallbackDir}/index.html`, indexHtml);
+    await puterFS.write(`${fallbackDir}/gameSpec.json`, specJson);
+    site = await window.puter.hosting.create(fallbackSlug, fallbackDir);
+
+    progress({ step: 'app', message: 'Registering app entry...', percent: 90 });
     try {
-      site = await puter.hosting.create(slug, appDir);
-    } catch(hostErr) {
-      const fallbackSlug = slug + '-' + Math.random().toString(36).slice(2, 6);
-      try {
-        const fallbackDir = `/${fallbackSlug}`;
-        try { await puter.fs.mkdir(fallbackDir); } catch(e) {}
-        await puter.fs.write(`${fallbackDir}/index.html`, indexHtml);
-        await puter.fs.write(`${fallbackDir}/gameSpec.json`, specJson);
-        site = await puter.hosting.create(fallbackSlug, fallbackDir);
-        return { success: true, url: `https://${fallbackSlug}.puter.site`, siteInfo: site };
-      } catch(e2) {
-        throw new Error(`Hosting failed: ${hostErr.message}. Retry also failed: ${e2.message}`);
-      }
-    }
-    
-    return {
-      success: true,
-      url: `https://${slug}.puter.site`,
-      siteInfo: site,
-    };
-  } catch (err) {
-    console.error('Deploy failed:', err);
-    throw new Error(`Deploy failed: ${err.message}`);
+      await puterApps.create(fallbackSlug, {
+        title: gameSpec.meta?.gameName || 'RPG Game',
+        description: gameSpec.meta?.tagline || 'A game built with Game Factory',
+        indexURL: `https://${fallbackSlug}.puter.site`,
+      });
+    } catch(e) {}
+
+    progress({ step: 'done', message: 'Deployment complete!', percent: 100 });
+    return { success: true, url: `https://${fallbackSlug}.puter.site`, siteInfo: site, user };
   }
+
+  progress({ step: 'app', message: 'Registering app entry...', percent: 90 });
+  try {
+    await puterApps.create(slug, {
+      title: gameSpec.meta?.gameName || 'RPG Game',
+      description: gameSpec.meta?.tagline || 'A game built with Game Factory',
+      indexURL: `https://${slug}.puter.site`,
+    });
+  } catch(e) {
+    try {
+      await puterApps.update(slug, {
+        title: gameSpec.meta?.gameName || 'RPG Game',
+        description: gameSpec.meta?.tagline || 'A game built with Game Factory',
+        indexURL: `https://${slug}.puter.site`,
+      });
+    } catch(e2) {}
+  }
+
+  progress({ step: 'done', message: 'Deployment complete!', percent: 100 });
+  return {
+    success: true,
+    url: `https://${slug}.puter.site`,
+    siteInfo: site,
+    user,
+  };
 }
 
 export async function saveSpecToCloud(gameSpec) {
-  if (!window.puter) {
+  if (!isPuterAvailable()) {
     localStorage.setItem('factory_gameSpec', JSON.stringify(gameSpec));
     return { saved: true, location: 'local' };
   }
-  
-  const key = `factory_${gameSpec.meta?.gameName?.replace(/\s+/g, '_') || 'game'}_${Date.now()}`;
-  await puter.kv.set(key, JSON.stringify(gameSpec));
+
+  await ensureAuthenticated();
+  const gameName = gameSpec.meta?.gameName?.replace(/\s+/g, '_') || 'game';
+  const key = `factory_${gameName}_${Date.now()}`;
+
+  await puterFS.write(`/game-specs/${gameName}.json`, JSON.stringify(gameSpec, null, 2)).catch(() => {});
+  await window.puter.kv.set(key, JSON.stringify(gameSpec));
+
   return { saved: true, location: 'cloud', key };
 }
 
 export async function loadSpecsFromCloud() {
   const specs = [];
-  
+
   const local = localStorage.getItem('factory_gameSpec');
   if (local) {
     try { specs.push({ source: 'local', spec: JSON.parse(local) }); } catch(e) {}
   }
-  
-  if (window.puter) {
+
+  if (isPuterAvailable()) {
     try {
-      const keys = await puter.kv.list();
-      const factoryKeys = (keys || []).filter(k => typeof k === 'string' && k.startsWith('factory_'));
-      for (const key of factoryKeys.slice(0, 10)) {
+      const signedIn = puterAuth.isSignedIn();
+      if (signedIn) {
+        const keys = await window.puter.kv.list();
+        const factoryKeys = (keys || []).filter(k => typeof k === 'string' && k.startsWith('factory_'));
+        for (const key of factoryKeys.slice(0, 10)) {
+          try {
+            const val = await window.puter.kv.get(key);
+            if (val) specs.push({ source: 'cloud', key, spec: JSON.parse(val) });
+          } catch(e) {}
+        }
+
         try {
-          const val = await puter.kv.get(key);
-          if (val) specs.push({ source: 'cloud', key, spec: JSON.parse(val) });
+          const files = await puterFS.readdir('/game-specs');
+          for (const file of (files || []).slice(0, 10)) {
+            try {
+              const content = await puterFS.read(`/game-specs/${file.name || file}`);
+              const text = typeof content === 'string' ? content : await content.text();
+              specs.push({ source: 'cloud-fs', path: `/game-specs/${file.name || file}`, spec: JSON.parse(text) });
+            } catch(e) {}
+          }
         } catch(e) {}
       }
     } catch(e) {}
   }
-  
+
   return specs;
 }
