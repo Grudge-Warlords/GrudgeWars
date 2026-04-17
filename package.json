@@ -55,13 +55,11 @@
     "react-router-dom": "^7.5.0",
     "rpg-encoder": "^0.6.0",
     "rpg-ts": "^1.7.4",
-    "server": "^1.0.42",
     "sprite": "^0.0.1",
     "static-extend": "^0.1.2",
     "svg-sprite-loader": "^6.0.11",
     "three": "^0.183.2",
     "three-mesh-bvh": "^0.9.9",
-    "ts": "^0.2.2",
     "voxel": "^0.5.0",
     "voxel-engine-stackgl": "^2.0.0",
     "voxel-mesh": "^0.3.0",
@@ -70,9 +68,35 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.19"
+    "vite": "^6.4.2"
   },
   "overrides": {
-    "@walletconnect/jsonrpc-provider": "npm:empty-npm-package@1.0.0"
+    "@walletconnect/jsonrpc-provider": "npm:empty-npm-package@1.0.0",
+    "@xmldom/xmldom": ">=0.8.12",
+    "axios": ">=1.8.2",
+    "bn.js": ">=5.2.3",
+    "brace-expansion": ">=1.1.13",
+    "braces": ">=3.0.3",
+    "cookie": ">=0.7.0",
+    "esbuild": ">=0.25.0",
+    "extend": ">=3.0.2",
+    "follow-redirects": ">=1.16.0",
+    "handlebars": ">=4.7.9",
+    "jpeg-js": ">=0.4.4",
+    "lodash": ">=4.17.21",
+    "micromatch": ">=4.0.8",
+    "min-document": ">=2.19.1",
+    "minimatch": ">=3.1.4",
+    "minimist": ">=1.2.8",
+    "postcss": ">=8.4.31",
+    "qs": ">=6.14.2",
+    "rollup": ">=4.59.0",
+    "socket.io-parser": ">=4.2.6",
+    "static-eval": ">=2.0.2",
+    "trim-newlines": ">=3.0.1",
+    "undici": ">=6.24.0",
+    "router": {
+      "path-to-regexp": ">=8.4.0"
+    }
   }
 }
