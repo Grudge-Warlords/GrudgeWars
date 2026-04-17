@@ -1,8 +1,8 @@
 {
-  "name": "Betta Warlords — The Sunken Kingdom of Abyssia",
-  "short_name": "Betta Warlords",
-  "description": "Underwater tactical RPG with 32 unique Warlord combinations, cNFT breeding, and GBuX rewards. Dive into the Sunken Kingdom of Abyssia.",
-  "start_url": "/",
+  "name": "RPG Maker Studio — Grudge Studios",
+  "short_name": "RPG Studio",
+  "description": "Game creation engine by Grudge Studios. Build, play, and deploy games powered by the Grudge ecosystem.",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#050a18",
   "theme_color": "#06b6d4",
