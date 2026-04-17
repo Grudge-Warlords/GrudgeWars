@@ -1,8 +1,9 @@
 {
+  "framework": "vite",
+  "installCommand": "npm install --legacy-peer-deps",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm install --legacy-peer-deps",
-  "framework": "vite",
+  "nodeVersion": "20.x",
   "headers": [
     {
       "source": "/assets/(.*)",

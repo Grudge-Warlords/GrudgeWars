@@ -1,0 +1,12 @@
+# Force Node.js runtime — prevents Nixpacks from detecting Python (main.py/pyproject.toml leftovers)
+[phases.setup]
+nixPkgs = ["nodejs_20", "npm-10_x"]
+
+[phases.install]
+cmds = ["npm install --legacy-peer-deps"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "node server.prod.js"
