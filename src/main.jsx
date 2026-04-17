@@ -1,6 +1,9 @@
 import { Buffer } from 'buffer'
 window.Buffer = Buffer
 
+import { initDebug } from './debug';
+initDebug();
+
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'

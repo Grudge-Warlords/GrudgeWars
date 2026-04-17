@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useAuthStore } from './stores/useAuth';
 import NavBar from './components/NavBar';
 import LoadingScreen from './components/LoadingScreen';
+import LegionPanel from './components/debug/LegionPanel';
 
 // Lazy-loaded pages
 const Landing = lazy(() => import('./pages/Landing'));
@@ -33,6 +34,7 @@ function AppLayout() {
   return (
     <>
       {!isFullscreen && <NavBar />}
+      <LegionPanel />
       <Suspense fallback={<LoadingScreen />}>
         <Routes>
           <Route path="/" element={<Landing />} />
