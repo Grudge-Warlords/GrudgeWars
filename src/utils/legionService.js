@@ -27,9 +27,11 @@
  */
 
 const LEGION_API = '/api/legion';
+const MONITOR_URL = 'https://legion-monitor.grudge.workers.dev';
 const EMIT_INTERVAL_MS = 30_000;   // auto-flush telemetry every 30s
 const MAX_QUEUE = 50;               // max events held before forced flush
 const SESSION_ID = `gruda-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+const SITE = 'grudge-warlords-rpg';
 
 // ─── Internal State ────────────────────────────────────────────────────────
 
@@ -58,6 +60,7 @@ function init(config = {}) {
     window.addEventListener('beforeunload', () => _flush(true));
   }
 
+  _installGlobalErrorHandlers();
   console.info('%c[Legion] Session started:', 'color:#FF6B35;font-weight:bold', SESSION_ID);
 }
 
@@ -212,6 +215,62 @@ function getState() {
   };
 }
 
+// ─── Error Reporting to Monitor ──────────────────────────────────────────
+
+let _errorCount = 0;
+let _errorResetTimer = null;
+
+function reportError(message, stack = '', type = 'error', context = {}) {
+  // Rate-limit: max 10 error reports per minute
+  if (_errorCount >= 10) return;
+  _errorCount++;
+  if (!_errorResetTimer) {
+    _errorResetTimer = setTimeout(() => { _errorCount = 0; _errorResetTimer = null; }, 60000);
+  }
+
+  const payload = {
+    site: SITE,
+    type,
+    message: String(message).slice(0, 1000),
+    stack: String(stack).slice(0, 2000),
+    url: window.location?.href || '',
+    sessionId: SESSION_ID,
+    severity: 'error',
+    context,
+    ts: Date.now(),
+  };
+
+  if (navigator?.sendBeacon) {
+    navigator.sendBeacon(
+      `${MONITOR_URL}/error`,
+      new Blob([JSON.stringify(payload)], { type: 'application/json' })
+    );
+  } else {
+    fetch(`${MONITOR_URL}/error`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {});
+  }
+}
+
+function _installGlobalErrorHandlers() {
+  if (typeof window === 'undefined') return;
+  window.addEventListener('error', (e) => {
+    reportError(e.message, e.error?.stack, 'error', {
+      filename: e.filename, lineno: e.lineno, colno: e.colno,
+    });
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    const reason = e.reason;
+    reportError(
+      reason?.message || String(reason) || 'Unhandled rejection',
+      reason?.stack, 'unhandledrejection'
+    );
+  });
+}
+
 // ─── Destroy ──────────────────────────────────────────────────────────────
 
 function destroy() {
@@ -232,6 +291,7 @@ export const legion = {
   getServerSnapshot,
   getState,
   destroy,
+  reportError,
   SESSION_ID,
 };
 
