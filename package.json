@@ -16,7 +16,8 @@
     "assets:doctor": "node scripts/dependency-doctor.mjs",
     "assets:prepare": "npm run assets:index",
     "deps:doctor": "node scripts/dependency-doctor.mjs",
-    "deps:install:safe": "npm install --legacy-peer-deps"
+    "deps:install:safe": "npm install --legacy-peer-deps",
+    "generate:hero-sprite-manifest": "node scripts/generate-hero-character-sprite-manifest.mjs"
   },
   "packageManager": "npm@11.8.0",
   "dependencies": {
