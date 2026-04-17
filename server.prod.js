@@ -10,6 +10,28 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const DISCORD_PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY;
 
+const ALLOWED_ORIGINS = [
+  'http://localhost:5000',
+  'http://127.0.0.1:5000',
+  'https://grudgewarlords.com',
+  'https://grudge-studio.com',
+  'https://grudge-wars.vercel.app',
+  process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : '',
+  process.env.CORS_EXTRA_ORIGIN || '',
+].filter(Boolean);
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.some(ao => origin.startsWith(ao))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-Id, X-Admin-Token');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
 app.use((req, res, next) => {
   if (req.path === '/api/discord/interactions') {
     return next();
@@ -945,17 +967,28 @@ app.post('/api/xai/trash-talk', async (req, res) => {
   }
 });
 
+// Hashed Vite assets — cache forever
+app.use('/assets', express.static(path.join(__dirname, 'dist', 'assets'), {
+  maxAge: '1y',
+  immutable: true,
+}));
+
+// Static game assets — cache aggressively
 app.use(express.static(path.join(__dirname, 'dist'), {
-  setHeaders: (res) => {
-    res.setHeader('Cache-Control', 'no-cache');
+  maxAge: '1d',
+  setHeaders: (res, filePath) => {
+    if (/\.(png|jpg|webp|gif|mp3|ogg|mp4|webm)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
   },
 }));
 
+// SPA fallback
 app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Betta Warlords production server running on port ${PORT}`);
+  console.log(`RPG Maker Studio server running on port ${PORT}`);
   registerSlashCommands();
 });
