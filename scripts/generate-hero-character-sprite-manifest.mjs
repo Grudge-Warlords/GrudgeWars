@@ -21,8 +21,16 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // ── CLI ──────────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const outFlagIdx = args.indexOf('--out');
+const outArg = outFlagIdx >= 0 ? args[outFlagIdx + 1] : null;
+
+if (outFlagIdx >= 0 && !outArg) {
+  console.error('Usage: node scripts/generate-hero-character-sprite-manifest.mjs [--out <path>]');
+  console.error('Error: `--out` requires a path argument.');
+  process.exit(1);
+}
+
 const outPath = outFlagIdx >= 0
-  ? resolve(args[outFlagIdx + 1])
+  ? resolve(outArg)
   : resolve(__dirname, '..', '..', '..', '..', 'Users', 'nugye', 'Documents', '1111111', 'ObjectStore', 'api', 'v1', 'heroCharacterSprites.json');
 
 const OBJECT_STORE_ORIGIN = process.env.OBJECT_STORE_ORIGIN || 'https://molochdagod.github.io/ObjectStore';
