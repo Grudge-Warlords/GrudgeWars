@@ -10,7 +10,7 @@
  * Usage:
  *   node scripts/generate-hero-character-sprite-manifest.mjs [--out <path>]
  *
- * Default output: ../../../Users/nugye/Documents/1111111/ObjectStore/api/v1/heroCharacterSprites.json
+ * Default output: <repo-root>/api/v1/heroCharacterSprites.json
  */
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -31,7 +31,7 @@ if (outFlagIdx >= 0 && !outArg) {
 
 const outPath = outFlagIdx >= 0
   ? resolve(outArg)
-  : resolve(__dirname, '..', '..', '..', '..', 'Users', 'nugye', 'Documents', '1111111', 'ObjectStore', 'api', 'v1', 'heroCharacterSprites.json');
+  : resolve(__dirname, '..', 'api', 'v1', 'heroCharacterSprites.json');
 
 const OBJECT_STORE_ORIGIN = process.env.OBJECT_STORE_ORIGIN || 'https://molochdagod.github.io/ObjectStore';
 
