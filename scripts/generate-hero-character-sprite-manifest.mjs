@@ -12,7 +12,7 @@
  *
  * Default output: ../../../Users/nugye/Documents/1111111/ObjectStore/api/v1/heroCharacterSprites.json
  */
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
