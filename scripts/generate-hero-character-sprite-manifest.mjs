@@ -33,12 +33,12 @@ const spriteMap = await import(spriteMapUrl);
 
 const {
   raceClassSpriteMap,
-  raceClassDefaultSpriteKeys,
-  raceClassDefaultProps,
+  raceClassDefaultSpriteKeys = {},
+  raceClassDefaultProps = {},
 } = spriteMap;
 
-if (!raceClassSpriteMap || !raceClassDefaultSpriteKeys) {
-  throw new Error('Could not import raceClassSpriteMap / raceClassDefaultSpriteKeys from spriteMap.js');
+if (!raceClassSpriteMap) {
+  throw new Error('Could not import raceClassSpriteMap from spriteMap.js');
 }
 
 const RACES = Object.keys(raceClassSpriteMap);          // ['human','orc','elf','undead','barbarian','dwarf']
