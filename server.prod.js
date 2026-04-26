@@ -754,7 +754,10 @@ const COMMAND_RESPONSES = {
   },
 };
 
-app.post('/api/discord/interactions', verifyKeyMiddleware(DISCORD_PUBLIC_KEY), async (req, res) => {
+if (!DISCORD_PUBLIC_KEY) {
+  console.warn('[Discord] DISCORD_PUBLIC_KEY not set — /api/discord/interactions disabled');
+}
+app.post('/api/discord/interactions', ...(DISCORD_PUBLIC_KEY ? [verifyKeyMiddleware(DISCORD_PUBLIC_KEY)] : []), async (req, res) => {
   const { type, data, member } = req.body;
 
   if (type === InteractionType.PING) {
@@ -966,6 +969,180 @@ app.post('/api/xai/trash-talk', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ─── Gruda Legion AI Routes ──────────────────────────────────────────────────
+//
+// The Legion is the overarching AI command system for Grudge Studio.
+// It ingests game telemetry (scene state, FPS, player events) and uses it
+// as grounding context for AI-powered queries via xAI (Grok).
+
+const LEGION_SYSTEM_PROMPT = `You are GRUDA LEGION — the AI command intelligence for Grudge Studio's game network.
+You have real-time access to telemetry from active game sessions: scene states, player actions, performance metrics, and game events.
+Your role:
+- Answer questions about the game state with precision and insight
+- Generate dynamic game content (enemies, loot, lore, missions) grounded in current session context
+- Diagnose performance issues and suggest optimizations
+- Help developers debug, balance, and expand the game
+- Act as mission control for the Grudge Studio ecosystem
+Tone: direct, intelligent, cyberpunk-military. You are the Legion's omniscient eye.
+Always use the telemetry context provided to give specific, relevant answers. Never be generic.`;
+
+// In-memory ring buffer — rolling window of telemetry batches per session
+const LEGION_TELEMETRY = new Map();  // sessionId → { batches: [], lastSeen }
+const LEGION_MAX_SESSIONS = 100;
+const LEGION_MAX_BATCHES = 20;       // per session
+const LEGION_SESSION_TTL = 3600000;  // 1 hour
+
+function legionStoreTelemetry(payload) {
+  const { sessionId, events, perf, scene, player, ts } = payload;
+  if (!sessionId) return;
+
+  // Evict stale sessions if at capacity
+  if (LEGION_TELEMETRY.size >= LEGION_MAX_SESSIONS) {
+    const oldest = [...LEGION_TELEMETRY.entries()]
+      .sort((a, b) => a[1].lastSeen - b[1].lastSeen)[0];
+    if (oldest) LEGION_TELEMETRY.delete(oldest[0]);
+  }
+
+  const session = LEGION_TELEMETRY.get(sessionId) || { batches: [], lastSeen: 0 };
+  session.batches.push({ events: events || [], perf: perf || [], scene, player, ts: ts || Date.now() });
+  if (session.batches.length > LEGION_MAX_BATCHES) session.batches.shift();
+  session.lastSeen = Date.now();
+  session.scene = scene;
+  session.player = player;
+  LEGION_TELEMETRY.set(sessionId, session);
+}
+
+function legionBuildContext(sessionId, extraContext = {}) {
+  const session = LEGION_TELEMETRY.get(sessionId);
+  const recentBatches = session ? session.batches.slice(-5) : [];
+
+  const allEvents = recentBatches.flatMap(b => b.events || []);
+  const allPerf = recentBatches.flatMap(b => b.perf || []);
+  const avgFps = allPerf.length
+    ? Math.round(allPerf.filter(p => p.fps).reduce((s, p) => s + p.fps, 0) / allPerf.filter(p => p.fps).length)
+    : null;
+
+  const lines = [];
+  if (session?.scene) lines.push(`Active scene: ${session.scene}`);
+  if (session?.player) lines.push(`Player: ${JSON.stringify(session.player)}`);
+  if (avgFps !== null) lines.push(`Avg FPS: ${avgFps}`);
+  if (extraContext.scene) lines.push(`Context scene: ${extraContext.scene}`);
+  if (extraContext.player) lines.push(`Context player: ${JSON.stringify(extraContext.player)}`);
+
+  // Summarize recent events
+  const eventSummary = allEvents.slice(-30).map(e =>
+    `[${new Date(e.ts).toISOString().slice(11, 19)}] ${e.type}: ${JSON.stringify(e.data).slice(0, 100)}`
+  ).join('\n');
+
+  if (eventSummary) lines.push(`\nRecent telemetry events:\n${eventSummary}`);
+
+  // Merge any extra context fields
+  Object.entries(extraContext).forEach(([k, v]) => {
+    if (!['scene', 'player', 'recentPerf'].includes(k)) {
+      lines.push(`${k}: ${typeof v === 'object' ? JSON.stringify(v).slice(0, 200) : v}`);
+    }
+  });
+
+  return lines.join('\n');
+}
+
+// POST /api/legion/telemetry — receive game telemetry batch
+app.post('/api/legion/telemetry', (req, res) => {
+  try {
+    legionStoreTelemetry(req.body);
+    res.json({ ok: true, sessions: LEGION_TELEMETRY.size });
+  } catch (err) {
+    console.error('[Legion] Telemetry error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/legion/query — query the Legion AI with game context
+app.post('/api/legion/query', async (req, res) => {
+  if (!xai) return res.status(503).json({ error: 'Legion AI unavailable (xAI not configured)' });
+
+  try {
+    const { prompt, sessionId, context = {}, mode = 'balanced' } = req.body;
+    if (!prompt) return res.status(400).json({ error: 'prompt required' });
+
+    const gameContext = legionBuildContext(sessionId, context);
+    const modelMap = { fast: 'grok-3-fast', balanced: 'grok-3', deep: 'grok-3' };
+    const model = modelMap[mode] || 'grok-3';
+    const maxTokens = mode === 'fast' ? 300 : mode === 'deep' ? 1200 : 600;
+
+    const userContent = gameContext
+      ? `LIVE GAME CONTEXT:\n${gameContext}\n\n---\n${prompt}`
+      : prompt;
+
+    const completion = await xai.chat.completions.create({
+      model,
+      messages: [
+        { role: 'system', content: LEGION_SYSTEM_PROMPT },
+        { role: 'user', content: userContent },
+      ],
+      max_tokens: maxTokens,
+      temperature: 0.75,
+    });
+
+    const response = completion.choices[0].message.content;
+    console.log(`[Legion] Query (${mode}): "${prompt.slice(0, 60)}..." → ${response.length} chars`);
+
+    res.json({
+      response,
+      sessionId,
+      model,
+      ts: Date.now(),
+    });
+  } catch (err) {
+    console.error('[Legion] Query error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/legion/snapshot — aggregated telemetry across all active sessions
+app.get('/api/legion/snapshot', (req, res) => {
+  const now = Date.now();
+  // Evict stale sessions
+  for (const [id, s] of LEGION_TELEMETRY) {
+    if (now - s.lastSeen > LEGION_SESSION_TTL) LEGION_TELEMETRY.delete(id);
+  }
+
+  const sessions = [...LEGION_TELEMETRY.entries()].map(([id, s]) => ({
+    sessionId: id,
+    scene: s.scene,
+    lastSeen: s.lastSeen,
+    eventCount: s.batches.reduce((acc, b) => acc + (b.events?.length || 0), 0),
+    recentEvents: s.batches.slice(-2).flatMap(b => b.events || []).slice(-10),
+  }));
+
+  res.json({
+    activeSessions: sessions.length,
+    sessions,
+    ts: now,
+  });
+});
+
+// GET /api/legion/health
+app.get('/api/legion/health', (req, res) => {
+  res.json({ status: 'online', xai: !!xai, sessions: LEGION_TELEMETRY.size, ts: Date.now() });
+});
+
+// CDN redirect — large game assets served from R2 when ASSETS_CDN_URL is set
+// Set ASSETS_CDN_URL=https://assets.grudge-studio.com/rpg-modular on Railway
+const ASSETS_CDN_URL = process.env.ASSETS_CDN_URL;
+if (ASSETS_CDN_URL) {
+  const CDN_PATHS = [
+    '/sprites', '/images', '/backgrounds', '/videos',
+    '/audio', '/icons', '/sprites-attacks', '/effects', '/map_nodes',
+  ];
+  CDN_PATHS.forEach(prefix => {
+    app.use(prefix, (req, res) => {
+      res.redirect(301, `${ASSETS_CDN_URL}${prefix}${req.path}`);
+    });
+  });
+  console.log(`[CDN] Game assets routed to ${ASSETS_CDN_URL}`);
+}
 
 // Hashed Vite assets — cache forever
 app.use('/assets', express.static(path.join(__dirname, 'dist', 'assets'), {
