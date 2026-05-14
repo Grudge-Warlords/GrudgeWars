@@ -559,8 +559,8 @@ app.post('/api/auth/login', async (req, res) => {
 // ── AUTH: Wallet (VPS proxy + local fallback) ─────────────────────────────────────
 app.post('/api/auth/wallet', async (req, res) => {
   try {
-    const { address, wallet_address, web3auth_token } = req.body;
-    const cleanAddr = (wallet_address || address || '').trim().slice(0, 64);
+    const { address, wallet_address, walletAddress, web3auth_token } = req.body;
+    const cleanAddr = (wallet_address || walletAddress || address || '').trim().slice(0, 64);
     if (!cleanAddr || cleanAddr.length < 32) {
       return res.status(400).json({ error: 'Valid wallet address required' });
     }
@@ -609,8 +609,10 @@ app.post('/api/auth/wallet', async (req, res) => {
 // ── AUTH: Puter (VPS proxy + local fallback) ──────────────────────────────
 app.post('/api/auth/puter', async (req, res) => {
   try {
-    const { puterUsername, puterUuid } = req.body;
-    if (!puterUsername && !puterUuid) return res.status(400).json({ error: 'Puter credentials required' });
+    const { puterUsername, puterUuid, puterId, displayName } = req.body;
+    const uuid = puterUuid || puterId;
+    const name = puterUsername || displayName;
+    if (!name && !uuid) return res.status(400).json({ error: 'Puter credentials required' });
 
     // Try VPS first
     const vps = await vpsPost('/auth/puter', { puterUuid, puterUsername });
