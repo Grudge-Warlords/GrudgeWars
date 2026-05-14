@@ -6,8 +6,12 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/api/auth/:path*",
+      "destination": "https://id.grudge-studio.com/auth/:path*"
+    },
+    {
       "source": "/api/:path*",
-      "destination": "/api/index.js"
+      "destination": "https://api.grudge-studio.com/api/:path*"
     },
     {
       "source": "/((?!api|assets|sprites|backgrounds|images|map_nodes|sounds|fonts|favicon|weapon-skill-tree).*)",
