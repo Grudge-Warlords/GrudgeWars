@@ -251,10 +251,10 @@ export default function TitleScreen() {
       const token = localStorage.getItem('grudge_session_token');
       if (token) {
         try {
-          const verifyRes = await fetch(`${API_BASE}/api/auth/verify`, {
-            method: 'POST',
+          const verifyRes = await fetch('https://id.grudge-studio.com/auth/me', {
+            method: 'GET',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionToken: token }),
+            credentials: 'include',
           });
           const verifyData = await verifyRes.json();
           if (!verifyData.valid) {
@@ -293,10 +293,11 @@ export default function TitleScreen() {
   const completePuterAuth = async (user) => {
     let grudgeId = null;
     try {
-      const r = await fetch(`${API_BASE}/api/auth/puter`, {
+      const r = await fetch('https://id.grudge-studio.com/auth/puter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ puterUsername: user.username, puterUuid: user.uuid || null }),
+        credentials: 'include',
       });
       const data = await r.json();
       if (data.sessionToken) localStorage.setItem('grudge_session_token', data.sessionToken);
@@ -368,8 +369,8 @@ export default function TitleScreen() {
     if (!formUsername || !formPassword) { setFormError('Enter username and password'); return; }
     setFormLoading(true); setFormError('');
     try {
-      const endpoint = isRegister ? `${API_BASE}/api/auth/register` : `${API_BASE}/api/auth/login`;
-      const r = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: formUsername, password: formPassword }) });
+      const endpoint = isRegister ? 'https://id.grudge-studio.com/auth/register' : 'https://id.grudge-studio.com/auth/login';
+      const r = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: formUsername, password: formPassword }), credentials: 'include' });
       const data = await r.json();
       if (!r.ok) { setFormError(data.error || 'Failed'); setFormLoading(false); return; }
       if (data.sessionToken) localStorage.setItem('grudge_session_token', data.sessionToken);
