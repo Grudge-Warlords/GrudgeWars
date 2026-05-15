@@ -1,295 +1,79 @@
-# Grudge Warlords MMO - Architecture Overview
+# Grudge Warlords — Architecture
 
-## System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         DEPLOYMENT FLOW                          │
-└─────────────────────────────────────────────────────────────────┘
-
-Local Development Machine                    Production VPS Server
-┌────────────────────┐                       ┌──────────────────────┐
-│                    │                       │                      │
-│  Unity Project     │                       │   Deployed Server    │
-│  ├─ Game Logic    │                       │   ├─ Node.js API    │
-│  ├─ Assets        │                       │   ├─ Unity Server   │
-│  └─ Server Build  │                       │   └─ Static Files   │
-│         │          │                       │          │           │
-│         ▼          │                       │          ▼           │
-│  Build Script      │   SSH/SCP Deploy     │   Docker Containers  │
-│  (build-server.sh) │──────────────────────▶│   ├─ Game Server   │
-│         │          │                       │   ├─ PostgreSQL     │
-│         ▼          │                       │   ├─ Redis          │
-│  ./builds/server/  │                       │   └─ Nginx          │
-│                    │                       │                      │
-│  Deploy Script     │                       │   Service Manager   │
-│  (deploy-to-vps.sh)│──────────────────────▶│   ├─ Docker Compose│
-│         │          │                       │   ├─ PM2            │
-│         │          │                       │   └─ systemd        │
-│         ▼          │                       │                      │
-│  CLI Manager       │   Monitoring         │   Logs & Metrics    │
-│  (grudge-cli.js)   │◀──────────────────────│   └─ /logs/         │
-│                    │                       │                      │
-└────────────────────┘                       └──────────────────────┘
-```
-
-## Production Stack
+## System Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      PRODUCTION STACK                            │
-└─────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│                    PRODUCTION ARCHITECTURE                       │
+└───────────────────────────────────────────────────────────────┘
 
-Internet Traffic
+Player Browser
       │
       ▼
-┌──────────────┐
-│ Firewall/UFW │  Ports: 22, 80, 443, 3000, 7777
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│    Nginx     │  Reverse Proxy & Load Balancer
-│  Port 80/443 │  - SSL/TLS Termination
-└──────┬───────┘  - Rate Limiting
-       │          - Static File Serving
-       │
-       ├─────────────────────┐
-       │                     │
-       ▼                     ▼
-┌─────────────┐      ┌──────────────┐
-│  Node.js    │      │ Unity Server │
-│  API Server │      │ Game Logic   │
-│  Port 3000  │      │ Port 7777    │
-└──────┬──────┘      └──────┬───────┘
-       │                    │
-       ├────────────────────┘
-       │
-       ├──────────┬──────────┐
-       │          │          │
-       ▼          ▼          ▼
-┌──────────┐ ┌────────┐ ┌─────────┐
-│PostgreSQL│ │ Redis  │ │  Logs   │
-│  Port    │ │ Cache  │ │ Winston │
-│  5432    │ │ Port   │ │ Rotate  │
-└──────────┘ │ 6379   │ └─────────┘
-             └────────┘
+┌───────────────────┐
+│ Cloudflare DNS/CDN  │  SSL termination, DDoS protection, edge caching
+└───────┬────┬──────┘
+        │    │
+        ▼    └──────────────────────────────┐
+┌───────────────────┐                               ▼
+│ Vercel (Frontend)   │                     ┌───────────────────┐
+│ ├─ React/Vite SPA   │                     │ CF Workers          │
+│ ├─ Serverless API   │                     │ ├─ grudge-identity  │
+│ └─ Static Assets    │                     │ ├─ grudge-asset-cdn │
+└───────┬───────────┘                     │ └─ grudgeassets     │
+        │                                     └─────┬─────────────┘
+        ▼                                           │
+┌───────────────────┐                               ▼
+│ Neon PostgreSQL     │                     ┌───────────────────┐
+│ ├─ Accounts        │                     │ Railway (Backend)   │
+│ ├─ Characters      │                     │ ├─ The-ENGINE (auth)│
+│ ├─ Arena Teams     │                     │ ├─ game-api         │
+│ └─ Inventory       │                     │ └─ GBUX economy     │
+└───────────────────┘                     └───────────────────┘
+
+┌───────────────────┐      ┌───────────────────┐
+│ Cloudflare R2       │      │ GitHub Pages        │
+│ (Asset CDN)         │      │ (ObjectStore CDN)   │
+│ assets.grudge-      │      │ 3,400+ items        │
+│ studio.com          │      │ 590+ icons          │
+└───────────────────┘      └───────────────────┘
 ```
 
-## Directory Structure
+## Live Services
 
-```
-StandaloneGrudge/
-├── server/                     # Node.js API server
-│   └── index.js               # Main server entry point
-├── scripts/                   # Automation scripts
-│   ├── build-server.sh       # Unity server build
-│   ├── deploy-to-vps.sh      # VPS deployment
-│   ├── grudge-cli.js         # AI-powered CLI
-│   └── test-vps-connection.sh # Connection test
-├── deployment/                # VPS configuration
-│   ├── setup-vps.sh          # Initial VPS setup
-│   ├── restart-services.sh   # Service management
-│   ├── nginx.conf            # Nginx config
-│   └── grudge-warlords.service # systemd service
-├── logs/                      # Application logs
-│   └── README.md             # Log documentation
-├── builds/                    # Build outputs (gitignored)
-│   └── server/               # Unity server builds
-├── .env.example              # Environment template
-├── .gitignore                # Git ignore rules
-├── package.json              # Node.js dependencies
-├── Dockerfile                # Container image
-├── docker-compose.yml        # Multi-container setup
-├── ecosystem.config.js       # PM2 configuration
-├── setup.sh                  # Quick setup script
-├── DEPLOYMENT.md             # Deployment guide
-└── README.md                 # Main documentation
-```
-
-## Deployment Options
-
-### Option 1: Docker Compose (Recommended)
-```bash
-# Start entire stack
-docker-compose up -d
-
-# Benefits:
-# - Isolated containers
-# - Easy scaling
-# - Consistent environment
-# - Built-in networking
-```
-
-### Option 2: PM2 Process Manager
-```bash
-# Start with PM2
-pm2 start ecosystem.config.js
-
-# Benefits:
-# - Cluster mode
-# - Auto-restart
-# - Log management
-# - Zero-downtime reload
-```
-
-### Option 3: systemd Service
-```bash
-# Install service
-sudo cp deployment/grudge-warlords.service /etc/systemd/system/
-sudo systemctl enable grudge-warlords
-sudo systemctl start grudge-warlords
-
-# Benefits:
-# - System integration
-# - Auto-start on boot
-# - Resource limits
-# - Security features
-```
+| Domain | Service | Backend |
+|--------|---------|---------|
+| `grudgewarlords.com` | Frontend + serverless API | Vercel |
+| `id.grudge-studio.com` | Identity / Auth | CF Worker → Railway |
+| `api.grudge-studio.com` | Game API | CF Tunnel → Railway |
+| `assets.grudge-studio.com` | Asset CDN | CF Worker → R2 |
+| `objectstore.grudge-studio.com` | ObjectStore API | CF Worker → D1 + R2 |
 
 ## Data Flow
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                      GAME CLIENT                              │
-│  Unity Client connects to server on port 7777                │
-└──────────────────┬───────────────────────────────────────────┘
-                   │
-                   ▼
-┌──────────────────────────────────────────────────────────────┐
-│                   UNITY SERVER (Port 7777)                    │
-│  ├─ Game State Management                                    │
-│  ├─ Player Synchronization                                   │
-│  └─ Game Logic Processing                                    │
-└──────────────────┬───────────────────────────────────────────┘
-                   │
-                   ▼
-┌──────────────────────────────────────────────────────────────┐
-│                  NODE.JS API (Port 3000)                      │
-│  ├─ Authentication & Authorization                           │
-│  ├─ Player Data Management                                   │
-│  ├─ Leaderboards & Statistics                                │
-│  └─ RESTful API Endpoints                                    │
-└──────────────────┬───────────────────────────────────────────┘
-                   │
-        ┌──────────┴──────────┐
-        │                     │
-        ▼                     ▼
-┌──────────────┐      ┌──────────────┐
-│  PostgreSQL  │      │    Redis     │
-│              │      │              │
-│ ├─ Players   │      │ ├─ Sessions  │
-│ ├─ Scores    │      │ ├─ Cache     │
-│ └─ Game Data │      │ └─ Queues    │
-└──────────────┘      └──────────────┘
+Auth:    Browser → id.grudge-studio.com → CF Worker → Railway (The-ENGINE) → DB
+Game:    Browser → api.grudge-studio.com → CF Tunnel → Railway (game-api) → DB
+Arena:   Browser → grudgewarlords.com/api/* → Vercel serverless → Neon PostgreSQL
+Assets:  Browser → assets.grudge-studio.com → CF Worker → R2 bucket
+Sync:    Browser → Puter KV (auto-push every 30s on state change)
 ```
 
-## Security Layers
+## Security
 
-```
-┌─────────────────────────────────────────────┐
-│  1. Network Security                        │
-│     ├─ UFW Firewall                        │
-│     ├─ fail2ban (Brute Force Protection)   │
-│     └─ SSH Key Authentication              │
-└─────────────────────────────────────────────┘
-┌─────────────────────────────────────────────┐
-│  2. Application Security                    │
-│     ├─ Environment Variables (.env)        │
-│     ├─ JWT Authentication                  │
-│     ├─ API Rate Limiting                   │
-│     └─ Input Validation                    │
-└─────────────────────────────────────────────┘
-┌─────────────────────────────────────────────┐
-│  3. Container Security (Docker)             │
-│     ├─ Non-root User                       │
-│     ├─ Read-only Filesystem                │
-│     └─ Resource Limits                     │
-└─────────────────────────────────────────────┘
-┌─────────────────────────────────────────────┐
-│  4. Data Security                           │
-│     ├─ Database SSL/TLS                    │
-│     ├─ Password Hashing                    │
-│     └─ Encrypted Connections               │
-└─────────────────────────────────────────────┘
-```
+- **Cloudflare**: SSL/TLS termination, DDoS protection, WAF
+- **Auth**: JWT tokens signed with shared secret across Railway + Vercel
+- **CORS**: Dynamic allowlist (grudge subdomains, Vercel previews, Puter)
+- **Rate limiting**: Per-IP on auth endpoints (10/min), general API (200/min)
+- **Secrets**: Environment variables via Vercel/Railway, never in source
 
-## CLI Features
+## Game State Persistence
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              Grudge Warlords CLI Manager                   │
-└────────────────────────────────────────────────────────────┘
-
-Commands:
-┌──────────────┬──────────────────────────────────────────────┐
-│ help         │ Show all available commands                  │
-│ deploy       │ Deploy to VPS (build + upload + restart)     │
-│ build        │ Build Unity server locally                   │
-│ status       │ Check server status and configuration        │
-│ logs [N]     │ Show last N lines of logs                    │
-│ ai <query>   │ AI-powered assistance (OpenAI integration)   │
-│ config       │ View/edit configuration                      │
-│ exit         │ Exit the CLI                                 │
-└──────────────┴──────────────────────────────────────────────┘
-
-AI Integration:
-├─ Natural language queries
-├─ Troubleshooting assistance
-├─ Performance optimization tips
-└─ Configuration help
-```
-
-## Monitoring & Health Checks
-
-```
-Health Check Endpoints:
-├─ GET /health          → Basic health status
-├─ GET /api/status      → Server status & player count
-└─ GET /api/info        → Server information
-
-Monitoring Tools:
-├─ Docker healthcheck   → Container health
-├─ PM2 monitoring       → Process metrics
-├─ Winston logging      → Application logs
-└─ Sentry (optional)    → Error tracking
-```
-
-## Scaling Strategy
-
-```
-┌────────────────────────────────────────────────────────────┐
-│                    HORIZONTAL SCALING                       │
-└────────────────────────────────────────────────────────────┘
-
-Small Scale (1-100 players)
-┌──────────────────────┐
-│  Single VPS          │
-│  ├─ All services     │
-│  └─ Shared resources │
-└──────────────────────┘
-
-Medium Scale (100-1000 players)
-┌──────────────────────┐  ┌──────────────────────┐
-│  Game Servers (x3)   │  │  Database Server     │
-│  ├─ Unity Server     │  │  ├─ PostgreSQL       │
-│  └─ Load Balanced    │──│  └─ Redis            │
-└──────────────────────┘  └──────────────────────┘
-
-Large Scale (1000+ players)
-┌──────────────────────┐  ┌──────────────────────┐
-│  Load Balancer       │  │  DB Cluster          │
-│  (Multiple Nginx)    │  │  ├─ Primary DB       │
-└──────┬───────────────┘  │  ├─ Read Replicas    │
-       │                  │  └─ Redis Cluster    │
-       ├─────────┬────────┴──────────────────────┘
-       │         │
-┌──────▼────┐ ┌─▼──────────┐
-│ Game      │ │ Game       │  (Auto-scaling)
-│ Server #1 │ │ Server #N  │
-└───────────┘ └────────────┘
-```
+- **Local**: Zustand + `persist` middleware → `localStorage` (grudge-warlords-save)
+- **Cloud**: Auto-sync to Puter KV on meaningful state changes (debounced 30s)
+- **Server**: Arena teams/battles in Neon PostgreSQL, characters in Railway DB
+- **Island state**: Persisted locally + cloud synced (buildings, heroes, resources)
 
 ---
 
-For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)
+For deployment guide, see [DEPLOYMENT.md](DEPLOYMENT.md)

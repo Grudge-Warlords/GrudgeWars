@@ -1,137 +1,111 @@
 # Grudge Warlords — grudgewarlords.com
 
-**Browser-based MMO with Vercel serverless API, Puter cloud sync, arena PvP, and cross-platform Grudge Studio integration.**
+**Dark fantasy turn-based RPG with 6 races, 4 classes, 15 weapon types, and cross-platform Grudge Studio integration.**
 
-Live at **https://grudgewarlords.com**
+Live at **https://grudgewarlords.com** · Created by **Racalvin The Pirate King** at Grudge Studio.
+
+## Architecture
+
+```
+Browser (grudgewarlords.com)
+   │
+   ├── Static assets ──── Vercel CDN
+   ├── /api/* ─────────── Vercel Serverless Function (api/index.js)
+   │                        ├── Arena, sync, webhooks → Neon PostgreSQL
+   │                        └── ObjectStore data → GitHub Pages CDN
+   │
+   ├── Auth calls ─────── id.grudge-studio.com
+   │                        └── CF Worker → the-engine.up.railway.app
+   │
+   └── Game API ───────── api.grudge-studio.com
+                            └── CF Tunnel → Railway game-api
+```
+
+| Layer | Service | Purpose |
+|-------|---------|--------|
+| **CDN / DNS** | Cloudflare | DNS, Workers, R2 asset storage, edge caching |
+| **Identity** | `id.grudge-studio.com` | Auth (Puter, Discord, Google, GitHub, Phantom, phone, username/password) |
+| **Game API** | `api.grudge-studio.com` | Characters, factions, economy, missions, combat |
+| **Assets** | `assets.grudge-studio.com` | R2 CDN for game assets |
+| **ObjectStore** | `objectstore.grudge-studio.com` | D1 metadata + R2 files for item database |
+| **Frontend** | Vercel (`grudgewarlords.com`) | React/Vite SPA + serverless API function |
+| **Database** | Neon PostgreSQL | Arena, accounts, characters, inventory, islands |
+| **Backend** | Railway (`the-engine`) | Full-stack auth + game portal + GBUX economy |
 
 ## Quick Start
 
 ```bash
 npm install
-cp .env.example .env   # configure DB, Puter, Discord, Crossmint keys
-npm run dev            # local Vite dev server
+cp .env.example .env   # configure DB, auth, Discord keys
+npm run dev            # local Vite dev server on port 5000
 ```
 
-Deployment is handled by Vercel — push to `main` and it auto-deploys.
-
-## Architecture
+## Project Structure
 
 ```
-src/                   # React client (Vite)
-  components/          # TitleScreen, HUD, Arena, Inventory, Island…
-  services/cloudSync.js  # Puter KV auto-sync (debounced 30s)
+src/                        # React client (Vite)
+  components/               # 80+ components: TitleScreen, BattleScreen, WorldMap, HomeIsland…
+  stores/gameStore.js        # Zustand store — 4500+ line combat engine + island + economy
+  data/                      # Canonical game data (races, classes, equipment, skills, enemies)
+  services/                  # Cloud sync, crafting API, grudge API client
+  utils/                     # Auth gateway, API base, studio URLs
 api/
-  index.js             # Vercel serverless Express app (~1700 lines)
-  lib/puter-service.js # Puter KV driver
-vercel.json            # Rewrites /api/* → api/index.js
+  index.js                   # Vercel serverless Express app
+  lib/                       # ObjectStore, S3, Puter, AI agents, UUID service
+vercel.json                  # Rewrites: /api/auth/* → id.grudge-studio.com, /api/* → api.grudge-studio.com
 ```
 
-## API Endpoints
+## Game Systems
 
-All endpoints live in `api/index.js` as a single Vercel serverless function.
+- **6 Races**: Human, Barbarian, Dwarf, Elf, Orc, Undead
+- **4 Classes**: Warrior, Mage Priest, Worge, Ranger
+- **3 Factions**: Crusade, Fabled, Legion (24 race×class combinations)
+- **15 Weapon Types** with per-weapon skill trees
+- **8 Attributes**: Strength, Vitality, Endurance, Dexterity, Agility, Intellect, Wisdom, Tactics
+- **8 Equipment Tiers** (1.0x → 45.0x stat scaling)
+- **5 Professions**: Miner, Forester, Mystic, Chef, Engineer
+- **Turn-based Combat**: Row/column positioning, Grudge meter, companions, totems, transformations
+- **Home Island**: Procedural terrain, building placement, hero deployment, passive resource generation
+- **Arena PvP**: Submit teams, fight ranked opponents, leaderboard
+- **Crafting Suite**: In-app with 5 professions, AFK harvesting, 3,400+ items
+- **World Map**: 30+ zones, roaming dragons, airship encounters, random events
+- **8 Scene Types**: Camp, Dungeon, Trading Post, Open Field, Portal, Boss Walkup, Airship, Home Island
 
-### Auth
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/auth/puter` | Puter token login |
-| POST | `/api/auth/login` | Username/password login |
-| POST | `/api/auth/register` | Create account |
-| GET  | `/api/auth/verify` | Verify session token |
+## Auth Flow
 
-### Cloud Sync
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/sync/push` | Push game state to Puter KV |
-| GET  | `/api/sync/pull` | Pull saved game state |
-
-### Public (no auth, CORS-open)
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/public/player-summary/:grudgeId` | Portable player data (heroes, arena, gold, wallet) |
-| GET | `/api/public/stats` | Platform-wide stats (players, heroes, battles) |
-| GET | `/api/public/leaderboard` | Arena leaderboard |
-| GET | `/api/health` | Health check |
-
-### Arena, Profile, Island, Wallet
-See `api/index.js` for full CRUD — arena teams/battles, character management, island ownership, Crossmint wallet integration.
-
-### Crafting Suite (In-App)
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/crafting/harvest/assign` | Assign hero to AFK harvesting building |
-| POST | `/api/crafting/harvest/collect` | Collect accumulated harvest resources |
-| GET  | `/api/crafting/harvest/state/:grudgeId` | Get current AFK harvest state |
-
-The Crafting Suite (`CraftingSuitePage.jsx`) is an in-app screen accessible from the War Room lobby, Camp scene, and Island sidebar. It provides:
-- **Dashboard** — Profession levels, active crafting jobs, recent activity
-- **Crafting Bench** — Recipe browser with tier/type/profession filters, material check, craft animation
-- **Inventory** — Combined suite + local items/resources with search and tier-colored borders
-- **AFK Harvest** — Deploy idle heroes to island buildings for passive resource generation
-- **Item Database** — Browse 3,400+ items from ObjectStore with tooltips
-- **5 Profession Pages** — Miner, Forester, Mystic, Chef, Engineer with XP bars and recipe lists
-
-Icons are resolved through the ObjectStore CDN (`objectStoreIcons.js`) with fallback to emoji. Tooltips use the shared `GameTooltip` system. Tier names and colors sync with `equipment.js` TIERS. Sidebar is mobile-responsive with collapse/expand.
-
-## Cross-Platform Integration
-
-Grudge Warlords exposes public endpoints consumed by the Grudge Studio site (`public-fawn-nine.vercel.app`) and other Grudge apps.
-
-**CORS-allowed origins:**
-- `https://grudgewarlords.com`
-- `https://public-fawn-nine.vercel.app`
-- `https://grudgestudio.com` / `https://www.grudgestudio.com`
-- `http://localhost:*` (dev)
-
-The `/api/public/player-summary/:grudgeId` endpoint returns a portable snapshot of a player's progress (characters, levels, arena record, gold, resources, wallet status) that any Grudge Studio app can display.
-
-## Database
-
-PostgreSQL with tables: `accounts`, `characters`, `inventory_items`, `crafted_items`, `islands`, `arena_teams`, `arena_battles`.
-
-Key columns on `accounts`: `grudge_id` (UUID, primary), `puter_uuid`, `wallet_address`, `discord_id`.
+All authentication routes through `id.grudge-studio.com` (Cloudflare Worker → Railway).
+Client utility: `src/utils/grudgeGateway.js`
 
 ## Environment Variables
 
 | Variable | Purpose |
 |----------|--------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `PUTER_API_KEY` | Puter cloud KV access |
-| `DISCORD_CLIENT_ID/SECRET` | Discord OAuth |
-| `CROSSMINT_API_KEY` | Wallet creation |
-| `JWT_SECRET` | Session token signing |
+| `GRUDGE_ACCOUNT_DB` | Neon PostgreSQL connection string |
+| `JWT_SECRET` | Session token signing (shared with Railway) |
+| `DISCORD_CLIENT_ID` | Discord OAuth app client ID |
+| `DISCORD_BOT_TOKEN` | Discord bot token |
+| `GAME_API_GRUDA` | Admin API token |
+| `OBJECTSTORE_BASE` | `https://molochdagod.github.io/ObjectStore` |
 
-## Legacy Infrastructure
+## Deployment
 
-The repo also contains VPS deployment scripts (`scripts/`, `deployment/`), Docker config, and a PM2 ecosystem file from the original standalone server setup. These are retained for reference but the active deployment target is Vercel.
+```bash
+git push origin main              # push to GitHub
+npx vercel deploy --prod --yes    # deploy via Vercel CLI
+```
 
-## Cross-App Links
+## Cross-Platform Integration
 
-Centralized in `src/utils/studioUrls.js` with SSO token forwarding:
+| App | URL | Purpose |
+|-----|-----|--------|
+| Grudge Studio | `grudge-studio.com` | Main platform portal |
+| Warlord Crafting Suite | `warlord-crafting-suite.vercel.app` | Crafting editor |
+| GrudgeBuilder | `grudge-builder.vercel.app` | Character builder + game modes |
+| ObjectStore | `molochdagod.github.io/ObjectStore` | Game data CDN |
 
-- **Grudge Builder** (`grudge-builder.vercel.app`) — Character creation, islands, roster management
-- **Crafting Suite** — Now integrated in-app at `/crafting-suite` route (previously external at `warlord-crafting-suite.vercel.app`)
-- **Object Store** (`molochdagod.github.io/ObjectStore`) — Game assets & sprites CDN
+All apps share auth via `id.grudge-studio.com`.
 
-## Standalone Tool Pages
-
-Static HTML pages served from `public/`, accessible without login:
-
-- **[/weapon-skill-tree.html](https://grudgewarlords.com/weapon-skill-tree.html)** — Weapon Skill Atlas: browse all 17 weapon types, 6 variants each, with mastery trees and combat skill loadouts
-- `/arena.html` — Arena browser
-- `/compendium.html` — Game compendium
-- `/hero-codex.html` — Hero codex viewer
-
-### React-Routed Pages
-
-- **[/character](https://grudgewarlords.com/character)** — Character compendium: 6 races, 4 classes with sprite previews and ability breakdowns, 8 attributes, 5 professions, island buildings, arena ranks, and gear overview. Uses ObjectStore icons throughout.
-
-## Related Projects
-
-- **Grudge Studio** (`public-fawn-nine.vercel.app`) — Marketing/studio site, consumes public API
-- **Auth Gateway** (`auth.grudgestudio.com`) — Shared auth service (Discord, username/password, guest)
-- **PuterGrudge** — GrudgeOS dev environment
-
-See [GRUDGE_BEST_PRACTICES.md](GRUDGE_BEST_PRACTICES.md) for cross-project conventions.
+See [ARCHITECTURE.md](ARCHITECTURE.md), [DEPLOYMENT.md](DEPLOYMENT.md), [AGENTS.md](AGENTS.md) for details.
 
 ---
 

@@ -36,20 +36,14 @@ NOTE: The old auth-gateway-otb8qmmyd-grudgenexus.vercel.app is RETIRED. Do NOT u
 
 ---
 
-### VPS Backend Services (all via Cloudflare + Traefik)
+### Backend Services (Cloudflare + Railway)
 
-| Service | URL | Purpose |
-|---------|-----|---------|
-| **Grudge ID (Auth)** | `https://id.grudge-studio.com` | SSO, JWT, OAuth (Discord/Google/GitHub/Phantom/Puter/Phone) |
-| **Game API** | `https://api.grudge-studio.com` | Game logic, AI agents, combat, economy, factions |
-| **Account API** | `https://account.grudge-studio.com` | Profiles, social, achievements |
-| **Asset Service** | `https://assets-api.grudge-studio.com` | Asset upload, metadata, UUID-keyed files |
-| **WebSocket** | `https://ws.grudge-studio.com` | Real-time: `/game`, `/crew`, `/global` namespaces |
-| **Launcher API** | `https://launcher.grudge-studio.com` | App registry & launch tokens |
-| **Wallet Service** | (internal Docker only) | Solana wallet management |
-| **AI Agent** | (internal Docker only) | AI query routing |
-
-**VPS**: `74.208.155.229` — managed via Coolify at port 8000 — **do not expose raw ports**
+| Service | URL | Backend | Purpose |
+|---------|-----|---------|--------|
+| **Identity (Auth)** | `https://id.grudge-studio.com` | CF Worker → Railway | SSO, JWT, OAuth (Discord/Google/GitHub/Phantom/Puter/Phone) |
+| **Game API** | `https://api.grudge-studio.com` | CF Tunnel → Railway | Characters, factions, economy, missions, combat |
+| **Asset CDN** | `https://assets.grudge-studio.com` | CF Worker → R2 | Game assets (sprites, models, audio) |
+| **ObjectStore** | `https://objectstore.grudge-studio.com` | CF Worker → D1+R2 | Item database, metadata, icons |
 
 ---
 
@@ -86,7 +80,7 @@ UUID.isValid(id);  // true
 UUID.parse(id);    // { prefix, timestamp, entityType, ... }
 ```
 
-**VPS** (CommonJS): `services/shared/uuid.js`
+**Backend** (CommonJS): `services/shared/uuid.js`
 ```js
 const { generate, isValid } = require('../../shared/uuid');
 const id = generate('asset', filename);
@@ -110,7 +104,7 @@ const id = generate('asset', filename);
 import { getWeaponIcon, getArmorIcon, OBJECTSTORE_BASE } from '../data/objectStoreIcons.js';
 ```
 
-**VPS helper**: `services/shared/objectStore.js`
+**Backend helper**: `services/shared/objectStore.js`
 ```js
 const { resolveAssetUrl, objectStoreUrl, storageKey } = require('../../shared/objectStore');
 ```
@@ -144,10 +138,9 @@ import { checkGatewayOnBoot, hydrateSessionFromGateway, gatewaySignOut } from '.
 |-----|-------|
 | `GRUDGE_ACCOUNT_DB` | Neon PostgreSQL connection string |
 | `DATABASE_URL` | Same as above |
-| `JWT_SECRET` | Shared with VPS |
-| `GAME_API_GRUDA` | Admin token (same as JWT_SECRET) |
+| `JWT_SECRET` | Shared with Railway |
+| `GAME_API_GRUDA` | Admin token |
 | `SSO_SECRET` | Session secret |
-| `VPS_AUTH_URL` | `https://id.grudge-studio.com` |
 | `DISCORD_CLIENT_ID` | `1471046591220678677` |
 | `DISCORD_BOT_TOKEN` | (set in Vercel) |
 | `DISCORD_GUILD_ID` | `960983121019437076` |
@@ -163,7 +156,7 @@ import { checkGatewayOnBoot, hydrateSessionFromGateway, gatewaySignOut } from '.
 - **Styling**: Inline styles only (no CSS files) — use gold/dark WCS theme (`#FAAC47`, `#DB6331`, `#0a0a12`)
 - **Font**: `'Cinzel'` for headings, `'Jost'` for body
 - **No Replit** — use Vercel for deployments
-- **No Neon directly for new features** — use the VPS backend or Vercel API proxy
+- **No Neon directly for new features** — use the Railway backend or Vercel API proxy
 - Always commit with `Co-Authored-By: Oz <oz-agent@warp.dev>`
 
 ---
@@ -172,7 +165,7 @@ import { checkGatewayOnBoot, hydrateSessionFromGateway, gatewaySignOut } from '.
 `https://grudgewarlords.com/discordauth` — **registered in Discord Developer Portal, do not change**
 
 ## Key Game Entities
-- **Races**: 6 (Human, Elf, Orc, Dwarf, Undead, Worge)
+- **Races**: 6 (Human, Barbarian, Dwarf, Elf, Orc, Undead)
 - **Classes**: Warrior, Mage, Ranger, Worge
 - **Factions**: Crusade, Fabled, Legion
 - **Warlords**: 24 (6 races × 4 classes)
