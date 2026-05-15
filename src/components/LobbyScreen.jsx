@@ -26,6 +26,7 @@ export default function LobbyScreen() {
   const playerRace = useGameStore(s => s.playerRace);
   const playerClass = useGameStore(s => s.playerClass);
   const resetGame = useGameStore(s => s.resetGame);
+  const enterScene = useGameStore(s => s.enterScene);
 
   const [activeTab, setActiveTab] = useState('main');
   const [isMuted, setIsMuted] = useState(() => getMusicMuted());
@@ -218,6 +219,7 @@ export default function LobbyScreen() {
           <NavItem essentialIcon="Cloud" label="DISCORD" active={activeTab === 'discord'} onClick={() => setActiveTab('discord')} />
           <NavItem essentialIcon="File" label="CODEX" active={activeTab === 'codex'} onClick={() => setActiveTab('codex')} />
           <NavItem essentialIcon="Briefcase" label="CRAFTING" active={false} onClick={() => setScreen('craftingSuite')} />
+          <NavItem essentialIcon="Home" label="ISLAND" active={false} onClick={() => enterScene('island', 'lobby')} />
           <div style={{ flex: 1 }} />
           <NavItem essentialIcon="Trophy" label="CREDITS" active={activeTab === 'credits'} onClick={() => setActiveTab('credits')} />
         </div>

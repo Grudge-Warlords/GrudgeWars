@@ -4066,6 +4066,32 @@ const useGameStore = create(persist((set, get) => ({
     const config = ISLAND_BUILDINGS[type];
     if (!config) return { success: false, reason: 'Unknown building type' };
 
+    // Validate placement is on buildable terrain (grass=2, forest=3, mountain=4)
+    const terrain = state.islandTerrain;
+    if (terrain) {
+      const cells = config.size * 4; // 4 grid cells per building unit
+      for (let dy = 0; dy < cells; dy++) {
+        for (let dx = 0; dx < cells; dx++) {
+          const tx = gridX + dx, ty = gridY + dy;
+          if (ty < 0 || ty >= terrain.length || tx < 0 || tx >= (terrain[0]?.length || 0)) {
+            return { success: false, reason: 'Out of bounds' };
+          }
+          if ((terrain[ty]?.[tx] || 0) < 2) {
+            return { success: false, reason: 'Must build on land (not water or beach)' };
+          }
+        }
+      }
+      // Check overlap with existing buildings
+      for (const existing of state.islandBuildings) {
+        const eMeta = ISLAND_BUILDINGS[existing.type];
+        const eCells = (eMeta?.size || 1) * 4;
+        if (gridX < existing.gridX + eCells && gridX + cells > existing.gridX &&
+            gridY < existing.gridY + eCells && gridY + cells > existing.gridY) {
+          return { success: false, reason: 'Overlaps existing building' };
+        }
+      }
+    }
+
     // Check cost against gold + harvestResources (island uses same economy)
     if (config.cost.gold && state.gold < (config.cost.gold || 0)) {
       return { success: false, reason: 'Not enough gold' };
