@@ -471,17 +471,15 @@ function EditorWrapper({ children }) {
 }
 
 // ── Auth constants ──────────────────────────────────────────────────────────
-const VPS_AUTH = 'https://id.grudge-studio.com';
+const AUTH_API = 'https://id.grudge-studio.com';
 const ADMIN_USERNAMES = ['admin', 'grudgewarlord', 'outapps', 'grudachain', 'racalvin'];
 
 // ── Studio Services config ──────────────────────────────────────────────────
 const STUDIO_SERVICES = [
-  { key: 'id', label: 'Identity API', url: 'https://id.grudge-studio.com', health: 'https://id.grudge-studio.com/health', color: '#f59e0b' },
-  { key: 'api', label: 'Game API', url: 'https://api.grudge-studio.com', health: 'https://api.grudge-studio.com/health', color: '#ef4444' },
-  { key: 'account', label: 'Account API', url: 'https://account.grudge-studio.com', health: 'https://account.grudge-studio.com/health', color: '#3b82f6' },
-  { key: 'ws', label: 'WebSocket', url: 'https://ws.grudge-studio.com', health: 'https://ws.grudge-studio.com/health', color: '#8b5cf6' },
-  { key: 'assets', label: 'Asset CDN', url: 'https://assets.grudge-studio.com', health: 'https://assets.grudge-studio.com/health', color: '#06b6d4' },
-  { key: 'launcher', label: 'Launcher', url: 'https://launcher.grudge-studio.com', health: 'https://launcher.grudge-studio.com/health', color: '#10b981' },
+  { key: 'id', label: 'Identity (Railway)', url: 'https://id.grudge-studio.com', health: 'https://id.grudge-studio.com/health', color: '#f59e0b' },
+  { key: 'api', label: 'Game API (Railway)', url: 'https://api.grudge-studio.com', health: 'https://api.grudge-studio.com/health', color: '#ef4444' },
+  { key: 'assets', label: 'Asset CDN (R2)', url: 'https://assets.grudge-studio.com', health: 'https://assets.grudge-studio.com/', color: '#06b6d4' },
+  { key: 'objectstore', label: 'ObjectStore (CF)', url: 'https://objectstore.grudge-studio.com', health: 'https://objectstore.grudge-studio.com/', color: '#3b82f6' },
 ];
 
 const STUDIO_LINKS = [
@@ -511,8 +509,8 @@ export default function AdminDashboard() {
     const token = localStorage.getItem('grudge_session_token') || localStorage.getItem('grudge_auth_token');
     if (!token) { setAuthState('denied'); return; }
 
-    // Verify token with VPS
-    fetch(`${VPS_AUTH}/auth/user`, {
+    // Verify token with identity API
+    fetch(`${AUTH_API}/auth/user`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => r.ok ? r.json() : Promise.reject())
@@ -570,8 +568,8 @@ export default function AdminDashboard() {
         <div style={{ color: '#6b7280', fontSize: '0.85rem' }}>Sign in with a Grudge ID to access the admin dashboard.</div>
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
           <a href="/" style={{ padding: '10px 20px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#ffd700', textDecoration: 'none', fontWeight: 600 }}>Back to Game</a>
-          <button onClick={() => { window.location.href = `${VPS_AUTH}/auth/discord?redirect_uri=${encodeURIComponent(window.location.href)}`; }} style={{ padding: '10px 20px', background: '#5865F222', border: '1px solid #5865F255', borderRadius: 6, color: '#7289da', cursor: 'pointer', fontWeight: 600 }}>Sign in with Discord</button>
-          <button onClick={() => { window.location.href = `${VPS_AUTH}/auth/google?redirect_uri=${encodeURIComponent(window.location.href)}`; }} style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 6, color: '#e2e8f0', cursor: 'pointer', fontWeight: 600 }}>Sign in with Google</button>
+          <button onClick={() => { window.location.href = `${AUTH_API}/auth/discord?redirect_uri=${encodeURIComponent(window.location.href)}`; }} style={{ padding: '10px 20px', background: '#5865F222', border: '1px solid #5865F255', borderRadius: 6, color: '#7289da', cursor: 'pointer', fontWeight: 600 }}>Sign in with Discord</button>
+          <button onClick={() => { window.location.href = `${AUTH_API}/auth/google?redirect_uri=${encodeURIComponent(window.location.href)}`; }} style={{ padding: '10px 20px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 6, color: '#e2e8f0', cursor: 'pointer', fontWeight: 600 }}>Sign in with Google</button>
         </div>
       </div>
     );

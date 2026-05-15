@@ -381,11 +381,11 @@ export default function TitleScreen() {
     setFormLoading(false);
   };
 
-  // Discord — route through VPS directly (avoids needing DISCORD_CLIENT_ID env var on Vercel)
-  const VPS_AUTH = 'https://id.grudge-studio.com';
+  // Discord — route through identity API directly
+  const AUTH_API = 'https://id.grudge-studio.com';
   const handleDiscordLogin = () => {
     setDiscordLoading(true);
-    window.location.href = `${VPS_AUTH}/auth/discord?redirect_uri=${encodeURIComponent(window.location.origin + '/play')}`;
+    window.location.href = `${AUTH_API}/auth/discord?redirect_uri=${encodeURIComponent(window.location.origin + '/play')}`;
   };
 
   const handleSignOut = () => {

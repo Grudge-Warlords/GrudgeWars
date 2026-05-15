@@ -1,13 +1,12 @@
 /**
- * @deprecated This Neon PostgreSQL connection is being migrated to the VPS MySQL backend.
- * All new routes should use backendProxy.js to proxy to api.grudge-studio.com.
- * Arena data → api.grudge-studio.com/arena/*
- * Player islands → api.grudge-studio.com/player-islands/*
- * Characters → api.grudge-studio.com/characters/*
- * Auth → id.grudge-studio.com/auth/*
+ * Vercel Serverless DB — Neon PostgreSQL connection.
+ * Used by the Vercel serverless function (api/index.js) for:
+ *   - Arena teams/battles/leaderboard
+ *   - Player accounts (game-local mirror)
+ *   - Inventory, islands, crafted items
  *
- * This file will be removed once all arena routes are migrated.
- * See: grudge-studio-backend/services/game-api/src/routes/arena.js
+ * Auth is handled by id.grudge-studio.com (Railway via Cloudflare Worker).
+ * Game data API is at api.grudge-studio.com (Railway via Cloudflare Tunnel).
  */
 import pg from 'pg';
 const { Pool } = pg;

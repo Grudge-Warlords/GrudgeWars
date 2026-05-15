@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePhantom, useModal } from '@phantom/react-sdk';
 
-const VPS_AUTH = 'https://id.grudge-studio.com';
+const AUTH_API = 'https://id.grudge-studio.com';
 
 // ── SVG icons ────────────────────────────────────────────────────────────────
 const DiscordSvg = ({ size = 18 }) => (
@@ -304,7 +304,7 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       let grudgeId = null;
       let sessionToken = null;
       try {
-        const r = await fetch(`${VPS_AUTH}/auth/puter`, {
+      const r = await fetch(`${AUTH_API}/auth/puter`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ puterUsername: user.username, puterUuid: user.uuid || null }),
@@ -376,7 +376,7 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
       try {
         let sessionToken = null;
         let grudgeId = null;
-        const r = await fetch(`${VPS_AUTH}/auth/wallet`, {
+        const r = await fetch(`${AUTH_API}/auth/wallet`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ walletAddress: address, walletType: 'solana' }),
@@ -408,22 +408,22 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     })();
   }, [phantomConnected, phantomUser]);
 
-  // ── Discord OAuth (VPS redirect) ────────────────────────────────────────
+  // ── Discord OAuth ──────────────────────────────────────────────────────
   const handleDiscord = () => {
-    window.location.href = `${VPS_AUTH}/auth/discord?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
+    window.location.href = `${AUTH_API}/auth/discord?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
   };
 
-  // ── Google OAuth (VPS redirect) ─────────────────────────────────────────
+  // ── Google OAuth ───────────────────────────────────────────────────────
   const handleGoogle = () => {
-    window.location.href = `${VPS_AUTH}/auth/google?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
+    window.location.href = `${AUTH_API}/auth/google?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
   };
 
-  // ── GitHub OAuth (VPS redirect) ─────────────────────────────────────────
+  // ── GitHub OAuth ───────────────────────────────────────────────────────
   const handleGithub = () => {
-    window.location.href = `${VPS_AUTH}/auth/github?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
+    window.location.href = `${AUTH_API}/auth/github?redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
   };
 
-  // ── Phone Auth (Twilio SMS via VPS) ─────────────────────────────────────────
+  // ── Phone Auth (Twilio SMS) ─────────────────────────────────────────────────
   const [phoneSent, setPhoneSent] = useState(false);
   const [phoneLoading, setPhoneLoading] = useState(false);
 
@@ -431,7 +431,7 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     if (!phone) { setError('Enter phone number'); return; }
     setPhoneLoading(true); setError('');
     try {
-      const r = await fetch(`${VPS_AUTH}/auth/phone-send`, {
+      const r = await fetch(`${AUTH_API}/auth/phone-send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone }),
@@ -447,7 +447,7 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     if (!phone || !phoneCode) { setError('Enter phone and code'); return; }
     setPhoneLoading(true); setError('');
     try {
-      const r = await fetch(`${VPS_AUTH}/auth/phone-verify`, {
+      const r = await fetch(`${AUTH_API}/auth/phone-verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, code: phoneCode }),
@@ -474,7 +474,7 @@ export default function GrudgeAuthModal({ onSuccess, inline = false }) {
     if (!username || !password) { setError('Enter username and password.'); return; }
     setLoading(true); setError('');
     try {
-      const endpoint = tab === 'register' ? `${VPS_AUTH}/auth/register` : `${VPS_AUTH}/auth/login`;
+      const endpoint = tab === 'register' ? `${AUTH_API}/auth/register` : `${AUTH_API}/auth/login`;
       const r = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
