@@ -87,7 +87,7 @@ export function gatewaySignOut() {
  * If not, and `autoRedirect` is true, redirect to gateway immediately.
  */
 export function checkGatewayOnBoot({ autoRedirect = false } = {}) {
-  // Check URL params — VPS OAuth callbacks return ?token=&grudge_id=&provider=
+  // Check URL params — OAuth callbacks return ?token=&grudge_id=&provider=
   // Also support legacy ?grudge_token= and SSO ?sso_token= params.
   const params = new URLSearchParams(window.location.search);
   const returnedToken = params.get('token') || params.get('sso_token') || params.get('grudge_token');

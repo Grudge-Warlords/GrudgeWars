@@ -1,6 +1,6 @@
-# Contributing to Grudge Warlords MMO
+# Contributing to Grudge Warlords
 
-Thank you for your interest in contributing to Grudge Warlords MMO!
+Thank you for your interest in contributing to Grudge Warlords!
 
 ## How to Contribute
 
@@ -8,7 +8,7 @@ Thank you for your interest in contributing to Grudge Warlords MMO!
 
 If you find a bug or have a feature request:
 
-1. Check if the issue already exists in the [Issues](https://github.com/MolochDaGod/StandaloneGrudge/issues) section
+1. Check if the issue already exists in the [Issues](https://github.com/MolochDaGod/GrudgeWars/issues) section
 2. If not, create a new issue with:
    - Clear title and description
    - Steps to reproduce (for bugs)
@@ -29,8 +29,8 @@ If you find a bug or have a feature request:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/StandaloneGrudge.git
-cd StandaloneGrudge
+git clone https://github.com/YOUR_USERNAME/GrudgeWars.git
+cd GrudgeWars
 
 # Install dependencies
 npm install
@@ -44,10 +44,11 @@ npm run dev
 
 ### Code Style
 
-- Follow existing code style
-- Use meaningful variable and function names
-- Add comments for complex logic
-- Keep functions small and focused
+- Inline styles only (no CSS files) — gold/dark WCS theme (`#FAAC47`, `#DB6331`, `#0a0a12`)
+- `'Cinzel'` for headings, `'Jost'` for body
+- React functional components with hooks only
+- ESM (`import`/`export`) in `src/`, CJS in `api/`
+- Always use `assetUrl()` or `getWeaponIcon()` for asset paths — never hardcode URLs
 
 ### Testing
 
@@ -56,19 +57,28 @@ Before submitting a PR:
 - Test all affected functionality
 - Ensure scripts run without errors
 - Verify documentation is updated
-- Check that build succeeds
+- Check that build succeeds (`npm run build`)
 
 ### Areas for Contribution
 
 We welcome contributions in:
 
-- **Server optimization** - Performance improvements
-- **Security enhancements** - Additional security measures
-- **Documentation** - Tutorials, guides, examples
-- **DevOps** - CI/CD, monitoring, logging
-- **Unity integration** - Better Unity server builds
-- **CLI features** - New commands, better AI integration
-- **Testing** - Unit tests, integration tests
+- **Game systems** — Combat, crafting, professions, island mechanics
+- **Sprite & animation** — New character sprites, VFX, animation mappings
+- **UI/UX** — Equipment panel, hotbar, harvest mode, radial menus
+- **Backend integration** — Railway API routes, Cloudflare Workers
+- **Documentation** — Tutorials, guides, system explanations
+- **Testing** — Unit tests, integration tests, load tests
+
+### Architecture
+
+- **Frontend**: React + Vite SPA on Vercel (`grudgewarlords.com`)
+- **Backend**: Railway Docker containers (`api.grudge-studio.com`)
+- **Auth**: Cloudflare Worker → Railway (`id.grudge-studio.com`)
+- **Assets**: Cloudflare R2 CDN (`assets.grudge-studio.com`)
+- **Game data**: ObjectStore on GitHub Pages + Cloudflare Workers
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for full details.
 
 ## Code of Conduct
 
@@ -83,4 +93,4 @@ Feel free to open an issue for questions or reach out to the maintainers.
 
 ---
 
-**May your grudges be eternal! ⚔️**
+*May your grudges be eternal.*

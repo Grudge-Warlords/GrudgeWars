@@ -26,13 +26,22 @@ export default function GameCard({ isLoggedIn }) {
     >
       {/* Background image */}
       <div style={{
-        height: 180, position: 'relative', overflow: 'hidden',
-        backgroundImage: 'url(/images/title-bg.png)',
-        backgroundSize: 'cover', backgroundPosition: 'center top',
+        height: 220, position: 'relative', overflow: 'hidden',
       }}>
+        <img
+          src="/backgrounds/verdant_plains.png"
+          alt=""
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center 30%',
+            filter: hovered ? 'saturate(1.1) brightness(0.55)' : 'saturate(0.8) brightness(0.4)',
+            transition: 'all 0.5s',
+            transform: hovered ? 'scale(1.03)' : 'scale(1)',
+          }}
+        />
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(10,10,18,0.95) 100%)',
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(10,10,18,0.4) 50%, rgba(10,10,18,0.97) 100%)',
         }} />
         {/* Shimmer on hover */}
         {hovered && (

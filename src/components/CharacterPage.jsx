@@ -3,7 +3,7 @@ import PortalHeader from './portal/PortalHeader';
 import SpriteAnimation from './SpriteAnimation';
 import { raceDefinitions, raceList } from '../data/races';
 import { classDefinitions } from '../data/classes';
-import { attributeDefinitions } from '../data/attributes';
+import { attributeDefinitions, calculateStats, calculateCombatPower } from '../data/attributes';
 import { getPlayerSprite } from '../data/spriteMap';
 import {
   getClassSkillIcon,
@@ -16,6 +16,10 @@ import {
   OBJECTSTORE_BASE,
 } from '../data/objectStoreIcons';
 import { BUILDER_URL } from '../utils/studioUrls';
+import {
+  getStartingEquipment, getStartingInventory, getStartingAttributes,
+  EQUIP_SLOT_ORDER, EQUIP_SLOT_LABELS, ATTR_KEYS, STARTING_GOLD,
+} from '../data/startingLoadouts';
 
 // â”€â”€ Shared style constants (matches StudioPortal) â”€â”€
 const GOLD = '#d4a96a';
@@ -511,8 +515,408 @@ function FooterCTAs() {
 // MAIN CHARACTER PAGE
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
+// ── Tab Navigation ──
+
+const TABS = [
+  { id: 'races',      label: 'Races',       color: '#FAAC47' },
+  { id: 'classes',     label: 'Classes',      color: '#ef4444' },
+  { id: 'attributes',  label: 'Attributes',   color: '#3b82f6' },
+  { id: 'crafting',    label: 'Crafting',     color: '#22c55e' },
+  { id: 'island',      label: 'Island',       color: '#ff6b35' },
+  { id: 'gameplay',    label: 'Gameplay',     color: '#a78bfa' },
+  { id: 'avatar',      label: 'Avatar & NFT', color: '#ec4899' },
+];
+
+function TabBar({ activeTab, onTabChange }) {
+  return (
+    <div style={{
+      display: 'flex', gap: 4, padding: '0 24px', maxWidth: 1100, margin: '0 auto',
+      overflowX: 'auto', scrollbarWidth: 'none',
+      borderBottom: `1px solid ${BORDER}`, background: 'rgba(0,0,0,0.3)',
+    }}>
+      {TABS.map(tab => {
+        const active = activeTab === tab.id;
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            style={{
+              padding: '12px 18px', border: 'none', borderRadius: '8px 8px 0 0',
+              background: active ? `${tab.color}18` : 'transparent',
+              color: active ? tab.color : MUTED,
+              fontFamily: "'Cinzel', serif", fontSize: '0.75rem', fontWeight: active ? 700 : 500,
+              letterSpacing: 1, cursor: 'pointer', whiteSpace: 'nowrap',
+              borderBottom: active ? `3px solid ${tab.color}` : '3px solid transparent',
+              transition: 'all 0.2s',
+            }}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Avatar & cNFT Section ──
+
+const ATTR_COLORS = {
+  Strength: '#ef4444', Vitality: '#22c55e', Endurance: '#6b7280', Dexterity: '#f59e0b',
+  Agility: '#06b6d4', Intellect: '#3b82f6', Wisdom: '#a855f7', Tactics: '#64748b',
+};
+
+function AvatarSection() {
+  const [selectedRace, setSelectedRace] = useState('human');
+  const [selectedClass, setSelectedClass] = useState('warrior');
+  const [hue, setHue] = useState(0);
+  const [sat, setSat] = useState(100);
+  const [bright, setBright] = useState(100);
+  const [generating, setGenerating] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [minting, setMinting] = useState(false);
+  const [mintResult, setMintResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  const sprite = getPlayerSprite(selectedClass, selectedRace);
+  const race = raceDefinitions[selectedRace];
+  const cls = classDefinitions[selectedClass];
+
+  // Computed data
+  const startAttrs = getStartingAttributes(cls, race);
+  const startStats = calculateStats(startAttrs, 0);
+  const combatPower = calculateCombatPower(startStats);
+  const equip = getStartingEquipment(selectedClass);
+  const inventory = getStartingInventory(selectedClass);
+
+  // Custom sprite filter
+  const baseFilter = sprite?.filter || '';
+  const customFilter = `${baseFilter} hue-rotate(${hue}deg) saturate(${sat}%) brightness(${bright}%)`;
+  const coloredSprite = sprite ? { ...sprite, filter: customFilter.trim() } : null;
+
+  const handleGenerate = async () => {
+    setGenerating(true);
+    setError(null);
+    setAvatarUrl(null);
+    try {
+      const token = localStorage.getItem('grudge_auth_token');
+      const res = await fetch('https://id.grudge-studio.com/api/auth/user', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error('Sign in to generate avatars');
+      const genRes = await fetch('https://api.grudge-studio.com/api/ai/generate-avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ raceId: selectedRace, classId: selectedClass, style: 'dark fantasy portrait' }),
+      });
+      if (!genRes.ok) { const err = await genRes.json().catch(() => ({})); throw new Error(err.error || 'Avatar generation failed'); }
+      const data = await genRes.json();
+      setAvatarUrl(data.url || data.imageUrl || null);
+    } catch (err) { setError(err.message); }
+    setGenerating(false);
+  };
+
+  const handleMintCNFT = async () => {
+    if (!avatarUrl) return;
+    setMinting(true);
+    setMintResult(null);
+    try {
+      const token = localStorage.getItem('grudge_auth_token');
+      if (!token) throw new Error('Sign in to mint');
+      const res = await fetch('https://api.grudge-studio.com/api/characters/mint-avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ avatarUrl, raceId: selectedRace, classId: selectedClass, spriteFilter: customFilter.trim(), cost: 100 }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Mint failed');
+      setMintResult({ success: true, mintAddress: data.mintAddress });
+    } catch (err) { setMintResult({ success: false, error: err.message }); }
+    setMinting(false);
+  };
+
+  // Slider helper
+  const Slider = ({ label, value, onChange, min, max, unit, color }) => (
+    <div style={{ marginBottom: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: MUTED, marginBottom: 2 }}>
+        <span>{label}</span><span style={{ color }}>{value}{unit}</span>
+      </div>
+      <input type="range" min={min} max={max} value={value} onChange={e => onChange(+e.target.value)}
+        style={{ width: '100%', height: 4, accentColor: color || '#ec4899' }} />
+    </div>
+  );
+
+  return (
+    <section>
+      <SectionHeading sub="Starting loadout, custom 2D sprite, AI avatar generation & cNFT minting">AVATAR & NFT</SectionHeading>
+
+      {/* Row 1: Race/Class selector + 2D Sprite with coloring */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 900, margin: '0 auto 20px' }}>
+        {/* Left: Selector */}
+        <Card accent={race?.color || '#ec4899'}>
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: '0.85rem', color: race?.color || '#ec4899', fontWeight: 700, marginBottom: 12 }}>
+            Select Race & Class
+          </div>
+          <div style={{ marginBottom: 10 }}>
+            <label style={{ fontSize: '0.65rem', color: MUTED, display: 'block', marginBottom: 3 }}>Race</label>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {raceList.map(r => (
+                <button key={r.id} onClick={() => setSelectedRace(r.id)} style={{
+                  padding: '5px 10px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 600, cursor: 'pointer',
+                  background: selectedRace === r.id ? `${r.color}25` : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${selectedRace === r.id ? r.color + '66' : BORDER}`,
+                  color: selectedRace === r.id ? r.color : MUTED,
+                }}>{r.name}</button>
+              ))}
+            </div>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: '0.65rem', color: MUTED, display: 'block', marginBottom: 3 }}>Class</label>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {CLASSES.map(c => (
+                <button key={c.id} onClick={() => setSelectedClass(c.id)} style={{
+                  padding: '5px 10px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 600, cursor: 'pointer',
+                  background: selectedClass === c.id ? `${c.color}25` : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${selectedClass === c.id ? c.color + '66' : BORDER}`,
+                  color: selectedClass === c.id ? c.color : MUTED,
+                }}>{c.name}</button>
+              ))}
+            </div>
+          </div>
+          {/* Sprite coloring sliders */}
+          <div style={{ padding: '10px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: `1px solid ${BORDER}`, marginBottom: 10 }}>
+            <div style={{ fontSize: '0.65rem', color: '#ec4899', fontWeight: 700, marginBottom: 6 }}>2D Sprite Coloring</div>
+            <Slider label="Hue" value={hue} onChange={setHue} min={0} max={360} unit="°" color="#ec4899" />
+            <Slider label="Saturation" value={sat} onChange={setSat} min={0} max={200} unit="%" color="#f59e0b" />
+            <Slider label="Brightness" value={bright} onChange={setBright} min={50} max={150} unit="%" color="#60a5fa" />
+            {(hue !== 0 || sat !== 100 || bright !== 100) && (
+              <button onClick={() => { setHue(0); setSat(100); setBright(100); }} style={{
+                fontSize: '0.6rem', color: MUTED, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline',
+              }}>Reset colors</button>
+            )}
+          </div>
+          {/* Trait */}
+          <div style={{ fontSize: '0.65rem', color: MUTED }}>
+            <span style={{ color: race?.color, fontWeight: 600 }}>{race?.trait}</span> · {race?.passive}
+          </div>
+        </Card>
+
+        {/* Right: 2D Sprite Preview */}
+        <Card accent={cls?.color || '#ec4899'}>
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: '0.85rem', color: cls?.color || '#ec4899', fontWeight: 700, marginBottom: 8 }}>
+            2D Sprite · cNFT Avatar
+          </div>
+          <div style={{
+            height: 200, borderRadius: 10,
+            background: `radial-gradient(circle at 50% 80%, ${cls?.color || '#fff'}15, transparent 70%)`,
+            border: `1px solid ${cls?.color || '#fff'}22`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: 10,
+          }}>
+            {coloredSprite ? (
+              <SpriteAnimation spriteData={coloredSprite} animation="idle" scale={4} speed={150} containerless={false} />
+            ) : (
+              <div style={{ color: MUTED, fontSize: '0.8rem' }}>No sprite</div>
+            )}
+          </div>
+          <div style={{ textAlign: 'center', marginBottom: 10 }}>
+            <span style={{ fontFamily: "'Cinzel', serif", color: race?.color || '#fff', fontSize: '1rem', fontWeight: 700 }}>
+              {race?.name} {cls?.name}
+            </span>
+          </div>
+          {/* 3D note */}
+          <div style={{
+            padding: '8px 12px', borderRadius: 8,
+            background: 'rgba(250,172,71,0.06)', border: '1px solid rgba(250,172,71,0.2)',
+            fontSize: '0.6rem', color: MUTED, textAlign: 'center',
+          }}>
+            This 2D sprite is your cNFT avatar. In 3D game modes, your character is rendered as a <span style={{ color: GOLD_BRIGHT, fontWeight: 700 }}>Grudge6</span> 3D model with matching race, class, and equipment.
+          </div>
+        </Card>
+      </div>
+
+      {/* Row 2: Starting Stats + Equipment + Inventory */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, maxWidth: 900, margin: '0 auto 20px' }}>
+        {/* Starting Attributes */}
+        <Card accent="#3b82f6">
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: '0.8rem', color: '#3b82f6', fontWeight: 700, marginBottom: 10 }}>
+            Starting Stats
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+            {ATTR_KEYS.map(key => {
+              const val = startAttrs[key] || 0;
+              return (
+                <div key={key} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '4px 8px', borderRadius: 5,
+                  background: val > 0 ? `${ATTR_COLORS[key]}10` : 'transparent',
+                  border: `1px solid ${val > 0 ? ATTR_COLORS[key] + '33' : 'transparent'}`,
+                }}>
+                  <span style={{ fontSize: '0.6rem', color: ATTR_COLORS[key], fontWeight: 600 }}>{key.slice(0, 3)}</span>
+                  <span style={{ fontSize: '0.7rem', color: '#e8dcc8', fontWeight: 700 }}>{val}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{
+            marginTop: 8, padding: '6px 8px', borderRadius: 6, textAlign: 'center',
+            background: 'rgba(250,172,71,0.08)', border: '1px solid rgba(250,172,71,0.2)',
+          }}>
+            <div style={{ fontSize: '0.55rem', color: MUTED }}>Combat Power</div>
+            <div style={{ fontSize: '0.9rem', color: GOLD_BRIGHT, fontWeight: 700 }}>{combatPower}</div>
+          </div>
+          <div style={{ marginTop: 6, textAlign: 'center' }}>
+            <span style={{ fontSize: '0.55rem', color: MUTED }}>HP {Math.round(startStats.health)} · MP {Math.round(startStats.mana)} · SP {Math.round(startStats.stamina)}</span>
+          </div>
+        </Card>
+
+        {/* Starting Equipment */}
+        <Card accent="#FAAC47">
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: '0.8rem', color: '#FAAC47', fontWeight: 700, marginBottom: 10 }}>
+            Starting Gear
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {EQUIP_SLOT_ORDER.map(slot => {
+              const item = equip[slot];
+              const isArmor = ['helmet','armor','pants','feet','back'].includes(slot);
+              const iconSrc = item
+                ? (isArmor ? getArmorIcon(slot, 1) : getWeaponIcon(item.icon))
+                : null;
+              return (
+                <div key={slot} style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '5px 8px', borderRadius: 6,
+                  background: item ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.01)',
+                  border: `1px solid ${item ? BORDER : 'rgba(255,255,255,0.05)'}`,
+                  opacity: item ? 1 : 0.35,
+                }}>
+                  {iconSrc ? (
+                    <IconImg src={iconSrc} size={20} />
+                  ) : (
+                    <div style={{ width: 20, height: 20, borderRadius: 3, background: 'rgba(255,255,255,0.05)' }} />
+                  )}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '0.6rem', color: item ? '#e8dcc8' : '#555', fontWeight: 600 }}>
+                      {item ? item.name : '—'}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '0.45rem', color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>{EQUIP_SLOT_LABELS[slot]}</div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+            <span style={{ fontSize: '0.65rem', color: '#ffd700', fontWeight: 700 }}>{STARTING_GOLD}g</span>
+            <span style={{ fontSize: '0.55rem', color: MUTED }}>starting gold</span>
+          </div>
+        </Card>
+
+        {/* Starting Inventory */}
+        <Card accent="#22c55e">
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: '0.8rem', color: '#22c55e', fontWeight: 700, marginBottom: 10 }}>
+            Starting Inventory
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {inventory.map(item => {
+              const catColor = item.category === 'tool' ? '#60a5fa'
+                : item.category === 'consumable' ? (item.cooldown ? '#a78bfa' : '#22c55e')
+                : MUTED;
+              return (
+                <div key={item.id} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '5px 8px', borderRadius: 5,
+                  background: 'rgba(255,255,255,0.03)', border: `1px solid ${BORDER}`,
+                }}>
+                  <div>
+                    <span style={{ fontSize: '0.6rem', color: '#e8dcc8' }}>{item.name}</span>
+                    {item.cooldown && <span style={{ fontSize: '0.45rem', color: '#a78bfa', marginLeft: 4 }}>1hr CD</span>}
+                  </div>
+                  <span style={{
+                    fontSize: '0.55rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4,
+                    background: `${catColor}15`, color: catColor,
+                  }}>{item.qty ? `x${item.qty}` : item.category}</span>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      </div>
+
+      {/* Row 3: Avatar Generation + cNFT Mint */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 900, margin: '0 auto' }}>
+        {/* AI Avatar */}
+        <Card accent="#ec4899">
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: '0.8rem', color: '#ec4899', fontWeight: 700, marginBottom: 10 }}>
+            AI Avatar Generation
+          </div>
+          <div style={{
+            height: 200, borderRadius: 10,
+            background: 'rgba(0,0,0,0.3)', border: `1px solid ${BORDER}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden', marginBottom: 12,
+          }}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Generated avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }} />
+            ) : (
+              <div style={{ textAlign: 'center', color: MUTED, fontSize: '0.75rem' }}>
+                {generating ? 'Generating...' : 'Generate an AI portrait for your character'}
+              </div>
+            )}
+          </div>
+          {error && (
+            <div style={{ padding: '6px 10px', borderRadius: 5, marginBottom: 8, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', fontSize: '0.65rem' }}>{error}</div>
+          )}
+          <button onClick={handleGenerate} disabled={generating} style={{
+            width: '100%', padding: '10px', borderRadius: 8, border: 'none',
+            background: generating ? 'rgba(236,72,153,0.15)' : 'linear-gradient(135deg, #ec4899, #db2777)',
+            color: '#fff', fontFamily: "'Cinzel', serif", fontSize: '0.8rem', fontWeight: 700,
+            letterSpacing: 2, cursor: generating ? 'wait' : 'pointer',
+          }}>
+            {generating ? 'GENERATING...' : 'GENERATE AVATAR'}
+          </button>
+        </Card>
+
+        {/* cNFT Mint */}
+        <Card accent="#a78bfa">
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: '0.8rem', color: '#a78bfa', fontWeight: 700, marginBottom: 10 }}>
+            Mint cNFT
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5, marginBottom: 12 }}>
+            Mint your 2D sprite avatar (with custom coloring) as a compressed NFT on Solana.
+            Your cNFT stores your race, class, starting loadout, and sprite filter.
+            In 3D games, it maps to your <span style={{ color: GOLD_BRIGHT, fontWeight: 600 }}>Grudge6</span> character model.
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <div style={{ fontSize: '0.65rem', color: MUTED }}>Cost</div>
+            <div style={{ padding: '4px 12px', borderRadius: 6, background: 'rgba(250,172,71,0.15)', border: '1px solid rgba(250,172,71,0.3)', color: '#FAAC47', fontSize: '0.75rem', fontWeight: 700 }}>100 GBUX</div>
+          </div>
+          <button onClick={handleMintCNFT} disabled={!avatarUrl || minting} style={{
+            width: '100%', padding: '10px', borderRadius: 8,
+            border: '1px solid rgba(139,92,246,0.4)',
+            background: !avatarUrl ? 'rgba(255,255,255,0.03)' : minting ? 'rgba(139,92,246,0.15)' : 'linear-gradient(135deg, rgba(139,92,246,0.3), rgba(168,85,247,0.2))',
+            color: !avatarUrl ? '#555' : '#a78bfa',
+            fontFamily: "'Cinzel', serif", fontSize: '0.8rem', fontWeight: 700,
+            letterSpacing: 1, cursor: !avatarUrl ? 'not-allowed' : minting ? 'wait' : 'pointer',
+          }}>
+            {minting ? 'MINTING...' : !avatarUrl ? 'GENERATE AVATAR FIRST' : 'MINT cNFT (100 GBUX)'}
+          </button>
+          {mintResult && (
+            <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 5, fontSize: '0.65rem', background: mintResult.success ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${mintResult.success ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, color: mintResult.success ? '#22c55e' : '#ef4444' }}>
+              {mintResult.success ? `Minted! ${mintResult.mintAddress?.slice(0, 8)}...` : mintResult.error}
+            </div>
+          )}
+        </Card>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: 16, fontSize: '0.6rem', color: 'rgba(255,255,255,0.15)' }}>
+        Avatar generation requires VITE_AI_AVATAR_ENABLED=true · cNFT minting requires CROSSMINT_API_KEY and 100 GBUX balance · Sprite color filters are stored on-chain with your cNFT
+      </div>
+    </section>
+  );
+}
+
 export default function CharacterPage() {
   const [session, setSession] = useState(null);
+  const [activeTab, setActiveTab] = useState('races');
 
   useEffect(() => {
     try {
@@ -527,6 +931,19 @@ export default function CharacterPage() {
     setSession(null);
   };
 
+  const renderTab = () => {
+    switch (activeTab) {
+      case 'races': return <RacesSection />;
+      case 'classes': return <ClassesSection />;
+      case 'attributes': return <AttributesSection />;
+      case 'crafting': return <CraftingSection />;
+      case 'island': return <IslandSection />;
+      case 'gameplay': return <GameplaySection />;
+      case 'avatar': return <AvatarSection />;
+      default: return <RacesSection />;
+    }
+  };
+
   return (
     <div style={{
       minHeight: '100vh', width: '100%',
@@ -536,50 +953,42 @@ export default function CharacterPage() {
     }}>
       <PortalHeader session={session} onSignOut={handleSignOut} />
 
-      {/* Hero Banner */}
+      {/* Compact Hero Banner */}
       <div style={{
         position: 'relative', overflow: 'hidden',
-        padding: '48px 24px 40px', textAlign: 'center',
+        padding: '28px 24px 16px', textAlign: 'center',
       }}>
         <div style={{
           position: 'absolute', inset: 0,
           backgroundImage: 'url(/backgrounds/character_create.png)',
           backgroundSize: 'cover', backgroundPosition: 'center',
-          opacity: 0.15, pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, rgba(10,10,18,0.3) 0%, rgba(10,10,18,0.95) 100%)',
-          pointerEvents: 'none',
+          opacity: 0.1, pointerEvents: 'none',
         }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <h1 style={{
             fontFamily: "'LifeCraft', 'Cinzel', serif",
-            fontSize: 'clamp(1.6rem, 4vw, 2.6rem)',
+            fontSize: 'clamp(1.4rem, 3vw, 2rem)',
             background: GOLD_GRADIENT, backgroundSize: '200% auto',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            letterSpacing: 6, margin: '0 0 8px',
-            filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.8))',
+            letterSpacing: 6, margin: 0,
           }}>
-            CHARACTERS OF THE GRUDGE WARS
+            GRUDGE WARLORDS
           </h1>
-          <div style={{ color: MUTED, fontSize: '0.9rem', maxWidth: 550, margin: '0 auto' }}>
-            6 Races &bull; 4 Classes &bull; 5 Professions &bull; 8 Attributes &bull; Islands &bull; AFK Harvesting &bull; Ranked Arena
+          <div style={{ color: MUTED, fontSize: '0.75rem', marginTop: 4 }}>
+            6 Races &bull; 4 Classes &bull; 24 Warlords &bull; 15 Weapons &bull; 8 Tiers
           </div>
         </div>
       </div>
 
-      {/* Main content */}
+      {/* Tab Navigation */}
+      <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {/* Active Tab Content */}
       <main style={{
         flex: 1, maxWidth: 1100, width: '100%', margin: '0 auto',
         padding: '32px 24px',
       }}>
-        <RacesSection />
-        <ClassesSection />
-        <AttributesSection />
-        <CraftingSection />
-        <IslandSection />
-        <GameplaySection />
+        {renderTab()}
         <FooterCTAs />
       </main>
     </div>

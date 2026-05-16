@@ -113,15 +113,19 @@ const { resolveAssetUrl, objectStoreUrl, storageKey } = require('../../shared/ob
 
 ---
 
-## Authentication Component
+## Authentication
 
-**Primary auth UI**: `src/components/GrudgeAuthModal.jsx`
-- Used in `StudioPortal.jsx` (portal at `/`)
-- Buttons: Gateway redirect, Wallet, Discord, Grudge ID form, Puter, Guest
+**No auth wall.** All pages load freely. Auth is handled by:
+1. **Cloudflare Worker** (`id.grudge-studio.com`) — validates JWT on API calls
+2. **Client-side `grudgeGateway.js`** — checks token on boot, hydrates session
+3. **Railway backend** — JWT validation on protected API endpoints
+
+Existing grudge-studio auth (from any app) carries over automatically.
+The landing page (`StudioPortal.jsx`) renders game content directly — no login modal.
 
 **Session bridge**: `src/utils/grudgeGateway.js`
 ```js
-import { checkGatewayOnBoot, hydrateSessionFromGateway, gatewaySignOut } from '../utils/grudgeGateway.js';
+import { checkGatewayOnBoot, isGatewayAuthenticated, gatewaySignOut } from '../utils/grudgeGateway.js';
 ```
 
 **Local session shape** (`localStorage['grudge-session']`):
