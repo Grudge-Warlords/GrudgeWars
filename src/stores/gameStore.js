@@ -16,6 +16,15 @@ import { TOTEM_DEFINITIONS, COMPANION_DEFINITIONS, namedHeroes } from '../data/s
 import { schedulePush, isLoggedIn as cloudIsLoggedIn } from '../services/cloudSync';
 import { API_BASE } from '../utils/apiBase.js';
 import grudgeApi from '../services/grudgeApi.js';
+import {
+  backendCharacterToHero,
+  filterWarlordsCharacters,
+  mergeBackendIntoHero,
+  normalizeClassId,
+  normalizeRaceId,
+  parseCharacterListResponse,
+  pickPrimaryBackendCharacter,
+} from '../utils/characterCanon.js';
 
 function floorTo2(n) { return Math.floor(n * 100) / 100; }
 
@@ -715,11 +724,8 @@ const useGameStore = create(persist((set, get) => ({
       return { success: false, reason: 'already_imported' };
     }
 
-    // Validate race/class — fall back to human/warrior if WCS uses unknown values
-    const validRaces = Object.keys(raceDefinitions);
-    const validClasses = Object.keys(classDefinitions);
-    const raceId = validRaces.includes(wcsChar.raceId) ? wcsChar.raceId : 'human';
-    const classId = validClasses.includes(wcsChar.classId) ? wcsChar.classId : 'warrior';
+    const raceId = normalizeRaceId(wcsChar.raceId || wcsChar.race);
+    const classId = normalizeClassId(wcsChar.classId || wcsChar.class);
 
     // Build attribute points from WCS data or compute from class+race defaults
     const zero = { Strength: 0, Vitality: 0, Endurance: 0, Dexterity: 0, Agility: 0, Intellect: 0, Wisdom: 0, Tactics: 0 };
@@ -816,48 +822,51 @@ const useGameStore = create(persist((set, get) => ({
       let updates = { backendSynced: true, lastBackendSync: Date.now() };
 
       if (charResult.status === 'fulfilled') {
-        const backendChars = (charResult.value?.characters || []);
-        // Merge: update existing heroes by backendId, add new ones not in local roster
-        const localIds = new Set(state.heroRoster.map(h => h.backendId).filter(Boolean));
-        const newFromBackend = backendChars
-          .filter(bc => !localIds.has(bc.id))
-          .map(bc => ({
-            id: `backend_${bc.id}`,
-            backendId: bc.id,
-            name: bc.name,
-            classId: bc.classId,
-            raceId: bc.raceId,
-            level: bc.level || 1,
-            xp: bc.xp || 0,
-            attributePoints: bc.attributePoints || {},
-            unspentPoints: bc.unspentPoints || 0,
-            skillPoints: bc.skillPoints || 0,
-            unlockedSkills: bc.unlockedSkills || {},
-            equipment: bc.equipment || {},
-            currentHealth: bc.currentHealth || 100,
-            currentMana: bc.currentMana || 50,
-            currentStamina: bc.currentStamina || 100,
-            abilityLoadout: bc.abilityLoadout || null,
-            source: 'backend',
-          }));
+        const backendChars = filterWarlordsCharacters(
+          parseCharacterListResponse(charResult.value)
+        );
 
-        // Update existing heroes that have backendIds
+        const localBackendIds = new Set(state.heroRoster.map(h => h.backendId).filter(Boolean));
+
         const updatedRoster = state.heroRoster.map(hero => {
           if (!hero.backendId) return hero;
-          const bc = backendChars.find(c => c.id === hero.backendId);
-          if (!bc) return hero;
-          return {
-            ...hero,
-            level: bc.level || hero.level,
-            xp: bc.xp || hero.xp,
-            unspentPoints: bc.unspentPoints ?? hero.unspentPoints,
-            skillPoints: bc.skillPoints ?? hero.skillPoints,
-          };
+          const bc = backendChars.find(c => String(c.id) === String(hero.backendId));
+          return bc ? mergeBackendIntoHero(hero, bc) : hero;
         });
 
-        const merged = [...updatedRoster, ...newFromBackend];
+        const newFromBackend = backendChars
+          .filter(bc => !localBackendIds.has(bc.id))
+          .map(bc => backendCharacterToHero(bc));
+
+        let merged = [...updatedRoster, ...newFromBackend];
+
+        // Empty local roster → hydrate entirely from account characters (same as Builder/WCS)
+        if (merged.length === 0 && newFromBackend.length > 0) {
+          merged = newFromBackend;
+        }
+
         updates.heroRoster = merged;
-        updates.maxHeroSlots = Math.max(state.maxHeroSlots, merged.length);
+        updates.maxHeroSlots = Math.max(state.maxHeroSlots, merged.length, 15);
+
+        const primary = pickPrimaryBackendCharacter(backendChars);
+        if (primary) {
+          const primaryHero = merged.find(h => String(h.backendId) === String(primary.id));
+          if (primaryHero) {
+            const rosterWasEmpty = state.heroRoster.length === 0;
+            const noLocalIdentity = !state.playerRace || !state.playerClass;
+            const activeUsesPrimary = state.activeHeroIds?.includes(primaryHero.id);
+            if (rosterWasEmpty || noLocalIdentity || activeUsesPrimary) {
+              updates.playerRace = primaryHero.raceId;
+              updates.playerClass = primaryHero.classId;
+              updates.playerName = primaryHero.name || state.playerName;
+              updates.level = primaryHero.level || state.level;
+              updates.xp = primaryHero.xp ?? state.xp;
+            }
+            if (!state.activeHeroIds?.length) {
+              updates.activeHeroIds = [primaryHero.id];
+            }
+          }
+        }
       }
 
       if (balResult.status === 'fulfilled') {
@@ -912,8 +921,8 @@ const useGameStore = create(persist((set, get) => ({
       // computes final stats as: base(10) + race bonuses + class starting + manual.
       const result = await grudgeApi.characters.create({
         name: hero.name,
-        classId: hero.classId,
-        raceId: hero.raceId,
+        classId: normalizeClassId(hero.classId),
+        raceId: normalizeRaceId(hero.raceId),
         manualAttributes: hero.attributePoints || {},
         gameOrigin: 'grudge-wars',
       });

@@ -7,12 +7,14 @@
  * 2. Export: Save GRUDA-Wars characters/progress back to grudgewarlords.com
  */
 
+import { backendCharacterToHero } from './characterCanon.js';
+
 // Platform URLs
 const GRUDGE_PLATFORM_URL = 'https://grudgewarlords.com';
 const GRUDA_WARS_URL = 'https://gruda-wars.vercel.app';
 
-// Storage keys
-const SYNC_TOKEN_KEY = 'grudge_sync_token';
+// Canonical auth — LANGUAGE_RULES.md: grudge_auth_token only
+const AUTH_TOKEN_KEY = 'grudge_auth_token';
 const SYNC_USER_KEY = 'grudge_sync_user';
 const IMPORTED_CHARACTERS_KEY = 'grudge_imported_characters';
 
@@ -39,14 +41,19 @@ export const CLASS_MAP = {
   'cleric': 'mage',   // Cleric can play as Mage
 };
 
-// Race mapping
+// Race mapping — prefer characterCanon for new code; kept for legacy import/export helpers
 export const RACE_MAP = {
   'human': 'human',
-  'orc': 'orc', 
+  'orc': 'orc',
   'elf': 'elf',
   'undead': 'undead',
   'dwarf': 'dwarf',
+  'barbarian': 'barbarian',
   'goblin': 'goblin',
+  wk: 'human',
+  brb: 'barbarian',
+  dwf: 'dwarf',
+  ud: 'undead',
 };
 
 // ============================================================================
@@ -57,7 +64,7 @@ export const RACE_MAP = {
  * Check if user is connected to grudgewarlords.com
  */
 export function isConnected() {
-  return !!localStorage.getItem(SYNC_TOKEN_KEY);
+  return !!localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
 /**
@@ -97,7 +104,7 @@ export function connectToPlatform() {
         window.removeEventListener('message', handleMessage);
         
         // Store auth data
-        localStorage.setItem(SYNC_TOKEN_KEY, event.data.token);
+        localStorage.setItem(AUTH_TOKEN_KEY, event.data.token);
         localStorage.setItem(SYNC_USER_KEY, JSON.stringify(event.data.user));
         
         popup.close();
@@ -124,7 +131,6 @@ export function connectToPlatform() {
  * Disconnect from platform
  */
 export function disconnect() {
-  localStorage.removeItem(SYNC_TOKEN_KEY);
   localStorage.removeItem(SYNC_USER_KEY);
   localStorage.removeItem(IMPORTED_CHARACTERS_KEY);
 }
@@ -137,13 +143,13 @@ export function disconnect() {
  * Fetch characters from grudgewarlords.com
  */
 export async function fetchPlatformCharacters() {
-  const token = localStorage.getItem(SYNC_TOKEN_KEY);
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
   if (!token) {
-    throw new Error('Not connected to grudgewarlords.com');
+    throw new Error('Not signed in — use id.grudge-studio.com SSO');
   }
 
   try {
-    const response = await fetch(`${GRUDGE_PLATFORM_URL}/api/characters`, {
+    const response = await fetch('https://api.grudge-studio.com/api/characters', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -159,7 +165,7 @@ export async function fetchPlatformCharacters() {
     }
 
     const data = await response.json();
-    return data.characters || [];
+    return Array.isArray(data) ? data : (data.characters || []);
   } catch (error) {
     console.error('[GrudgeSync] Fetch characters error:', error);
     throw error;
@@ -170,35 +176,14 @@ export async function fetchPlatformCharacters() {
  * Convert a grudgewarlords.com character to GRUDA-Wars format
  */
 export function convertToGrudaWarsFormat(platformCharacter) {
-  const classId = CLASS_MAP[platformCharacter.classId] || platformCharacter.classId;
-  const raceId = RACE_MAP[platformCharacter.raceId] || platformCharacter.raceId;
-  
-  // Convert attributes from platform format to GRUDA-Wars format
-  const attributes = platformCharacter.attributes || {};
-  const attributePoints = {};
-  
-  STANDARD_ATTRIBUTES.forEach(attr => {
-    const key = attr.charAt(0).toUpperCase() + attr.slice(1).toLowerCase();
-    attributePoints[key] = attributes[attr.toLowerCase()] || attributes[attr] || 5;
-  });
+  const hero = backendCharacterToHero(platformCharacter);
+  const structuredEquip = convertEquipment(platformCharacter.equipment || {});
 
   return {
+    ...hero,
     id: `import_${platformCharacter.id}`,
     platformId: platformCharacter.id,
-    name: platformCharacter.name,
-    classId: classId,
-    raceId: raceId,
-    level: platformCharacter.level || 1,
-    xp: platformCharacter.xp || 0,
-    attributePoints: attributePoints,
-    unspentPoints: platformCharacter.unspentAttributePoints || 0,
-    skillPoints: platformCharacter.skillPoints || 1,
-    unlockedSkills: {},
-    equipment: convertEquipment(platformCharacter.equipment || {}),
-    currentHealth: platformCharacter.hp || 100,
-    currentMana: platformCharacter.mana || 50,
-    currentStamina: platformCharacter.stamina || 100,
-    abilityLoadout: null,
+    equipment: Object.keys(structuredEquip).length ? structuredEquip : hero.equipment,
     imported: true,
     importedAt: Date.now(),
     lastSyncedAt: Date.now(),
@@ -341,9 +326,9 @@ function convertEquipmentToPlatform(grudaWarsEquipment) {
  * Export a GRUDA-Wars character to grudgewarlords.com
  */
 export async function exportCharacter(grudaWarsCharacter) {
-  const token = localStorage.getItem(SYNC_TOKEN_KEY);
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
   if (!token) {
-    throw new Error('Not connected to grudgewarlords.com');
+    throw new Error('Not signed in — use id.grudge-studio.com SSO');
   }
 
   const platformCharacter = convertToPlatformFormat(grudaWarsCharacter);
@@ -391,9 +376,9 @@ export async function syncProgress(grudaWarsCharacter) {
     return exportCharacter(grudaWarsCharacter);
   }
 
-  const token = localStorage.getItem(SYNC_TOKEN_KEY);
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
   if (!token) {
-    throw new Error('Not connected to grudgewarlords.com');
+    throw new Error('Not signed in — use id.grudge-studio.com SSO');
   }
 
   const updates = {

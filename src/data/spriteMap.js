@@ -1,3 +1,5 @@
+import { normalizeClassId, normalizeRaceId } from '../utils/characterCanon.js';
+
 export const classSpriteMap = {
   warrior: {
     folder: 'knight',
@@ -2006,17 +2008,20 @@ export const weaponSkillEffectMap = {
 };
 
 export function getRaceClassSprite(raceId, classId) {
-  const raceMap = raceClassSpriteMap[raceId];
-  if (raceMap && raceMap[classId]) return raceMap[classId];
-  return classSpriteMap[classId] || classSpriteMap.warrior;
+  const race = normalizeRaceId(raceId);
+  const cls = normalizeClassId(classId);
+  const raceMap = raceClassSpriteMap[race];
+  if (raceMap && raceMap[cls]) return raceMap[cls];
+  return classSpriteMap[cls] || classSpriteMap.warrior;
 }
 
 export function getPlayerSprite(classId, raceId, namedHeroId) {
   if (namedHeroId && namedHeroes[namedHeroId]) {
     return namedHeroes[namedHeroId].sprite;
   }
-  if (raceId) return getRaceClassSprite(raceId, classId);
-  return classSpriteMap[classId] || classSpriteMap.warrior;
+  const cls = normalizeClassId(classId);
+  if (raceId) return getRaceClassSprite(raceId, cls);
+  return classSpriteMap[cls] || classSpriteMap.warrior;
 }
 
 export function getWorgTransformSprite(raceId, namedHeroId) {

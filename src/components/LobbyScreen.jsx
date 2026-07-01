@@ -2,7 +2,8 @@
 import useGameStore from '../stores/gameStore';
 import { InlineIcon, EssentialIcon } from '../data/uiSprites';
 import SpriteAnimation from './SpriteAnimation';
-import { getRaceClassSprite, worgTransformSprite, worgBearTransformSprite, eliteTransformSprites, warriorTransformSprite, mageTransformSprites, effectSprites, spriteSheets } from '../data/spriteMap';
+import { getRaceClassSprite, getPlayerSprite, worgTransformSprite, worgBearTransformSprite, eliteTransformSprites, warriorTransformSprite, mageTransformSprites, effectSprites, spriteSheets } from '../data/spriteMap';
+import { resolveHeroClassId, resolveHeroRaceId } from '../utils/characterCanon';
 import { raceDefinitions } from '../data/races';
 import { classDefinitions } from '../data/classes';
 import {
@@ -1342,9 +1343,11 @@ function HeroSlideshow() {
     const attackFrames = Math.min(spriteData?.[chosenAttack]?.frames || 8, maxFrames);
     const attackDuration = attackFrames * 80;
 
-    const isArcaneArcher = comboId === 'human_ranger';
+    const isHumanRanger = comboId === 'human_ranger';
+    const hasFullArcaneSeq = spriteData?.jump && spriteData?.doublejump && spriteData?.wallslide;
+    const hasJumpAttackSeq = spriteData?.jump && spriteData?.attack1;
 
-    if (isArcaneArcher && spriteData?.jump && spriteData?.doublejump && spriteData?.wallslide) {
+    if (isHumanRanger && hasFullArcaneSeq) {
       addTimer(() => {
         setAnim('idle');
         setTextVisible(true);
@@ -1456,6 +1459,62 @@ function HeroSlideshow() {
         setShowBubble(false);
         setSpriteY(0);
         setSpriteRotation(0);
+        addTimer(() => setIndex(prev => (prev + 1) % ALL_COMBOS.length), 600);
+      }, attackStart + atkDuration + 3000);
+    } else if (isHumanRanger && hasJumpAttackSeq) {
+      const restX = 22;
+      const shotX = 58;
+
+      addTimer(() => {
+        setAnim('idle');
+        setTextVisible(true);
+        setAuraIntensity(1);
+      }, walkDuration);
+
+      const jumpStart = walkDuration + 600;
+      const jumpDuration = 500;
+      const jumpStep = 16;
+      addTimer(() => {
+        setAnim('jump');
+        let jElapsed = 0;
+        const jInterval = setInterval(() => {
+          jElapsed += jumpStep;
+          const p = Math.min(jElapsed / jumpDuration, 1);
+          const arcY = Math.sin(p * Math.PI) * 100;
+          setSpriteY(arcY);
+          setSpriteX(restX + (shotX - restX) * p);
+          if (p >= 1) clearInterval(jInterval);
+        }, jumpStep);
+        intervalRefs.current.push(jInterval);
+      }, jumpStart);
+
+      const attackStart = jumpStart + jumpDuration;
+      const atkFrames = Math.min(spriteData?.attack1?.frames || 14, maxFrames);
+      const atkDuration = atkFrames * 80;
+      addTimer(() => {
+        setSpriteY(0);
+        setAnim('attack1');
+        addTimer(() => {
+          setShowVfx(true);
+          setDummyAnim('hurt');
+          setDummyShake(1);
+          addTimer(() => setDummyShake(0), 300);
+          addTimer(() => setDummyAnim('idle'), 400);
+        }, 150);
+      }, attackStart);
+
+      addTimer(() => {
+        setAnim('idle');
+        setShowVfx(false);
+        setSpriteX(shotX);
+      }, attackStart + atkDuration + 100);
+
+      addTimer(() => setShowBubble(true), attackStart + atkDuration + 300);
+
+      addTimer(() => {
+        setPhase('exit');
+        setShowBubble(false);
+        setSpriteY(0);
         addTimer(() => setIndex(prev => (prev + 1) % ALL_COMBOS.length), 600);
       }, attackStart + atkDuration + 3000);
     } else {
@@ -2177,16 +2236,19 @@ function HeroStatBar({ label, current, max, color, icon }) {
 
 function HeroCard({ hero, panelStyle, expanded, onToggle }) {
   const [hovered, setHovered] = useState(false);
+  const raceId = resolveHeroRaceId(hero);
+  const classId = resolveHeroClassId(hero);
   const rec = hero.battleRecord || { wins: 0, losses: 0, kills: 0, bossKills: 0, damageDealt: 0, healingDone: 0 };
-  const raceDef = raceDefinitions[hero.race] || {};
-  const classDef = classDefinitions[hero.classId] || {};
+  const raceDef = raceDefinitions[raceId] || {};
+  const classDef = classDefinitions[classId] || {};
   const totalBattles = rec.wins + rec.losses;
   const winRate = totalBattles > 0 ? Math.round((rec.wins / totalBattles) * 100) : 0;
   const equipCount = hero.equipment ? Object.keys(hero.equipment).filter(k => hero.equipment[k]).length : 0;
 
   const raceColor = {
-    human: '#6ee7b7', elf: '#93c5fd', dwarf: '#f59e0b', orc: '#ef4444', worge: '#a78bfa', undead: '#94a3b8'
-  }[hero.race] || '#fff';
+    human: '#6ee7b7', elf: '#93c5fd', dwarf: '#f59e0b', orc: '#ef4444',
+    barbarian: '#f97316', undead: '#94a3b8', goblin: '#84cc16',
+  }[raceId] || '#fff';
 
   return (
     <div
@@ -2211,7 +2273,7 @@ function HeroCard({ hero, panelStyle, expanded, onToggle }) {
           position: 'relative',
         }}>
           <SpriteAnimation
-            spriteData={getRaceClassSprite(hero.race, hero.classId)}
+            spriteData={getPlayerSprite(classId, raceId, hero.namedHeroId)}
             animation="idle"
             scale={0.55}
             containerless={false}
@@ -2228,7 +2290,7 @@ function HeroCard({ hero, panelStyle, expanded, onToggle }) {
             <div>
               <span className="font-cinzel" style={{ color: '#fff', fontSize: '0.95rem' }}>{hero.name}</span>
               <span style={{ color: 'var(--muted)', fontSize: '0.7rem', marginLeft: 8 }}>
-                {raceDef.name || hero.race} {classDef.name || hero.classId}
+                {raceDef.name || raceId} {classDef.name || classId}
               </span>
             </div>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
