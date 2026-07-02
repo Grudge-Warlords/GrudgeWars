@@ -12,6 +12,9 @@ export const CRAFTING_SUITE_URL = 'https://warlord-crafting-suite.vercel.app';
 // Object Store (static CDN) — no trailing slash
 export const OBJECT_STORE_URL = 'https://molochdagod.github.io/ObjectStore';
 
+// Gruda Wars — 2D war-room client (sibling Vercel project, same repo/build)
+export const GRUDA_WARS_URL = 'https://gruda-wars.vercel.app';
+
 // Grudge Wars API — backend for asset resolution, game data, accounts
 export const GRUDGE_API_URL = window.location.origin.includes('localhost')
   ? '' // Same origin in dev

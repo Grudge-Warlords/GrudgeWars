@@ -17,6 +17,14 @@ npx vercel deploy --prod --yes
 
 The Vercel project is `grudgenexus/grudge-wars`. Domain: `grudgewarlords.com`.
 
+**Sibling project:** `grudgenexus/gruda-wars` → `https://gruda-wars.vercel.app` (same repo, war-room / 2D client). It does not auto-deploy from GitHub unless connected in the Vercel dashboard. After `main` changes, redeploy:
+
+```bash
+# Link once (creates .vercel/ — gitignored)
+npx vercel link --scope grudgenexus --project gruda-wars --yes
+npx vercel deploy --prod --yes
+```
+
 ## Deploy Auth Worker (Cloudflare)
 
 The `grudge-identity-api` Worker proxies auth requests to Railway.

@@ -8,10 +8,10 @@
  */
 
 import { backendCharacterToHero } from './characterCanon.js';
+import { GRUDA_WARS_URL } from './studioUrls.js';
 
 // Platform URLs
 const GRUDGE_PLATFORM_URL = 'https://grudgewarlords.com';
-const GRUDA_WARS_URL = 'https://gruda-wars.vercel.app';
 
 // Canonical auth — LANGUAGE_RULES.md: grudge_auth_token only
 const AUTH_TOKEN_KEY = 'grudge_auth_token';

@@ -1,0 +1,22 @@
+name: Deploy gruda-wars
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Deploy to gruda-wars
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: team_VZ7uiFGiR9QBdqtzne04xygG
+          vercel-project-id: prj_9ShOGn3lQ3Nfe41obrwDoJbsfosl
+          vercel-args: '--prod'
