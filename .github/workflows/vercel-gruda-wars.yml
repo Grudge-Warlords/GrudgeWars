@@ -1,6 +1,13 @@
 name: Deploy gruda-wars
 
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/railway-deploy.yml'
+      - '.github/workflows/deploy-vps.yml'
   workflow_dispatch:
 
 jobs:
