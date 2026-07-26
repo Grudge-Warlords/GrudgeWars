@@ -35,10 +35,8 @@ export function isGatewayAuthenticated() {
 // ── Redirect to gateway ───────────────────────────────────────────────────────
 export function redirectToGateway(returnUrl) {
   const ret = returnUrl || window.location.href;
-  // Use SSO check — id.grudge-studio.com reads the grudge_sso cookie and
-  // redirects back with ?sso_token= if valid, or ?sso_required=true if not.
-  // If sso_required, bounce to the client portal login page.
-  window.location.href = `${GATEWAY_URL}/auth/sso-check?return=${encodeURIComponent(ret)}`;
+  // Canonical login — /login?redirect_uri= (sso-check optional after probe:auth passes)
+  window.location.href = `${GATEWAY_URL}/login?redirect_uri=${encodeURIComponent(ret)}`;
 }
 
 // ── Map gateway session → grudge-wars local session format ────────────────────
