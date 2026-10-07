@@ -14,13 +14,15 @@
     "dev:server": "node server.js",
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\"",
     "check:favicons": "pwsh -File scripts/check-favicons.ps1",
-    "build": "vite build",
-    "build:vercel": "vite build",
+    "build": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\grudgegit\\GrudgeWars/Build-Workspace.ps1\" -PackageRelative \".\" -Script \"build\" -NoLaunchPrompt",
+    "build:vercel": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\grudgegit\\GrudgeWars/Build-Workspace.ps1\" -PackageRelative \".\" -Script \"build:vercel\" -NoLaunchPrompt",
     "predeploy": "pwsh -File scripts/check-favicons.ps1",
     "start": "node server.js",
     "preview": "npm run build && wrangler dev",
     "export:skills": "node scripts/export-skill-trees.js",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "workspace:build": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\grudgegit\\GrudgeWars/Build-Workspace.ps1\"",
+    "workspace:menu": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\grudgegit\\GrudgeWars/Project-Console.ps1\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1007.0",
